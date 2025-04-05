@@ -38,25 +38,37 @@ namespace teams_phonemanager.ViewModels
                 IsBusy = true;
                 _loggingService.Log("Checking PowerShell modules...", LogLevel.Info);
 
-                // Simple command to check if modules are available
+                // Command to check and install modules if needed
                 var command = @"
 $ErrorActionPreference = 'Stop'
 $output = @()
 
-# Check MicrosoftTeams module
-$teamsModule = Get-Module -ListAvailable -Name MicrosoftTeams
-if ($teamsModule) {
+# Check and install MicrosoftTeams module
+if (Get-Module -ListAvailable -Name MicrosoftTeams) {
+    $teamsModule = Get-Module -ListAvailable -Name MicrosoftTeams
     $output += 'MicrosoftTeams module is available: ' + $teamsModule.Version
 } else {
-    $output += 'MicrosoftTeams module is NOT available'
+    $output += 'MicrosoftTeams module is NOT available, attempting to install...'
+    try {
+        Install-Module -Name MicrosoftTeams -Force -AllowClobber
+        $output += 'MicrosoftTeams module installed successfully'
+    } catch {
+        $output += 'ERROR: Failed to install MicrosoftTeams module: ' + $_.Exception.Message
+    }
 }
 
-# Check Microsoft.Graph module
-$graphModule = Get-Module -ListAvailable -Name Microsoft.Graph
-if ($graphModule) {
+# Check and install Microsoft.Graph module
+if (Get-Module -ListAvailable -Name Microsoft.Graph) {
+    $graphModule = Get-Module -ListAvailable -Name Microsoft.Graph
     $output += 'Microsoft.Graph module is available: ' + $graphModule.Version
 } else {
-    $output += 'Microsoft.Graph module is NOT available'
+    $output += 'Microsoft.Graph module is NOT available, attempting to install...'
+    try {
+        Install-Module -Name Microsoft.Graph -Force
+        $output += 'Microsoft.Graph module installed successfully'
+    } catch {
+        $output += 'ERROR: Failed to install Microsoft.Graph module: ' + $_.Exception.Message
+    }
 }
 
 $output | ForEach-Object { Write-Host $_ }
@@ -64,14 +76,14 @@ $output | ForEach-Object { Write-Host $_ }
 
                 var result = await _powerShellService.ExecuteCommandAsync(command);
                 
-                // Check if both modules are available
-                ModulesChecked = result.Contains("MicrosoftTeams module is available") && 
-                                result.Contains("Microsoft.Graph module is available");
+                // Check if both modules are available or were successfully installed
+                ModulesChecked = (result.Contains("MicrosoftTeams module is available") || result.Contains("MicrosoftTeams module installed successfully")) && 
+                                (result.Contains("Microsoft.Graph module is available") || result.Contains("Microsoft.Graph module installed successfully"));
                 
                 if (ModulesChecked)
                 {
                     _loggingService.Log("PowerShell modules are available", LogLevel.Success);
-                    // Log the module versions
+                    // Log the module versions and installation status
                     foreach (var line in result.Split('\n'))
                     {
                         if (!string.IsNullOrWhiteSpace(line))
@@ -82,7 +94,7 @@ $output | ForEach-Object { Write-Host $_ }
                 }
                 else
                 {
-                    var errorMessage = "One or more required modules are not available";
+                    var errorMessage = "One or more required modules could not be installed";
                     _loggingService.Log(errorMessage, LogLevel.Error);
                 }
             }
@@ -166,7 +178,7 @@ catch {
 
                 var command = @"
 try {
-    Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All, Group.ReadWrite.All, Directory.ReadWrite.All -ErrorAction Stop
+    Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All, Group.ReadWrite.All, Directory.ReadWrite.All -ErrorAction Stop -NoWelcome
     $context = Get-MgContext -ErrorAction Stop
     if ($context) {
         Write-Host 'SUCCESS: Connected to Microsoft Graph'
