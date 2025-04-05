@@ -1,0 +1,16 @@
+# Build output
+.cursor/
+bin/
+obj/
+*.exe
+*.dll
+
+# User settings
+*.user
+*.suo
+
+# VS-specific folders
+.vs/
+
+# Publish folders
+publish/
