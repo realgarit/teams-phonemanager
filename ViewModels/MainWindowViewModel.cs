@@ -33,7 +33,7 @@ namespace teams_phonemanager.ViewModels
         private bool _isLogExpanded;
 
         [ObservableProperty]
-        private string _version = "Version 1.0.0";
+        private string _version = "Version 1.5.4";
 
         public MainWindowViewModel()
         {
