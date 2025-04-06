@@ -68,21 +68,21 @@ namespace teams_phonemanager.Models
             set => SetField(ref _customerGroupName, value);
         }
 
-        private string _languageId = "de-DE";
+        private string _languageId = string.Empty;
         public string LanguageId
         {
             get => _languageId;
             set => SetField(ref _languageId, value);
         }
 
-        private string _timeZoneId = "W. Europe Standard Time";
+        private string _timeZoneId = string.Empty;
         public string TimeZoneId
         {
             get => _timeZoneId;
             set => SetField(ref _timeZoneId, value);
         }
 
-        private string _usageLocation = "CH";
+        private string _usageLocation = string.Empty;
         public string UsageLocation
         {
             get => _usageLocation;
@@ -112,7 +112,7 @@ namespace teams_phonemanager.Models
             set => SetField(ref _csAppAaId, value);
         }
 
-        private string _raaAnrName = "hn";
+        private string _raaAnrName = string.Empty;
         public string RaaAnrName
         {
             get => _raaAnrName;
@@ -126,7 +126,7 @@ namespace teams_phonemanager.Models
             set => SetField(ref _raaAnr, value);
         }
 
-        private string _phoneNumberType = "DirectRouting";
+        private string _phoneNumberType = string.Empty;
         public string PhoneNumberType
         {
             get => _phoneNumberType;
@@ -147,28 +147,28 @@ namespace teams_phonemanager.Models
             set => SetField(ref _afterHoursCallFlowGreetingPromptDE, value);
         }
 
-        private TimeSpan _openingHours1Start = new TimeSpan(8, 0, 0);
+        private TimeSpan _openingHours1Start = new TimeSpan(0, 0, 0);
         public TimeSpan OpeningHours1Start
         {
             get => _openingHours1Start;
             set => SetField(ref _openingHours1Start, value);
         }
 
-        private TimeSpan _openingHours1End = new TimeSpan(12, 0, 0);
+        private TimeSpan _openingHours1End = new TimeSpan(0, 0, 0);
         public TimeSpan OpeningHours1End
         {
             get => _openingHours1End;
             set => SetField(ref _openingHours1End, value);
         }
 
-        private TimeSpan _openingHours2Start = new TimeSpan(13, 30, 0);
+        private TimeSpan _openingHours2Start = new TimeSpan(0, 0, 0);
         public TimeSpan OpeningHours2Start
         {
             get => _openingHours2Start;
             set => SetField(ref _openingHours2Start, value);
         }
 
-        private TimeSpan _openingHours2End = new TimeSpan(17, 0, 0);
+        private TimeSpan _openingHours2End = new TimeSpan(0, 0, 0);
         public TimeSpan OpeningHours2End
         {
             get => _openingHours2End;
