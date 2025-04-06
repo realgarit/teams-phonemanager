@@ -8,10 +8,12 @@ namespace teams_phonemanager.ViewModels
     public partial class WelcomeViewModel : ViewModelBase
     {
         private readonly LoggingService _loggingService;
+        private readonly MainWindowViewModel _mainWindowViewModel;
 
         public WelcomeViewModel()
         {
             _loggingService = LoggingService.Instance;
+            _mainWindowViewModel = App.Current.MainWindow.DataContext as MainWindowViewModel;
             _loggingService.Log("Welcome page loaded", LogLevel.Info);
         }
 
@@ -21,7 +23,7 @@ namespace teams_phonemanager.ViewModels
         [RelayCommand]
         private void NavigateToGetStarted()
         {
-            // This will be handled by the parent MainWindowViewModel
+            _mainWindowViewModel?.NavigateToCommand.Execute("GetStarted");
             _loggingService.Log("Navigating to Get Started page", LogLevel.Info);
         }
 

@@ -11,6 +11,7 @@ namespace teams_phonemanager.ViewModels
         private readonly PowerShellService _powerShellService;
         private readonly LoggingService _loggingService;
         private readonly SessionManager _sessionManager;
+        private readonly MainWindowViewModel _mainWindowViewModel;
 
         [ObservableProperty]
         private bool _modulesChecked;
@@ -29,6 +30,7 @@ namespace teams_phonemanager.ViewModels
             _powerShellService = PowerShellService.Instance;
             _loggingService = LoggingService.Instance;
             _sessionManager = SessionManager.Instance;
+            _mainWindowViewModel = App.Current.MainWindow.DataContext as MainWindowViewModel;
             
             // Initialize state from session manager
             _modulesChecked = _sessionManager.ModulesChecked;
@@ -37,6 +39,16 @@ namespace teams_phonemanager.ViewModels
             UpdateCanProceed();
             
             _loggingService.Log("Get Started page loaded", LogLevel.Info);
+        }
+
+        [RelayCommand]
+        private void NavigateTo(string page)
+        {
+            if (CanProceed)
+            {
+                _mainWindowViewModel?.NavigateToCommand.Execute(page);
+                _loggingService.Log($"Navigating to {page} page", LogLevel.Info);
+            }
         }
 
         [RelayCommand]
@@ -342,7 +354,11 @@ catch {
 
         private void UpdateCanProceed()
         {
-            CanProceed = TeamsConnected && GraphConnected;
+            CanProceed = ModulesChecked && TeamsConnected && GraphConnected;
         }
+
+        partial void OnModulesCheckedChanged(bool value) => UpdateCanProceed();
+        partial void OnTeamsConnectedChanged(bool value) => UpdateCanProceed();
+        partial void OnGraphConnectedChanged(bool value) => UpdateCanProceed();
     }
 } 

@@ -189,7 +189,7 @@
                         <TextBox materialDesign:HintAssist.Hint="RAAA Number Name"
                                  Text="{Binding Variables.RaaAnrName, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
-                        <TextBlock Text="Example: hn" Style="{StaticResource ExampleTextStyle}"/>
+                        <TextBlock Text="Example: hn for 'Hauptnummer'" Style="{StaticResource ExampleTextStyle}"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
