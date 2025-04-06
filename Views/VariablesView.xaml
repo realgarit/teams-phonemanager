@@ -21,6 +21,12 @@
             <Setter Property="IsReadOnly" Value="True"/>
         </Style>
         
+        <!-- Style for semi-locked fields -->
+        <Style x:Key="SemiLockedFieldStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}"/>
+        </Style>
+        
         <!-- Style for example text -->
         <Style x:Key="ExampleTextStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="11"/>
@@ -271,10 +277,45 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,8,8">
-                        <TextBox materialDesign:HintAssist.Hint="Holiday Name"
-                                 Text="{Binding Variables.HolidayName, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
-                        <TextBlock Text="Example: hd-acme-luc-kantonal-2025" Style="{StaticResource ExampleTextStyle}"/>
+                        <Grid>
+                            <TextBox materialDesign:HintAssist.Hint="Holiday Name"
+                                     Text="{Binding Variables.HolidayNameSuffix, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource SemiLockedFieldStyle}">
+                                <TextBox.Template>
+                                    <ControlTemplate TargetType="TextBox">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" 
+                                                    Background="Transparent"
+                                                    Padding="14,8,4,8"
+                                                    BorderThickness="1,1,0,1"
+                                                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                                    Opacity="0.7">
+                                                <TextBlock Text="{Binding Variables.Customer, StringFormat=hd-\{0\}-, FallbackValue=hd-}"
+                                                         VerticalAlignment="Center"
+                                                         Height="{Binding ActualHeight, ElementName=PART_ContentHost}"/>
+                                            </Border>
+                                            <Border Grid.Column="1"
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderThickness="0,1,1,1"
+                                                    BorderBrush="{TemplateBinding BorderBrush}">
+                                                <ScrollViewer x:Name="PART_ContentHost" 
+                                                            Focusable="false" 
+                                                            HorizontalScrollBarVisibility="Hidden" 
+                                                            VerticalScrollBarVisibility="Hidden"
+                                                            VerticalAlignment="Center"
+                                                            Padding="4,8,14,8"
+                                                            Margin="0"/>
+                                            </Border>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </TextBox.Template>
+                            </TextBox>
+                        </Grid>
+                        <TextBlock Text="Example: kantonal-2025" Style="{StaticResource ExampleTextStyle}"/>
                     </StackPanel>
                     
                     <StackPanel Grid.Row="0" Grid.Column="1" Margin="8,0,0,8">

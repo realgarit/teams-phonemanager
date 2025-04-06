@@ -8,12 +8,21 @@ namespace teams_phonemanager.ViewModels
     public partial class WelcomeViewModel : ViewModelBase
     {
         private readonly LoggingService _loggingService;
-        private readonly MainWindowViewModel _mainWindowViewModel;
+        private readonly MainWindowViewModel? _mainWindowViewModel;
 
         public WelcomeViewModel()
         {
             _loggingService = LoggingService.Instance;
-            _mainWindowViewModel = App.Current.MainWindow.DataContext as MainWindowViewModel;
+            
+            if (App.Current?.MainWindow?.DataContext is MainWindowViewModel mainViewModel)
+            {
+                _mainWindowViewModel = mainViewModel;
+            }
+            else
+            {
+                _loggingService.Log("Failed to get MainWindowViewModel reference", LogLevel.Warning);
+            }
+            
             _loggingService.Log("Welcome page loaded", LogLevel.Info);
         }
 
@@ -23,8 +32,15 @@ namespace teams_phonemanager.ViewModels
         [RelayCommand]
         private void NavigateToGetStarted()
         {
-            _mainWindowViewModel?.NavigateToCommand.Execute("GetStarted");
-            _loggingService.Log("Navigating to Get Started page", LogLevel.Info);
+            if (_mainWindowViewModel?.NavigateToCommand != null)
+            {
+                _mainWindowViewModel.NavigateToCommand.Execute("GetStarted");
+                _loggingService.Log("Navigating to Get Started page", LogLevel.Info);
+            }
+            else
+            {
+                _loggingService.Log("Navigation failed: MainWindowViewModel not available", LogLevel.Error);
+            }
         }
 
         [RelayCommand]

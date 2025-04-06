@@ -176,11 +176,46 @@ namespace teams_phonemanager.Models
         }
 
         // Holidays Variables
-        private string _holidayName = string.Empty;
+        private string _holidayNameSuffix = string.Empty;
+        public string HolidayNameSuffix
+        {
+            get => _holidayNameSuffix;
+            set
+            {
+                if (SetField(ref _holidayNameSuffix, value))
+                {
+                    OnPropertyChanged(nameof(HolidayName));
+                }
+            }
+        }
+
+        private string GetHolidayPrefix() => $"hd-{Customer}-";
+
         public string HolidayName
         {
-            get => _holidayName;
-            set => SetField(ref _holidayName, value);
+            get => GetHolidayPrefix() + HolidayNameSuffix;
+            set
+            {
+                string prefix = GetHolidayPrefix();
+                string newValue = value;
+
+                // Remove any duplicate prefixes that might have been added
+                while (newValue.StartsWith("hd-"))
+                {
+                    int nextDash = newValue.IndexOf('-', 3);
+                    if (nextDash == -1) break;
+                    
+                    string potentialCustomer = newValue.Substring(3, nextDash - 3);
+                    if (potentialCustomer == Customer)
+                    {
+                        newValue = newValue.Substring(nextDash + 1);
+                    }
+                    else break;
+                }
+
+                HolidayNameSuffix = newValue;
+                OnPropertyChanged();
+            }
         }
 
         private string _holidayGreetingPromptDE = string.Empty;
