@@ -18,6 +18,24 @@ namespace teams_phonemanager.Models
             if (EqualityComparer<T>.Default.Equals(field, value)) return false;
             field = value;
             OnPropertyChanged(propertyName);
+
+            // Notify changes for derived properties
+            switch (propertyName)
+            {
+                case nameof(Customer):
+                case nameof(CustomerGroupName):
+                case nameof(MsFallbackDomain):
+                case nameof(RaaAnrName):
+                    OnPropertyChanged(nameof(M365Group));
+                    OnPropertyChanged(nameof(RacqUPN));
+                    OnPropertyChanged(nameof(RacqDisplayName));
+                    OnPropertyChanged(nameof(CqDisplayName));
+                    OnPropertyChanged(nameof(RaaaUPN));
+                    OnPropertyChanged(nameof(RaaaDisplayName));
+                    OnPropertyChanged(nameof(AaDisplayName));
+                    break;
+            }
+
             return true;
         }
 
@@ -92,6 +110,13 @@ namespace teams_phonemanager.Models
         {
             get => _csAppAaId;
             set => SetField(ref _csAppAaId, value);
+        }
+
+        private string _raaAnrName = "hn";
+        public string RaaAnrName
+        {
+            get => _raaAnrName;
+            set => SetField(ref _raaAnrName, value);
         }
 
         private string _raaAnr = string.Empty;
@@ -177,8 +202,8 @@ namespace teams_phonemanager.Models
         public string RacqUPN => $"racq-{Customer}-{CustomerGroupName}{MsFallbackDomain}";
         public string RacqDisplayName => $"racq-{Customer}-{CustomerGroupName}";
         public string CqDisplayName => $"cq-{Customer}-{CustomerGroupName}";
-        public string RaaaUPN => $"raaa-{Customer}-hn-{CustomerGroupName}{MsFallbackDomain}";
-        public string RaaaDisplayName => $"raaa-{Customer}-hn-{CustomerGroupName}";
-        public string AaDisplayName => $"aa-{Customer}-hn-{CustomerGroupName}";
+        public string RaaaUPN => $"raaa-{Customer}-{RaaAnrName}-{CustomerGroupName}{MsFallbackDomain}";
+        public string RaaaDisplayName => $"raaa-{Customer}-{RaaAnrName}-{CustomerGroupName}";
+        public string AaDisplayName => $"aa-{Customer}-{RaaAnrName}-{CustomerGroupName}";
     }
 } 

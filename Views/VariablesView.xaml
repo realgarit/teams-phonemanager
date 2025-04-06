@@ -130,6 +130,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <TextBox Grid.Row="0" Grid.Column="0"
@@ -145,29 +146,35 @@
                              Margin="8,0,0,8"/>
 
                     <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                             materialDesign:HintAssist.Hint="RAA ANR"
-                             Text="{Binding Variables.RaaAnr, UpdateSourceTrigger=PropertyChanged}"
+                             materialDesign:HintAssist.Hint="RAAA Number Name"
+                             Text="{Binding Variables.RaaAnrName, UpdateSourceTrigger=PropertyChanged}"
                              Style="{StaticResource MaterialDesignOutlinedTextBox}"
                              Margin="0,0,0,8"/>
 
                     <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                             materialDesign:HintAssist.Hint="RAAA Number"
+                             Text="{Binding Variables.RaaAnr, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,0,0,8"/>
+
+                    <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
                              materialDesign:HintAssist.Hint="Default Call Flow Greeting Prompt (DE)"
                              Text="{Binding Variables.DefaultCallFlowGreetingPromptDE, UpdateSourceTrigger=PropertyChanged}"
                              Style="{StaticResource MaterialDesignOutlinedTextBox}"
                              Margin="0,0,0,8"/>
 
-                    <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                    <TextBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
                              materialDesign:HintAssist.Hint="After Hours Call Flow Greeting Prompt (DE)"
                              Text="{Binding Variables.AfterHoursCallFlowGreetingPromptDE, UpdateSourceTrigger=PropertyChanged}"
                              Style="{StaticResource MaterialDesignOutlinedTextBox}"
                              Margin="0,0,0,8"/>
 
-                    <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+                    <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
                              Text="Opening Hours 1"
                              Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
                              Margin="0,0,0,8"/>
 
-                    <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
+                    <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
                         <TextBox Width="100"
                                  materialDesign:HintAssist.Hint="Start Time"
                                  Text="{Binding Variables.OpeningHours1Start, StringFormat=HH:mm}"
@@ -179,12 +186,12 @@
                                  Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
                     </StackPanel>
 
-                    <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                    <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"
                              Text="Opening Hours 2"
                              Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
                              Margin="0,0,0,8"/>
 
-                    <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
+                    <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
                         <TextBox Width="100"
                                  materialDesign:HintAssist.Hint="Start Time"
                                  Text="{Binding Variables.OpeningHours2Start, StringFormat=HH:mm}"
