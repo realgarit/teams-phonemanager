@@ -44,6 +44,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <TextBox Grid.Row="0" Grid.Column="0"
@@ -80,10 +81,154 @@
                              Margin="8,0,0,8"/>
                     
                     <TextBox Grid.Row="3" Grid.Column="0"
+                             materialDesign:HintAssist.Hint="Usage Location"
+                             Text="{Binding Variables.UsageLocation, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,0,8,8"/>
+                    <TextBox Grid.Row="3" Grid.Column="1"
                              materialDesign:HintAssist.Hint="SKU ID"
                              Text="{Binding Variables.SkuId, UpdateSourceTrigger=PropertyChanged}"
                              Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             IsReadOnly="True"
+                             Margin="8,0,0,8"/>
+                </Grid>
+
+                <!-- Call Queues Variables -->
+                <TextBlock Text="Call Queues Variables"
+                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                         Margin="0,0,0,16"/>
+                
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox Grid.Column="0"
+                             materialDesign:HintAssist.Hint="CS App CQ ID"
+                             Text="{Binding Variables.CsAppCqId, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             IsReadOnly="True"
+                             Margin="0,0,0,8"/>
+                </Grid>
+
+                <!-- Auto Attendants Variables -->
+                <TextBlock Text="Auto Attendants Variables"
+                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                         Margin="0,0,0,16"/>
+                
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBox Grid.Row="0" Grid.Column="0"
+                             materialDesign:HintAssist.Hint="CS App AA ID"
+                             Text="{Binding Variables.CsAppAaId, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             IsReadOnly="True"
                              Margin="0,0,8,8"/>
+                    <TextBox Grid.Row="0" Grid.Column="1"
+                             materialDesign:HintAssist.Hint="Phone Number Type"
+                             Text="{Binding Variables.PhoneNumberType, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="8,0,0,8"/>
+
+                    <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                             materialDesign:HintAssist.Hint="RAA ANR"
+                             Text="{Binding Variables.RaaAnr, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,0,0,8"/>
+
+                    <TextBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                             materialDesign:HintAssist.Hint="Default Call Flow Greeting Prompt (DE)"
+                             Text="{Binding Variables.DefaultCallFlowGreetingPromptDE, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,0,0,8"/>
+
+                    <TextBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                             materialDesign:HintAssist.Hint="After Hours Call Flow Greeting Prompt (DE)"
+                             Text="{Binding Variables.AfterHoursCallFlowGreetingPromptDE, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,0,0,8"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+                             Text="Opening Hours 1"
+                             Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                             Margin="0,0,0,8"/>
+
+                    <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBox Width="100"
+                                 materialDesign:HintAssist.Hint="Start Time"
+                                 Text="{Binding Variables.OpeningHours1Start, StringFormat=HH:mm}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Margin="0,0,8,0"/>
+                        <TextBox Width="100"
+                                 materialDesign:HintAssist.Hint="End Time"
+                                 Text="{Binding Variables.OpeningHours1End, StringFormat=HH:mm}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                             Text="Opening Hours 2"
+                             Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                             Margin="0,0,0,8"/>
+
+                    <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBox Width="100"
+                                 materialDesign:HintAssist.Hint="Start Time"
+                                 Text="{Binding Variables.OpeningHours2Start, StringFormat=HH:mm}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Margin="0,0,8,0"/>
+                        <TextBox Width="100"
+                                 materialDesign:HintAssist.Hint="End Time"
+                                 Text="{Binding Variables.OpeningHours2End, StringFormat=HH:mm}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Holidays Variables -->
+                <TextBlock Text="Holidays Variables"
+                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                         Margin="0,0,0,16"/>
+                
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBox Grid.Row="0" Grid.Column="0"
+                             materialDesign:HintAssist.Hint="Holiday Name"
+                             Text="{Binding Variables.HolidayName, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,0,8,8"/>
+                    <DatePicker Grid.Row="0" Grid.Column="1"
+                               materialDesign:HintAssist.Hint="Holiday Date"
+                               SelectedDate="{Binding Variables.HolidayDate, UpdateSourceTrigger=PropertyChanged}"
+                               Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                               Margin="8,0,0,8"/>
+
+                    <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                             materialDesign:HintAssist.Hint="Holiday Greeting Prompt (DE)"
+                             Text="{Binding Variables.HolidayGreetingPromptDE, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,0,0,8"/>
                 </Grid>
 
                 <!-- Auto-generated Variables -->
