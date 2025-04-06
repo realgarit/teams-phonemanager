@@ -6,19 +6,169 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:teams_phonemanager.Views"
              xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
+             xmlns:converters="clr-namespace:teams_phonemanager.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     
-    <UserControl.DataContext>
-        <viewmodels:VariablesViewModel/>
-    </UserControl.DataContext>
+    <UserControl.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    </UserControl.Resources>
 
-    <materialDesign:Card Margin="32" UniformCornerRadius="8">
-        <Grid>
-            <TextBlock Text="Variables View - Coming Soon"
-                     Style="{StaticResource MaterialDesignHeadline4TextBlock}"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"/>
-        </Grid>
-    </materialDesign:Card>
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Welcome Message -->
+        <TextBlock Text="{Binding WelcomeMessage}"
+                 Style="{StaticResource MaterialDesignBody1TextBlock}"
+                 TextWrapping="Wrap"
+                 Margin="0,0,0,16"/>
+
+        <!-- Variables Form -->
+        <ScrollViewer Grid.Row="1" IsEnabled="{Binding CanProceed}">
+            <StackPanel>
+                <!-- General Variables -->
+                <TextBlock Text="General Variables"
+                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                         Margin="0,0,0,16"/>
+                
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBox Grid.Row="0" Grid.Column="0"
+                             materialDesign:HintAssist.Hint="Customer Legal Name"
+                             Text="{Binding Variables.CustomerLegalName, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,0,8,8"/>
+                    <TextBox Grid.Row="0" Grid.Column="1"
+                             materialDesign:HintAssist.Hint="MS Fallback Domain"
+                             Text="{Binding Variables.MsFallbackDomain, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="8,0,0,8"/>
+                    
+                    <TextBox Grid.Row="1" Grid.Column="0"
+                             materialDesign:HintAssist.Hint="Customer"
+                             Text="{Binding Variables.Customer, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,0,8,8"/>
+                    <TextBox Grid.Row="1" Grid.Column="1"
+                             materialDesign:HintAssist.Hint="Customer Group Name"
+                             Text="{Binding Variables.CustomerGroupName, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="8,0,0,8"/>
+                    
+                    <TextBox Grid.Row="2" Grid.Column="0"
+                             materialDesign:HintAssist.Hint="Language ID"
+                             Text="{Binding Variables.LanguageId, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,0,8,8"/>
+                    <TextBox Grid.Row="2" Grid.Column="1"
+                             materialDesign:HintAssist.Hint="Time Zone ID"
+                             Text="{Binding Variables.TimeZoneId, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="8,0,0,8"/>
+                    
+                    <TextBox Grid.Row="3" Grid.Column="0"
+                             materialDesign:HintAssist.Hint="SKU ID"
+                             Text="{Binding Variables.SkuId, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,0,8,8"/>
+                </Grid>
+
+                <!-- Auto-generated Variables -->
+                <TextBlock Text="Auto-generated Variables"
+                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                         Margin="0,0,0,16"/>
+                
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBox Grid.Row="0" Grid.Column="0"
+                             materialDesign:HintAssist.Hint="M365 Group"
+                             Text="{Binding Variables.M365Group, Mode=OneWay}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             IsReadOnly="True"
+                             Margin="0,0,8,8"/>
+                    <TextBox Grid.Row="0" Grid.Column="1"
+                             materialDesign:HintAssist.Hint="RACQ UPN"
+                             Text="{Binding Variables.RacqUPN, Mode=OneWay}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             IsReadOnly="True"
+                             Margin="8,0,0,8"/>
+                    
+                    <TextBox Grid.Row="1" Grid.Column="0"
+                             materialDesign:HintAssist.Hint="RACQ Display Name"
+                             Text="{Binding Variables.RacqDisplayName, Mode=OneWay}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             IsReadOnly="True"
+                             Margin="0,0,8,8"/>
+                    <TextBox Grid.Row="1" Grid.Column="1"
+                             materialDesign:HintAssist.Hint="CQ Display Name"
+                             Text="{Binding Variables.CqDisplayName, Mode=OneWay}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             IsReadOnly="True"
+                             Margin="8,0,0,8"/>
+                    
+                    <TextBox Grid.Row="2" Grid.Column="0"
+                             materialDesign:HintAssist.Hint="RAAA UPN"
+                             Text="{Binding Variables.RaaaUPN, Mode=OneWay}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             IsReadOnly="True"
+                             Margin="0,0,8,8"/>
+                    <TextBox Grid.Row="2" Grid.Column="1"
+                             materialDesign:HintAssist.Hint="RAAA Display Name"
+                             Text="{Binding Variables.RaaaDisplayName, Mode=OneWay}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             IsReadOnly="True"
+                             Margin="8,0,0,8"/>
+                    
+                    <TextBox Grid.Row="3" Grid.Column="0"
+                             materialDesign:HintAssist.Hint="AA Display Name"
+                             Text="{Binding Variables.AaDisplayName, Mode=OneWay}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             IsReadOnly="True"
+                             Margin="0,0,8,8"/>
+                </Grid>
+
+                <!-- Action Buttons -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                    <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                            Command="{Binding LoadVariablesCommand}"
+                            Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="FolderOpen" Margin="0,0,8,0"/>
+                            <TextBlock Text="Load"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                            Command="{Binding SaveVariablesCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ContentSave" Margin="0,0,8,0"/>
+                            <TextBlock Text="Save"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
 </UserControl> 

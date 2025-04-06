@@ -218,7 +218,7 @@ catch {
 
                 var command = @"
 try {
-    Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All, Group.ReadWrite.All, Directory.ReadWrite.All -ErrorAction Stop
+    Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All, Group.ReadWrite.All, Directory.ReadWrite.All -ErrorAction Stop -NoWelcome
     $context = Get-MgContext -ErrorAction Stop
     if ($context) {
         Write-Host 'SUCCESS: Connected to Microsoft Graph'
