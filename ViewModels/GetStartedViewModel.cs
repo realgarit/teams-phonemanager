@@ -11,6 +11,7 @@ namespace teams_phonemanager.ViewModels
         private readonly PowerShellService _powerShellService;
         private readonly LoggingService _loggingService;
         private readonly SessionManager _sessionManager;
+        private readonly MainWindowViewModel? _mainWindowViewModel;
 
         [ObservableProperty]
         private bool _modulesChecked;
@@ -30,6 +31,15 @@ namespace teams_phonemanager.ViewModels
             _loggingService = LoggingService.Instance;
             _sessionManager = SessionManager.Instance;
             
+            if (App.Current?.MainWindow?.DataContext is MainWindowViewModel mainViewModel)
+            {
+                _mainWindowViewModel = mainViewModel;
+            }
+            else
+            {
+                _loggingService.Log("Failed to get MainWindowViewModel reference", LogLevel.Warning);
+            }
+            
             // Initialize state from session manager
             _modulesChecked = _sessionManager.ModulesChecked;
             _teamsConnected = _sessionManager.TeamsConnected;
@@ -37,6 +47,26 @@ namespace teams_phonemanager.ViewModels
             UpdateCanProceed();
             
             _loggingService.Log("Get Started page loaded", LogLevel.Info);
+        }
+
+        [RelayCommand]
+        private void NavigateTo(string page)
+        {
+            if (!CanProceed)
+            {
+                _loggingService.Log("Cannot navigate: prerequisites not met", LogLevel.Warning);
+                return;
+            }
+
+            if (_mainWindowViewModel?.NavigateToCommand != null)
+            {
+                _mainWindowViewModel.NavigateToCommand.Execute(page);
+                _loggingService.Log($"Navigating to {page} page", LogLevel.Info);
+            }
+            else
+            {
+                _loggingService.Log("Navigation failed: MainWindowViewModel not available", LogLevel.Error);
+            }
         }
 
         [RelayCommand]
@@ -342,7 +372,11 @@ catch {
 
         private void UpdateCanProceed()
         {
-            CanProceed = TeamsConnected && GraphConnected;
+            CanProceed = ModulesChecked && TeamsConnected && GraphConnected;
         }
+
+        partial void OnModulesCheckedChanged(bool value) => UpdateCanProceed();
+        partial void OnTeamsConnectedChanged(bool value) => UpdateCanProceed();
+        partial void OnGraphConnectedChanged(bool value) => UpdateCanProceed();
     }
 } 
