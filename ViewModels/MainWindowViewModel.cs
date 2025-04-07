@@ -34,7 +34,7 @@ namespace teams_phonemanager.ViewModels
         private bool _isLogExpanded;
 
         [ObservableProperty]
-        private string _version = "Version 1.9.18";
+        private string _version = "Version 1.10.21";
         
         [ObservableProperty]
         private PhoneManagerVariables _variables = new();

@@ -7,6 +7,7 @@ namespace teams_phonemanager.Views
         public CallQueuesView()
         {
             InitializeComponent();
+            DataContext = new ViewModels.CallQueuesViewModel();
         }
     }
 } 
