@@ -1,9 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Windows;
+using teams_phonemanager.Services;
 using System;
 using System.Threading.Tasks;
 using teams_phonemanager.Models;
-using teams_phonemanager.Services;
 
 namespace teams_phonemanager.ViewModels
 {
@@ -12,12 +13,10 @@ namespace teams_phonemanager.ViewModels
         private readonly PowerShellService _powerShellService;
         private readonly LoggingService _loggingService;
         private readonly SessionManager _sessionManager;
+        private readonly MainWindowViewModel? _mainWindowViewModel;
 
         [ObservableProperty]
-        private PhoneManagerVariables _variables = new();
-
-        [ObservableProperty]
-        private string _welcomeMessage = "Welcome to the Variables page. Please make sure you have connected to Teams and Graph on the Get Started page before proceeding.";
+        private string _welcomeMessage = "Welcome to the Variables page. Here you can set the variables that will be used throughout the application.";
 
         [ObservableProperty]
         private bool _teamsConnected;
@@ -25,52 +24,32 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private bool _graphConnected;
 
-        public bool CanProceed => TeamsConnected && GraphConnected;
-
-        public VariablesViewModel(
-            PowerShellService powerShellService,
-            LoggingService loggingService,
-            SessionManager sessionManager)
+        public VariablesViewModel()
         {
-            _powerShellService = powerShellService;
-            _loggingService = loggingService;
-            _sessionManager = sessionManager;
+            _powerShellService = PowerShellService.Instance;
+            _loggingService = LoggingService.Instance;
+            _sessionManager = SessionManager.Instance;
+            _mainWindowViewModel = Application.Current.MainWindow.DataContext as MainWindowViewModel;
 
-            // Initialize state from session manager
             TeamsConnected = _sessionManager.TeamsConnected;
             GraphConnected = _sessionManager.GraphConnected;
 
-            _loggingService.Log("Variables page initialized", LogLevel.Info);
+            _loggingService.Log("Variables page loaded", LogLevel.Info);
         }
 
-        [RelayCommand]
-        private void SaveVariables()
+        public PhoneManagerVariables Variables
         {
-            try
+            get => _mainWindowViewModel?.Variables ?? new PhoneManagerVariables();
+            set
             {
-                _loggingService.Log("Saving variables...", LogLevel.Info);
-                // TODO: Implement save functionality
-                _loggingService.Log("Variables saved successfully", LogLevel.Info);
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Log($"Error saving variables: {ex.Message}", LogLevel.Error);
+                if (_mainWindowViewModel != null)
+                {
+                    _mainWindowViewModel.Variables = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
-        [RelayCommand]
-        private void LoadVariables()
-        {
-            try
-            {
-                _loggingService.Log("Loading variables...", LogLevel.Info);
-                // TODO: Implement load functionality
-                _loggingService.Log("Variables loaded successfully", LogLevel.Info);
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Log($"Error loading variables: {ex.Message}", LogLevel.Error);
-            }
-        }
+        public bool CanProceed => TeamsConnected && GraphConnected;
     }
 } 

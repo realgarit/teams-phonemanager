@@ -9,6 +9,7 @@ using System.Text;
 using System.Linq;
 using System.Windows.Input;
 using System;
+using teams_phonemanager.Models;
 
 namespace teams_phonemanager.ViewModels
 {
@@ -33,7 +34,10 @@ namespace teams_phonemanager.ViewModels
         private bool _isLogExpanded;
 
         [ObservableProperty]
-        private string _version = "Version 1.7.16";
+        private string _version = "Version 1.10.21";
+        
+        [ObservableProperty]
+        private PhoneManagerVariables _variables = new();
 
         public MainWindowViewModel()
         {
@@ -65,7 +69,7 @@ namespace teams_phonemanager.ViewModels
         }
 
         [RelayCommand]
-        private void NavigateTo(string page)
+        public void NavigateTo(string page)
         {
             CurrentPage = page;
             _loggingService.Log($"Navigated to {page} page", LogLevel.Info);
