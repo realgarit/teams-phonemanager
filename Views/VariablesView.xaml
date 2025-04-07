@@ -352,7 +352,7 @@
 
                     <Grid Grid.Row="0" Grid.Column="0" Margin="0,0,8,8">
                         <TextBox materialDesign:HintAssist.Hint="M365 Group"
-                                 Text="{Binding Variables.M365Group, Mode=OneWay}"
+                                 Text="{Binding Variables.M365Group, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource LockedFieldStyle}"/>
                         <materialDesign:PackIcon Kind="Lock" 
                                                HorizontalAlignment="Right" 
@@ -362,7 +362,7 @@
                     
                     <Grid Grid.Row="0" Grid.Column="1" Margin="8,0,0,8">
                         <TextBox materialDesign:HintAssist.Hint="RACQ UPN"
-                                 Text="{Binding Variables.RacqUPN, Mode=OneWay}"
+                                 Text="{Binding Variables.RacqUPN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource LockedFieldStyle}"/>
                         <materialDesign:PackIcon Kind="Lock" 
                                                HorizontalAlignment="Right" 
@@ -372,7 +372,7 @@
                     
                     <Grid Grid.Row="1" Grid.Column="0" Margin="0,0,8,8">
                         <TextBox materialDesign:HintAssist.Hint="RACQ Display Name"
-                                 Text="{Binding Variables.RacqDisplayName, Mode=OneWay}"
+                                 Text="{Binding Variables.RacqDisplayName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource LockedFieldStyle}"/>
                         <materialDesign:PackIcon Kind="Lock" 
                                                HorizontalAlignment="Right" 
@@ -382,7 +382,7 @@
                     
                     <Grid Grid.Row="1" Grid.Column="1" Margin="8,0,0,8">
                         <TextBox materialDesign:HintAssist.Hint="CQ Display Name"
-                                 Text="{Binding Variables.CqDisplayName, Mode=OneWay}"
+                                 Text="{Binding Variables.CqDisplayName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource LockedFieldStyle}"/>
                         <materialDesign:PackIcon Kind="Lock" 
                                                HorizontalAlignment="Right" 
@@ -392,7 +392,7 @@
                     
                     <Grid Grid.Row="2" Grid.Column="0" Margin="0,0,8,8">
                         <TextBox materialDesign:HintAssist.Hint="RAAA UPN"
-                                 Text="{Binding Variables.RaaaUPN, Mode=OneWay}"
+                                 Text="{Binding Variables.RaaaUPN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource LockedFieldStyle}"/>
                         <materialDesign:PackIcon Kind="Lock" 
                                                HorizontalAlignment="Right" 
@@ -402,7 +402,7 @@
                     
                     <Grid Grid.Row="2" Grid.Column="1" Margin="8,0,0,8">
                         <TextBox materialDesign:HintAssist.Hint="RAAA Display Name"
-                                 Text="{Binding Variables.RaaaDisplayName, Mode=OneWay}"
+                                 Text="{Binding Variables.RaaaDisplayName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource LockedFieldStyle}"/>
                         <materialDesign:PackIcon Kind="Lock" 
                                                HorizontalAlignment="Right" 
@@ -412,7 +412,7 @@
                     
                     <Grid Grid.Row="3" Grid.Column="0" Margin="0,0,8,8">
                         <TextBox materialDesign:HintAssist.Hint="AA Display Name"
-                                 Text="{Binding Variables.AaDisplayName, Mode=OneWay}"
+                                 Text="{Binding Variables.AaDisplayName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource LockedFieldStyle}"/>
                         <materialDesign:PackIcon Kind="Lock" 
                                                HorizontalAlignment="Right" 
@@ -420,25 +420,6 @@
                                                Margin="0,0,8,0"/>
                     </Grid>
                 </Grid>
-
-                <!-- Action Buttons -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-                    <Button Style="{StaticResource MaterialDesignOutlinedButton}"
-                            Command="{Binding LoadVariablesCommand}"
-                            Margin="0,0,8,0">
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="FolderOpen" Margin="0,0,8,0"/>
-                            <TextBlock Text="Load"/>
-                        </StackPanel>
-                    </Button>
-                    <Button Style="{StaticResource MaterialDesignRaisedButton}"
-                            Command="{Binding SaveVariablesCommand}">
-                        <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="ContentSave" Margin="0,0,8,0"/>
-                            <TextBlock Text="Save"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
             </StackPanel>
         </ScrollViewer>
     </Grid>
