@@ -296,7 +296,7 @@
                          TextTrimming="CharacterEllipsis" Margin="16,0" VerticalAlignment="Center"/>
                 
                 <!-- Copyright -->
-                <TextBlock Grid.Column="2" Text="Realgar © 2025. All rights reserved." VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="Realgar © 2025. Licensed under the MIT License." VerticalAlignment="Center"/>
             </Grid>
         </materialDesign:ColorZone>
 
