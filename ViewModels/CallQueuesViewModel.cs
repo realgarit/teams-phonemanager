@@ -27,6 +27,9 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private bool _showConfirmation;
 
+        [ObservableProperty]
+        private string? _waitingMessage = string.Empty;
+
         public CallQueuesViewModel()
         {
             _powerShellService = PowerShellService.Instance;
@@ -87,6 +90,7 @@ namespace teams_phonemanager.ViewModels
                 m365groupId = variables.M365Group;
 
                 _loggingService.Log($"Creating Call Queue: {cqDisplayName}", LogLevel.Info);
+                WaitingMessage = "Creating call queue. This process takes approximately 4 minutes due to Microsoft's background replication. Please be patient.";
 
                 var command = $@"
 # Create Resource Account for Main Call Queue
@@ -114,6 +118,23 @@ Write-Host ""Resource account ID: $racqid""
 
 # Assign Usage Location
 Update-MgUser -UserId ""{racqUPN}"" -UsageLocation ""{usagelocation}""
+Write-Host ""Usage location assigned to resource account successfully""
+
+# Assign license to Resource Account
+# SkuId for Teams Phone Resource license is 440eaaa8-b3e0-484b-a8be-62870b9ba70a
+$SkuId = ""440eaaa8-b3e0-484b-a8be-62870b9ba70a""
+$body = @{{
+    addLicenses = @(
+        @{{
+            skuId         = $SkuId
+            disabledPlans = @()
+        }}
+    )
+    removeLicenses = @()
+}}
+
+Invoke-MgGraphRequest -Method POST -Uri ""https://graph.microsoft.com/v1.0/users/{racqUPN}/assignLicense"" -Body $body
+Write-Host ""License assigned to resource account successfully""
 
 # Get M365 Group ObjectId
 $m365Group = Get-MgGroup -Filter ""displayName eq '{m365groupId}'""
@@ -132,18 +153,18 @@ if ($existingQueue) {{
     $callQueue = New-CsCallQueue `
     -Name ""{cqDisplayName}"" `
     -RoutingMethod Attendant `
-    -AllowOptOut $true `
+    -AllowOptOut $false `
     -ConferenceMode $true `
     -AgentAlertTime 30 `
     -LanguageId ""{languageId}"" `
     -DistributionLists @($m365GroupId) `
     -OverflowThreshold 15 `
-    -OverflowAction Forward `
-    -OverflowActionTarget $racqid `
+    -OverflowAction Disconnect `
     -TimeoutThreshold 30 `
-    -TimeoutAction Forward `
-    -TimeoutActionTarget $racqid `
+    -TimeoutAction Disconnect `
     -UseDefaultMusicOnHold $true `
+    -NoAgentApplyTo NewCalls `
+    -NoAgentAction Disconnect `
     -PresenceBasedRouting $false
 
     if (-not $callQueue) {{
@@ -181,17 +202,20 @@ try {{
                 {
                     QueueStatus = "Call Queue created successfully";
                     IsQueueCreated = true;
+                    WaitingMessage = string.Empty;
                     _loggingService.Log($"Call Queue {cqDisplayName} created successfully", LogLevel.Info);
                 }
                 else
                 {
                     QueueStatus = "Error: No output from PowerShell command";
+                    WaitingMessage = string.Empty;
                     _loggingService.Log($"Error creating Call Queue {cqDisplayName}: No output from PowerShell command", LogLevel.Error);
                 }
             }
             catch (Exception ex)
             {
                 QueueStatus = $"Error: {ex.Message}";
+                WaitingMessage = string.Empty;
                 _loggingService.Log($"Exception in CreateCallQueueAsync for queue {cqDisplayName}: {ex}", LogLevel.Error);
             }
             finally
