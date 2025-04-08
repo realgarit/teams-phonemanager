@@ -109,7 +109,18 @@
                   Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
                            Value="0"
-                           IsIndeterminate="True"/>
+                           IsIndeterminate="True"
+                           Width="50"
+                           Height="50"
+                           Margin="0,16,0,0"/>
+                
+                <!-- Waiting Message -->
+                <TextBlock Text="{Binding WaitingMessage, TargetNullValue=''}"
+                           Style="{StaticResource MaterialDesignBody2TextBlock}"
+                           TextWrapping="Wrap"
+                           Margin="0,8,0,0"
+                           TextAlignment="Center"
+                           Foreground="{DynamicResource MaterialDesignBodyLight}"/>
             </Grid>
         </Grid>
     </materialDesign:Card>
