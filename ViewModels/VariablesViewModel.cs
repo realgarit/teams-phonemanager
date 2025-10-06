@@ -10,9 +10,6 @@ namespace teams_phonemanager.ViewModels
 {
     public partial class VariablesViewModel : ViewModelBase
     {
-        private readonly PowerShellService _powerShellService;
-        private readonly LoggingService _loggingService;
-        private readonly SessionManager _sessionManager;
         private readonly MainWindowViewModel? _mainWindowViewModel;
 
         [ObservableProperty]
@@ -26,9 +23,6 @@ namespace teams_phonemanager.ViewModels
 
         public VariablesViewModel()
         {
-            _powerShellService = PowerShellService.Instance;
-            _loggingService = LoggingService.Instance;
-            _sessionManager = SessionManager.Instance;
             _mainWindowViewModel = Application.Current.MainWindow.DataContext as MainWindowViewModel;
 
             TeamsConnected = _sessionManager.TeamsConnected;

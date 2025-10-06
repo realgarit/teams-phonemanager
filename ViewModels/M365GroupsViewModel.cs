@@ -10,9 +10,6 @@ namespace teams_phonemanager.ViewModels
 {
     public partial class M365GroupsViewModel : ViewModelBase
     {
-        private readonly PowerShellService _powerShellService;
-        private readonly LoggingService _loggingService;
-        private readonly SessionManager _sessionManager;
         private readonly MainWindowViewModel? _mainWindowViewModel;
 
         [ObservableProperty]
@@ -32,9 +29,6 @@ namespace teams_phonemanager.ViewModels
 
         public M365GroupsViewModel()
         {
-            _powerShellService = PowerShellService.Instance;
-            _loggingService = LoggingService.Instance;
-            _sessionManager = SessionManager.Instance;
             _mainWindowViewModel = Application.Current.MainWindow.DataContext as MainWindowViewModel;
 
             _loggingService.Log("M365 Groups page loaded", LogLevel.Info);
@@ -47,13 +41,9 @@ namespace teams_phonemanager.ViewModels
         }
 
         [RelayCommand]
-        private void NavigateToVariables()
+        private void NavigateToVariablesPage()
         {
-            if (_mainWindowViewModel != null)
-            {
-                _mainWindowViewModel.NavigateTo("Variables");
-                _loggingService.Log("Navigated to Variables page", LogLevel.Info);
-            }
+            NavigateToVariables();
         }
 
         [RelayCommand]
@@ -73,39 +63,17 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
 
+                if (!ValidateVariables(variables))
+                {
+                    return;
+                }
+
                 m365group = variables.M365Group;
                 _loggingService.Log($"Checking M365 group: {m365group}", LogLevel.Info);
 
-                var command = $@"
-# Check if M365 group already exists
-$existingGroup = Get-MgGroup -Filter ""displayName eq '{m365group}'"" -ErrorAction SilentlyContinue
-if ($existingGroup) 
-{{
-    Write-Host ""{m365group} already exists. Please check, otherwise SFO will be salty!""
-    # Get the ID of the existing M365 group
-    $global:m365groupId = $existingGroup.Id
-    Write-Host ""{m365group} was found successfully with ID: $global:m365groupId""
-    return
-}} 
-
-try {{
-    # Create M365 group
-    $newGroup = New-MgGroup -DisplayName ""{m365group}"" `
-        -MailEnabled:$False `
-        -MailNickName ""{m365group}"" `
-        -SecurityEnabled `
-        -GroupTypes @(""Unified"")
-
-    # Get the ID of the created M365 group
-    $global:m365groupId = $newGroup.Id
-    Write-Host ""{m365group} created successfully with ID: $global:m365groupId""
-}}
-catch {{
-    Write-Host ""{m365group} failed to create: $_""
-    exit
-}}";
-
-                var result = await _powerShellService.ExecuteCommandAsync(command);
+                var command = _powerShellCommandService.GetCreateM365GroupCommand(m365group);
+                var result = await ExecutePowerShellCommandAsync(command, "CheckM365Group");
+                
                 if (!string.IsNullOrEmpty(result))
                 {
                     var output = result.Trim();

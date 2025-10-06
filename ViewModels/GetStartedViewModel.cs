@@ -8,11 +8,6 @@ namespace teams_phonemanager.ViewModels
 {
     public partial class GetStartedViewModel : ViewModelBase
     {
-        private readonly PowerShellService _powerShellService;
-        private readonly LoggingService _loggingService;
-        private readonly SessionManager _sessionManager;
-        private readonly MainWindowViewModel? _mainWindowViewModel;
-
         [ObservableProperty]
         private bool _modulesChecked;
 
@@ -25,22 +20,11 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private bool _canProceed;
 
+        public bool CanConnectTeams => ModulesChecked && !TeamsConnected;
+        public bool CanConnectGraph => ModulesChecked && !GraphConnected;
+
         public GetStartedViewModel()
         {
-            _powerShellService = PowerShellService.Instance;
-            _loggingService = LoggingService.Instance;
-            _sessionManager = SessionManager.Instance;
-            
-            if (App.Current?.MainWindow?.DataContext is MainWindowViewModel mainViewModel)
-            {
-                _mainWindowViewModel = mainViewModel;
-            }
-            else
-            {
-                _loggingService.Log("Failed to get MainWindowViewModel reference", LogLevel.Warning);
-            }
-            
-            // Initialize state from session manager
             _modulesChecked = _sessionManager.ModulesChecked;
             _teamsConnected = _sessionManager.TeamsConnected;
             _graphConnected = _sessionManager.GraphConnected;
@@ -50,7 +34,7 @@ namespace teams_phonemanager.ViewModels
         }
 
         [RelayCommand]
-        private void NavigateTo(string page)
+        private void NavigateToPage(string page)
         {
             if (!CanProceed)
             {
@@ -58,15 +42,7 @@ namespace teams_phonemanager.ViewModels
                 return;
             }
 
-            if (_mainWindowViewModel?.NavigateToCommand != null)
-            {
-                _mainWindowViewModel.NavigateToCommand.Execute(page);
-                _loggingService.Log($"Navigating to {page} page", LogLevel.Info);
-            }
-            else
-            {
-                _loggingService.Log("Navigation failed: MainWindowViewModel not available", LogLevel.Error);
-            }
+            NavigateTo(page);
         }
 
         [RelayCommand]
@@ -77,55 +53,17 @@ namespace teams_phonemanager.ViewModels
                 IsBusy = true;
                 _loggingService.Log("Checking PowerShell modules...", LogLevel.Info);
 
-                // Command to check and install modules if needed
-                var command = @"
-$ErrorActionPreference = 'Stop'
-$output = @()
-
-# Check and install MicrosoftTeams module
-if (Get-Module -ListAvailable -Name MicrosoftTeams) {
-    $teamsModule = Get-Module -ListAvailable -Name MicrosoftTeams
-    $output += 'MicrosoftTeams module is available: ' + $teamsModule.Version
-} else {
-    $output += 'MicrosoftTeams module is NOT available, attempting to install...'
-    try {
-        Install-Module -Name MicrosoftTeams -Force -AllowClobber
-        $output += 'MicrosoftTeams module installed successfully'
-    } catch {
-        $output += 'ERROR: Failed to install MicrosoftTeams module: ' + $_.Exception.Message
-    }
-}
-
-# Check and install Microsoft.Graph module
-if (Get-Module -ListAvailable -Name Microsoft.Graph) {
-    $graphModule = Get-Module -ListAvailable -Name Microsoft.Graph
-    $output += 'Microsoft.Graph module is available: ' + $graphModule.Version
-} else {
-    $output += 'Microsoft.Graph module is NOT available, attempting to install...'
-    try {
-        Install-Module -Name Microsoft.Graph -Force
-        $output += 'Microsoft.Graph module installed successfully'
-    } catch {
-        $output += 'ERROR: Failed to install Microsoft.Graph module: ' + $_.Exception.Message
-    }
-}
-
-$output | ForEach-Object { Write-Host $_ }
-";
-
-                var result = await _powerShellService.ExecuteCommandAsync(command);
+                var command = _powerShellCommandService.GetCheckModulesCommand();
+                var result = await ExecutePowerShellCommandAsync(command, "CheckModules");
                 
-                // Check if both modules are available or were successfully installed
                 ModulesChecked = (result.Contains("MicrosoftTeams module is available") || result.Contains("MicrosoftTeams module installed successfully")) && 
                                 (result.Contains("Microsoft.Graph module is available") || result.Contains("Microsoft.Graph module installed successfully"));
                 
-                // Update session manager
                 _sessionManager.UpdateModulesChecked(ModulesChecked);
                 
                 if (ModulesChecked)
                 {
                     _loggingService.Log("PowerShell modules are available", LogLevel.Success);
-                    // Log the module versions and installation status
                     foreach (var line in result.Split('\n'))
                     {
                         if (!string.IsNullOrWhiteSpace(line))
@@ -166,24 +104,10 @@ $output | ForEach-Object { Write-Host $_ }
                 IsBusy = true;
                 _loggingService.Log("Connecting to Microsoft Teams...", LogLevel.Info);
 
-                var command = @"
-try {
-    Connect-MicrosoftTeams -ErrorAction Stop
-    $connection = Get-CsTenant -ErrorAction Stop
-    if ($connection) {
-        Write-Host 'SUCCESS: Connected to Microsoft Teams'
-        Write-Host ""Connected to tenant: $($connection.DisplayName) ($($connection.TenantId))""
-    }
-}
-catch {
-    Write-Error ""Failed to connect to Microsoft Teams: $_""
-    exit 1
-}";
-
-                var result = await _powerShellService.ExecuteCommandAsync(command);
+                var command = _powerShellCommandService.GetConnectTeamsCommand();
+                var result = await ExecutePowerShellCommandAsync(command, "ConnectTeams");
                 TeamsConnected = result.Contains("SUCCESS:");
                 
-                // Extract tenant information if connected
                 string? tenantId = null;
                 string? tenantName = null;
                 
@@ -191,7 +115,6 @@ catch {
                 {
                     _loggingService.Log("Connected to Microsoft Teams successfully", LogLevel.Success);
                     
-                    // Extract tenant information from the result
                     foreach (var line in result.Split('\n'))
                     {
                         if (line.Contains("Connected to tenant:"))
@@ -210,7 +133,6 @@ catch {
                     _loggingService.Log($"Error connecting to Microsoft Teams: {result}", LogLevel.Error);
                 }
                 
-                // Update session manager
                 _sessionManager.UpdateTeamsConnection(TeamsConnected);
                 if (tenantId != null && tenantName != null)
                 {
@@ -246,31 +168,16 @@ catch {
                 IsBusy = true;
                 _loggingService.Log("Connecting to Microsoft Graph...", LogLevel.Info);
 
-                var command = @"
-try {
-    Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All, Group.ReadWrite.All, Directory.ReadWrite.All -ErrorAction Stop -NoWelcome
-    $context = Get-MgContext -ErrorAction Stop
-    if ($context) {
-        Write-Host 'SUCCESS: Connected to Microsoft Graph'
-        Write-Host ""Connected as: $($context.Account)""
-    }
-}
-catch {
-    Write-Error ""Failed to connect to Microsoft Graph: $_""
-    exit 1
-}";
-
-                var result = await _powerShellService.ExecuteCommandAsync(command);
+                var command = _powerShellCommandService.GetConnectGraphCommand();
+                var result = await ExecutePowerShellCommandAsync(command, "ConnectGraph");
                 GraphConnected = result.Contains("SUCCESS:");
                 
-                // Extract account information if connected
                 string? account = null;
                 
                 if (GraphConnected)
                 {
                     _loggingService.Log($"Connected to Microsoft Graph successfully\n{result}", LogLevel.Success);
                     
-                    // Extract account information from the result
                     foreach (var line in result.Split('\n'))
                     {
                         if (line.Contains("Connected as:"))
@@ -284,9 +191,7 @@ catch {
                     _loggingService.Log($"Error connecting to Microsoft Graph: {result}", LogLevel.Error);
                 }
                 
-                // Update session manager
                 _sessionManager.UpdateGraphConnection(GraphConnected, account);
-                
                 UpdateCanProceed();
             }
             catch (Exception ex)
@@ -310,17 +215,8 @@ catch {
                 IsBusy = true;
                 _loggingService.Log("Disconnecting from Microsoft Teams...", LogLevel.Info);
 
-                var command = @"
-try {
-    Disconnect-MicrosoftTeams -ErrorAction Stop
-    Write-Host 'SUCCESS: Disconnected from Microsoft Teams'
-}
-catch {
-    Write-Error ""Failed to disconnect from Microsoft Teams: $_""
-    exit 1
-}";
-
-                var result = await _powerShellService.ExecuteCommandAsync(command);
+                var command = _powerShellCommandService.GetDisconnectTeamsCommand();
+                var result = await ExecutePowerShellCommandAsync(command, "DisconnectTeams");
                 TeamsConnected = false;
                 _sessionManager.UpdateTeamsConnection(false);
                 _loggingService.Log("Disconnected from Microsoft Teams", LogLevel.Info);
@@ -344,17 +240,8 @@ catch {
                 IsBusy = true;
                 _loggingService.Log("Disconnecting from Microsoft Graph...", LogLevel.Info);
 
-                var command = @"
-try {
-    Disconnect-MgGraph -ErrorAction Stop
-    Write-Host 'SUCCESS: Disconnected from Microsoft Graph'
-}
-catch {
-    Write-Error ""Failed to disconnect from Microsoft Graph: $_""
-    exit 1
-}";
-
-                var result = await _powerShellService.ExecuteCommandAsync(command);
+                var command = _powerShellCommandService.GetDisconnectGraphCommand();
+                var result = await ExecutePowerShellCommandAsync(command, "DisconnectGraph");
                 GraphConnected = false;
                 _sessionManager.UpdateGraphConnection(false);
                 _loggingService.Log("Disconnected from Microsoft Graph", LogLevel.Info);
@@ -375,8 +262,23 @@ catch {
             CanProceed = ModulesChecked && TeamsConnected && GraphConnected;
         }
 
-        partial void OnModulesCheckedChanged(bool value) => UpdateCanProceed();
-        partial void OnTeamsConnectedChanged(bool value) => UpdateCanProceed();
-        partial void OnGraphConnectedChanged(bool value) => UpdateCanProceed();
+        partial void OnModulesCheckedChanged(bool value) 
+        { 
+            UpdateCanProceed();
+            OnPropertyChanged(nameof(CanConnectTeams));
+            OnPropertyChanged(nameof(CanConnectGraph));
+        }
+        
+        partial void OnTeamsConnectedChanged(bool value) 
+        { 
+            UpdateCanProceed();
+            OnPropertyChanged(nameof(CanConnectTeams));
+        }
+        
+        partial void OnGraphConnectedChanged(bool value) 
+        { 
+            UpdateCanProceed();
+            OnPropertyChanged(nameof(CanConnectGraph));
+        }
     }
 } 

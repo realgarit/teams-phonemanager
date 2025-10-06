@@ -11,7 +11,7 @@ namespace teams_phonemanager.Helpers
             {
                 return !boolValue;
             }
-            return true;
+            return value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -20,7 +20,7 @@ namespace teams_phonemanager.Helpers
             {
                 return !boolValue;
             }
-            return true;
+            return value;
         }
     }
 } 

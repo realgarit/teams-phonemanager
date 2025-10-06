@@ -27,7 +27,8 @@ namespace teams_phonemanager.Helpers
             
             if (item is string pageName)
             {
-                DataTemplate template = pageName switch
+                var normalizedPageName = pageName.Replace(" ", "");
+                DataTemplate template = normalizedPageName switch
                 {
                     "Welcome" => WelcomeTemplate,
                     "GetStarted" => GetStartedTemplate,
@@ -39,7 +40,7 @@ namespace teams_phonemanager.Helpers
                     _ => WelcomeTemplate
                 };
 
-                _loggingService.Log($"Selected template for page '{pageName}'", LogLevel.Info);
+                _loggingService.Log($"Selected template for page '{pageName}' (normalized: '{normalizedPageName}')", LogLevel.Info);
                 return template;
             }
 

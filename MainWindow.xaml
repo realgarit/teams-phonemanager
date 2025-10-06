@@ -8,6 +8,7 @@
         xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
         xmlns:helpers="clr-namespace:teams_phonemanager.Helpers"
         xmlns:views="clr-namespace:teams_phonemanager.Views"
+        xmlns:services="clr-namespace:teams_phonemanager.Services"
         mc:Ignorable="d"
         Title="Teams Phone Manager" Height="720" Width="1280"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"

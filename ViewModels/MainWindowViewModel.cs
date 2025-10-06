@@ -15,7 +15,6 @@ namespace teams_phonemanager.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private readonly LoggingService _loggingService;
         private readonly PaletteHelper _paletteHelper;
 
         public ObservableCollection<string> LogEntries => _loggingService.LogEntries;
@@ -34,28 +33,33 @@ namespace teams_phonemanager.ViewModels
         private bool _isLogExpanded;
 
         [ObservableProperty]
-        private string _version = "Version 1.11.24";
+        private string _version = ConstantsService.Application.Version;
         
         [ObservableProperty]
         private PhoneManagerVariables _variables = new();
 
         public MainWindowViewModel()
         {
-            _loggingService = LoggingService.Instance;
             _paletteHelper = new PaletteHelper();
             
-            // Initialize theme based on current system theme
             var theme = _paletteHelper.GetTheme();
             IsDarkTheme = theme.GetBaseTheme() == BaseTheme.Dark;
             
             _loggingService.Log("Application started", LogLevel.Info);
 
-            // Subscribe to logging service property changes
             _loggingService.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(LoggingService.LatestLogEntry))
                 {
                     OnPropertyChanged(nameof(LatestLogEntry));
+                }
+            };
+
+            _navigationService.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(NavigationService.CurrentPage))
+                {
+                    CurrentPage = _navigationService.CurrentPage;
                 }
             };
         }
@@ -69,10 +73,9 @@ namespace teams_phonemanager.ViewModels
         }
 
         [RelayCommand]
-        public void NavigateTo(string page)
+        public new void NavigateTo(string page)
         {
-            CurrentPage = page;
-            _loggingService.Log($"Navigated to {page} page", LogLevel.Info);
+            _navigationService.NavigateTo(page);
         }
 
         [RelayCommand]
