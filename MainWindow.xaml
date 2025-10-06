@@ -8,6 +8,7 @@
         xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
         xmlns:helpers="clr-namespace:teams_phonemanager.Helpers"
         xmlns:views="clr-namespace:teams_phonemanager.Views"
+        xmlns:services="clr-namespace:teams_phonemanager.Services"
         mc:Ignorable="d"
         Title="Teams Phone Manager" Height="720" Width="1280"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -296,7 +297,7 @@
                          TextTrimming="CharacterEllipsis" Margin="16,0" VerticalAlignment="Center"/>
                 
                 <!-- Copyright -->
-                <TextBlock Grid.Column="2" Text="Realgar © 2025. All rights reserved." VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="Realgar © 2025. Licensed under the MIT License." VerticalAlignment="Center"/>
             </Grid>
         </materialDesign:ColorZone>
 

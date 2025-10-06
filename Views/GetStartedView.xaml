@@ -35,7 +35,7 @@
             <!-- Teams Connection -->
             <Button Style="{StaticResource MaterialDesignRaisedButton}"
                     Command="{Binding ConnectTeamsCommand}"
-                    IsEnabled="{Binding ModulesChecked}"
+                    IsEnabled="{Binding CanConnectTeams}"
                     Margin="0,0,0,16">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="MicrosoftTeams" Margin="0,0,8,0"/>
@@ -56,7 +56,7 @@
             <!-- Graph Connection -->
             <Button Style="{StaticResource MaterialDesignRaisedButton}"
                     Command="{Binding ConnectGraphCommand}"
-                    IsEnabled="{Binding ModulesChecked}"
+                    IsEnabled="{Binding CanConnectGraph}"
                     Margin="0,0,0,16">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="MicrosoftAzure" Margin="0,0,8,0"/>
@@ -76,7 +76,7 @@
 
             <!-- Proceed Button -->
             <Button Style="{StaticResource MaterialDesignRaisedButton}"
-                    Command="{Binding NavigateToCommand}"
+                    Command="{Binding NavigateToPageCommand}"
                     CommandParameter="Variables"
                     IsEnabled="{Binding CanProceed}"
                     Margin="0,32,0,0">

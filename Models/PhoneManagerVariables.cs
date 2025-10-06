@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using CommunityToolkit.Mvvm.ComponentModel;
+using teams_phonemanager.Services;
 
 namespace teams_phonemanager.Models
 {
@@ -38,13 +39,13 @@ namespace teams_phonemanager.Models
         private string _usageLocation = string.Empty;
 
         [ObservableProperty]
-        private string _skuId = "440eaaa8-b3e0-484b-a8be-62870b9ba70a";
+        private string _skuId = ConstantsService.TeamsPhone.SkuId;
 
         [ObservableProperty]
-        private string _csAppCqId = "11cd3e2e-fccb-42ad-ad00-878b93575e07";
+        private string _csAppCqId = ConstantsService.TeamsPhone.CallQueueAppId;
 
         [ObservableProperty]
-        private string _csAppAaId = "ce933385-9390-45d1-9512-c8d228074e07";
+        private string _csAppAaId = ConstantsService.TeamsPhone.AutoAttendantAppId;
 
         [ObservableProperty]
         private string _raaAnr = string.Empty;
@@ -79,7 +80,6 @@ namespace teams_phonemanager.Models
         [ObservableProperty]
         private DateTime _holidayDate = DateTime.Now;
 
-        // Auto-generated variables (read-only)
         public string M365Group => $"ttgrp-{Customer}-{CustomerGroupName}";
         public string RacqUPN => $"racq-{Customer}-{CustomerGroupName}{MsFallbackDomain}";
         public string RacqDisplayName => $"racq-{Customer}-{CustomerGroupName}";
@@ -96,7 +96,6 @@ namespace teams_phonemanager.Models
                 string prefix = $"hd-{Customer}-";
                 string newValue = value;
 
-                // Remove any duplicate prefixes that might have been added
                 while (newValue.StartsWith("hd-"))
                 {
                     int nextDash = newValue.IndexOf('-', 3);

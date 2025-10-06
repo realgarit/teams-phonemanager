@@ -83,7 +83,7 @@
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
                             <Button Style="{StaticResource MaterialDesignFlatButton}"
-                                    Command="{Binding NavigateToVariablesCommand}"
+                                    Command="{Binding NavigateToVariablesPageCommand}"
                                     Margin="0,0,8,0">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon Kind="Variable" Margin="0,0,8,0"/>

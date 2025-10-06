@@ -21,41 +21,31 @@ namespace teams_phonemanager.Services
             }
         }
         
-        // Module availability state
         public bool ModulesChecked { get; set; }
         
-        // Connection states
         public bool TeamsConnected { get; set; }
         public bool GraphConnected { get; set; }
         
-        // Session information
         public string? TeamsAccount { get; set; }
         public string? GraphAccount { get; set; }
         
-        // Tenant information
         public string? TeamsTenantId { get; set; }
         public string? TeamsTenantName { get; set; }
         
-        // Session timestamp
         public DateTime LastTeamsConnection { get; set; }
         public DateTime LastGraphConnection { get; set; }
         
-        // Session status
         public bool IsSessionValid => TeamsConnected && GraphConnected;
         
-        // Session duration
         public TimeSpan TeamsSessionDuration => DateTime.Now - LastTeamsConnection;
         public TimeSpan GraphSessionDuration => DateTime.Now - LastGraphConnection;
         
-        // Session timeout (24 hours)
         public TimeSpan SessionTimeout => TimeSpan.FromHours(24);
         
-        // Check if session is expired
         public bool IsSessionExpired => 
             TeamsSessionDuration > SessionTimeout || 
             GraphSessionDuration > SessionTimeout;
         
-        // Update Teams connection state
         public void UpdateTeamsConnection(bool connected, string? account = null)
         {
             TeamsConnected = connected;
@@ -72,7 +62,6 @@ namespace teams_phonemanager.Services
             }
         }
         
-        // Update Graph connection state
         public void UpdateGraphConnection(bool connected, string? account = null)
         {
             GraphConnected = connected;
@@ -89,14 +78,12 @@ namespace teams_phonemanager.Services
             }
         }
         
-        // Update module availability
         public void UpdateModulesChecked(bool modulesChecked)
         {
             ModulesChecked = modulesChecked;
             LoggingService.Instance.Log($"Modules checked state updated: {modulesChecked}", LogLevel.Info);
         }
         
-        // Update tenant information
         public void UpdateTeamsTenantInfo(string tenantId, string tenantName)
         {
             TeamsTenantId = tenantId;
@@ -104,7 +91,6 @@ namespace teams_phonemanager.Services
             LoggingService.Instance.Log($"Teams tenant info updated: {tenantName} ({tenantId})", LogLevel.Info);
         }
         
-        // Reset all session data
         public void ResetSession()
         {
             TeamsConnected = false;

@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -12,9 +12,6 @@ using teams_phonemanager.Services;
 
 namespace teams_phonemanager;
 
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
 public partial class MainWindow : Window
 {
     public MainWindow()
@@ -25,6 +22,6 @@ public partial class MainWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
-        PowerShellService.Instance.Dispose();
+        PowerShellContextService.Instance.Dispose();
     }
 }
