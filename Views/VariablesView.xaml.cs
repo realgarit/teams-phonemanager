@@ -7,6 +7,7 @@ namespace teams_phonemanager.Views
         public VariablesView()
         {
             InitializeComponent();
+            DataContext = new ViewModels.VariablesViewModel();
         }
     }
 } 

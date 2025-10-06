@@ -6,19 +6,421 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:teams_phonemanager.Views"
              xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
+             xmlns:converters="clr-namespace:teams_phonemanager.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     
-    <UserControl.DataContext>
-        <viewmodels:VariablesViewModel/>
-    </UserControl.DataContext>
+    <UserControl.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        
+        <!-- Style for locked fields -->
+        <Style x:Key="LockedFieldStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}"/>
+            <Setter Property="Opacity" Value="0.7"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+        </Style>
+        
+        <!-- Style for semi-locked fields -->
+        <Style x:Key="SemiLockedFieldStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}"/>
+        </Style>
+        
+        <!-- Style for example text -->
+        <Style x:Key="ExampleTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBodyLight}"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+        </Style>
+    </UserControl.Resources>
 
-    <materialDesign:Card Margin="32" UniformCornerRadius="8">
-        <Grid>
-            <TextBlock Text="Variables View - Coming Soon"
-                     Style="{StaticResource MaterialDesignHeadline4TextBlock}"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"/>
-        </Grid>
-    </materialDesign:Card>
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Welcome Message -->
+        <TextBlock Text="{Binding WelcomeMessage}"
+                 Style="{StaticResource MaterialDesignBody1TextBlock}"
+                 TextWrapping="Wrap"
+                 Margin="0,0,0,16"/>
+
+        <!-- Variables Form -->
+        <ScrollViewer Grid.Row="1" IsEnabled="{Binding CanProceed}">
+            <StackPanel>
+                <!-- General Variables -->
+                <TextBlock Text="General Variables"
+                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                         Margin="0,0,0,16"/>
+                
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,8,8">
+                        <TextBox materialDesign:HintAssist.Hint="Customer Legal Name"
+                                 Text="{Binding Variables.CustomerLegalName, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                        <TextBlock Text="Example: Acme Corp" Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="8,0,0,8">
+                        <TextBox materialDesign:HintAssist.Hint="MS Fallback Domain"
+                                 Text="{Binding Variables.MsFallbackDomain, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                        <TextBlock Text="Example: @acme.onmicrosoft.com" Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,8,8">
+                        <TextBox materialDesign:HintAssist.Hint="Customer"
+                                 Text="{Binding Variables.Customer, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                        <TextBlock Text="Example: acm-luc" Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="1" Grid.Column="1" Margin="8,0,0,8">
+                        <TextBox materialDesign:HintAssist.Hint="Customer Group Name"
+                                 Text="{Binding Variables.CustomerGroupName, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                        <TextBlock Text="Example: immo" Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,8,8">
+                        <TextBox materialDesign:HintAssist.Hint="Language ID"
+                                 Text="{Binding Variables.LanguageId, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                        <TextBlock Text="Example: de-DE" Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="2" Grid.Column="1" Margin="8,0,0,8">
+                        <TextBox materialDesign:HintAssist.Hint="Time Zone ID"
+                                 Text="{Binding Variables.TimeZoneId, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                        <TextBlock Text="Example: W. Europe Standard Time" Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,0,8,8">
+                        <TextBox materialDesign:HintAssist.Hint="Usage Location"
+                                 Text="{Binding Variables.UsageLocation, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                        <TextBlock Text="Example: CH" Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="3" Grid.Column="1" Margin="8,0,0,8">
+                        <Grid>
+                            <TextBox materialDesign:HintAssist.Hint="SKU ID"
+                                     Text="{Binding Variables.SkuId, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource LockedFieldStyle}"/>
+                            <materialDesign:PackIcon Kind="Lock" 
+                                                   HorizontalAlignment="Right" 
+                                                   VerticalAlignment="Center" 
+                                                   Margin="0,0,8,0"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Call Queues Variables -->
+                <TextBlock Text="Call Queues Variables"
+                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                         Margin="0,0,0,16"/>
+                
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid>
+                        <TextBox Grid.Column="0"
+                                 materialDesign:HintAssist.Hint="CS App CQ ID"
+                                 Text="{Binding Variables.CsAppCqId, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource LockedFieldStyle}"/>
+                        <materialDesign:PackIcon Kind="Lock" 
+                                               HorizontalAlignment="Right" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0"/>
+                    </Grid>
+                </Grid>
+
+                <!-- Auto Attendants Variables -->
+                <TextBlock Text="Auto Attendants Variables"
+                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                         Margin="0,0,0,16"/>
+                
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Grid.Column="0" Margin="0,0,8,8">
+                        <TextBox materialDesign:HintAssist.Hint="CS App AA ID"
+                                 Text="{Binding Variables.CsAppAaId, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource LockedFieldStyle}"/>
+                        <materialDesign:PackIcon Kind="Lock" 
+                                               HorizontalAlignment="Right" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0"/>
+                    </Grid>
+                    
+                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="8,0,0,8">
+                        <TextBox materialDesign:HintAssist.Hint="Phone Number Type"
+                                 Text="{Binding Variables.PhoneNumberType, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                        <TextBlock Text="Example: DirectRouting" Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
+                        <TextBox materialDesign:HintAssist.Hint="RAAA Number Name"
+                                 Text="{Binding Variables.RaaAnrName, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                        <TextBlock Text="Example: hn for 'Hauptnummer'" Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
+                        <TextBox materialDesign:HintAssist.Hint="RAAA Number"
+                                 Text="{Binding Variables.RaaAnr, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                        <TextBlock Text="Example: +41413290024" Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
+                        <TextBox materialDesign:HintAssist.Hint="Default Call Flow Greeting Prompt (DE)"
+                                 Text="{Binding Variables.DefaultCallFlowGreetingPromptDE, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                        <TextBlock Text="Example: Herzlich Willkommen bei der Acme Corp!" Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
+                        <TextBox materialDesign:HintAssist.Hint="After Hours Call Flow Greeting Prompt (DE)"
+                                 Text="{Binding Variables.AfterHoursCallFlowGreetingPromptDE, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                        <TextBlock Text="Example: Herzlich Willkommen bei der Acme Corp, Sie rufen ausserhalb der Öffnungszeiten." Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+                             Text="Opening Hours 1"
+                             Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                             Margin="0,0,0,8"/>
+
+                    <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
+                        <StackPanel Width="100" Margin="0,0,8,0">
+                            <TextBox materialDesign:HintAssist.Hint="Start Time"
+                                     Text="{Binding Variables.OpeningHours1Start, StringFormat=HH:mm}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                            <TextBlock Text="Example: 08:00" Style="{StaticResource ExampleTextStyle}"/>
+                        </StackPanel>
+                        <StackPanel Width="100">
+                            <TextBox materialDesign:HintAssist.Hint="End Time"
+                                     Text="{Binding Variables.OpeningHours1End, StringFormat=HH:mm}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                            <TextBlock Text="Example: 12:00" Style="{StaticResource ExampleTextStyle}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <TextBlock Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"
+                             Text="Opening Hours 2"
+                             Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                             Margin="0,0,0,8"/>
+
+                    <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
+                        <StackPanel Width="100" Margin="0,0,8,0">
+                            <TextBox materialDesign:HintAssist.Hint="Start Time"
+                                     Text="{Binding Variables.OpeningHours2Start, StringFormat=HH:mm}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                            <TextBlock Text="Example: 13:30" Style="{StaticResource ExampleTextStyle}"/>
+                        </StackPanel>
+                        <StackPanel Width="100">
+                            <TextBox materialDesign:HintAssist.Hint="End Time"
+                                     Text="{Binding Variables.OpeningHours2End, StringFormat=HH:mm}"
+                                     Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                            <TextBlock Text="Example: 17:00" Style="{StaticResource ExampleTextStyle}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Holidays Variables -->
+                <TextBlock Text="Holidays Variables"
+                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                         Margin="0,0,0,16"/>
+                
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,8,8">
+                        <Grid>
+                            <TextBox materialDesign:HintAssist.Hint="Holiday Name"
+                                     Text="{Binding Variables.HolidayNameSuffix, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource SemiLockedFieldStyle}">
+                                <TextBox.Template>
+                                    <ControlTemplate TargetType="TextBox">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" 
+                                                    Background="Transparent"
+                                                    Padding="14,8,4,8"
+                                                    BorderThickness="1,1,0,1"
+                                                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                                    Opacity="0.7">
+                                                <TextBlock Text="{Binding Variables.Customer, StringFormat=hd-\{0\}-, FallbackValue=hd-}"
+                                                         VerticalAlignment="Center"
+                                                         Height="{Binding ActualHeight, ElementName=PART_ContentHost}"/>
+                                            </Border>
+                                            <Border Grid.Column="1"
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderThickness="0,1,1,1"
+                                                    BorderBrush="{TemplateBinding BorderBrush}">
+                                                <ScrollViewer x:Name="PART_ContentHost" 
+                                                            Focusable="false" 
+                                                            HorizontalScrollBarVisibility="Hidden" 
+                                                            VerticalScrollBarVisibility="Hidden"
+                                                            VerticalAlignment="Center"
+                                                            Padding="4,8,14,8"
+                                                            Margin="0"/>
+                                            </Border>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </TextBox.Template>
+                            </TextBox>
+                        </Grid>
+                        <TextBlock Text="Example: kantonal-2025" Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="8,0,0,8">
+                        <DatePicker materialDesign:HintAssist.Hint="Holiday Date"
+                                   SelectedDate="{Binding Variables.HolidayDate, UpdateSourceTrigger=PropertyChanged}"
+                                   Style="{StaticResource MaterialDesignOutlinedDatePicker}"/>
+                        <TextBlock Text="Example: 01.01.2025" Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
+                        <TextBox materialDesign:HintAssist.Hint="Holiday Greeting Prompt (DE)"
+                                 Text="{Binding Variables.HolidayGreetingPromptDE, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
+                        <TextBlock Text="Example: Herzlich Willkommen bei der Acme Corp. Leider können wir Ihren Anruf derzeit nicht entgegennehmen, da Sie uns an einem Feiertag anrufen." Style="{StaticResource ExampleTextStyle}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Auto-generated Variables -->
+                <TextBlock Text="Auto-generated Variables"
+                         Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                         Margin="0,0,0,16"/>
+                
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Grid.Column="0" Margin="0,0,8,8">
+                        <TextBox materialDesign:HintAssist.Hint="M365 Group"
+                                 Text="{Binding Variables.M365Group, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource LockedFieldStyle}"/>
+                        <materialDesign:PackIcon Kind="Lock" 
+                                               HorizontalAlignment="Right" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0"/>
+                    </Grid>
+                    
+                    <Grid Grid.Row="0" Grid.Column="1" Margin="8,0,0,8">
+                        <TextBox materialDesign:HintAssist.Hint="RACQ UPN"
+                                 Text="{Binding Variables.RacqUPN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource LockedFieldStyle}"/>
+                        <materialDesign:PackIcon Kind="Lock" 
+                                               HorizontalAlignment="Right" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0"/>
+                    </Grid>
+                    
+                    <Grid Grid.Row="1" Grid.Column="0" Margin="0,0,8,8">
+                        <TextBox materialDesign:HintAssist.Hint="RACQ Display Name"
+                                 Text="{Binding Variables.RacqDisplayName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource LockedFieldStyle}"/>
+                        <materialDesign:PackIcon Kind="Lock" 
+                                               HorizontalAlignment="Right" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0"/>
+                    </Grid>
+                    
+                    <Grid Grid.Row="1" Grid.Column="1" Margin="8,0,0,8">
+                        <TextBox materialDesign:HintAssist.Hint="CQ Display Name"
+                                 Text="{Binding Variables.CqDisplayName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource LockedFieldStyle}"/>
+                        <materialDesign:PackIcon Kind="Lock" 
+                                               HorizontalAlignment="Right" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0"/>
+                    </Grid>
+                    
+                    <Grid Grid.Row="2" Grid.Column="0" Margin="0,0,8,8">
+                        <TextBox materialDesign:HintAssist.Hint="RAAA UPN"
+                                 Text="{Binding Variables.RaaaUPN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource LockedFieldStyle}"/>
+                        <materialDesign:PackIcon Kind="Lock" 
+                                               HorizontalAlignment="Right" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0"/>
+                    </Grid>
+                    
+                    <Grid Grid.Row="2" Grid.Column="1" Margin="8,0,0,8">
+                        <TextBox materialDesign:HintAssist.Hint="RAAA Display Name"
+                                 Text="{Binding Variables.RaaaDisplayName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource LockedFieldStyle}"/>
+                        <materialDesign:PackIcon Kind="Lock" 
+                                               HorizontalAlignment="Right" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0"/>
+                    </Grid>
+                    
+                    <Grid Grid.Row="3" Grid.Column="0" Margin="0,0,8,8">
+                        <TextBox materialDesign:HintAssist.Hint="AA Display Name"
+                                 Text="{Binding Variables.AaDisplayName, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource LockedFieldStyle}"/>
+                        <materialDesign:PackIcon Kind="Lock" 
+                                               HorizontalAlignment="Right" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0"/>
+                    </Grid>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
 </UserControl> 

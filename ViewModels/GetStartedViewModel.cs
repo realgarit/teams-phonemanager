@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using teams_phonemanager.Services;
 using System.Threading.Tasks;
+using System;
 
 namespace teams_phonemanager.ViewModels
 {
@@ -9,6 +10,8 @@ namespace teams_phonemanager.ViewModels
     {
         private readonly PowerShellService _powerShellService;
         private readonly LoggingService _loggingService;
+        private readonly SessionManager _sessionManager;
+        private readonly MainWindowViewModel? _mainWindowViewModel;
 
         [ObservableProperty]
         private bool _modulesChecked;
@@ -26,126 +29,150 @@ namespace teams_phonemanager.ViewModels
         {
             _powerShellService = PowerShellService.Instance;
             _loggingService = LoggingService.Instance;
+            _sessionManager = SessionManager.Instance;
+            
+            if (App.Current?.MainWindow?.DataContext is MainWindowViewModel mainViewModel)
+            {
+                _mainWindowViewModel = mainViewModel;
+            }
+            else
+            {
+                _loggingService.Log("Failed to get MainWindowViewModel reference", LogLevel.Warning);
+            }
+            
+            // Initialize state from session manager
+            _modulesChecked = _sessionManager.ModulesChecked;
+            _teamsConnected = _sessionManager.TeamsConnected;
+            _graphConnected = _sessionManager.GraphConnected;
+            UpdateCanProceed();
+            
             _loggingService.Log("Get Started page loaded", LogLevel.Info);
+        }
+
+        [RelayCommand]
+        private void NavigateTo(string page)
+        {
+            if (!CanProceed)
+            {
+                _loggingService.Log("Cannot navigate: prerequisites not met", LogLevel.Warning);
+                return;
+            }
+
+            if (_mainWindowViewModel?.NavigateToCommand != null)
+            {
+                _mainWindowViewModel.NavigateToCommand.Execute(page);
+                _loggingService.Log($"Navigating to {page} page", LogLevel.Info);
+            }
+            else
+            {
+                _loggingService.Log("Navigation failed: MainWindowViewModel not available", LogLevel.Error);
+            }
         }
 
         [RelayCommand]
         private async Task CheckModulesAsync()
         {
-            IsBusy = true;
-            _loggingService.Log("Checking PowerShell modules...", LogLevel.Info);
+            try
+            {
+                IsBusy = true;
+                _loggingService.Log("Checking PowerShell modules...", LogLevel.Info);
 
-            var command = @"
+                // Command to check and install modules if needed
+                var command = @"
 $ErrorActionPreference = 'Stop'
-$error.Clear()
 $output = @()
 
-try {
-    # First ensure NuGet provider and PowerShellGet are available
-    if (-not (Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue)) {
-        $output += 'Installing NuGet package provider...'
-        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope AllUsers | Out-Null
-        $output += 'NuGet package provider installed successfully'
-    }
-    else {
-        $output += 'NuGet package provider is already installed'
-    }
-
-    if (-not (Get-Module -ListAvailable -Name PowerShellGet)) {
-        throw 'PowerShellGet module is not available. Please ensure PowerShell 5.1 or later is installed.'
-    }
-    else {
-        $output += 'PowerShellGet module is available'
-    }
-
-    # Set PSGallery as trusted
-    Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-    $output += 'PSGallery set as trusted'
-
-    # Check and install/import MicrosoftTeams module
-    if (-not (Get-Module -ListAvailable -Name MicrosoftTeams)) {
-        $output += 'Installing MicrosoftTeams module...'
-        Install-Module -Name MicrosoftTeams -Force -AllowClobber -Scope AllUsers
+# Check and install MicrosoftTeams module
+if (Get-Module -ListAvailable -Name MicrosoftTeams) {
+    $teamsModule = Get-Module -ListAvailable -Name MicrosoftTeams
+    $output += 'MicrosoftTeams module is available: ' + $teamsModule.Version
+} else {
+    $output += 'MicrosoftTeams module is NOT available, attempting to install...'
+    try {
+        Install-Module -Name MicrosoftTeams -Force -AllowClobber
         $output += 'MicrosoftTeams module installed successfully'
+    } catch {
+        $output += 'ERROR: Failed to install MicrosoftTeams module: ' + $_.Exception.Message
     }
-    else {
-        $output += 'MicrosoftTeams module is already installed'
-    }
-    
-    Import-Module MicrosoftTeams -ErrorAction Stop
-    $output += 'MicrosoftTeams module imported successfully'
-
-    # Check and install/import Microsoft.Graph module
-    if (-not (Get-Module -ListAvailable -Name Microsoft.Graph)) {
-        $output += 'Installing Microsoft.Graph module...'
-        Install-Module -Name Microsoft.Graph -Force -AllowClobber -Scope AllUsers
-        $output += 'Microsoft.Graph module installed successfully'
-    }
-    else {
-        $output += 'Microsoft.Graph module is already installed'
-    }
-    
-    Import-Module Microsoft.Graph -ErrorAction Stop
-    $output += 'Microsoft.Graph module imported successfully'
-
-    $output += 'SUCCESS: All modules are installed and imported successfully'
-    $output | ForEach-Object { Write-Host $_ }
 }
-catch {
-    $errorDetails = @{
-        Message = $_.Exception.Message
-        ScriptStackTrace = $_.ScriptStackTrace
-        FullError = $_
-    } | ConvertTo-Json
 
-    Write-Error ""ERROR: $($_.Exception.Message)`nStack Trace: $($_.ScriptStackTrace)""
-    exit 1
-}";
+# Check and install Microsoft.Graph module
+if (Get-Module -ListAvailable -Name Microsoft.Graph) {
+    $graphModule = Get-Module -ListAvailable -Name Microsoft.Graph
+    $output += 'Microsoft.Graph module is available: ' + $graphModule.Version
+} else {
+    $output += 'Microsoft.Graph module is NOT available, attempting to install...'
+    try {
+        Install-Module -Name Microsoft.Graph -Force
+        $output += 'Microsoft.Graph module installed successfully'
+    } catch {
+        $output += 'ERROR: Failed to install Microsoft.Graph module: ' + $_.Exception.Message
+    }
+}
 
-            var result = await _powerShellService.ExecuteCommandAsync(command);
-            ModulesChecked = result.Contains("SUCCESS:");
-            
-            if (ModulesChecked)
-            {
-                _loggingService.Log("PowerShell modules installed and imported successfully", LogLevel.Success);
-                // Log the detailed success information
-                foreach (var line in result.Split('\n'))
+$output | ForEach-Object { Write-Host $_ }
+";
+
+                var result = await _powerShellService.ExecuteCommandAsync(command);
+                
+                // Check if both modules are available or were successfully installed
+                ModulesChecked = (result.Contains("MicrosoftTeams module is available") || result.Contains("MicrosoftTeams module installed successfully")) && 
+                                (result.Contains("Microsoft.Graph module is available") || result.Contains("Microsoft.Graph module installed successfully"));
+                
+                // Update session manager
+                _sessionManager.UpdateModulesChecked(ModulesChecked);
+                
+                if (ModulesChecked)
                 {
-                    if (!string.IsNullOrWhiteSpace(line) && !line.Contains("SUCCESS:"))
+                    _loggingService.Log("PowerShell modules are available", LogLevel.Success);
+                    // Log the module versions and installation status
+                    foreach (var line in result.Split('\n'))
                     {
-                        _loggingService.Log(line.Trim(), LogLevel.Info);
+                        if (!string.IsNullOrWhiteSpace(line))
+                        {
+                            _loggingService.Log(line.Trim(), LogLevel.Info);
+                        }
                     }
                 }
+                else
+                {
+                    var errorMessage = "One or more required modules could not be installed";
+                    _loggingService.Log(errorMessage, LogLevel.Error);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var errorMessage = result.Contains("ERROR:") 
-                    ? result.Substring(result.IndexOf("ERROR:")).Trim() 
-                    : "Unknown error occurred while checking PowerShell modules";
-                _loggingService.Log(errorMessage, LogLevel.Error);
+                _loggingService.Log($"Error checking PowerShell modules: {ex.Message}", LogLevel.Error);
+                ModulesChecked = false;
+                _sessionManager.UpdateModulesChecked(false);
             }
-            
-            IsBusy = false;
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         [RelayCommand]
         private async Task ConnectTeamsAsync()
         {
-            if (!ModulesChecked)
+            try
             {
-                _loggingService.Log("Please check modules first", LogLevel.Warning);
-                return;
-            }
+                if (!ModulesChecked)
+                {
+                    _loggingService.Log("Please check modules first", LogLevel.Warning);
+                    return;
+                }
 
-            IsBusy = true;
-            _loggingService.Log("Connecting to Microsoft Teams...", LogLevel.Info);
+                IsBusy = true;
+                _loggingService.Log("Connecting to Microsoft Teams...", LogLevel.Info);
 
-            var command = @"
+                var command = @"
 try {
     Connect-MicrosoftTeams -ErrorAction Stop
     $connection = Get-CsTenant -ErrorAction Stop
     if ($connection) {
         Write-Host 'SUCCESS: Connected to Microsoft Teams'
+        Write-Host ""Connected to tenant: $($connection.DisplayName) ($($connection.TenantId))""
     }
 }
 catch {
@@ -153,37 +180,75 @@ catch {
     exit 1
 }";
 
-            var result = await _powerShellService.ExecuteCommandAsync(command);
-            TeamsConnected = result.Contains("SUCCESS:");
-            
-            if (TeamsConnected)
-            {
-                _loggingService.Log("Connected to Microsoft Teams successfully", LogLevel.Success);
+                var result = await _powerShellService.ExecuteCommandAsync(command);
+                TeamsConnected = result.Contains("SUCCESS:");
+                
+                // Extract tenant information if connected
+                string? tenantId = null;
+                string? tenantName = null;
+                
+                if (TeamsConnected)
+                {
+                    _loggingService.Log("Connected to Microsoft Teams successfully", LogLevel.Success);
+                    
+                    // Extract tenant information from the result
+                    foreach (var line in result.Split('\n'))
+                    {
+                        if (line.Contains("Connected to tenant:"))
+                        {
+                            var parts = line.Split(':')[1].Trim().Split('(');
+                            if (parts.Length >= 2)
+                            {
+                                tenantName = parts[0].Trim();
+                                tenantId = parts[1].Trim(')').Trim();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    _loggingService.Log($"Error connecting to Microsoft Teams: {result}", LogLevel.Error);
+                }
+                
+                // Update session manager
+                _sessionManager.UpdateTeamsConnection(TeamsConnected);
+                if (tenantId != null && tenantName != null)
+                {
+                    _sessionManager.UpdateTeamsTenantInfo(tenantId, tenantName);
+                }
+                
+                UpdateCanProceed();
             }
-            else
+            catch (Exception ex)
             {
-                _loggingService.Log($"Error connecting to Microsoft Teams: {result}", LogLevel.Error);
+                _loggingService.Log($"Error connecting to Microsoft Teams: {ex.Message}", LogLevel.Error);
+                TeamsConnected = false;
+                _sessionManager.UpdateTeamsConnection(false);
+                UpdateCanProceed();
             }
-            
-            UpdateCanProceed();
-            IsBusy = false;
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         [RelayCommand]
         private async Task ConnectGraphAsync()
         {
-            if (!ModulesChecked)
+            try
             {
-                _loggingService.Log("Please check modules first", LogLevel.Warning);
-                return;
-            }
+                if (!ModulesChecked)
+                {
+                    _loggingService.Log("Please check modules first", LogLevel.Warning);
+                    return;
+                }
 
-            IsBusy = true;
-            _loggingService.Log("Connecting to Microsoft Graph...", LogLevel.Info);
+                IsBusy = true;
+                _loggingService.Log("Connecting to Microsoft Graph...", LogLevel.Info);
 
-            var command = @"
+                var command = @"
 try {
-    Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All, Group.ReadWrite.All, Directory.ReadWrite.All -ErrorAction Stop
+    Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All, Group.ReadWrite.All, Directory.ReadWrite.All -ErrorAction Stop -NoWelcome
     $context = Get-MgContext -ErrorAction Stop
     if ($context) {
         Write-Host 'SUCCESS: Connected to Microsoft Graph'
@@ -195,29 +260,57 @@ catch {
     exit 1
 }";
 
-            var result = await _powerShellService.ExecuteCommandAsync(command);
-            GraphConnected = result.Contains("SUCCESS:");
-            
-            if (GraphConnected)
-            {
-                _loggingService.Log($"Connected to Microsoft Graph successfully\n{result}", LogLevel.Success);
+                var result = await _powerShellService.ExecuteCommandAsync(command);
+                GraphConnected = result.Contains("SUCCESS:");
+                
+                // Extract account information if connected
+                string? account = null;
+                
+                if (GraphConnected)
+                {
+                    _loggingService.Log($"Connected to Microsoft Graph successfully\n{result}", LogLevel.Success);
+                    
+                    // Extract account information from the result
+                    foreach (var line in result.Split('\n'))
+                    {
+                        if (line.Contains("Connected as:"))
+                        {
+                            account = line.Split(':')[1].Trim();
+                        }
+                    }
+                }
+                else
+                {
+                    _loggingService.Log($"Error connecting to Microsoft Graph: {result}", LogLevel.Error);
+                }
+                
+                // Update session manager
+                _sessionManager.UpdateGraphConnection(GraphConnected, account);
+                
+                UpdateCanProceed();
             }
-            else
+            catch (Exception ex)
             {
-                _loggingService.Log($"Error connecting to Microsoft Graph: {result}", LogLevel.Error);
+                _loggingService.Log($"Error connecting to Microsoft Graph: {ex.Message}", LogLevel.Error);
+                GraphConnected = false;
+                _sessionManager.UpdateGraphConnection(false);
+                UpdateCanProceed();
             }
-            
-            UpdateCanProceed();
-            IsBusy = false;
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         [RelayCommand]
         private async Task DisconnectTeamsAsync()
         {
-            IsBusy = true;
-            _loggingService.Log("Disconnecting from Microsoft Teams...", LogLevel.Info);
+            try
+            {
+                IsBusy = true;
+                _loggingService.Log("Disconnecting from Microsoft Teams...", LogLevel.Info);
 
-            var command = @"
+                var command = @"
 try {
     Disconnect-MicrosoftTeams -ErrorAction Stop
     Write-Host 'SUCCESS: Disconnected from Microsoft Teams'
@@ -227,20 +320,31 @@ catch {
     exit 1
 }";
 
-            var result = await _powerShellService.ExecuteCommandAsync(command);
-            TeamsConnected = false;
-            _loggingService.Log("Disconnected from Microsoft Teams", LogLevel.Info);
-            UpdateCanProceed();
-            IsBusy = false;
+                var result = await _powerShellService.ExecuteCommandAsync(command);
+                TeamsConnected = false;
+                _sessionManager.UpdateTeamsConnection(false);
+                _loggingService.Log("Disconnected from Microsoft Teams", LogLevel.Info);
+                UpdateCanProceed();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Error disconnecting from Microsoft Teams: {ex.Message}", LogLevel.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         [RelayCommand]
         private async Task DisconnectGraphAsync()
         {
-            IsBusy = true;
-            _loggingService.Log("Disconnecting from Microsoft Graph...", LogLevel.Info);
+            try
+            {
+                IsBusy = true;
+                _loggingService.Log("Disconnecting from Microsoft Graph...", LogLevel.Info);
 
-            var command = @"
+                var command = @"
 try {
     Disconnect-MgGraph -ErrorAction Stop
     Write-Host 'SUCCESS: Disconnected from Microsoft Graph'
@@ -250,16 +354,29 @@ catch {
     exit 1
 }";
 
-            var result = await _powerShellService.ExecuteCommandAsync(command);
-            GraphConnected = false;
-            _loggingService.Log("Disconnected from Microsoft Graph", LogLevel.Info);
-            UpdateCanProceed();
-            IsBusy = false;
+                var result = await _powerShellService.ExecuteCommandAsync(command);
+                GraphConnected = false;
+                _sessionManager.UpdateGraphConnection(false);
+                _loggingService.Log("Disconnected from Microsoft Graph", LogLevel.Info);
+                UpdateCanProceed();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Error disconnecting from Microsoft Graph: {ex.Message}", LogLevel.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         private void UpdateCanProceed()
         {
-            CanProceed = TeamsConnected && GraphConnected;
+            CanProceed = ModulesChecked && TeamsConnected && GraphConnected;
         }
+
+        partial void OnModulesCheckedChanged(bool value) => UpdateCanProceed();
+        partial void OnTeamsConnectedChanged(bool value) => UpdateCanProceed();
+        partial void OnGraphConnectedChanged(bool value) => UpdateCanProceed();
     }
 } 
