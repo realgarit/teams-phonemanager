@@ -57,7 +57,7 @@ namespace teams_phonemanager.Services
             if (_disposed)
                 throw new ObjectDisposedException(nameof(PowerShellContextService));
 
-            LoggingService.Instance.Log("Executing PowerShell command in persistent context", LogLevel.Info);
+            // Keep logs meaningful; avoid noisy debug spam
             
             try
             {

@@ -12,6 +12,7 @@
     
     <UserControl.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <converters:TimeSpanConverter x:Key="TimeSpanConverter"/>
         
         <!-- Style for locked fields -->
         <Style x:Key="LockedFieldStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
@@ -39,6 +40,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Welcome Message -->
@@ -227,13 +229,13 @@
                     <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
                         <StackPanel Width="100" Margin="0,0,8,0">
                             <TextBox materialDesign:HintAssist.Hint="Start Time"
-                                     Text="{Binding Variables.OpeningHours1Start, StringFormat=HH:mm}"
+                                     Text="{Binding Variables.OpeningHours1Start, Converter={StaticResource TimeSpanConverter}}"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
                             <TextBlock Text="Example: 08:00" Style="{StaticResource ExampleTextStyle}"/>
                         </StackPanel>
                         <StackPanel Width="100">
                             <TextBox materialDesign:HintAssist.Hint="End Time"
-                                     Text="{Binding Variables.OpeningHours1End, StringFormat=HH:mm}"
+                                     Text="{Binding Variables.OpeningHours1End, Converter={StaticResource TimeSpanConverter}}"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
                             <TextBlock Text="Example: 12:00" Style="{StaticResource ExampleTextStyle}"/>
                         </StackPanel>
@@ -247,13 +249,13 @@
                     <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
                         <StackPanel Width="100" Margin="0,0,8,0">
                             <TextBox materialDesign:HintAssist.Hint="Start Time"
-                                     Text="{Binding Variables.OpeningHours2Start, StringFormat=HH:mm}"
+                                     Text="{Binding Variables.OpeningHours2Start, Converter={StaticResource TimeSpanConverter}}"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
                             <TextBlock Text="Example: 13:30" Style="{StaticResource ExampleTextStyle}"/>
                         </StackPanel>
                         <StackPanel Width="100">
                             <TextBox materialDesign:HintAssist.Hint="End Time"
-                                     Text="{Binding Variables.OpeningHours2End, StringFormat=HH:mm}"
+                                     Text="{Binding Variables.OpeningHours2End, Converter={StaticResource TimeSpanConverter}}"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
                             <TextBlock Text="Example: 17:00" Style="{StaticResource ExampleTextStyle}"/>
                         </StackPanel>
@@ -422,5 +424,28 @@
                 </Grid>
             </StackPanel>
         </ScrollViewer>
+        
+        <!-- Save and Load Buttons -->
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Margin="0,16,0,0">
+            <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Command="{Binding LoadVariablesFromFileCommand}"
+                    Margin="0,0,8,0">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="FolderOpen" Margin="0,0,8,0"/>
+                    <TextBlock Text="Load Variables from File"/>
+                </StackPanel>
+            </Button>
+            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                    Command="{Binding SaveVariablesToFileCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="ContentSave" Margin="0,0,8,0"/>
+                    <TextBlock Text="Save Variables to File"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
     </Grid>
 </UserControl> 

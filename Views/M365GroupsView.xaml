@@ -16,31 +16,16 @@
     <materialDesign:Card Margin="32" UniformCornerRadius="8">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Header -->
-            <StackPanel Grid.Row="0" Margin="32,32,32,16">
-                <materialDesign:PackIcon Kind="AccountGroup" 
-                                       Width="48" 
-                                       Height="48"
-                                       Foreground="{DynamicResource PrimaryHueMidBrush}"/>
-                <TextBlock Text="M365 Groups"
-                         Style="{StaticResource MaterialDesignHeadline4TextBlock}"
-                         Margin="0,16,0,8"/>
-                <TextBlock Text="{Binding WelcomeMessage}"
-                         Style="{StaticResource MaterialDesignBody1TextBlock}"
-                         TextWrapping="Wrap"
-                         Opacity="0.87"/>
-            </StackPanel>
-
             <!-- Main Content -->
-            <Grid Grid.Row="1" Margin="32,0">
+            <Grid Grid.Row="0" Margin="32,32,32,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
@@ -58,21 +43,69 @@
                              Visibility="{Binding IsGroupChecked, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 </StackPanel>
 
-                <!-- Action Button -->
-                <Button Grid.Row="1"
-                        Style="{StaticResource MaterialDesignRaisedButton}"
-                        Command="{Binding ShowVariablesConfirmationCommand}"
-                        HorizontalAlignment="Left"
-                        Margin="0,16">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="Check" Margin="0,0,8,0"/>
-                        <TextBlock Text="Check Group"/>
-                    </StackPanel>
-                </Button>
+                <!-- Action + Search -->
+                <Grid Grid.Row="1" Margin="0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            Command="{Binding RetrieveM365GroupsCommand}"
+                            Margin="0,0,16,0">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Refresh" Margin="0,0,8,0"/>
+                            <TextBlock Text="Retrieve Groups"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button Grid.Column="1"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            Command="{Binding OpenCreateGroupDialogCommand}"
+                            Background="{DynamicResource SecondaryHueMidBrush}"
+                            Margin="0,0,16,0">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Plus" Margin="0,0,8,0"/>
+                            <TextBlock Text="Create New Group"/>
+                        </StackPanel>
+                    </Button>
+
+                    <TextBox Grid.Column="2"
+                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             materialDesign:HintAssist.Hint="Search by name, nickname, description, or ID"/>
+                </Grid>
+
+                <!-- Groups List -->
+                <DataGrid Grid.Row="2" 
+                          Margin="0,16" 
+                          ItemsSource="{Binding GroupsView}"
+                          AutoGenerateColumns="False"
+                          HeadersVisibility="Column"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          IsReadOnly="True"
+                          GridLinesVisibility="None"
+                          SelectionMode="Single"
+                          SelectionUnit="FullRow"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Auto"
+                          materialDesign:DataGridAssist.CellPadding="12,8,12,8"
+                          materialDesign:DataGridAssist.ColumnHeaderPadding="12,8,12,8">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" Width="2*"/>
+                        <DataGridTextColumn Header="Mail Nickname" Binding="{Binding MailNickname}" Width="*"/>
+                        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
+                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="2*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
             </Grid>
 
             <!-- Confirmation Dialog -->
-            <materialDesign:DialogHost Grid.RowSpan="3" 
+            <materialDesign:DialogHost Grid.RowSpan="2" 
                                      IsOpen="{Binding ShowConfirmation}">
                 <materialDesign:DialogHost.DialogContent>
                     <StackPanel Margin="16">
@@ -105,8 +138,59 @@
                 </materialDesign:DialogHost.DialogContent>
             </materialDesign:DialogHost>
 
+            <!-- Create Group Dialog -->
+            <materialDesign:DialogHost Grid.RowSpan="2" 
+                                     IsOpen="{Binding ShowCreateGroupDialog}">
+                <materialDesign:DialogHost.DialogContent>
+                    <StackPanel Margin="16" MinWidth="400">
+                        <TextBlock Text="Create New M365 Group"
+                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="Group Name:"
+                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding NewGroupName}"
+                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                               Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="Description (Optional):"
+                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding NewGroupDescription}"
+                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                               AcceptsReturn="True"
+                               TextWrapping="Wrap"
+                               Height="60"
+                               Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="The group name is auto-generated from your variables. You can modify it if needed."
+                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"
+                                 Margin="0,0,0,16"/>
+                        
+                        <StackPanel Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding CloseCreateGroupDialogCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Command="{Binding CreateNewGroupCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Plus" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Create Group"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:DialogHost.DialogContent>
+            </materialDesign:DialogHost>
+
             <!-- Progress Indicator -->
-            <Grid Grid.RowSpan="3"
+            <Grid Grid.RowSpan="2"
                   Background="{DynamicResource MaterialDesignBackground}"
                   Opacity="0.8"
                   Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">

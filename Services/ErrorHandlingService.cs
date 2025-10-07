@@ -19,7 +19,9 @@ namespace teams_phonemanager.Services
 
         public void HandlePowerShellError(string command, string error, string context = "")
         {
-            var message = $"PowerShell Error in {context}:\nCommand: {command}\nError: {error}";
+            // Clean up the command string to avoid formatting issues
+            var cleanCommand = command?.Replace("\r", "").Replace("\n", " ") ?? "";
+            var message = $"PowerShell Error in {context}:\nCommand: {cleanCommand}\nError: {error}";
             LoggingService.Instance.Log(message, LogLevel.Error);
             
             MessageBox.Show(
