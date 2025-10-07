@@ -44,15 +44,10 @@ namespace teams_phonemanager.ViewModels
         {
             try
             {
-                _loggingService.Log($"Executing PowerShell command in {context}", LogLevel.Info);
-                
-                // Check connection status before executing
-                var connectionStatus = await _powerShellContextService.GetConnectionStatusAsync();
-                _loggingService.Log($"Connection status before command: {connectionStatus}", LogLevel.Info);
-                
                 var result = await _powerShellContextService.ExecuteCommandAsync(command);
                 
-                if (result.Contains("ERROR:"))
+                // Only treat as error if result contains ERROR: and not SUCCESS
+                if (result.Contains("ERROR:") && !result.Contains("SUCCESS"))
                 {
                     _errorHandlingService.HandlePowerShellError(command, result, context);
                 }

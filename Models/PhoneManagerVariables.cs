@@ -75,6 +75,9 @@ namespace teams_phonemanager.Models
         private string _holidayNameSuffix = string.Empty;
 
         [ObservableProperty]
+        private string _m365GroupId = string.Empty;
+
+        [ObservableProperty]
         private string _holidayGreetingPromptDE = string.Empty;
 
         [ObservableProperty]
@@ -153,6 +156,26 @@ namespace teams_phonemanager.Models
         partial void OnHolidayNameSuffixChanged(string value)
         {
             OnPropertyChanged(nameof(HolidayName));
+        }
+
+        partial void OnOpeningHours1StartChanged(TimeSpan value)
+        {
+            OnPropertyChanged();
+        }
+
+        partial void OnOpeningHours1EndChanged(TimeSpan value)
+        {
+            OnPropertyChanged();
+        }
+
+        partial void OnOpeningHours2StartChanged(TimeSpan value)
+        {
+            OnPropertyChanged();
+        }
+
+        partial void OnOpeningHours2EndChanged(TimeSpan value)
+        {
+            OnPropertyChanged();
         }
     }
 } 

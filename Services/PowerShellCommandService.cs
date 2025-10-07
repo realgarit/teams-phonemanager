@@ -240,5 +240,150 @@ $HolidayAutoAttendant.CallFlows += @($HolidayCallFlow)
 $HolidayAutoAttendant.CallHandlingAssociations += @($HolidayCallHandlingAssociation)
 Set-CsAutoAttendant -Instance $HolidayAutoAttendant";
         }
+
+        public string GetRetrieveM365GroupsCommand()
+        {
+            return @"
+try {
+    $groups = Get-MgGroup -Filter ""startswith(displayName,'ttgrp')"" -All
+    if ($groups) {
+        Write-Host ""SUCCESS: Found $($groups.Count) groups starting with 'ttgrp'""
+        foreach ($group in $groups) {
+            Write-Host ""GROUP: $($group.DisplayName)|$($group.Id)|$($group.MailNickname)|$($group.Description)""
+        }
+    } else {
+        Write-Host ""INFO: No groups found starting with 'ttgrp'""
+    }
+}
+catch {
+    Write-Host ""ERROR: Failed to retrieve groups: $_""
+}";
+        }
+
+        public string GetRetrieveResourceAccountsCommand()
+        {
+            return @"
+try {
+    $resourceAccounts = Get-MgUser -Filter ""startswith(userPrincipalName,'racq-')"" -Property Id,DisplayName,UserPrincipalName,UsageLocation
+    if ($resourceAccounts) {
+        Write-Host ""SUCCESS: Found $($resourceAccounts.Count) resource accounts starting with 'racq-'""
+        foreach ($account in $resourceAccounts) {
+            Write-Host ""RESOURCEACCOUNT: $($account.DisplayName)|$($account.UserPrincipalName)|$($account.Id)|$($account.UsageLocation)""
+        }
+    } else {
+        Write-Host ""INFO: No resource accounts found starting with 'racq-'""
+    }
+}
+catch {
+    Write-Host ""ERROR: Failed to retrieve resource accounts: $_""
+}";
+        }
+
+        public string GetRetrieveCallQueuesCommand()
+        {
+            return @"
+try {
+    $callQueues = Get-CsCallQueue | Where-Object {$_.Name -like '*cq-*'}
+    if ($callQueues) {
+        Write-Host ""SUCCESS: Found $($callQueues.Count) call queues containing 'cq-'""
+        foreach ($queue in $callQueues) {
+            Write-Host ""CALLQUEUE: $($queue.Name)|$($queue.Identity)|$($queue.RoutingMethod)|$($queue.AgentAlertTime)""
+        }
+    } else {
+        Write-Host ""INFO: No call queues found containing 'cq-'""
+    }
+}
+catch {
+    Write-Host ""ERROR: Failed to retrieve call queues: $_""
+}";
+        }
+
+        public string GetCreateResourceAccountCommand(PhoneManagerVariables variables)
+        {
+            return $@"
+New-CsOnlineApplicationInstance -UserPrincipalName {variables.RacqUPN} -ApplicationId {variables.CsAppCqId} -DisplayName {variables.RacqDisplayName}
+Write-Host ""SUCCESS: Resource account {variables.RacqUPN} created successfully""";
+        }
+
+        public string GetUpdateResourceAccountUsageLocationCommand(string upn, string usageLocation)
+        {
+            return $@"
+try {{
+    Update-MgUser -UserId {upn} -UsageLocation {usageLocation}
+    Write-Host ""SUCCESS: Updated usage location for {upn} to {usageLocation}""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to update usage location for {upn}: $_""
+}}";
+        }
+
+        public string GetCreateCallQueueCommand(string name, string languageId, string m365GroupId)
+        {
+            return $@"
+try {{
+    New-CsCallQueue `
+    -Name {name} `
+    -RoutingMethod Attendant `
+    -AllowOptOut $true `
+    -ConferenceMode $true `
+    -AgentAlertTime 30 `
+    -LanguageId {languageId} `
+    -DistributionLists {m365GroupId} `
+    -OverflowThreshold 15 `
+    -OverflowAction Disconnect `
+    -TimeoutThreshold 30 `
+    -TimeoutAction Disconnect `
+    -UseDefaultMusicOnHold $true `
+    -PresenceBasedRouting $false
+    
+    Write-Host ""SUCCESS: Call queue {name} created successfully""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create call queue {name}: $_""
+}}";
+        }
+
+        public string GetAssociateResourceAccountWithCallQueueCommand(string resourceAccountUpn, string callQueueName)
+        {
+            return $@"
+try {{
+    $cqapplicationInstanceId = (Get-CsOnlineUser {resourceAccountUpn}).Identity
+    $cqautoAttendantId = (Get-CsCallQueue -NameFilter {callQueueName}).Identity
+    New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceId) -ConfigurationId $cqautoAttendantId -ConfigurationType CallQueue
+    Write-Host ""SUCCESS: Associated resource account {resourceAccountUpn} with call queue {callQueueName}""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to associate resource account {resourceAccountUpn} with call queue {callQueueName}: $_""
+}}";
+        }
+
+        public string GetM365GroupIdCommand(string groupName)
+        {
+            return $@"
+try {{
+    $group = Get-MgGroup -Filter ""DisplayName eq '{groupName}'""
+    if ($group) {{
+        Write-Host ""SUCCESS: M365 Group ID retrieved successfully""
+        Write-Host ""M365GROUPID: $($group.Id)""
+    }} else {{
+        Write-Host ""ERROR: M365 Group '{groupName}' not found""
+    }}
+}}
+catch {{
+    Write-Host ""ERROR: Failed to retrieve M365 Group ID for '{groupName}': $_""
+}}";
+        }
+
+        public string GetAssignLicenseCommand(string userId, string skuId)
+        {
+            return $@"
+try {{
+    Set-MgUserLicense -UserId {userId} -AddLicenses @{{SkuId = ""{skuId}""}} -RemoveLicenses @()
+    Write-Host ""SUCCESS: License assigned to user {userId} successfully""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to assign license to user {userId}: $_""
+}}";
+        }
     }
 }

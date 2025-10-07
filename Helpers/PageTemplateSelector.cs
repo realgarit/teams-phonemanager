@@ -23,8 +23,6 @@ namespace teams_phonemanager.Helpers
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            _loggingService.Log($"Selecting template for page: {item}", LogLevel.Info);
-            
             if (item is string pageName)
             {
                 var normalizedPageName = pageName.Replace(" ", "");
