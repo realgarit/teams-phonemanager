@@ -13,12 +13,843 @@
         <viewmodels:AutoAttendantsViewModel/>
     </UserControl.DataContext>
 
+    <Grid>
     <materialDesign:Card Margin="32" UniformCornerRadius="8">
         <Grid>
-            <TextBlock Text="Auto Attendants View - Coming Soon"
-                     Style="{StaticResource MaterialDesignHeadline4TextBlock}"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Main Content -->
+            <Grid Grid.Row="0" Margin="32,32,32,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Status Message -->
+                <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                    <TextBlock Text="{Binding StatusMessage}"
+                             Style="{StaticResource MaterialDesignBody1TextBlock}"
+                             Foreground="{DynamicResource PrimaryHueMidBrush}"
+                             TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <!-- Tab Control -->
+                <TabControl Grid.Row="1" Style="{StaticResource MaterialDesignTabControl}">
+                    
+                    <!-- Resource Accounts Tab -->
+                    <TabItem Header="Resource Accounts">
+                        <Grid Margin="16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Resource Accounts Actions -->
+                            <Grid Grid.Row="0" Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Button Grid.Column="0"
+                                        Style="{StaticResource MaterialDesignRaisedButton}"
+                                        Command="{Binding RetrieveResourceAccountsCommand}"
+                                        Margin="0,0,16,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="Refresh" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Retrieve Accounts"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button Grid.Column="1"
+                                        Style="{StaticResource MaterialDesignRaisedButton}"
+                                        Command="{Binding OpenCreateResourceAccountDialogCommand}"
+                                        Background="{DynamicResource SecondaryHueMidBrush}"
+                                        Margin="0,0,16,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="AccountPlus" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Create Account"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <TextBox Grid.Column="2"
+                                         Text="{Binding SearchResourceAccountsText, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         materialDesign:HintAssist.Hint="Search resource accounts"/>
+                            </Grid>
+
+                            <!-- Resource Accounts List -->
+                            <DataGrid Grid.Row="2"
+                                      ItemsSource="{Binding ResourceAccountsView}"
+                                      AutoGenerateColumns="False"
+                                      HeadersVisibility="Column"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False"
+                                      IsReadOnly="True"
+                                      GridLinesVisibility="None"
+                                      SelectionMode="Single"
+                                      SelectionUnit="FullRow"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      materialDesign:DataGridAssist.CellPadding="12,8,12,8"
+                                      materialDesign:DataGridAssist.ColumnHeaderPadding="12,8,12,8">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" Width="2*"/>
+                                    <DataGridTextColumn Header="UPN" Binding="{Binding UserPrincipalName}" Width="2*"/>
+                                    <DataGridTextColumn Header="Identity" Binding="{Binding Identity}" Width="2*"/>
+                                    <DataGridTextColumn Header="Usage Location" Binding="{Binding UsageLocation}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- Auto Attendants Tab -->
+                    <TabItem Header="Auto Attendants">
+                        <Grid Margin="16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Auto Attendants Actions -->
+                            <Grid Grid.Row="0" Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Button Grid.Column="0"
+                                        Style="{StaticResource MaterialDesignRaisedButton}"
+                                        Command="{Binding RetrieveAutoAttendantsCommand}"
+                                        Margin="0,0,16,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="Refresh" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Retrieve Auto Attendants"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <Button Grid.Column="1"
+                                        Style="{StaticResource MaterialDesignRaisedButton}"
+                                        Command="{Binding OpenCreateAutoAttendantDialogCommand}"
+                                        Background="{DynamicResource SecondaryHueMidBrush}"
+                                        Margin="0,0,16,0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="PhoneInTalk" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Create Auto Attendant"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <TextBox Grid.Column="2"
+                                         Text="{Binding SearchAutoAttendantsText, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                         materialDesign:HintAssist.Hint="Search auto attendants"/>
+                            </Grid>
+
+                            <!-- Auto Attendants List -->
+                            <DataGrid Grid.Row="2"
+                                      ItemsSource="{Binding AutoAttendantsView}"
+                                      AutoGenerateColumns="False"
+                                      HeadersVisibility="Column"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False"
+                                      IsReadOnly="True"
+                                      GridLinesVisibility="None"
+                                      SelectionMode="Single"
+                                      SelectionUnit="FullRow"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      materialDesign:DataGridAssist.CellPadding="12,8,12,8"
+                                      materialDesign:DataGridAssist.ColumnHeaderPadding="12,8,12,8">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*"/>
+                                    <DataGridTextColumn Header="Identity" Binding="{Binding Identity}" Width="2*"/>
+                                    <DataGridTextColumn Header="Language ID" Binding="{Binding LanguageId}" Width="*"/>
+                                    <DataGridTextColumn Header="Time Zone ID" Binding="{Binding TimeZoneId}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </TabItem>
+
+                    <!-- Step-by-Step Creation Tab -->
+                    <TabItem Header="Step-by-Step Creation">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="16">
+                            <StackPanel>
+                                <TextBlock Text="Follow these steps in order to create a complete auto attendant setup:"
+                                         Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                         Margin="0,0,0,24"/>
+
+                                <!-- Step 1: Create Resource Account -->
+                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                    <StackPanel>
+                                        <TextBlock Text="Step 1: Create Resource Account"
+                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 FontWeight="Bold"
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock Text="Create a resource account for the auto attendant. This account will handle the auto attendant functionality."
+                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 TextWrapping="Wrap"
+                                                 Margin="0,0,0,16"/>
+                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                                Command="{Binding OpenCreateResourceAccountDialogCommand}"
+                                                HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="AccountPlus" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Create Resource Account"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </materialDesign:Card>
+
+                                <!-- Step 2: Update Usage Location -->
+                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                    <StackPanel>
+                                        <TextBlock Text="Step 2: Update Usage Location"
+                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 FontWeight="Bold"
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock Text="Set the usage location for the resource account. This is required for licensing."
+                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 TextWrapping="Wrap"
+                                                 Margin="0,0,0,16"/>
+                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                                Command="{Binding OpenUpdateUsageLocationDialogCommand}"
+                                                HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="MapMarker" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Update Usage Location"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </materialDesign:Card>
+
+                                <!-- Step 3: Assign License -->
+                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                    <StackPanel>
+                                        <TextBlock Text="Step 3: Assign License"
+                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 FontWeight="Bold"
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock Text="Assign a license to the resource account. This is required for the resource account to function properly."
+                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 TextWrapping="Wrap"
+                                                 Margin="0,0,0,16"/>
+                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                                Command="{Binding AssignLicenseCommand}"
+                                                HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="Certificate" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Assign License"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </materialDesign:Card>
+
+                                <!-- Step 4: Validate Call Queue Resource Account -->
+                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                    <StackPanel>
+                                        <TextBlock Text="Step 4: Validate Call Queue Resource Account"
+                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 FontWeight="Bold"
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock Text="Validate that the Call Queue resource account exists and can be used as the call target for the auto attendant."
+                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 TextWrapping="Wrap"
+                                                 Margin="0,0,0,16"/>
+                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                                Command="{Binding OpenValidateCallQueueDialogCommand}"
+                                                HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="AccountCheck" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Validate Call Queue Account"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </materialDesign:Card>
+
+                                <!-- Step 5: Create Call Target -->
+                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                    <StackPanel>
+                                        <TextBlock Text="Step 5: Create Call Target"
+                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 FontWeight="Bold"
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock Text="Create the callable entity that will be used as the call target for the auto attendant."
+                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 TextWrapping="Wrap"
+                                                 Margin="0,0,0,16"/>
+                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                                Command="{Binding OpenCreateCallTargetDialogCommand}"
+                                                HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="AccountArrowRight" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Create Call Target"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </materialDesign:Card>
+
+                                <!-- Step 6: Create Default Call Flow -->
+                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                    <StackPanel>
+                                        <TextBlock Text="Step 6: Create Default Call Flow"
+                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 FontWeight="Bold"
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock Text="Create the default call flow with menu options for the auto attendant."
+                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 TextWrapping="Wrap"
+                                                 Margin="0,0,0,16"/>
+                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                                Command="{Binding OpenCreateDefaultCallFlowDialogCommand}"
+                                                HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="PhoneForward" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Create Default Call Flow"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </materialDesign:Card>
+
+                                <!-- Step 7: Create After Hours Call Flow -->
+                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                    <StackPanel>
+                                        <TextBlock Text="Step 7: Create After Hours Call Flow"
+                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 FontWeight="Bold"
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock Text="Create the after hours call flow with disconnect option."
+                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 TextWrapping="Wrap"
+                                                 Margin="0,0,0,16"/>
+                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                                Command="{Binding OpenCreateAfterHoursCallFlowDialogCommand}"
+                                                HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="PhoneHangup" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Create After Hours Call Flow"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </materialDesign:Card>
+
+                                <!-- Step 8: Create After Hours Schedule -->
+                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                    <StackPanel>
+                                        <TextBlock Text="Step 8: Create After Hours Schedule"
+                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 FontWeight="Bold"
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock Text="Create the schedule that defines when the after hours call flow should be active."
+                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 TextWrapping="Wrap"
+                                                 Margin="0,0,0,16"/>
+                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                                Command="{Binding OpenCreateAfterHoursScheduleDialogCommand}"
+                                                HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="ClockOutline" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Create After Hours Schedule"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </materialDesign:Card>
+
+                                <!-- Step 9: Create Call Handling Association -->
+                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                    <StackPanel>
+                                        <TextBlock Text="Step 9: Create Call Handling Association"
+                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 FontWeight="Bold"
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock Text="Associate the after hours schedule with the after hours call flow."
+                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 TextWrapping="Wrap"
+                                                 Margin="0,0,0,16"/>
+                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                                Command="{Binding OpenCreateCallHandlingAssociationDialogCommand}"
+                                                HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="Link" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Create Call Handling Association"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </materialDesign:Card>
+
+                                <!-- Step 10: Create Auto Attendant -->
+                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                    <StackPanel>
+                                        <TextBlock Text="Step 10: Create Auto Attendant"
+                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 FontWeight="Bold"
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock Text="Create the actual auto attendant with all the configured call flows and associations."
+                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 TextWrapping="Wrap"
+                                                 Margin="0,0,0,16"/>
+                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                                Command="{Binding OpenCreateAutoAttendantDialogCommand}"
+                                                HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="PhoneInTalk" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Create Auto Attendant"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </materialDesign:Card>
+
+                                <!-- Step 11: Associate Resource Account -->
+                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                    <StackPanel>
+                                        <TextBlock Text="Step 11: Associate Resource Account"
+                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 FontWeight="Bold"
+                                                 Margin="0,0,0,8"/>
+                                        <TextBlock Text="Associate the resource account with the auto attendant to complete the setup."
+                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 TextWrapping="Wrap"
+                                                 Margin="0,0,0,16"/>
+                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                                Command="{Binding OpenAssociateDialogCommand}"
+                                                HorizontalAlignment="Left">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="Link" Margin="0,0,8,0"/>
+                                                <TextBlock Text="Associate Account"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </materialDesign:Card>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+
+            <!-- Progress Bar -->
+            <ProgressBar Grid.Row="1" 
+                         IsIndeterminate="{Binding IsBusy}"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}"
+                         Height="4"
+                         Margin="32,0,32,16"/>
         </Grid>
     </materialDesign:Card>
+
+            <!-- Create Resource Account Dialog -->
+            <materialDesign:DialogHost Grid.RowSpan="2" 
+                                     IsOpen="{Binding ShowCreateResourceAccountDialog}">
+                <materialDesign:DialogHost.DialogContent>
+                    <StackPanel Margin="16" MinWidth="400">
+                        <TextBlock Text="Create Resource Account"
+                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="UPN:"
+                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding ResourceAccountUpn}"
+                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                               Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="Display Name:"
+                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding ResourceAccountDisplayName}"
+                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                               Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="The values are auto-generated from your variables. You can modify them if needed."
+                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"
+                                 Margin="0,0,0,16"/>
+                        
+                        <StackPanel Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding CloseCreateResourceAccountDialogCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Command="{Binding CreateResourceAccountCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="AccountPlus" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Create Account"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:DialogHost.DialogContent>
+            </materialDesign:DialogHost>
+
+            <!-- Update Usage Location Dialog -->
+            <materialDesign:DialogHost Grid.RowSpan="2" 
+                                     IsOpen="{Binding ShowUpdateUsageLocationDialog}">
+                <materialDesign:DialogHost.DialogContent>
+                    <StackPanel Margin="16" MinWidth="400">
+                        <TextBlock Text="Update Usage Location"
+                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="Resource Account UPN:"
+                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding ResourceAccountUpn}"
+                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                               IsReadOnly="True"
+                               Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="This will update the usage location for the resource account. The value is taken from your variables."
+                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"
+                                 Margin="0,0,0,16"/>
+                        
+                        <StackPanel Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding CloseUpdateUsageLocationDialogCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Command="{Binding UpdateUsageLocationCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="MapMarker" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Update Location"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:DialogHost.DialogContent>
+            </materialDesign:DialogHost>
+
+            <!-- Create Auto Attendant Dialog -->
+            <materialDesign:DialogHost Grid.RowSpan="2" 
+                                     IsOpen="{Binding ShowCreateAutoAttendantDialog}">
+                <materialDesign:DialogHost.DialogContent>
+                    <StackPanel Margin="16" MinWidth="400">
+                        <TextBlock Text="Create Auto Attendant"
+                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="Auto Attendant Name:"
+                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding AutoAttendantName}"
+                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                               Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="The auto attendant name is auto-generated from your variables. Make sure to validate the Call Queue resource account before creating the auto attendant."
+                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"
+                                 Margin="0,0,0,16"/>
+                        
+                        <StackPanel Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding CloseCreateAutoAttendantDialogCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Command="{Binding CreateAutoAttendantCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="PhoneInTalk" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Create Auto Attendant"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:DialogHost.DialogContent>
+            </materialDesign:DialogHost>
+
+            <!-- Associate Resource Account Dialog -->
+            <materialDesign:DialogHost Grid.RowSpan="2" 
+                                     IsOpen="{Binding ShowAssociateDialog}">
+                <materialDesign:DialogHost.DialogContent>
+                    <StackPanel Margin="16" MinWidth="400">
+                        <TextBlock Text="Associate Resource Account with Auto Attendant"
+                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="Resource Account UPN:"
+                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding ResourceAccountUpn}"
+                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                               Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="Auto Attendant Name:"
+                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding AutoAttendantName}"
+                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                               Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="This will associate the resource account with the auto attendant to complete the setup."
+                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"
+                                 Margin="0,0,0,16"/>
+                        
+                        <StackPanel Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding CloseAssociateDialogCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Command="{Binding AssociateResourceAccountWithAutoAttendantCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Link" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Associate"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:DialogHost.DialogContent>
+            </materialDesign:DialogHost>
+
+            <!-- Validate Call Queue Resource Account Dialog -->
+            <materialDesign:DialogHost Grid.RowSpan="2" 
+                                     IsOpen="{Binding ShowValidateCallQueueDialog}">
+                <materialDesign:DialogHost.DialogContent>
+                    <StackPanel Margin="16" MinWidth="400">
+                        <TextBlock Text="Validate Call Queue Resource Account"
+                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="Call Queue Resource Account UPN:"
+                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Margin="0,0,0,8"/>
+                        <TextBox Text="{Binding CallQueueUpn}"
+                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                               Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="This will validate that the Call Queue resource account exists and can be used as the call target for the auto attendant. The value is auto-generated from your variables, but you can modify it if needed."
+                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"
+                                 Margin="0,0,0,16"/>
+                        
+                        <StackPanel Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding CloseValidateCallQueueDialogCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Command="{Binding ValidateCallQueueResourceAccountCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="AccountCheck" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Validate Account"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:DialogHost.DialogContent>
+            </materialDesign:DialogHost>
+
+            <!-- Create Call Target Dialog -->
+            <materialDesign:DialogHost Grid.RowSpan="2" 
+                                     IsOpen="{Binding ShowCreateCallTargetDialog}">
+                <materialDesign:DialogHost.DialogContent>
+                    <StackPanel Margin="16" MinWidth="400">
+                        <TextBlock Text="Create Call Target"
+                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="This will create the callable entity that will be used as the call target for the auto attendant."
+                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"
+                                 Margin="0,0,0,16"/>
+                        
+                        <StackPanel Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding CloseCreateCallTargetDialogCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Command="{Binding CreateCallTargetCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="AccountArrowRight" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Create Call Target"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:DialogHost.DialogContent>
+            </materialDesign:DialogHost>
+
+            <!-- Create Default Call Flow Dialog -->
+            <materialDesign:DialogHost Grid.RowSpan="2" 
+                                     IsOpen="{Binding ShowCreateDefaultCallFlowDialog}">
+                <materialDesign:DialogHost.DialogContent>
+                    <StackPanel Margin="16" MinWidth="400">
+                        <TextBlock Text="Create Default Call Flow"
+                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="This will create the default call flow with menu options for the auto attendant."
+                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"
+                                 Margin="0,0,0,16"/>
+                        
+                        <StackPanel Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding CloseCreateDefaultCallFlowDialogCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Command="{Binding CreateDefaultCallFlowCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="PhoneForward" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Create Default Call Flow"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:DialogHost.DialogContent>
+            </materialDesign:DialogHost>
+
+            <!-- Create After Hours Call Flow Dialog -->
+            <materialDesign:DialogHost Grid.RowSpan="2" 
+                                     IsOpen="{Binding ShowCreateAfterHoursCallFlowDialog}">
+                <materialDesign:DialogHost.DialogContent>
+                    <StackPanel Margin="16" MinWidth="400">
+                        <TextBlock Text="Create After Hours Call Flow"
+                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="This will create the after hours call flow with disconnect option."
+                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"
+                                 Margin="0,0,0,16"/>
+                        
+                        <StackPanel Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding CloseCreateAfterHoursCallFlowDialogCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Command="{Binding CreateAfterHoursCallFlowCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="PhoneHangup" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Create After Hours Call Flow"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:DialogHost.DialogContent>
+            </materialDesign:DialogHost>
+
+            <!-- Create After Hours Schedule Dialog -->
+            <materialDesign:DialogHost Grid.RowSpan="2" 
+                                     IsOpen="{Binding ShowCreateAfterHoursScheduleDialog}">
+                <materialDesign:DialogHost.DialogContent>
+                    <StackPanel Margin="16" MinWidth="400">
+                        <TextBlock Text="Create After Hours Schedule"
+                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="This will create the schedule that defines when the after hours call flow should be active."
+                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"
+                                 Margin="0,0,0,16"/>
+                        
+                        <StackPanel Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding CloseCreateAfterHoursScheduleDialogCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Command="{Binding CreateAfterHoursScheduleCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="ClockOutline" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Create After Hours Schedule"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:DialogHost.DialogContent>
+            </materialDesign:DialogHost>
+
+            <!-- Create Call Handling Association Dialog -->
+            <materialDesign:DialogHost Grid.RowSpan="2" 
+                                     IsOpen="{Binding ShowCreateCallHandlingAssociationDialog}">
+                <materialDesign:DialogHost.DialogContent>
+                    <StackPanel Margin="16" MinWidth="400">
+                        <TextBlock Text="Create Call Handling Association"
+                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="This will associate the after hours schedule with the after hours call flow."
+                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"
+                                 Margin="0,0,0,16"/>
+                        
+                        <StackPanel Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding CloseCreateCallHandlingAssociationDialogCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Command="{Binding CreateCallHandlingAssociationCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Link" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Create Call Handling Association"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </materialDesign:DialogHost.DialogContent>
+            </materialDesign:DialogHost>
+
+            <!-- Progress Indicator -->
+            <Grid Grid.RowSpan="2"
+                  Background="{DynamicResource MaterialDesignBackground}"
+                  Opacity="0.8"
+                  Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                           Value="0"
+                           IsIndeterminate="True"
+                           Width="50"
+                           Height="50"
+                           Margin="0,16,0,0"/>
+                
+                <!-- Waiting Message -->
+                <TextBlock Text="{Binding WaitingMessage, TargetNullValue=''}"
+                           Style="{StaticResource MaterialDesignBody2TextBlock}"
+                           TextWrapping="Wrap"
+                           Margin="0,8,0,0"
+                           TextAlignment="Center"
+                           Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+            </Grid>
+    </Grid>
 </UserControl> 

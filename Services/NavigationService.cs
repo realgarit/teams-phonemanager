@@ -61,6 +61,7 @@ namespace teams_phonemanager.Services
             NavigateTo("Auto Attendants");
         }
 
+
         public void NavigateToHolidays()
         {
             NavigateTo("Holidays");
