@@ -179,22 +179,16 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceI
         public string GetCreateAutoAttendantCommand(PhoneManagerVariables variables)
         {
             return $@"
-New-CsOnlineApplicationInstance -UserPrincipalName {variables.RaaaUPN} -ApplicationId {variables.CsAppAaId} -DisplayName {variables.RaaaDisplayName}
+New-CsOnlineApplicationInstance -UserPrincipalName ""{variables.RaaaUPN}"" -ApplicationId ""{variables.CsAppAaId}"" -DisplayName ""{variables.RaaaDisplayName}""
 
-Write-Host ""{ConstantsService.Messages.WaitingMessage}""
-Start-Sleep -Seconds {ConstantsService.PowerShell.DefaultWaitTimeSeconds}
-
-Update-MgUser -UserId {variables.RaaaUPN} -UsageLocation {variables.UsageLocation}
+Update-MgUser -UserId ""{variables.RaaaUPN}"" -UsageLocation ""{variables.UsageLocation}""
 
 $SkuId = ""{variables.SkuId}""
-Set-MgUserLicense -UserId {variables.RaaaUPN} -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
+Set-MgUserLicense -UserId ""{variables.RaaaUPN}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
 
-Write-Host ""{ConstantsService.Messages.LicenseWaitingMessage}""
-Start-Sleep -Seconds {ConstantsService.PowerShell.DefaultWaitTimeSeconds}
+Set-CsPhoneNumberAssignment -Identity ""{variables.RaaaUPN}"" -PhoneNumber ""{variables.RaaAnr}"" -PhoneNumberType ""{variables.PhoneNumberType}""
 
-Set-CsPhoneNumberAssignment -Identity {variables.RaaaUPN} -PhoneNumber {variables.RaaAnr} -PhoneNumberType {variables.PhoneNumberType}
-
-$racqUser = Get-CsOnlineUser {variables.RacqUPN}
+$racqUser = Get-CsOnlineUser ""{variables.RacqUPN}""
 if (-not $racqUser) {{
     throw ""Resource account {variables.RacqUPN} not found. Please ensure it was created successfully.""
 }}
@@ -204,18 +198,21 @@ $aamenuOptionDisconnect = New-CsAutoAttendantMenuOption -Action TransferCallToTa
 $aadefaultMenu = New-CsAutoAttendantMenu -Name ""Default menu"" -MenuOptions $aamenuOptionDisconnect
 $aadefaultCallFlow = New-CsAutoAttendantCallFlow -Name ""Default call flow"" -Greetings @(""{variables.DefaultCallFlowGreetingPromptDE}"") -Menu $aadefaultMenu
 
-$aaAfterHoursMenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic
-$aaafterHoursMenu = New-CsAutoAttendantMenu -Name ""After Hours menu"" -MenuOptions @($aaAfterHoursMenuOption)
+$aaafterHoursMenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic
+$aaafterHoursMenu = New-CsAutoAttendantMenu -Name ""After Hours menu"" -MenuOptions @($aaafterHoursMenuOption)
 $aaafterHoursCallFlow = New-CsAutoAttendantCallFlow -Name ""After Hours call flow"" -Greetings @(""{variables.AfterHoursCallFlowGreetingPromptDE}"") -Menu $aaafterHoursMenu
-$aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours @({{Start = ""{variables.OpeningHours1Start:hh\:mm}"", End = ""{variables.OpeningHours1End:hh\:mm}""}}, {{Start = ""{variables.OpeningHours2Start:hh\:mm}"", End = ""{variables.OpeningHours2End:hh\:mm}""}}) -TuesdayHours @({{Start = ""{variables.OpeningHours1Start:hh\:mm}"", End = ""{variables.OpeningHours1End:hh\:mm}""}}, {{Start = ""{variables.OpeningHours2Start:hh\:mm}"", End = ""{variables.OpeningHours2End:hh\:mm}""}}) -WednesdayHours @({{Start = ""{variables.OpeningHours1Start:hh\:mm}"", End = ""{variables.OpeningHours1End:hh\:mm}""}}, {{Start = ""{variables.OpeningHours2Start:hh\:mm}"", End = ""{variables.OpeningHours2End:hh\:mm}""}}) -ThursdayHours @({{Start = ""{variables.OpeningHours1Start:hh\:mm}"", End = ""{variables.OpeningHours1End:hh\:mm}""}}, {{Start = ""{variables.OpeningHours2Start:hh\:mm}"", End = ""{variables.OpeningHours2End:hh\:mm}""}}) -FridayHours @({{Start = ""{variables.OpeningHours1Start:hh\:mm}"", End = ""{variables.OpeningHours1End:hh\:mm}""}}, {{Start = ""{variables.OpeningHours2Start:hh\:mm}"", End = ""{variables.OpeningHours2End:hh\:mm}""}}) -Complement
+$aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -TuesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -WednesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -ThursdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -FridayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -Complement
 $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
-New-CsAutoAttendant -Name {variables.AaDisplayName} -DefaultCallFlow $aadefaultCallFlow -CallFlows @($aaafterHoursCallFlow) -CallHandlingAssociations @($aaafterHoursCallHandlingAssociation) -LanguageId {variables.LanguageId} -TimeZoneId {variables.TimeZoneId}
+New-CsAutoAttendant `
+-Name ""{variables.AaDisplayName}"" `
+-DefaultCallFlow $aadefaultCallFlow `
+-CallFlows @($aaafterHoursCallFlow) `
+-CallHandlingAssociations @($aaafterHoursCallHandlingAssociation) `
+-LanguageId ""{variables.LanguageId}"" `
+-TimeZoneId ""{variables.TimeZoneId}""
 
-Write-Host ""{ConstantsService.Messages.WaitingMessage}""
-Start-Sleep -Seconds {ConstantsService.PowerShell.DefaultWaitTimeSeconds}
-
-$aaapplicationInstanceId = (Get-CsOnlineUser {variables.RaaaUPN}).Identity
-$aaautoAttendantId = (Get-CsAutoAttendant -NameFilter {variables.AaDisplayName}).Identity
+$aaapplicationInstanceId = (Get-CsOnlineUser ""{variables.RaaaUPN}"").Identity
+$aaautoAttendantId = (Get-CsAutoAttendant -NameFilter ""{variables.AaDisplayName}"").Identity
 New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceId) -ConfigurationId $aaautoAttendantId -ConfigurationType AutoAttendant";
         }
 
@@ -383,6 +380,207 @@ try {{
 }}
 catch {{
     Write-Host ""ERROR: Failed to assign license to user {userId}: $_""
+}}";
+        }
+
+        public string GetRetrieveAutoAttendantResourceAccountsCommand()
+        {
+            return @"
+try {
+    $resourceAccounts = Get-MgUser -Filter ""startswith(userPrincipalName,'raaa-')"" -Property Id,DisplayName,UserPrincipalName,UsageLocation
+    if ($resourceAccounts) {
+        Write-Host ""SUCCESS: Found $($resourceAccounts.Count) resource accounts starting with 'raaa-'""
+        foreach ($account in $resourceAccounts) {
+            Write-Host ""RESOURCEACCOUNT: $($account.DisplayName)|$($account.UserPrincipalName)|$($account.Id)|$($account.UsageLocation)""
+        }
+    } else {
+        Write-Host ""INFO: No resource accounts found starting with 'raaa-'""
+    }
+}
+catch {
+    Write-Host ""ERROR: Failed to retrieve resource accounts: $_""
+}";
+        }
+
+        public string GetRetrieveAutoAttendantsCommand()
+        {
+            return @"
+try {
+    $autoAttendants = Get-CsAutoAttendant | Where-Object {$_.Name -like '*aa-*'}
+    if ($autoAttendants) {
+        Write-Host ""SUCCESS: Found $($autoAttendants.Count) auto attendants containing 'aa-'""
+        foreach ($aa in $autoAttendants) {
+            Write-Host ""AUTOATTENDANT: $($aa.Name)|$($aa.Identity)|$($aa.LanguageId)|$($aa.TimeZoneId)""
+        }
+    } else {
+        Write-Host ""INFO: No auto attendants found containing 'aa-'""
+    }
+}
+catch {
+    Write-Host ""ERROR: Failed to retrieve auto attendants: $_""
+}";
+        }
+
+        public string GetCreateAutoAttendantResourceAccountCommand(PhoneManagerVariables variables)
+        {
+            return $@"
+New-CsOnlineApplicationInstance -UserPrincipalName {variables.RaaaUPN} -ApplicationId {variables.CsAppAaId} -DisplayName {variables.RaaaDisplayName}
+Write-Host ""SUCCESS: Resource account {variables.RaaaUPN} created successfully""";
+        }
+
+        public string GetUpdateAutoAttendantResourceAccountUsageLocationCommand(string upn, string usageLocation)
+        {
+            return $@"
+try {{
+    Update-MgUser -UserId {upn} -UsageLocation {usageLocation}
+    Write-Host ""SUCCESS: Updated usage location for {upn} to {usageLocation}""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to update usage location for {upn}: $_""
+}}";
+        }
+
+        public string GetAssignAutoAttendantLicenseCommand(string userId, string skuId)
+        {
+            return $@"
+try {{
+    Set-MgUserLicense -UserId {userId} -AddLicenses @{{SkuId = ""{skuId}""}} -RemoveLicenses @()
+    Write-Host ""SUCCESS: License assigned to user {userId} successfully""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to assign license to user {userId}: $_""
+}}";
+        }
+
+        public string GetAssignPhoneNumberToAutoAttendantCommand(string upn, string phoneNumber, string phoneNumberType)
+        {
+            return $@"
+try {{
+    Set-CsPhoneNumberAssignment -Identity {upn} -PhoneNumber {phoneNumber} -PhoneNumberType {phoneNumberType}
+    Write-Host ""SUCCESS: Phone number {phoneNumber} assigned to {upn} successfully""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to assign phone number {phoneNumber} to {upn}: $_""
+}}";
+        }
+
+
+
+        public string GetValidateCallQueueResourceAccountCommand(string racqUpn)
+        {
+            return $@"
+try {{
+    $racqUser = Get-CsOnlineUser {racqUpn}
+    if ($racqUser) {{
+        Write-Host ""SUCCESS: Call Queue resource account {racqUpn} found and validated""
+        Write-Host ""Account Details: $($racqUser.DisplayName) - $($racqUser.UserPrincipalName)""
+    }} else {{
+        Write-Host ""ERROR: Call Queue resource account {racqUpn} not found. Please create it first.""
+    }}
+}}
+catch {{
+    Write-Host ""ERROR: Failed to validate Call Queue resource account {racqUpn}: $_""
+}}";
+        }
+
+        public string GetCreateCallTargetCommand(string racqUpn)
+        {
+            return $@"
+try {{
+    $racqUser = Get-CsOnlineUser ""{racqUpn}""
+    if (-not $racqUser) {{
+        throw ""Resource account {racqUpn} not found. Please ensure it was created successfully.""
+    }}
+    $racqid = $racqUser.Identity
+    $aacalltarget = New-CsAutoAttendantCallableEntity -Identity $racqid -Type ApplicationEndpoint
+    Write-Host ""SUCCESS: Created call target for {racqUpn}""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create call target for {racqUpn}: $_""
+}}";
+        }
+
+        public string GetCreateDefaultCallFlowCommand(string greetingText)
+        {
+            return $@"
+try {{
+    $aamenuOptionDisconnect = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -CallTarget $aacalltarget -DtmfResponse Automatic
+    $aadefaultMenu = New-CsAutoAttendantMenu -Name ""Default menu"" -MenuOptions $aamenuOptionDisconnect
+    $aadefaultCallFlow = New-CsAutoAttendantCallFlow -Name ""Default call flow"" -Greetings @(""{greetingText}"") -Menu $aadefaultMenu
+    Write-Host ""SUCCESS: Created default call flow""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create default call flow: $_""
+}}";
+        }
+
+        public string GetCreateAfterHoursCallFlowCommand(string greetingText)
+        {
+            return $@"
+try {{
+    $aaafterHoursMenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic
+    $aaafterHoursMenu = New-CsAutoAttendantMenu -Name ""After Hours menu"" -MenuOptions @($aaafterHoursMenuOption)
+    $aaafterHoursCallFlow = New-CsAutoAttendantCallFlow -Name ""After Hours call flow"" -Greetings @(""{greetingText}"") -Menu $aaafterHoursMenu
+    Write-Host ""SUCCESS: Created after hours call flow""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create after hours call flow: $_""
+}}";
+        }
+
+        public string GetCreateAfterHoursScheduleCommand(PhoneManagerVariables variables)
+        {
+            return $@"
+try {{
+    $aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -TuesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -WednesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -ThursdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -FridayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -Complement
+    Write-Host ""SUCCESS: Created after hours schedule""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create after hours schedule: $_""
+}}";
+        }
+
+        public string GetCreateCallHandlingAssociationCommand()
+        {
+            return $@"
+try {{
+    $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
+    Write-Host ""SUCCESS: Created call handling association""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create call handling association: $_""
+}}";
+        }
+
+        public string GetCreateSimpleAutoAttendantCommand(PhoneManagerVariables variables)
+        {
+            return $@"
+try {{
+    New-CsAutoAttendant `
+    -Name ""{variables.AaDisplayName}"" `
+    -DefaultCallFlow $aadefaultCallFlow `
+    -CallFlows @($aaafterHoursCallFlow) `
+    -CallHandlingAssociations @($aaafterHoursCallHandlingAssociation) `
+    -LanguageId ""{variables.LanguageId}"" `
+    -TimeZoneId ""{variables.TimeZoneId}""
+    Write-Host ""SUCCESS: Auto attendant {variables.AaDisplayName} created successfully""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create auto attendant {variables.AaDisplayName}: $_""
+}}";
+        }
+
+        public string GetAssociateResourceAccountWithAutoAttendantCommand(string resourceAccountUpn, string autoAttendantName)
+        {
+            return $@"
+try {{
+    $aaapplicationInstanceId = (Get-CsOnlineUser {resourceAccountUpn}).Identity
+    $aaautoAttendantId = (Get-CsAutoAttendant -NameFilter {autoAttendantName}).Identity
+    New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceId) -ConfigurationId $aaautoAttendantId -ConfigurationType AutoAttendant
+    Write-Host ""SUCCESS: Associated resource account {resourceAccountUpn} with auto attendant {autoAttendantName}""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to associate resource account {resourceAccountUpn} with auto attendant {autoAttendantName}: $_""
 }}";
         }
     }

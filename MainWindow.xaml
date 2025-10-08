@@ -47,7 +47,7 @@
         <!-- Main Content -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="220"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
@@ -80,9 +80,9 @@
                             </StackPanel>
                         </Button>
 
-                        <!-- Configuration Section -->
+                        <!-- Variables Section -->
                         <Separator Margin="16,16,16,8"/>
-                        <TextBlock Text="CONFIGURATION" 
+                        <TextBlock Text="VARIABLES" 
                                  Margin="16,0,16,8" 
                                  Foreground="{DynamicResource MaterialDesignBodyLight}"
                                  FontSize="12"/>
@@ -99,9 +99,9 @@
                             </StackPanel>
                         </Button>
 
-                        <!-- Teams Configuration Section -->
+                        <!-- Voice Configuration Section -->
                         <Separator Margin="16,16,16,8"/>
-                        <TextBlock Text="TEAMS CONFIGURATION" 
+                        <TextBlock Text="VOICE CONFIGURATION" 
                                  Margin="16,0,16,8" 
                                  Foreground="{DynamicResource MaterialDesignBodyLight}"
                                  FontSize="12"/>
@@ -141,6 +141,7 @@
                                 <TextBlock Text="Auto Attendants" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
+
 
                         <Button Style="{StaticResource MaterialDesignFlatButton}" 
                                Command="{Binding NavigateToCommand}" 
