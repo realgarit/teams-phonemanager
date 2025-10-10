@@ -310,6 +310,152 @@ namespace teams_phonemanager.ViewModels
             }
         }
 
+        // Predefined sets wizard state
+        [ObservableProperty]
+        private bool _showPredefinedHolidaysWizard = false;
+
+        [ObservableProperty]
+        private bool _showAargauInfoDialog = false;
+
+        [ObservableProperty]
+        private ObservableCollection<string> _countries = new ObservableCollection<string>(new[] { "Switzerland" });
+
+        [ObservableProperty]
+        private string? _selectedCountry = "Switzerland";
+
+        [ObservableProperty]
+        private ObservableCollection<string> _cantons = new ObservableCollection<string>(new[] { "Aargau", "Luzern" });
+
+        [ObservableProperty]
+        private string? _selectedCanton;
+
+        [ObservableProperty]
+        private ObservableCollection<string> _bezirke = new ObservableCollection<string>(new[] { 
+            "Aarau (Brugg/Kulm/Lenzburg/Zofingen/Baden - nur Bergdietikon)", 
+            "Baden (ohne Bergdietikon)", 
+            "Bremgarten", 
+            "Muri (Laufenburg, Rheinfelden - nur Hellikon, Mumpf, Obermumpf, Schupfart, Stein, Wegstetten)", 
+            "Rheinfelden (nur Kaiseraugst, Magden, Möhlin, Olsberg, Rheinfelden, Wallbach, Zeiningen, Zuzgen)", 
+            "Zurzach" 
+        });
+
+        [ObservableProperty]
+        private string? _selectedBezirk;
+
+        [ObservableProperty]
+        private ObservableCollection<int> _years = new ObservableCollection<int>(Enumerable.Range(Math.Max(2025, DateTime.Now.Year), Math.Max(0, 2030 - Math.Max(2025, DateTime.Now.Year) + 1)));
+
+        [ObservableProperty]
+        private int _selectedYear = Math.Max(2025, Math.Min(2030, DateTime.Now.Year));
+
+        public bool IsSwitzerlandSelected => string.Equals(SelectedCountry, "Switzerland", StringComparison.OrdinalIgnoreCase);
+        public bool IsAargauSelected => string.Equals(SelectedCanton, "Aargau", StringComparison.OrdinalIgnoreCase);
+
+        partial void OnSelectedCountryChanged(string? value)
+        {
+            OnPropertyChanged(nameof(IsSwitzerlandSelected));
+            OnPropertyChanged(nameof(CanApplyPredefinedSelection));
+        }
+
+        partial void OnSelectedCantonChanged(string? value)
+        {
+            OnPropertyChanged(nameof(IsAargauSelected));
+            OnPropertyChanged(nameof(CanApplyPredefinedSelection));
+        }
+
+        public bool CanApplyPredefinedSelection
+        {
+            get
+            {
+                if (!IsSwitzerlandSelected)
+                    return SelectedYear >= 2025 && SelectedYear <= 2030;
+
+                if (IsAargauSelected)
+                    return !string.IsNullOrEmpty(SelectedBezirk) && SelectedYear >= 2025 && SelectedYear <= 2030;
+
+                return !string.IsNullOrEmpty(SelectedCanton) && SelectedYear >= 2025 && SelectedYear <= 2030;
+            }
+        }
+
+        partial void OnSelectedBezirkChanged(string? value)
+        {
+            OnPropertyChanged(nameof(CanApplyPredefinedSelection));
+        }
+
+        partial void OnSelectedYearChanged(int value)
+        {
+            OnPropertyChanged(nameof(CanApplyPredefinedSelection));
+        }
+
+        [RelayCommand]
+        private void OpenPredefinedHolidaysWizard()
+        {
+            try
+            {
+                SelectedCountry = "Switzerland";
+                SelectedCanton = null;
+                SelectedBezirk = null;
+                SelectedYear = Math.Max(2025, Math.Min(2030, DateTime.Now.Year));
+                ShowPredefinedHolidaysWizard = true;
+                _loggingService.Log("Opened Predefined Holidays wizard", LogLevel.Info);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Error opening wizard: {ex.Message}", LogLevel.Error);
+            }
+        }
+
+        [RelayCommand]
+        private void CancelPredefinedHolidaysWizard()
+        {
+            ShowPredefinedHolidaysWizard = false;
+        }
+
+        [RelayCommand]
+        private void ShowAargauInfo()
+        {
+            try
+            {
+                ShowAargauInfoDialog = true;
+                _loggingService.Log("Opened Aargau holiday reference info", LogLevel.Info);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Error opening Aargau info: {ex.Message}", LogLevel.Error);
+            }
+        }
+
+        [RelayCommand]
+        private void CloseAargauInfo()
+        {
+            ShowAargauInfoDialog = false;
+        }
+
+        [RelayCommand]
+        private void ApplyPredefinedHolidays()
+        {
+            try
+            {
+                var variables = _mainWindowViewModel?.Variables;
+                if (variables == null) return;
+
+                // Use Swiss provider for Switzerland; expand later for other countries
+                var provider = new teams_phonemanager.Services.Holidays.SwissHolidaysProvider();
+                var holidays = provider.GetHolidays(SelectedCountry ?? "", SelectedCanton, SelectedBezirk, SelectedYear);
+
+                foreach (var holiday in holidays)
+                {
+                    variables.HolidaySeries.Add(holiday);
+                    _loggingService.Log($"Added predefined holiday: {holiday.DisplayText}", LogLevel.Info);
+                }
+
+                ShowPredefinedHolidaysWizard = false;
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Error applying predefined holidays: {ex.Message}", LogLevel.Error);
+            }
+        }
         [RelayCommand]
         private void EditHoliday(HolidayEntry? holiday)
         {
@@ -430,6 +576,25 @@ namespace teams_phonemanager.ViewModels
             catch (Exception ex)
             {
                 _loggingService.Log($"Error in RemoveHoliday: {ex.Message}", LogLevel.Error);
+            }
+        }
+
+        [RelayCommand]
+        private void DeleteAllHolidays()
+        {
+            try
+            {
+                var variables = _mainWindowViewModel?.Variables;
+                if (variables != null && variables.HolidaySeries.Count > 0)
+                {
+                    var count = variables.HolidaySeries.Count;
+                    variables.HolidaySeries.Clear();
+                    _loggingService.Log($"Deleted all {count} holidays from series", LogLevel.Info);
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Error in DeleteAllHolidays: {ex.Message}", LogLevel.Error);
             }
         }
 

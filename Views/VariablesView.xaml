@@ -14,6 +14,7 @@
     <UserControl.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <converters:TimeSpanConverter x:Key="TimeSpanConverter"/>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         
         <!-- Style for locked fields -->
         <Style x:Key="LockedFieldStyle" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
@@ -629,11 +630,12 @@
                                             </Grid.ColumnDefinitions>
                                             
                                             <StackPanel Grid.Column="0">
-                                                <TextBlock Text="{Binding Date, StringFormat='Date: {0:dd.MM.yyyy}'}"
+                                                <TextBlock Text="{Binding DisplayText}"
                                                          Style="{StaticResource MaterialDesignSubtitle2TextBlock}"/>
-                                                <TextBlock Text="{Binding Time, StringFormat='Time: {0:hh\\:mm}'}"
+                                                <TextBlock Text="{Binding Name, StringFormat='Holiday: {0}'}"
                                                          Style="{StaticResource MaterialDesignCaptionTextBlock}"
-                                                         Opacity="0.7"/>
+                                                         Opacity="0.7"
+                                                         Visibility="{Binding Name, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                             </StackPanel>
                                             
                                             <Button Grid.Column="1"
@@ -658,14 +660,35 @@
                         </ItemsControl>
                     </ScrollViewer>
                     
-                    <!-- Add Holiday Button -->
+                    <!-- Add Holiday and Delete All Buttons -->
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                        <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Command="{Binding AddHolidayCommand}"
+                                Margin="0,0,8,0">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Plus" Margin="0,0,8,0"/>
+                                <TextBlock Text="Add Holiday"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Command="{Binding DeleteAllHolidaysCommand}"
+                                Background="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                Foreground="White">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="DeleteSweep" Margin="0,0,8,0"/>
+                                <TextBlock Text="Delete All"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                    
+                    <!-- Use Predefined Sets Button -->
                     <Button Style="{StaticResource MaterialDesignOutlinedButton}"
-                            Command="{Binding AddHolidayCommand}"
+                            Command="{Binding OpenPredefinedHolidaysWizardCommand}"
                             HorizontalAlignment="Left"
                             Margin="0,0,0,16">
                         <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="Plus" Margin="0,0,8,0"/>
-                            <TextBlock Text="Add Holiday"/>
+                            <materialDesign:PackIcon Kind="PlaylistPlus" Margin="0,0,8,0"/>
+                            <TextBlock Text="Use Predefined Sets…"/>
                         </StackPanel>
                     </Button>
                     
@@ -824,6 +847,143 @@
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="Check" Margin="0,0,8,0"/>
                                 <TextBlock Text="Save"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </materialDesign:DialogHost.DialogContent>
+        </materialDesign:DialogHost>
+
+        <!-- Predefined Holidays Wizard Dialog -->
+        <materialDesign:DialogHost Grid.RowSpan="3"
+                                   IsOpen="{Binding ShowPredefinedHolidaysWizard}">
+            <materialDesign:DialogHost.DialogContent>
+                <StackPanel Margin="16" MinWidth="500" MaxWidth="700">
+                    <TextBlock Text="Predefined Holiday Sets"
+                               Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                               Margin="0,0,0,16"/>
+
+                    <TextBlock Text="Country" Style="{StaticResource MaterialDesignSubtitle2TextBlock}"/>
+                    <ComboBox ItemsSource="{Binding Countries}"
+                              SelectedItem="{Binding SelectedCountry}"
+                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                              Margin="0,0,0,16"/>
+
+                    <StackPanel Visibility="{Binding IsSwitzerlandSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Canton" Style="{StaticResource MaterialDesignSubtitle2TextBlock}" VerticalAlignment="Center"/>
+                            <Button Style="{StaticResource MaterialDesignIconButton}"
+                                    Command="{Binding ShowAargauInfoCommand}"
+                                    Visibility="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    Margin="8,0,0,0"
+                                    ToolTip="Aargau Holiday Reference Information">
+                                <materialDesign:PackIcon Kind="Information" Foreground="#FFD700"/>
+                            </Button>
+                            <!-- Animated arrow pointing to info button -->
+                            <StackPanel Orientation="Horizontal" 
+                                        Visibility="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                        Margin="8,0,0,0"
+                                        VerticalAlignment="Center">
+                                <materialDesign:PackIcon Kind="ArrowLeft" 
+                                                         Foreground="#FFD700" 
+                                                         Width="16" 
+                                                         Height="16"
+                                                         VerticalAlignment="Center">
+                                    <materialDesign:PackIcon.RenderTransform>
+                                        <TranslateTransform/>
+                                    </materialDesign:PackIcon.RenderTransform>
+                                    <materialDesign:PackIcon.Style>
+                                        <Style TargetType="materialDesign:PackIcon">
+                                            <Style.Triggers>
+                                                <EventTrigger RoutedEvent="Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard RepeatBehavior="Forever">
+                                                            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.X"
+                                                                             From="0" To="-4" Duration="0:0:0.8"
+                                                                             AutoReverse="True"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </materialDesign:PackIcon.Style>
+                                </materialDesign:PackIcon>
+                                <TextBlock Text="Click for reference" 
+                                           Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                           Foreground="#FFD700"
+                                           Opacity="0.9"
+                                           Margin="4,0,0,0"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <ComboBox ItemsSource="{Binding Cantons}"
+                                  SelectedItem="{Binding SelectedCanton}"
+                                  Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                  Margin="0,0,0,16"/>
+
+                        <StackPanel Visibility="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <TextBlock Text="Bezirk" Style="{StaticResource MaterialDesignSubtitle2TextBlock}"/>
+                            <ComboBox ItemsSource="{Binding Bezirke}"
+                                      SelectedItem="{Binding SelectedBezirk}"
+                                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                                      Margin="0,0,0,16"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <TextBlock Text="Year" Style="{StaticResource MaterialDesignSubtitle2TextBlock}"/>
+                    <ComboBox ItemsSource="{Binding Years}"
+                              SelectedItem="{Binding SelectedYear}"
+                              Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                              Margin="0,0,0,16"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding CancelPredefinedHolidaysWizardCommand}"
+                                Margin="0,0,8,0">
+                            <TextBlock Text="Cancel"/>
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                Command="{Binding ApplyPredefinedHolidaysCommand}"
+                                IsEnabled="{Binding CanApplyPredefinedSelection}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Check" Margin="0,0,8,0"/>
+                                <TextBlock Text="Add Holidays"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </materialDesign:DialogHost.DialogContent>
+        </materialDesign:DialogHost>
+
+        <!-- Aargau Info Dialog -->
+        <materialDesign:DialogHost Grid.RowSpan="3"
+                                   IsOpen="{Binding ShowAargauInfoDialog}">
+            <materialDesign:DialogHost.DialogContent>
+                <StackPanel Margin="16" MinWidth="600" MaxWidth="800">
+                    <TextBlock Text="Aargau Holiday Reference"
+                               Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                               Margin="0,0,0,16"/>
+
+                    <TextBlock Text="Use this as a reference image because the holidays in Aargau can vary yearly. Please look up the official page of the DEPARTEMENT VOLKSWIRTSCHAFT UND INNERES, Amt für Wirtschaft und Arbeit of Kanton Aargau to get the newest list."
+                               Style="{StaticResource MaterialDesignBody2TextBlock}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,16"/>
+
+                    <Border BorderBrush="{DynamicResource MaterialDesignDivider}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Margin="0,0,0,16">
+                        <Image Source="pack://application:,,,/Resources/AargauHolidaysReference.png"
+                               Stretch="Uniform"
+                               MaxHeight="400"/>
+                    </Border>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                Command="{Binding CloseAargauInfoCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Check" Margin="0,0,8,0"/>
+                                <TextBlock Text="Close"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
