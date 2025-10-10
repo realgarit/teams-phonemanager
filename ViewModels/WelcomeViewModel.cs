@@ -28,7 +28,7 @@ namespace teams_phonemanager.ViewModels
             {
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName = "https://github.com/yourusername/teams-phonemanager/wiki",
+                    FileName = "https://github.com/realgarit/teams-phonemanager",
                     UseShellExecute = true
                 });
                 _loggingService.Log("Opening documentation in browser", LogLevel.Info);
