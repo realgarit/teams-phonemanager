@@ -7,91 +7,285 @@
              xmlns:local="clr-namespace:teams_phonemanager.Views"
              xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="600" d:DesignWidth="1000">
     
     <UserControl.DataContext>
         <viewmodels:GetStartedViewModel/>
     </UserControl.DataContext>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="24">
 
-        <!-- Main Content -->
-        <StackPanel Grid.Row="0" MaxWidth="600" VerticalAlignment="Center">
-            <!-- Module Check -->
-            <Button Style="{StaticResource MaterialDesignRaisedButton}"
-                    Command="{Binding CheckModulesCommand}"
-                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"
-                    Margin="0,0,0,16">
-                <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="Package" Margin="0,0,8,0"/>
-                    <TextBlock Text="Check PowerShell Modules"/>
-                </StackPanel>
-            </Button>
+            <!-- Setup Steps -->
+            <TextBlock Text="Setup Steps"
+                     Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                     Margin="0,0,0,16"
+                     FontWeight="Bold"/>
 
-            <!-- Teams Connection -->
-            <Button Style="{StaticResource MaterialDesignRaisedButton}"
-                    Command="{Binding ConnectTeamsCommand}"
-                    IsEnabled="{Binding CanConnectTeams}"
-                    Margin="0,0,0,16">
-                <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="MicrosoftTeams" Margin="0,0,8,0"/>
-                    <TextBlock Text="Connect with Teams PowerShell"/>
-                </StackPanel>
-            </Button>
+            <!-- Step 1: PowerShell Modules -->
+            <materialDesign:Card Margin="0,0,0,16" UniformCornerRadius="8" Padding="24">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Step Number -->
+                    <materialDesign:PackIcon Kind="Numeric1Box" 
+                                           Width="48" 
+                                           Height="48"
+                                           Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,20,0"/>
+                    
+                    <!-- Step Content -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Check PowerShell Modules"
+                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                 FontWeight="Bold"
+                                 Margin="0,0,0,8"/>
+                        <TextBlock Text="Verify that Microsoft Teams and Microsoft Graph PowerShell modules are installed and available."
+                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                 TextWrapping="Wrap"
+                                 Opacity="0.87"/>
+                    </StackPanel>
+                    
+                    <!-- Action Button -->
+                    <StackPanel Grid.Column="2" Orientation="Vertical">
+                        <Button Command="{Binding CheckModulesCommand}"
+                                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"
+                                Padding="30,15"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Background="{DynamicResource PrimaryHueMidBrush}"
+                                Foreground="White"
+                                BorderThickness="0"
+                                MinWidth="200"
+                                Height="50">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Package" 
+                                                       Width="20" 
+                                                       Height="20"
+                                                       Margin="0,0,8,0"/>
+                                <TextBlock Text="Check Modules"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </materialDesign:Card>
 
-            <Button Style="{StaticResource MaterialDesignOutlinedButton}"
-                    Command="{Binding DisconnectTeamsCommand}"
-                    IsEnabled="{Binding TeamsConnected}"
-                    Margin="0,0,0,16">
-                <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="Logout" Margin="0,0,8,0"/>
-                    <TextBlock Text="Sign out of Teams"/>
-                </StackPanel>
-            </Button>
+            <!-- Step 2: Teams Connection -->
+            <materialDesign:Card Margin="0,0,0,16" UniformCornerRadius="8" Padding="24">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Step Number -->
+                    <materialDesign:PackIcon Kind="Numeric2Box" 
+                                           Width="48" 
+                                           Height="48"
+                                           Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,20,0"/>
+                    
+                    <!-- Step Content -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Connect to Microsoft Teams"
+                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                 FontWeight="Bold"
+                                 Margin="0,0,0,8"/>
+                        <TextBlock Text="Establish a connection to your Microsoft Teams tenant using PowerShell."
+                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                 TextWrapping="Wrap"
+                                 Opacity="0.87"/>
+                    </StackPanel>
+                    
+                    <!-- Action Buttons -->
+                    <StackPanel Grid.Column="2" Orientation="Vertical">
+                        <Button Command="{Binding ConnectTeamsCommand}"
+                                IsEnabled="{Binding CanConnectTeams}"
+                                Padding="30,15"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Background="{DynamicResource PrimaryHueMidBrush}"
+                                Foreground="White"
+                                BorderThickness="0"
+                                MinWidth="200"
+                                Height="50"
+                                Margin="0,0,0,8">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="MicrosoftTeams" 
+                                                       Width="20" 
+                                                       Height="20"
+                                                       Margin="0,0,8,0"/>
+                                <TextBlock Text="Connect Teams"/>
+                            </StackPanel>
+                        </Button>
+                        
+                        <Button Command="{Binding DisconnectTeamsCommand}"
+                                IsEnabled="{Binding TeamsConnected}"
+                                Padding="30,15"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Background="{DynamicResource PrimaryHueMidBrush}"
+                                Foreground="White"
+                                BorderThickness="0"
+                                MinWidth="200"
+                                Height="50">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Logout" 
+                                                       Width="20" 
+                                                       Height="20"
+                                                       Margin="0,0,8,0"/>
+                                <TextBlock Text="Disconnect Teams"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </materialDesign:Card>
 
-            <!-- Graph Connection -->
-            <Button Style="{StaticResource MaterialDesignRaisedButton}"
-                    Command="{Binding ConnectGraphCommand}"
-                    IsEnabled="{Binding CanConnectGraph}"
-                    Margin="0,0,0,16">
-                <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="MicrosoftAzure" Margin="0,0,8,0"/>
-                    <TextBlock Text="Connect with MG Graph PowerShell"/>
-                </StackPanel>
-            </Button>
+            <!-- Step 3: Graph Connection -->
+            <materialDesign:Card Margin="0,0,0,16" UniformCornerRadius="8" Padding="24">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Step Number -->
+                    <materialDesign:PackIcon Kind="Numeric3Box" 
+                                           Width="48" 
+                                           Height="48"
+                                           Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,20,0"/>
+                    
+                    <!-- Step Content -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="Connect to Microsoft Graph"
+                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                 FontWeight="Bold"
+                                 Margin="0,0,0,8"/>
+                        <TextBlock Text="Establish a connection to Microsoft Graph for managing M365 groups and resources."
+                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                 TextWrapping="Wrap"
+                                 Opacity="0.87"/>
+                    </StackPanel>
+                    
+                    <!-- Action Buttons -->
+                    <StackPanel Grid.Column="2" Orientation="Vertical">
+                        <Button Command="{Binding ConnectGraphCommand}"
+                                IsEnabled="{Binding CanConnectGraph}"
+                                Padding="30,15"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Background="{DynamicResource PrimaryHueMidBrush}"
+                                Foreground="White"
+                                BorderThickness="0"
+                                MinWidth="200"
+                                Height="50"
+                                Margin="0,0,0,8">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="MicrosoftAzure" 
+                                                       Width="20" 
+                                                       Height="20"
+                                                       Margin="0,0,8,0"/>
+                                <TextBlock Text="Connect Graph"/>
+                            </StackPanel>
+                        </Button>
+                        
+                        <Button Command="{Binding DisconnectGraphCommand}"
+                                IsEnabled="{Binding GraphConnected}"
+                                Padding="30,15"
+                                FontSize="16"
+                                FontWeight="Bold"
+                                Background="{DynamicResource PrimaryHueMidBrush}"
+                                Foreground="White"
+                                BorderThickness="0"
+                                MinWidth="200"
+                                Height="50">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Logout" 
+                                                       Width="20" 
+                                                       Height="20"
+                                                       Margin="0,0,8,0"/>
+                                <TextBlock Text="Disconnect Graph"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </materialDesign:Card>
 
-            <Button Style="{StaticResource MaterialDesignOutlinedButton}"
-                    Command="{Binding DisconnectGraphCommand}"
-                    IsEnabled="{Binding GraphConnected}"
-                    Margin="0,0,0,16">
-                <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="Logout" Margin="0,0,8,0"/>
-                    <TextBlock Text="Sign out of MG Graph"/>
+            <!-- Proceed Section -->
+            <materialDesign:Card Margin="0,24,0,0" UniformCornerRadius="12" Padding="32">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
+                        <materialDesign:PackIcon Kind="CheckCircle" 
+                                               Width="48" 
+                                               Height="48"
+                                               Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                               Margin="0,0,16,0"/>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Ready to Continue"
+                                     Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                     FontWeight="Bold"/>
+                            <TextBlock Text="All prerequisites completed"
+                                     Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                     Opacity="0.7"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <TextBlock Text="Once all connections are established, you can proceed to configure your phone system variables."
+                             Style="{StaticResource MaterialDesignBody1TextBlock}"
+                             TextAlignment="Center"
+                             TextWrapping="Wrap"
+                             Opacity="0.87"
+                             Margin="0,0,0,24"/>
+                    
+                    <Button Command="{Binding NavigateToPageCommand}"
+                            CommandParameter="Variables"
+                            IsEnabled="{Binding CanProceed}"
+                            HorizontalAlignment="Center"
+                            Padding="30,15"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Background="{DynamicResource PrimaryHueMidBrush}"
+                            Foreground="White"
+                            BorderThickness="0"
+                            MinWidth="200"
+                            Height="50">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ArrowRight" 
+                                                   Width="20" 
+                                                   Height="20"
+                                                   Margin="0,0,8,0"/>
+                            <TextBlock Text="Proceed to Variables"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
-            </Button>
+            </materialDesign:Card>
 
-            <!-- Proceed Button -->
-            <Button Style="{StaticResource MaterialDesignRaisedButton}"
-                    Command="{Binding NavigateToPageCommand}"
-                    CommandParameter="Variables"
-                    IsEnabled="{Binding CanProceed}"
-                    Margin="0,32,0,0">
-                <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="ArrowRight" Margin="0,0,8,0"/>
-                    <TextBlock Text="Proceed"/>
+            <!-- Progress Indicator -->
+            <materialDesign:Card Margin="0,24,0,0" 
+                               UniformCornerRadius="8" 
+                               Padding="24"
+                               Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <ProgressBar IsIndeterminate="True"
+                               Style="{StaticResource MaterialDesignCircularProgressBar}"
+                               Width="24"
+                               Height="24"
+                               Margin="0,0,16,0"/>
+                    <TextBlock Text="Processing..."
+                             Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                             VerticalAlignment="Center"/>
                 </StackPanel>
-            </Button>
+            </materialDesign:Card>
         </StackPanel>
-
-        <!-- Progress Indicator -->
-        <ProgressBar Grid.Row="1"
-                     IsIndeterminate="True"
-                     Style="{StaticResource MaterialDesignCircularProgressBar}"
-                     Value="0"
-                     Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-    </Grid>
+    </ScrollViewer>
 </UserControl> 
