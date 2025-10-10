@@ -6733,7 +6733,7 @@
     "C:\\Users\\Realgar\\.nuget\\packages\\": {}
   },
   "project": {
-    "version": "1.0.0",
+    "version": "1.14.0",
     "restore": {
       "projectUniqueName": "C:\\Git\\teams-phonemanager\\teams-phonemanager.csproj",
       "projectName": "teams-phonemanager",
