@@ -19,66 +19,64 @@ namespace teams_phonemanager.Services.Holidays
             {
                 { "Neujahr", SwissHolidayFormulaEvaluator.NewYear },
                 { "Berchtoldstag", SwissHolidayFormulaEvaluator.Berchtoldstag },
+                { "Dreikönigstag", SwissHolidayFormulaEvaluator.Epiphany },
+                { "San Giuseppe", SwissHolidayFormulaEvaluator.StJosephsDay },
                 { "Karfreitag", SwissHolidayFormulaEvaluator.GoodFriday },
                 { "Ostermontag", SwissHolidayFormulaEvaluator.EasterMonday },
+                { "Tag der Arbeit", SwissHolidayFormulaEvaluator.LabourDay },
                 { "Auffahrt", SwissHolidayFormulaEvaluator.AscensionDay },
                 { "Pfingstmontag", SwissHolidayFormulaEvaluator.WhitMonday },
                 { "Fronleichnam", SwissHolidayFormulaEvaluator.CorpusChristi },
+                { "San Pietro e Paolo", SwissHolidayFormulaEvaluator.StPeterAndPaul },
                 { "Bundesfeier", SwissHolidayFormulaEvaluator.SwissNationalDay },
                 { "Mariä Himmelfahrt", SwissHolidayFormulaEvaluator.AssumptionDay },
                 { "Allerheiligen", SwissHolidayFormulaEvaluator.AllSaintsDay },
                 { "Mariä Empfängnis", SwissHolidayFormulaEvaluator.ImmaculateConception },
                 { "Weihnachtstag", SwissHolidayFormulaEvaluator.Christmas },
-                { "Stephanstag", SwissHolidayFormulaEvaluator.StStephensDay }
+                { "Stephanstag", SwissHolidayFormulaEvaluator.StStephensDay },
+                { "Näfelser Fahrt", SwissHolidayFormulaEvaluator.NaefelserFahrt },
+                { "Jeûne genevois", SwissHolidayFormulaEvaluator.JeuneGenevois },
+                { "Restauration de la République", SwissHolidayFormulaEvaluator.RestaurationRepublique }
             };
 
-            // Selection for Luzern as requested (from the provided list)
-            if (string.Equals(canton, "Luzern", StringComparison.OrdinalIgnoreCase))
+            // Get holidays for specific canton
+            var cantonHolidays = GetCantonHolidays(canton, district);
+            foreach (var name in cantonHolidays)
             {
-                string[] lucerne = new[]
+                if (pool.TryGetValue(name, out var f))
                 {
-                    "Neujahr",
-                    "Berchtoldstag",
-                    "Karfreitag",
-                    "Ostermontag",
-                    "Auffahrt",
-                    "Pfingstmontag",
-                    "Fronleichnam",
-                    "Bundesfeier",
-                    "Mariä Himmelfahrt",
-                    "Allerheiligen",
-                    "Weihnachtstag",
-                    "Stephanstag"
-                };
-
-                foreach (var name in lucerne)
-                {
-                    if (pool.TryGetValue(name, out var f))
-                    {
-                        var date = f(year);
-                        list.Add(new HolidayEntry(date, new TimeSpan(0, 0, 0), name));
-                    }
+                    var date = f(year);
+                    list.Add(new HolidayEntry(date, new TimeSpan(0, 0, 0), name));
                 }
-            }
-            // Selection for Aargau Bezirke
-            else if (string.Equals(canton, "Aargau", StringComparison.OrdinalIgnoreCase))
-            {
-                var aargauHolidays = GetAargauHolidays(district);
-                foreach (var name in aargauHolidays)
-                {
-                    if (pool.TryGetValue(name, out var f))
-                    {
-                        var date = f(year);
-                        list.Add(new HolidayEntry(date, new TimeSpan(0, 0, 0), name));
-                    }
-                }
-            }
-            else
-            {
-                // For other cantons we can later plug in their specific sets
             }
 
             return list;
+        }
+
+        private static string[] GetCantonHolidays(string? canton, string? district)
+        {
+            if (string.IsNullOrEmpty(canton))
+                return Array.Empty<string>();
+
+            var cantonLower = canton.ToLowerInvariant();
+
+            return cantonLower switch
+            {
+                "aargau" => GetAargauHolidays(district),
+                "bern" => new[] { "Neujahr", "Berchtoldstag", "Karfreitag", "Ostermontag", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Weihnachtstag", "Stephanstag" },
+                "basel-land" => new[] { "Neujahr", "Karfreitag", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Weihnachtstag", "Stephanstag" },
+                "fribourg" => new[] { "Neujahr", "Berchtoldstag", "Karfreitag", "Ostermontag", "Auffahrt", "Pfingstmontag", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag", "Stephanstag" },
+                "genf" => new[] { "Neujahr", "Karfreitag", "Ostermontag", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Jeûne genevois", "Weihnachtstag", "Restauration de la République" },
+                "glarus" => new[] { "Neujahr", "Berchtoldstag", "Karfreitag", "Ostermontag", "Näfelser Fahrt", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Allerheiligen", "Weihnachtstag", "Stephanstag" },
+                "luzern" => new[] { "Neujahr", "Berchtoldstag", "Karfreitag", "Ostermontag", "Auffahrt", "Pfingstmontag", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag", "Stephanstag" },
+                "solothurn" => new[] { "Neujahr", "Berchtoldstag", "Karfreitag", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Weihnachtstag", "Stephanstag" },
+                "schwyz" => new[] { "Neujahr", "Berchtoldstag", "Karfreitag", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag", "Stephanstag" },
+                "tessin" => new[] { "Neujahr", "Dreikönigstag", "San Giuseppe", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Fronleichnam", "San Pietro e Paolo", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag", "Stephanstag" },
+                "thurgau" => new[] { "Neujahr", "Berchtoldstag", "Karfreitag", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag", "Stephanstag" },
+                "zug" => new[] { "Neujahr", "Berchtoldstag", "Karfreitag", "Ostermontag", "Auffahrt", "Pfingstmontag", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag", "Stephanstag" },
+                "zürich" => new[] { "Neujahr", "Berchtoldstag", "Karfreitag", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Weihnachtstag", "Stephanstag" },
+                _ => Array.Empty<string>()
+            };
         }
 
         private static string[] GetAargauHolidays(string? district)

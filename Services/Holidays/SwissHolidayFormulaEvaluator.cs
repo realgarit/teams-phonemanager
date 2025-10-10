@@ -17,6 +17,32 @@ namespace teams_phonemanager.Services.Holidays
         public static DateTime ImmaculateConception(int year) => new DateTime(year, 12, 8);
         public static DateTime Christmas(int year) => new DateTime(year, 12, 25);
         public static DateTime StStephensDay(int year) => new DateTime(year, 12, 26);
+        public static DateTime LabourDay(int year) => new DateTime(year, 5, 1);
+        public static DateTime Epiphany(int year) => new DateTime(year, 1, 6);
+        public static DateTime StJosephsDay(int year) => new DateTime(year, 3, 19);
+        public static DateTime StPeterAndPaul(int year) => new DateTime(year, 6, 29);
+        
+        // Geneva-specific holidays
+        public static DateTime JeuneGenevois(int year)
+        {
+            // Thursday after the first Sunday in September
+            var firstSunday = new DateTime(year, 9, 1);
+            while (firstSunday.DayOfWeek != DayOfWeek.Sunday)
+                firstSunday = firstSunday.AddDays(1);
+            return firstSunday.AddDays(4); // Thursday
+        }
+        
+        public static DateTime RestaurationRepublique(int year) => new DateTime(year, 12, 31);
+        
+        // Glarus-specific holiday
+        public static DateTime NaefelserFahrt(int year)
+        {
+            // First Thursday in April
+            var april1 = new DateTime(year, 4, 1);
+            while (april1.DayOfWeek != DayOfWeek.Thursday)
+                april1 = april1.AddDays(1);
+            return april1;
+        }
 
         // Computus - Meeus/Jones/Butcher algorithm for Gregorian Easter Sunday
         public static DateTime EasterSunday(int year)

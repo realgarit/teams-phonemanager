@@ -324,7 +324,10 @@ namespace teams_phonemanager.ViewModels
         private string? _selectedCountry = "Switzerland";
 
         [ObservableProperty]
-        private ObservableCollection<string> _cantons = new ObservableCollection<string>(new[] { "Aargau", "Luzern" });
+        private ObservableCollection<string> _cantons = new ObservableCollection<string>(new[] { 
+            "Aargau", "Basel-Land", "Bern", "Fribourg", "Genf", "Glarus", "Luzern", 
+            "Schwyz", "Solothurn", "Tessin", "Thurgau", "Zug", "Zürich" 
+        });
 
         [ObservableProperty]
         private string? _selectedCanton;
