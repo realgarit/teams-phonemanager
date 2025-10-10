@@ -7,6 +7,7 @@
              xmlns:local="clr-namespace:teams_phonemanager.Views"
              xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
              xmlns:converters="clr-namespace:teams_phonemanager.Helpers"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     
@@ -321,10 +322,18 @@
                     </StackPanel>
                     
                     <StackPanel Grid.Row="0" Grid.Column="1" Margin="8,0,0,8">
-                        <DatePicker materialDesign:HintAssist.Hint="Holiday Date"
-                                   SelectedDate="{Binding Variables.HolidayDate, UpdateSourceTrigger=PropertyChanged}"
-                                   Style="{StaticResource MaterialDesignOutlinedDatePicker}"/>
-                        <TextBlock Text="Example: 01.01.2025" Style="{StaticResource ExampleTextStyle}"/>
+                        <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Command="{Binding OpenHolidaySeriesManagerCommand}"
+                                HorizontalAlignment="Stretch">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="CalendarMultiple" Margin="0,0,8,0"/>
+                                <TextBlock Text="Manage Holiday Series"/>
+                                <TextBlock Text="{Binding Variables.HolidaySeries.Count, StringFormat=' ({0} holidays)'}"
+                                         Margin="8,0,0,0"
+                                         Opacity="0.7"/>
+                            </StackPanel>
+                        </Button>
+                        <TextBlock Text="Click to manage multiple holiday dates and times" Style="{StaticResource ExampleTextStyle}"/>
                     </StackPanel>
 
                     <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
@@ -447,5 +456,379 @@
                 </StackPanel>
             </Button>
         </StackPanel>
+        
+        <!-- Holiday Time Picker Popup -->
+        <materialDesign:DialogHost Grid.RowSpan="3" 
+                                 IsOpen="{Binding ShowHolidayTimePicker}">
+            <materialDesign:DialogHost.DialogContent>
+                <StackPanel Margin="16" MinWidth="300">
+                    <TextBlock Text="Select Holiday Time"
+                             Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                             Margin="0,0,0,16"/>
+                    
+                    <TextBlock Text="Choose a time that aligns with 15-minute boundaries:"
+                             Style="{StaticResource MaterialDesignBody2TextBlock}"
+                             TextWrapping="Wrap"
+                             Margin="0,0,0,16"/>
+                    
+                    <ComboBox SelectedItem="{Binding SelectedHolidayTime}"
+                            Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                            materialDesign:HintAssist.Hint="Select time"
+                            Margin="0,0,0,16">
+                        <ComboBox.Items>
+                            <ComboBoxItem Content="00:00" Tag="00:00"/>
+                            <ComboBoxItem Content="00:15" Tag="00:15"/>
+                            <ComboBoxItem Content="00:30" Tag="00:30"/>
+                            <ComboBoxItem Content="00:45" Tag="00:45"/>
+                            <ComboBoxItem Content="01:00" Tag="01:00"/>
+                            <ComboBoxItem Content="01:15" Tag="01:15"/>
+                            <ComboBoxItem Content="01:30" Tag="01:30"/>
+                            <ComboBoxItem Content="01:45" Tag="01:45"/>
+                            <ComboBoxItem Content="02:00" Tag="02:00"/>
+                            <ComboBoxItem Content="02:15" Tag="02:15"/>
+                            <ComboBoxItem Content="02:30" Tag="02:30"/>
+                            <ComboBoxItem Content="02:45" Tag="02:45"/>
+                            <ComboBoxItem Content="03:00" Tag="03:00"/>
+                            <ComboBoxItem Content="03:15" Tag="03:15"/>
+                            <ComboBoxItem Content="03:30" Tag="03:30"/>
+                            <ComboBoxItem Content="03:45" Tag="03:45"/>
+                            <ComboBoxItem Content="04:00" Tag="04:00"/>
+                            <ComboBoxItem Content="04:15" Tag="04:15"/>
+                            <ComboBoxItem Content="04:30" Tag="04:30"/>
+                            <ComboBoxItem Content="04:45" Tag="04:45"/>
+                            <ComboBoxItem Content="05:00" Tag="05:00"/>
+                            <ComboBoxItem Content="05:15" Tag="05:15"/>
+                            <ComboBoxItem Content="05:30" Tag="05:30"/>
+                            <ComboBoxItem Content="05:45" Tag="05:45"/>
+                            <ComboBoxItem Content="06:00" Tag="06:00"/>
+                            <ComboBoxItem Content="06:15" Tag="06:15"/>
+                            <ComboBoxItem Content="06:30" Tag="06:30"/>
+                            <ComboBoxItem Content="06:45" Tag="06:45"/>
+                            <ComboBoxItem Content="07:00" Tag="07:00"/>
+                            <ComboBoxItem Content="07:15" Tag="07:15"/>
+                            <ComboBoxItem Content="07:30" Tag="07:30"/>
+                            <ComboBoxItem Content="07:45" Tag="07:45"/>
+                            <ComboBoxItem Content="08:00" Tag="08:00"/>
+                            <ComboBoxItem Content="08:15" Tag="08:15"/>
+                            <ComboBoxItem Content="08:30" Tag="08:30"/>
+                            <ComboBoxItem Content="08:45" Tag="08:45"/>
+                            <ComboBoxItem Content="09:00" Tag="09:00"/>
+                            <ComboBoxItem Content="09:15" Tag="09:15"/>
+                            <ComboBoxItem Content="09:30" Tag="09:30"/>
+                            <ComboBoxItem Content="09:45" Tag="09:45"/>
+                            <ComboBoxItem Content="10:00" Tag="10:00"/>
+                            <ComboBoxItem Content="10:15" Tag="10:15"/>
+                            <ComboBoxItem Content="10:30" Tag="10:30"/>
+                            <ComboBoxItem Content="10:45" Tag="10:45"/>
+                            <ComboBoxItem Content="11:00" Tag="11:00"/>
+                            <ComboBoxItem Content="11:15" Tag="11:15"/>
+                            <ComboBoxItem Content="11:30" Tag="11:30"/>
+                            <ComboBoxItem Content="11:45" Tag="11:45"/>
+                            <ComboBoxItem Content="12:00" Tag="12:00"/>
+                            <ComboBoxItem Content="12:15" Tag="12:15"/>
+                            <ComboBoxItem Content="12:30" Tag="12:30"/>
+                            <ComboBoxItem Content="12:45" Tag="12:45"/>
+                            <ComboBoxItem Content="13:00" Tag="13:00"/>
+                            <ComboBoxItem Content="13:15" Tag="13:15"/>
+                            <ComboBoxItem Content="13:30" Tag="13:30"/>
+                            <ComboBoxItem Content="13:45" Tag="13:45"/>
+                            <ComboBoxItem Content="14:00" Tag="14:00"/>
+                            <ComboBoxItem Content="14:15" Tag="14:15"/>
+                            <ComboBoxItem Content="14:30" Tag="14:30"/>
+                            <ComboBoxItem Content="14:45" Tag="14:45"/>
+                            <ComboBoxItem Content="15:00" Tag="15:00"/>
+                            <ComboBoxItem Content="15:15" Tag="15:15"/>
+                            <ComboBoxItem Content="15:30" Tag="15:30"/>
+                            <ComboBoxItem Content="15:45" Tag="15:45"/>
+                            <ComboBoxItem Content="16:00" Tag="16:00"/>
+                            <ComboBoxItem Content="16:15" Tag="16:15"/>
+                            <ComboBoxItem Content="16:30" Tag="16:30"/>
+                            <ComboBoxItem Content="16:45" Tag="16:45"/>
+                            <ComboBoxItem Content="17:00" Tag="17:00"/>
+                            <ComboBoxItem Content="17:15" Tag="17:15"/>
+                            <ComboBoxItem Content="17:30" Tag="17:30"/>
+                            <ComboBoxItem Content="17:45" Tag="17:45"/>
+                            <ComboBoxItem Content="18:00" Tag="18:00"/>
+                            <ComboBoxItem Content="18:15" Tag="18:15"/>
+                            <ComboBoxItem Content="18:30" Tag="18:30"/>
+                            <ComboBoxItem Content="18:45" Tag="18:45"/>
+                            <ComboBoxItem Content="19:00" Tag="19:00"/>
+                            <ComboBoxItem Content="19:15" Tag="19:15"/>
+                            <ComboBoxItem Content="19:30" Tag="19:30"/>
+                            <ComboBoxItem Content="19:45" Tag="19:45"/>
+                            <ComboBoxItem Content="20:00" Tag="20:00"/>
+                            <ComboBoxItem Content="20:15" Tag="20:15"/>
+                            <ComboBoxItem Content="20:30" Tag="20:30"/>
+                            <ComboBoxItem Content="20:45" Tag="20:45"/>
+                            <ComboBoxItem Content="21:00" Tag="21:00"/>
+                            <ComboBoxItem Content="21:15" Tag="21:15"/>
+                            <ComboBoxItem Content="21:30" Tag="21:30"/>
+                            <ComboBoxItem Content="21:45" Tag="21:45"/>
+                            <ComboBoxItem Content="22:00" Tag="22:00"/>
+                            <ComboBoxItem Content="22:15" Tag="22:15"/>
+                            <ComboBoxItem Content="22:30" Tag="22:30"/>
+                            <ComboBoxItem Content="22:45" Tag="22:45"/>
+                            <ComboBoxItem Content="23:00" Tag="23:00"/>
+                            <ComboBoxItem Content="23:15" Tag="23:15"/>
+                            <ComboBoxItem Content="23:30" Tag="23:30"/>
+                            <ComboBoxItem Content="23:45" Tag="23:45"/>
+                        </ComboBox.Items>
+                    </ComboBox>
+                    
+                    <StackPanel Orientation="Horizontal" 
+                              HorizontalAlignment="Right">
+                        <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding CloseHolidayTimePickerCommand}"
+                                Margin="0,0,8,0">
+                            <TextBlock Text="Cancel"/>
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                Command="{Binding SaveHolidayTimeCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Check" Margin="0,0,8,0"/>
+                                <TextBlock Text="Save Time"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </materialDesign:DialogHost.DialogContent>
+        </materialDesign:DialogHost>
+        
+        <!-- Holiday Series Manager Popup -->
+        <materialDesign:DialogHost Grid.RowSpan="3" 
+                                 IsOpen="{Binding ShowHolidaySeriesManager}">
+            <materialDesign:DialogHost.DialogContent>
+                <StackPanel Margin="16" MinWidth="600" MaxWidth="800">
+                    <TextBlock Text="Manage Holiday Series"
+                             Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                             Margin="0,0,0,16"/>
+                    
+                    <TextBlock Text="Add, edit, or remove holiday dates and times. Each holiday will be created with the specified date and time."
+                             Style="{StaticResource MaterialDesignBody2TextBlock}"
+                             TextWrapping="Wrap"
+                             Margin="0,0,0,16"/>
+
+                    <TextBlock Text="If no time is selected, 00:00 will be used by default."
+                             Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                             Opacity="0.7"
+                             Margin="0,0,0,16"/>
+                    
+                    <!-- Holiday List -->
+                    <ScrollViewer MaxHeight="300" Margin="0,0,0,16">
+                        <ItemsControl ItemsSource="{Binding Variables.HolidaySeries}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                            BorderThickness="0,0,0,1"
+                                            Padding="0,8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            
+                                            <StackPanel Grid.Column="0">
+                                                <TextBlock Text="{Binding Date, StringFormat='Date: {0:dd.MM.yyyy}'}"
+                                                         Style="{StaticResource MaterialDesignSubtitle2TextBlock}"/>
+                                                <TextBlock Text="{Binding Time, StringFormat='Time: {0:hh\\:mm}'}"
+                                                         Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                                         Opacity="0.7"/>
+                                            </StackPanel>
+                                            
+                                            <Button Grid.Column="1"
+                                                    Style="{StaticResource MaterialDesignIconButton}"
+                                                    Command="{Binding DataContext.EditHolidayCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Margin="8,0">
+                                                <materialDesign:PackIcon Kind="Edit"/>
+                                            </Button>
+                                            
+                                            <Button Grid.Column="2"
+                                                    Style="{StaticResource MaterialDesignIconButton}"
+                                                    Command="{Binding DataContext.RemoveHolidayCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Margin="8,0">
+                                                <materialDesign:PackIcon Kind="Delete"/>
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                    
+                    <!-- Add Holiday Button -->
+                    <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                            Command="{Binding AddHolidayCommand}"
+                            HorizontalAlignment="Left"
+                            Margin="0,0,0,16">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Plus" Margin="0,0,8,0"/>
+                            <TextBlock Text="Add Holiday"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <!-- Action Buttons -->
+                    <StackPanel Orientation="Horizontal" 
+                              HorizontalAlignment="Right">
+                        <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding CancelHolidaySeriesManagerCommand}"
+                                Margin="0,0,8,0">
+                            <TextBlock Text="Cancel"/>
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                Command="{Binding SaveHolidaySeriesCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Check" Margin="0,0,8,0"/>
+                                <TextBlock Text="Save Series"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </materialDesign:DialogHost.DialogContent>
+        </materialDesign:DialogHost>
+        
+        <!-- Edit Holiday Dialog -->
+        <materialDesign:DialogHost Grid.RowSpan="3" 
+                                 IsOpen="{Binding ShowEditHolidayDialog}">
+            <materialDesign:DialogHost.DialogContent>
+                <StackPanel Margin="16" MinWidth="400">
+                    <TextBlock Text="Edit Holiday"
+                             Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                             Margin="0,0,0,16"/>
+                    
+                    <TextBlock Text="Holiday Date:"
+                             Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                             Margin="0,0,0,8"/>
+                    <DatePicker SelectedDate="{Binding DialogHolidayDate, TargetNullValue={x:Static sys:DateTime.Today}}"
+                              Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                              Margin="0,0,0,16"/>
+                    
+                    <TextBlock Text="Holiday Time:"
+                             Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                             Margin="0,0,0,8"/>
+                    <ComboBox SelectedItem="{Binding SelectedEditHolidayTime}"
+                             Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                             materialDesign:HintAssist.Hint="Select time"
+                             Margin="0,0,0,16">
+                        <ComboBox.Items>
+                            <ComboBoxItem Content="00:00" Tag="00:00:00"/>
+                            <ComboBoxItem Content="00:15" Tag="00:15:00"/>
+                            <ComboBoxItem Content="00:30" Tag="00:30:00"/>
+                            <ComboBoxItem Content="00:45" Tag="00:45:00"/>
+                            <ComboBoxItem Content="01:00" Tag="01:00:00"/>
+                            <ComboBoxItem Content="01:15" Tag="01:15:00"/>
+                            <ComboBoxItem Content="01:30" Tag="01:30:00"/>
+                            <ComboBoxItem Content="01:45" Tag="01:45:00"/>
+                            <ComboBoxItem Content="02:00" Tag="02:00:00"/>
+                            <ComboBoxItem Content="02:15" Tag="02:15:00"/>
+                            <ComboBoxItem Content="02:30" Tag="02:30:00"/>
+                            <ComboBoxItem Content="02:45" Tag="02:45:00"/>
+                            <ComboBoxItem Content="03:00" Tag="03:00:00"/>
+                            <ComboBoxItem Content="03:15" Tag="03:15:00"/>
+                            <ComboBoxItem Content="03:30" Tag="03:30:00"/>
+                            <ComboBoxItem Content="03:45" Tag="03:45:00"/>
+                            <ComboBoxItem Content="04:00" Tag="04:00:00"/>
+                            <ComboBoxItem Content="04:15" Tag="04:15:00"/>
+                            <ComboBoxItem Content="04:30" Tag="04:30:00"/>
+                            <ComboBoxItem Content="04:45" Tag="04:45:00"/>
+                            <ComboBoxItem Content="05:00" Tag="05:00:00"/>
+                            <ComboBoxItem Content="05:15" Tag="05:15:00"/>
+                            <ComboBoxItem Content="05:30" Tag="05:30:00"/>
+                            <ComboBoxItem Content="05:45" Tag="05:45:00"/>
+                            <ComboBoxItem Content="06:00" Tag="06:00:00"/>
+                            <ComboBoxItem Content="06:15" Tag="06:15:00"/>
+                            <ComboBoxItem Content="06:30" Tag="06:30:00"/>
+                            <ComboBoxItem Content="06:45" Tag="06:45:00"/>
+                            <ComboBoxItem Content="07:00" Tag="07:00:00"/>
+                            <ComboBoxItem Content="07:15" Tag="07:15:00"/>
+                            <ComboBoxItem Content="07:30" Tag="07:30:00"/>
+                            <ComboBoxItem Content="07:45" Tag="07:45:00"/>
+                            <ComboBoxItem Content="08:00" Tag="08:00:00"/>
+                            <ComboBoxItem Content="08:15" Tag="08:15:00"/>
+                            <ComboBoxItem Content="08:30" Tag="08:30:00"/>
+                            <ComboBoxItem Content="08:45" Tag="08:45:00"/>
+                            <ComboBoxItem Content="09:00" Tag="09:00:00"/>
+                            <ComboBoxItem Content="09:15" Tag="09:15:00"/>
+                            <ComboBoxItem Content="09:30" Tag="09:30:00"/>
+                            <ComboBoxItem Content="09:45" Tag="09:45:00"/>
+                            <ComboBoxItem Content="10:00" Tag="10:00:00"/>
+                            <ComboBoxItem Content="10:15" Tag="10:15:00"/>
+                            <ComboBoxItem Content="10:30" Tag="10:30:00"/>
+                            <ComboBoxItem Content="10:45" Tag="10:45:00"/>
+                            <ComboBoxItem Content="11:00" Tag="11:00:00"/>
+                            <ComboBoxItem Content="11:15" Tag="11:15:00"/>
+                            <ComboBoxItem Content="11:30" Tag="11:30:00"/>
+                            <ComboBoxItem Content="11:45" Tag="11:45:00"/>
+                            <ComboBoxItem Content="12:00" Tag="12:00:00"/>
+                            <ComboBoxItem Content="12:15" Tag="12:15:00"/>
+                            <ComboBoxItem Content="12:30" Tag="12:30:00"/>
+                            <ComboBoxItem Content="12:45" Tag="12:45:00"/>
+                            <ComboBoxItem Content="13:00" Tag="13:00:00"/>
+                            <ComboBoxItem Content="13:15" Tag="13:15:00"/>
+                            <ComboBoxItem Content="13:30" Tag="13:30:00"/>
+                            <ComboBoxItem Content="13:45" Tag="13:45:00"/>
+                            <ComboBoxItem Content="14:00" Tag="14:00:00"/>
+                            <ComboBoxItem Content="14:15" Tag="14:15:00"/>
+                            <ComboBoxItem Content="14:30" Tag="14:30:00"/>
+                            <ComboBoxItem Content="14:45" Tag="14:45:00"/>
+                            <ComboBoxItem Content="15:00" Tag="15:00:00"/>
+                            <ComboBoxItem Content="15:15" Tag="15:15:00"/>
+                            <ComboBoxItem Content="15:30" Tag="15:30:00"/>
+                            <ComboBoxItem Content="15:45" Tag="15:45:00"/>
+                            <ComboBoxItem Content="16:00" Tag="16:00:00"/>
+                            <ComboBoxItem Content="16:15" Tag="16:15:00"/>
+                            <ComboBoxItem Content="16:30" Tag="16:30:00"/>
+                            <ComboBoxItem Content="16:45" Tag="16:45:00"/>
+                            <ComboBoxItem Content="17:00" Tag="17:00:00"/>
+                            <ComboBoxItem Content="17:15" Tag="17:15:00"/>
+                            <ComboBoxItem Content="17:30" Tag="17:30:00"/>
+                            <ComboBoxItem Content="17:45" Tag="17:45:00"/>
+                            <ComboBoxItem Content="18:00" Tag="18:00:00"/>
+                            <ComboBoxItem Content="18:15" Tag="18:15:00"/>
+                            <ComboBoxItem Content="18:30" Tag="18:30:00"/>
+                            <ComboBoxItem Content="18:45" Tag="18:45:00"/>
+                            <ComboBoxItem Content="19:00" Tag="19:00:00"/>
+                            <ComboBoxItem Content="19:15" Tag="19:15:00"/>
+                            <ComboBoxItem Content="19:30" Tag="19:30:00"/>
+                            <ComboBoxItem Content="19:45" Tag="19:45:00"/>
+                            <ComboBoxItem Content="20:00" Tag="20:00:00"/>
+                            <ComboBoxItem Content="20:15" Tag="20:15:00"/>
+                            <ComboBoxItem Content="20:30" Tag="20:30:00"/>
+                            <ComboBoxItem Content="20:45" Tag="20:45:00"/>
+                            <ComboBoxItem Content="21:00" Tag="21:00:00"/>
+                            <ComboBoxItem Content="21:15" Tag="21:15:00"/>
+                            <ComboBoxItem Content="21:30" Tag="21:30:00"/>
+                            <ComboBoxItem Content="21:45" Tag="21:45:00"/>
+                            <ComboBoxItem Content="22:00" Tag="22:00:00"/>
+                            <ComboBoxItem Content="22:15" Tag="22:15:00"/>
+                            <ComboBoxItem Content="22:30" Tag="22:30:00"/>
+                            <ComboBoxItem Content="22:45" Tag="22:45:00"/>
+                            <ComboBoxItem Content="23:00" Tag="23:00:00"/>
+                            <ComboBoxItem Content="23:15" Tag="23:15:00"/>
+                            <ComboBoxItem Content="23:30" Tag="23:30:00"/>
+                            <ComboBoxItem Content="23:45" Tag="23:45:00"/>
+                        </ComboBox.Items>
+                    </ComboBox>
+                    
+                    <StackPanel Orientation="Horizontal" 
+                              HorizontalAlignment="Right">
+                        <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding CancelEditHolidayCommand}"
+                                Margin="0,0,8,0">
+                            <TextBlock Text="Cancel"/>
+                        </Button>
+                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                Command="{Binding SaveEditHolidayCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Check" Margin="0,0,8,0"/>
+                                <TextBlock Text="Save"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </materialDesign:DialogHost.DialogContent>
+        </materialDesign:DialogHost>
     </Grid>
 </UserControl> 
