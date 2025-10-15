@@ -298,7 +298,7 @@ try {{
     $HolidayCallFlow = New-CsAutoAttendantCallFlow -Name $HolidayScheduleName -Menu $HolidayMenu -Greetings @($HolidayGreetingPromptDE)
     $HolidayCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type Holiday -ScheduleId $HolidaySchedule.Id -CallFlowId $HolidayCallFlow.Id
     
-    $HolidayAutoAttendant = Get-CsAutoAttendant -NameFilter ""{aaDisplayName}"" | Where-Object { $_.Name -eq ""{aaDisplayName}"" } | Select-Object -First 1
+    $HolidayAutoAttendant = Get-CsAutoAttendant -NameFilter ""{aaDisplayName}"" | Where-Object {{$_.Name -eq ""{aaDisplayName}""}} | Select-Object -First 1
     if (-not $HolidayAutoAttendant) {{
         throw ""Auto Attendant '{aaDisplayName}' not found. Please ensure it exists.""
     }}
