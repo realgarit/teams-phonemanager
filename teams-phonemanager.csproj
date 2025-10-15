@@ -7,9 +7,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <Version>1.14.0</Version>
-    <AssemblyVersion>1.14.0.0</AssemblyVersion>
-    <FileVersion>1.14.0.0</FileVersion>
+    <Version>2.0.1</Version>
+    <AssemblyVersion>2.0.1.0</AssemblyVersion>
+    <FileVersion>2.0.1.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +21,12 @@
 
   <ItemGroup>
     <Resource Include="Resources\AargauHolidaysReference.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="WinUI3-Test\**" />
+    <EmbeddedResource Remove="WinUI3-Test\**" />
+    <None Remove="WinUI3-Test\**" />
   </ItemGroup>
 
 </Project>

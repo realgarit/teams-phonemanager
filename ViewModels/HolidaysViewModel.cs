@@ -203,10 +203,12 @@ namespace teams_phonemanager.ViewModels
             if (variables != null && !string.IsNullOrEmpty(variables.Customer) && !string.IsNullOrEmpty(variables.CustomerGroupName))
             {
                 AutoAttendantName = variables.AaDisplayName;
+                HolidayName = variables.HolidayName;
             }
             else
             {
                 AutoAttendantName = "aa-";
+                HolidayName = "hd-";
             }
             ShowAttachHolidayDialog = true;
         }
@@ -238,7 +240,7 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
 
-                var holidayName = variables.HolidayName;
+                var holidayName = HolidayName;
                 _loggingService.Log($"Attaching holiday {holidayName} to auto attendant {AutoAttendantName}", LogLevel.Info);
 
                 var command = _powerShellCommandService.GetAttachHolidayToAutoAttendantCommand(holidayName, AutoAttendantName, variables.HolidayGreetingPromptDE);

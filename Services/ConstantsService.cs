@@ -18,7 +18,7 @@ namespace teams_phonemanager.Services
 
         public static class Application
         {
-            public const string Version = "Version 2.0.0";
+            public const string Version = "Version 2.0.1";
             public const string Copyright = "Realgar © 2025. Licensed under the MIT License.";
         }
 

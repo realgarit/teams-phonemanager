@@ -219,7 +219,6 @@
                              Margin="0,0,0,8"/>
                     <TextBox Text="{Binding HolidayName}"
                            Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                           IsReadOnly="True"
                            Margin="0,0,0,16"/>
                     
                     <TextBlock Text="Auto Attendant Name:"
