@@ -200,7 +200,7 @@ namespace teams_phonemanager.ViewModels
         private void OpenAttachHolidayDialog()
         {
             var variables = _mainWindowViewModel?.Variables;
-            if (variables != null && !string.IsNullOrEmpty(variables.Customer) && !string.IsNullOrEmpty(variables.CustomerGroupName))
+            if (variables != null)
             {
                 AutoAttendantName = variables.AaDisplayName;
                 HolidayName = variables.HolidayName;

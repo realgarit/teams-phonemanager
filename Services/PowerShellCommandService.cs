@@ -298,14 +298,21 @@ try {{
     $HolidayCallFlow = New-CsAutoAttendantCallFlow -Name $HolidayScheduleName -Menu $HolidayMenu -Greetings @($HolidayGreetingPromptDE)
     $HolidayCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type Holiday -ScheduleId $HolidaySchedule.Id -CallFlowId $HolidayCallFlow.Id
     
-    $HolidayAutoAttendant = Get-CsAutoAttendant -NameFilter ""{aaDisplayName}""
-    if (-not $HolidayAutoAttendant) {{
+    $aaMatch = Get-CsAutoAttendant -NameFilter ""{aaDisplayName}"" | Where-Object {{$_.Name -eq ""{aaDisplayName}""}} | Select-Object -First 1
+    if (-not $aaMatch) {{
         throw ""Auto Attendant '{aaDisplayName}' not found. Please ensure it exists.""
     }}
-    
-    $HolidayAutoAttendant.CallFlows += @($HolidayCallFlow)
-    $HolidayAutoAttendant.CallHandlingAssociations += @($HolidayCallHandlingAssociation)
-    Set-CsAutoAttendant -Instance $HolidayAutoAttendant
+
+    # Retrieve full instance to ensure mutable properties are present
+    $aaInstance = Get-CsAutoAttendant -Identity $aaMatch.Identity
+
+    if (-not $aaInstance.CallFlows) {{ $aaInstance.CallFlows = @() }}
+    if (-not $aaInstance.CallHandlingAssociations) {{ $aaInstance.CallHandlingAssociations = @() }}
+
+    $aaInstance.CallFlows = @($aaInstance.CallFlows + $HolidayCallFlow)
+    $aaInstance.CallHandlingAssociations = @($aaInstance.CallHandlingAssociations + $HolidayCallHandlingAssociation)
+
+    Set-CsAutoAttendant -Instance $aaInstance
     Write-Host ""SUCCESS: Holiday {holidayName} attached to auto attendant {aaDisplayName} successfully""
 }}
 catch {{
