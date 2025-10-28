@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Microsoft.Graph.Authentication</id>
+    <version>2.32.0</version>
+    <authors>Microsoft</authors>
+    <owners>Microsoft</owners>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <licenseUrl>https://aka.ms/devservicesagreement</licenseUrl>
+    <projectUrl>https://github.com/microsoftgraph/msgraph-sdk-powershell</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/microsoftgraph/msgraph-sdk-powershell/dev/docs/images/graph_color256.png</iconUrl>
+    <description>Microsoft Graph PowerShell authentication module</description>
+    <releaseNotes>See https://aka.ms/GraphPowerShell-Release.</releaseNotes>
+    <copyright>© Microsoft Corporation. All rights reserved.</copyright>
+    <tags>Microsoft Office365 Graph PowerShell GraphServiceClient Outlook OneDrive AzureAD GraphAPI Productivity SharePoint Intune SDK PSModule PSIncludes_Cmdlet</tags>
+  </metadata>
+</package>
