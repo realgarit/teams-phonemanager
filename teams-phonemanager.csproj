@@ -7,9 +7,23 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
-    <Version>2.0.1</Version>
-    <AssemblyVersion>2.0.1.0</AssemblyVersion>
-    <FileVersion>2.0.1.0</FileVersion>
+    <Version>2.0.2</Version>
+    <AssemblyVersion>2.0.2</AssemblyVersion>
+    <FileVersion>2.0.2</FileVersion>
+    
+    <!-- Publish Settings for Framework-Dependent Deployment -->
+    <PublishSingleFile>false</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <PublishTrimmed>false</PublishTrimmed>
+    <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
+    
+    <!-- Application Settings -->
+    <ApplicationTitle>Teams Phone Manager</ApplicationTitle>
+    <ApplicationDescription>A WPF-based Microsoft Teams Phone Manager to simplify admin tasks</ApplicationDescription>
+    <Company>Realgar</Company>
+    <Product>Teams Phone Manager</Product>
+    <Copyright>Copyright © 2025</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
