@@ -23,30 +23,51 @@ namespace teams_phonemanager.Services
 $ErrorActionPreference = 'Stop'
 $output = @()
 
+# Enable TLS 1.2 for secure communication
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+$output += 'TLS 1.2 security protocol enabled'
+
+# Add bundled modules to PSModulePath
+$appDir = Get-Location
+$possiblePaths = @(
+    (Join-Path $appDir 'Modules'),
+    (Join-Path $appDir 'win-x64\Modules'),
+    (Join-Path $appDir '..\Modules'),
+    (Join-Path $appDir '..\win-x64\Modules')
+)
+
+$bundledModulesPath = $null
+foreach ($path in $possiblePaths) {
+    if (Test-Path $path) {
+        $bundledModulesPath = $path
+        break
+    }
+}
+
+if ($bundledModulesPath) {
+    $env:PSModulePath = $bundledModulesPath + ';' + $env:PSModulePath
+    $output += 'Bundled modules path added to PSModulePath: ' + $bundledModulesPath
+} else {
+    $output += 'WARNING: Bundled modules path not found in any expected location'
+    $output += 'App directory: ' + $appDir
+    $output += 'Checked paths: ' + ($possiblePaths -join ', ')
+    $output += 'Current location: ' + (Get-Location)
+}
+
+# Check MicrosoftTeams module
 if (Get-Module -ListAvailable -Name MicrosoftTeams) {
     $teamsModule = Get-Module -ListAvailable -Name MicrosoftTeams
     $output += 'MicrosoftTeams module is available: ' + $teamsModule.Version
 } else {
-    $output += 'MicrosoftTeams module is NOT available, attempting to install...'
-    try {
-        Install-Module -Name MicrosoftTeams -Force -AllowClobber
-        $output += 'MicrosoftTeams module installed successfully'
-    } catch {
-        $output += 'ERROR: Failed to install MicrosoftTeams module: ' + $_.Exception.Message
-    }
+    $output += 'ERROR: MicrosoftTeams module not found in bundled modules'
 }
 
+# Check Microsoft.Graph module
 if (Get-Module -ListAvailable -Name Microsoft.Graph) {
     $graphModule = Get-Module -ListAvailable -Name Microsoft.Graph
     $output += 'Microsoft.Graph module is available: ' + $graphModule.Version
 } else {
-    $output += 'Microsoft.Graph module is NOT available, attempting to install...'
-    try {
-        Install-Module -Name Microsoft.Graph -Force
-        $output += 'Microsoft.Graph module installed successfully'
-    } catch {
-        $output += 'ERROR: Failed to install Microsoft.Graph module: ' + $_.Exception.Message
-    }
+    $output += 'ERROR: Microsoft.Graph module not found in bundled modules'
 }
 
 $output | ForEach-Object { Write-Host $_ }
@@ -74,6 +95,12 @@ catch {
         {
             return @"
 try {
+    # Import Microsoft.Graph modules
+    Import-Module Microsoft.Graph.Authentication -Force
+    Import-Module Microsoft.Graph.Users -Force
+    Import-Module Microsoft.Graph.Groups -Force
+    Import-Module Microsoft.Graph.Identity.DirectoryManagement -Force
+    
     Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All, Group.ReadWrite.All, Directory.ReadWrite.All -ErrorAction Stop -NoWelcome
     $context = Get-MgContext -ErrorAction Stop
     if ($context) {
@@ -104,6 +131,9 @@ catch {
         {
             return @"
 try {
+    # Import Microsoft.Graph modules
+    Import-Module Microsoft.Graph.Authentication -Force
+    
     Disconnect-MgGraph -ErrorAction Stop
     Write-Host 'SUCCESS: Disconnected from Microsoft Graph'
 }
@@ -116,6 +146,9 @@ catch {
         public string GetCreateM365GroupCommand(string groupName)
         {
             return $@"
+# Import Microsoft.Graph modules
+Import-Module Microsoft.Graph.Groups -Force
+
 $existingGroup = Get-MgGroup -Filter ""displayName eq '{groupName}'"" -ErrorAction SilentlyContinue
 if ($existingGroup) 
 {{
