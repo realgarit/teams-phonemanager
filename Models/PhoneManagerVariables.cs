@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using teams_phonemanager.Services;
 
@@ -82,6 +83,12 @@ namespace teams_phonemanager.Models
 
         [ObservableProperty]
         private DateTime _holidayDate = DateTime.Now;
+
+        [ObservableProperty]
+        private TimeSpan _holidayTime = new TimeSpan(9, 0, 0); // Default to 9:00 AM
+
+        [ObservableProperty]
+        private ObservableCollection<HolidayEntry> _holidaySeries = new ObservableCollection<HolidayEntry>();
 
         public string M365Group => $"ttgrp-{Customer}-{CustomerGroupName}";
         public string RacqUPN => $"racq-{Customer}-{CustomerGroupName}{MsFallbackDomain}";
