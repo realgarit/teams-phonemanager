@@ -218,24 +218,99 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceI
 
         public string GetCreateHolidayCommand(string holidayName, DateTime holidayDate)
         {
+            // Format date explicitly to ensure slashes are used instead of dots
+            var formattedDate = holidayDate.ToString("d/M/yyyy H:mm", System.Globalization.CultureInfo.InvariantCulture);
+            var formattedDateShort = holidayDate.ToString("d/M/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+            
             return $@"
-$HolidayDateRange = New-CsOnlineDateTimeRange -Start ""{holidayDate:dd.MM.yyyy HH:mm}""
-New-CsOnlineSchedule -Name ""{holidayName}"" -FixedSchedule -DateTimeRanges @($HolidayDateRange)";
+try {{
+    $HolidayDateRange = New-CsOnlineDateTimeRange -Start ""{formattedDate}""
+    New-CsOnlineSchedule -Name ""{holidayName}"" -FixedSchedule -DateTimeRanges @($HolidayDateRange)
+    Write-Host ""SUCCESS: Holiday {holidayName} created successfully for {formattedDateShort}""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create holiday {holidayName}: $_""
+}}";
+        }
+
+        public string GetCreateHolidaySeriesCommand(string holidayName, List<DateTime> holidayDates)
+        {
+            var formattedDateTimes = new List<string>();
+            var formattedDates = new List<string>();
+            
+            foreach (var date in holidayDates)
+            {
+                var formattedDateTime = date.ToString("d/M/yyyy H:mm", System.Globalization.CultureInfo.InvariantCulture);
+                var formattedDateShort = date.ToString("d/M/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                // Use single-quoted string literals for PowerShell date strings
+                formattedDateTimes.Add($"'{formattedDateTime}'");
+                formattedDates.Add(formattedDateShort);
+            }
+            
+            var datesArray = string.Join(", ", formattedDateTimes);
+            var datesList = string.Join(", ", formattedDates);
+            
+            return $@"
+try {{
+    $dates = @({datesArray})
+    $HolidayDateRange = foreach ($d in $dates) {{
+        New-CsOnlineDateTimeRange -Start $d
+    }}
+    New-CsOnlineSchedule -Name ""{holidayName}"" -FixedSchedule -DateTimeRanges @($HolidayDateRange)
+    Write-Host ""SUCCESS: Holiday series {holidayName} created successfully for dates: {datesList}""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create holiday series {holidayName}: $_""
+}}";
+        }
+
+        public string GetVerifyAutoAttendantCommand(string aaDisplayName)
+        {
+            return $@"
+try {{
+    $AutoAttendant = Get-CsAutoAttendant -NameFilter ""{aaDisplayName}""
+    if ($AutoAttendant) {{
+        Write-Host ""SUCCESS: Auto attendant '{aaDisplayName}' found and is accessible""
+        Write-Host ""Auto Attendant ID: $($AutoAttendant.Identity)""
+        Write-Host ""Auto Attendant Name: $($AutoAttendant.Name)""
+    }} else {{
+        Write-Host ""ERROR: Auto attendant '{aaDisplayName}' not found""
+    }}
+}}
+catch {{
+    Write-Host ""ERROR: Failed to verify auto attendant '{aaDisplayName}': $_""
+}}";
         }
 
         public string GetAttachHolidayToAutoAttendantCommand(string holidayName, string aaDisplayName, string holidayGreetingPrompt)
         {
             return $@"
-$HolidaySchedule = Get-CsOnlineSchedule | Where-Object {{$_.Name -eq ""{holidayName}""}}
-$HolidayScheduleName = $HolidaySchedule.Name
-$HolidayMenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic
-$HolidayMenu = New-CsAutoAttendantMenu -Name $HolidayScheduleName -MenuOptions @($HolidayMenuOption)
-$HolidayCallFlow = New-CsAutoAttendantCallFlow -Name $HolidayScheduleName -Menu $HolidayMenu -Greetings ""{holidayGreetingPrompt}""
-$HolidayCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type Holiday -ScheduleId $HolidaySchedule.Id -CallFlowId $HolidayCallFlow.Id
-$HolidayAutoAttendant = Get-CsAutoAttendant -NameFilter ""{aaDisplayName}""
-$HolidayAutoAttendant.CallFlows += @($HolidayCallFlow)
-$HolidayAutoAttendant.CallHandlingAssociations += @($HolidayCallHandlingAssociation)
-Set-CsAutoAttendant -Instance $HolidayAutoAttendant";
+try {{
+    $HolidaySchedule = Get-CsOnlineSchedule | Where-Object {{$_.Name -eq ""{holidayName}""}}
+    if (-not $HolidaySchedule) {{
+        throw ""Holiday schedule '{holidayName}' not found. Please create the holiday first.""
+    }}
+    
+    $HolidayScheduleName = $HolidaySchedule.Name
+    $HolidayMenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic
+    $HolidayMenu = New-CsAutoAttendantMenu -Name $HolidayScheduleName -MenuOptions @($HolidayMenuOption)
+    $HolidayGreetingPromptDE = New-CsAutoAttendantPrompt -TextToSpeechPrompt ""{holidayGreetingPrompt}""
+    $HolidayCallFlow = New-CsAutoAttendantCallFlow -Name $HolidayScheduleName -Menu $HolidayMenu -Greetings @($HolidayGreetingPromptDE)
+    $HolidayCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type Holiday -ScheduleId $HolidaySchedule.Id -CallFlowId $HolidayCallFlow.Id
+    
+    $HolidayAutoAttendant = Get-CsAutoAttendant -NameFilter ""{aaDisplayName}"" | Where-Object {{$_.Name -eq ""{aaDisplayName}""}} | Select-Object -First 1
+    if (-not $HolidayAutoAttendant) {{
+        throw ""Auto Attendant '{aaDisplayName}' not found. Please ensure it exists.""
+    }}
+    
+    $HolidayAutoAttendant.CallFlows += @($HolidayCallFlow)
+    $HolidayAutoAttendant.CallHandlingAssociations += @($HolidayCallHandlingAssociation)
+    Set-CsAutoAttendant -Instance $HolidayAutoAttendant
+    Write-Host ""SUCCESS: Holiday {holidayName} attached to auto attendant {aaDisplayName} successfully""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to attach holiday {holidayName} to auto attendant {aaDisplayName}: $_""
+}}";
         }
 
         public string GetRetrieveM365GroupsCommand()
