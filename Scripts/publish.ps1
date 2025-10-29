@@ -6,23 +6,25 @@ param(
     [switch]$Help = $false
 )
 
+$repoRoot = (Split-Path $PSScriptRoot -Parent)
+
 if ($Help) {
     Write-Host "Teams Phone Manager - Publish Script" -ForegroundColor Green
     Write-Host ""
-    Write-Host "Usage: .\publish.ps1 [options]" -ForegroundColor Yellow
+    Write-Host "Usage: .\Scripts\publish.ps1 [options]" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Options:" -ForegroundColor Yellow
     Write-Host "  -Configuration <config>  Build configuration (Debug|Release). Default: Release" -ForegroundColor White
     Write-Host "  -Runtime <runtime>       Target runtime (win-x64|win-x86|win-arm64). Default: win-x64" -ForegroundColor White
-    Write-Host "  -OutputPath <path>       Output directory. Default: .\publish\framework-dependent" -ForegroundColor White
+    Write-Host "  -OutputPath <path>       Output directory. Default: .\\publish\\framework-dependent (repo root)" -ForegroundColor White
     Write-Host "  -Clean                   Clean output directory before publishing" -ForegroundColor White
     Write-Host "  -Help                    Show this help message" -ForegroundColor White
     Write-Host ""
     Write-Host "Examples:" -ForegroundColor Yellow
-    Write-Host "  .\publish.ps1                                    # Default publish" -ForegroundColor White
-    Write-Host "  .\publish.ps1 -Configuration Debug              # Debug build" -ForegroundColor White
-    Write-Host "  .\publish.ps1 -Runtime win-x86                  # 32-bit build" -ForegroundColor White
-    Write-Host "  .\publish.ps1 -Clean                            # Clean publish" -ForegroundColor White
+    Write-Host "  .\Scripts\publish.ps1                                    # Default publish" -ForegroundColor White
+    Write-Host "  .\Scripts\publish.ps1 -Configuration Debug              # Debug build" -ForegroundColor White
+    Write-Host "  .\Scripts\publish.ps1 -Runtime win-x86                  # 32-bit build" -ForegroundColor White
+    Write-Host "  .\Scripts\publish.ps1 -Clean                            # Clean publish" -ForegroundColor White
     exit 0
 }
 
@@ -36,6 +38,12 @@ try {
 } catch {
     Write-Host "Error: .NET SDK not found. Please install .NET 8 SDK." -ForegroundColor Red
     exit 1
+}
+
+# Normalize OutputPath to be relative to repo root when a relative path is provided
+if (-not [System.IO.Path]::IsPathRooted($OutputPath)) {
+    # Treat as repo-root relative
+    $OutputPath = Join-Path $repoRoot $OutputPath
 }
 
 if ($Clean -and (Test-Path $OutputPath)) {
@@ -110,3 +118,5 @@ try {
     Write-Host "❌ Error during publish: $($_.Exception.Message)" -ForegroundColor Red
     exit 1
 }
+
+
