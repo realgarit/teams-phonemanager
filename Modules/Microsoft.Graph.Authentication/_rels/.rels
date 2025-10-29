@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Type="http://schemas.microsoft.com/packaging/2010/07/manifest" Target="/Microsoft.Graph.Authentication.nuspec" Id="R9374B5156FEA0525" />
-  <Relationship Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="/package/services/metadata/core-properties/e4608cb2d46c46e198abed65d9c092b0.psmdcp" Id="RDADEE5BE6DFE5B6B" />
-</Relationships>
