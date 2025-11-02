@@ -20,6 +20,14 @@ namespace teams_phonemanager.ViewModels
         public ObservableCollection<string> LogEntries => _loggingService.LogEntries;
         public string LatestLogEntry => _loggingService.LatestLogEntry;
 
+        public string AllLogEntriesText
+        {
+            get
+            {
+                return string.Join(Environment.NewLine, LogEntries);
+            }
+        }
+
         [ObservableProperty]
         private bool _isDarkTheme;
 
@@ -30,7 +38,7 @@ namespace teams_phonemanager.ViewModels
         private bool _isSettingsOpen;
 
         [ObservableProperty]
-        private bool _isLogExpanded;
+        private bool _isLogDialogOpen;
 
         [ObservableProperty]
         private string _version = ConstantsService.Application.Version;
@@ -53,6 +61,11 @@ namespace teams_phonemanager.ViewModels
                 {
                     OnPropertyChanged(nameof(LatestLogEntry));
                 }
+            };
+
+            LogEntries.CollectionChanged += (s, e) =>
+            {
+                OnPropertyChanged(nameof(AllLogEntriesText));
             };
 
             _navigationService.PropertyChanged += (s, e) =>
@@ -97,6 +110,20 @@ namespace teams_phonemanager.ViewModels
         {
             _loggingService.Clear();
             _loggingService.Log("Log cleared", LogLevel.Info);
+        }
+
+        [RelayCommand]
+        private void ToggleLogDialog()
+        {
+            IsLogDialogOpen = !IsLogDialogOpen;
+            _loggingService.Log($"Log viewer {(IsLogDialogOpen ? "opened" : "closed")}", LogLevel.Info);
+        }
+
+        [RelayCommand]
+        private void CloseLogDialog()
+        {
+            IsLogDialogOpen = false;
+            _loggingService.Log("Log viewer closed", LogLevel.Info);
         }
     }
 } 

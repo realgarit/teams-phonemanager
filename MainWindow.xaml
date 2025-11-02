@@ -26,7 +26,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Top Bar -->
@@ -204,85 +203,8 @@
             </Grid>
         </Grid>
 
-        <!-- Log Viewer -->
-        <Expander Grid.Row="2" Header="Log" IsExpanded="{Binding IsLogExpanded}" Margin="16,0,16,8">
-            <ListView x:Name="LogView"
-                     ItemsSource="{Binding LogEntries}"
-                     MaxHeight="200"
-                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                     Background="Transparent"
-                     BorderThickness="0"
-                     SelectionMode="Extended">
-                <ListView.Style>
-                    <Style TargetType="ListView">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListView">
-                                    <Border BorderThickness="{TemplateBinding BorderThickness}"
-                                            BorderBrush="{TemplateBinding BorderBrush}"
-                                            Background="{TemplateBinding Background}">
-                                        <ScrollViewer Padding="{TemplateBinding Padding}"
-                                                    Style="{DynamicResource {x:Static GridView.GridViewScrollViewerStyleKey}}">
-                                            <ItemsPresenter />
-                                        </ScrollViewer>
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListView.Style>
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListViewItem">
-                                    <ContentPresenter />
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Clear Log" 
-                                Command="{Binding ClearLogCommand}">
-                            <MenuItem.Icon>
-                                <materialDesign:PackIcon Kind="Delete"/>
-                            </MenuItem.Icon>
-                        </MenuItem>
-                    </ContextMenu>
-                </ListView.ContextMenu>
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <TextBox Text="{Binding Mode=OneWay}"
-                                TextWrapping="NoWrap"
-                                FontFamily="Consolas"
-                                Margin="0,2"
-                                IsReadOnly="True"
-                                BorderThickness="0"
-                                Background="Transparent"
-                                Foreground="{DynamicResource MaterialDesignBody}"
-                                SelectionBrush="{DynamicResource MaterialDesignSelection}"
-                                materialDesign:TextFieldAssist.DecorationVisibility="Hidden">
-                            <TextBox.Style>
-                                <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
-                                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource MaterialDesignDivider}"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBox.Style>
-                        </TextBox>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </Expander>
-
         <!-- Bottom Bar -->
-        <materialDesign:ColorZone Mode="Standard" Grid.Row="3" Padding="16">
+        <materialDesign:ColorZone Mode="Standard" Grid.Row="2" Padding="16">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -293,17 +215,157 @@
                 <!-- Version -->
                 <TextBlock Grid.Column="0" Text="{Binding Version}" VerticalAlignment="Center"/>
                 
-                <!-- Latest Log Entry -->
-                <TextBlock Grid.Column="1" Text="{Binding LatestLogEntry}" 
-                         TextTrimming="CharacterEllipsis" Margin="16,0" VerticalAlignment="Center"/>
+                <!-- Latest Log Entry - Clickable Log Area -->
+                <Button Grid.Column="1" 
+                        Command="{Binding ToggleLogDialogCommand}"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        Margin="16,0"
+                        Padding="12,8"
+                        HorizontalAlignment="Stretch"
+                        ToolTip="Click to view full log">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <materialDesign:PackIcon Grid.Column="0" 
+                                               Kind="Console" 
+                                               Width="20" 
+                                               Height="20"
+                                               Margin="0,0,8,0"
+                                               VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" 
+                                 Text="{Binding LatestLogEntry}" 
+                                 TextTrimming="CharacterEllipsis" 
+                                 VerticalAlignment="Center"
+                                 FontFamily="Consolas"
+                                 FontSize="12"/>
+                        <materialDesign:PackIcon Grid.Column="2" 
+                                               Kind="ChevronRight" 
+                                               Width="16" 
+                                               Height="16"
+                                               Margin="8,0,0,0"
+                                               Opacity="0.6"
+                                               VerticalAlignment="Center"/>
+                    </Grid>
+                </Button>
                 
                 <!-- Copyright -->
                 <TextBlock Grid.Column="2" Text="Realgar © 2025. Licensed under the MIT License." VerticalAlignment="Center"/>
             </Grid>
         </materialDesign:ColorZone>
 
+        <!-- Log Viewer Dialog -->
+        <materialDesign:DialogHost Grid.RowSpan="3" 
+                                   IsOpen="{Binding IsLogDialogOpen}"
+                                   DialogOpened="LogDialogHost_DialogOpened">
+            <materialDesign:DialogHost.DialogContent>
+                <materialDesign:Card Padding="0" Margin="16" MaxWidth="1000" MaxHeight="600">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- Dialog Header -->
+                        <materialDesign:ColorZone Mode="PrimaryMid" Grid.Row="0" Padding="16">
+                            <DockPanel LastChildFill="False">
+                                <TextBlock Text="Log Viewer" 
+                                         Style="{StaticResource MaterialDesignHeadline6TextBlock}" 
+                                         Foreground="White"
+                                         VerticalAlignment="Center"/>
+                                <Button DockPanel.Dock="Right" 
+                                        Style="{StaticResource MaterialDesignIconButton}" 
+                                        Command="{Binding CloseLogDialogCommand}"
+                                        Foreground="White">
+                                    <materialDesign:PackIcon Kind="Close" Width="24" Height="24"/>
+                                </Button>
+                            </DockPanel>
+                        </materialDesign:ColorZone>
+                        
+                        <!-- Log Content -->
+                        <ScrollViewer x:Name="LogScrollViewer"
+                                    Grid.Row="1"
+                                    VerticalScrollBarVisibility="Auto"
+                                    HorizontalScrollBarVisibility="Auto"
+                                    Margin="16">
+                            <TextBox x:Name="LogView"
+                                   Text="{Binding AllLogEntriesText, Mode=OneWay}"
+                                   TextWrapping="NoWrap"
+                                   FontFamily="Consolas"
+                                   FontSize="12"
+                                   IsReadOnly="True"
+                                   AcceptsReturn="True"
+                                   AcceptsTab="True"
+                                   BorderThickness="1"
+                                   Padding="8"
+                                   Background="{DynamicResource MaterialDesignPaper}"
+                                   Foreground="{DynamicResource MaterialDesignBody}"
+                                   SelectionBrush="{DynamicResource MaterialDesignSelection}"
+                                   materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
+                                   TextChanged="LogView_TextChanged">
+                                <TextBox.Style>
+                                    <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
+                                        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}"/>
+                                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                    </Style>
+                                </TextBox.Style>
+                                <TextBox.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Select All" 
+                                                Command="ApplicationCommands.SelectAll"
+                                                CommandTarget="{Binding RelativeSource={RelativeSource AncestorType=TextBox}}">
+                                            <MenuItem.Icon>
+                                                <materialDesign:PackIcon Kind="SelectAll"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <MenuItem Header="Copy" 
+                                                Command="ApplicationCommands.Copy"
+                                                CommandTarget="{Binding RelativeSource={RelativeSource AncestorType=TextBox}}">
+                                            <MenuItem.Icon>
+                                                <materialDesign:PackIcon Kind="ContentCopy"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                        <Separator/>
+                                        <MenuItem Header="Clear Log" 
+                                                Command="{Binding ClearLogCommand}">
+                                            <MenuItem.Icon>
+                                                <materialDesign:PackIcon Kind="Delete"/>
+                                            </MenuItem.Icon>
+                                        </MenuItem>
+                                    </ContextMenu>
+                                </TextBox.ContextMenu>
+                            </TextBox>
+                        </ScrollViewer>
+                        
+                        <!-- Dialog Footer -->
+                        <StackPanel Grid.Row="2" 
+                                   Orientation="Horizontal" 
+                                   HorizontalAlignment="Right"
+                                   Margin="16,8,16,16">
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding ClearLogCommand}"
+                                    Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Delete" Margin="0,0,8,0" Width="16" Height="16"/>
+                                    <TextBlock Text="Clear Log"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Command="{Binding CloseLogDialogCommand}">
+                                <TextBlock Text="Close"/>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
+            </materialDesign:DialogHost.DialogContent>
+        </materialDesign:DialogHost>
+
         <!-- Settings Flyout -->
-        <materialDesign:DrawerHost Grid.RowSpan="4" IsRightDrawerOpen="{Binding IsSettingsOpen}">
+        <materialDesign:DrawerHost Grid.RowSpan="3" IsRightDrawerOpen="{Binding IsSettingsOpen}">
             <materialDesign:DrawerHost.RightDrawerContent>
                 <StackPanel Width="300" Margin="16">
                     <DockPanel Margin="0,0,0,16">
