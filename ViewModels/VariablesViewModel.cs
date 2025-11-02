@@ -9,6 +9,7 @@ using System.IO;
 using System.Text.Json;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using teams_phonemanager.Helpers;
 
 namespace teams_phonemanager.ViewModels
 {
@@ -24,8 +25,14 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private bool _showHolidayTimePicker = false;
 
+        /// <summary>
+        /// Observable collection of time options in 15-minute increments (00:00 to 23:45).
+        /// Uses the shared TimeOptionsProvider for consistency across the application.
+        /// </summary>
+        public ObservableCollection<TimeSpan> TimeOptions => TimeOptionsProvider.TimeOptions;
+
         [ObservableProperty]
-        private object? _selectedHolidayTime;
+        private TimeSpan? _selectedHolidayTime;
 
         [ObservableProperty]
         private bool _showHolidaySeriesManager = false;
@@ -37,7 +44,7 @@ namespace teams_phonemanager.ViewModels
         private bool _showEditHolidayDialog = false;
 
         [ObservableProperty]
-        private object? _selectedEditHolidayTime;
+        private TimeSpan? _selectedEditHolidayTime;
 
         // Simple properties for Add/Edit dialogs
         [ObservableProperty]
@@ -184,17 +191,9 @@ namespace teams_phonemanager.ViewModels
         {
             // Set the current time as selected if it exists
             var currentTime = Variables.HolidayTime;
-            var timeString = currentTime.ToString(@"hh\:mm");
-            
-            // Find the corresponding ComboBoxItem
-            foreach (var item in GetTimeOptions())
-            {
-                if (item.Tag?.ToString() == timeString)
-                {
-                    SelectedHolidayTime = item;
-                    break;
-                }
-            }
+            // Round to nearest 15-minute increment if needed
+            var roundedTime = new TimeSpan(currentTime.Hours, (currentTime.Minutes / 15) * 15, 0);
+            SelectedHolidayTime = roundedTime;
             
             ShowHolidayTimePicker = true;
         }
@@ -208,38 +207,13 @@ namespace teams_phonemanager.ViewModels
         [RelayCommand]
         private void SaveHolidayTime()
         {
-            if (SelectedHolidayTime is System.Windows.Controls.ComboBoxItem selectedItem && 
-                selectedItem.Tag is string timeString)
+            if (SelectedHolidayTime.HasValue)
             {
-                if (TimeSpan.TryParse(timeString, out var timeSpan))
-                {
-                    Variables.HolidayTime = timeSpan;
-                    _loggingService.Log($"Holiday time updated to: {timeString}", LogLevel.Info);
-                }
+                Variables.HolidayTime = SelectedHolidayTime.Value;
+                _loggingService.Log($"Holiday time updated to: {SelectedHolidayTime.Value:hh\\:mm}", LogLevel.Info);
             }
             
             ShowHolidayTimePicker = false;
-        }
-
-        private System.Collections.Generic.List<System.Windows.Controls.ComboBoxItem> GetTimeOptions()
-        {
-            var times = new System.Collections.Generic.List<System.Windows.Controls.ComboBoxItem>();
-            
-            for (int hour = 0; hour < 24; hour++)
-            {
-                for (int minute = 0; minute < 60; minute += 15)
-                {
-                    var timeString = $"{hour:D2}:{minute:D2}";
-                    var item = new System.Windows.Controls.ComboBoxItem
-                    {
-                        Content = timeString,
-                        Tag = timeString
-                    };
-                    times.Add(item);
-                }
-            }
-            
-            return times;
         }
 
         [RelayCommand]
@@ -296,8 +270,9 @@ namespace teams_phonemanager.ViewModels
                 NewHolidayTime = new TimeSpan(0, 0, 0);
                 EditingHoliday = null; // This is a new holiday, not editing existing
                 
-                // Set the selected time for the dialog
-                SetSelectedTimeForEdit(NewHolidayTime);
+                // Set the selected time for the dialog (round to nearest 15-minute increment)
+                var roundedTime = new TimeSpan(NewHolidayTime.Hours, (NewHolidayTime.Minutes / 15) * 15, 0);
+                SelectedEditHolidayTime = roundedTime;
                 
                 // Open the edit dialog
                 ShowEditHolidayDialog = true;
@@ -470,8 +445,9 @@ namespace teams_phonemanager.ViewModels
                     EditingHoliday = holiday;
                     _loggingService.Log($"EditHoliday: Set EditingHoliday", LogLevel.Info);
                     
-                    // Set the selected ComboBoxItem for the time
-                    SetSelectedTimeForEdit(holiday.Time);
+                    // Set the selected time, rounding to nearest 15-minute increment if needed
+                    var roundedTime = new TimeSpan(holiday.Time.Hours, (holiday.Time.Minutes / 15) * 15, 0);
+                    SelectedEditHolidayTime = roundedTime;
                     
                     ShowEditHolidayDialog = true;
                     _loggingService.Log($"EditHoliday: Set ShowEditHolidayDialog to true", LogLevel.Info);
@@ -501,15 +477,7 @@ namespace teams_phonemanager.ViewModels
                 if (variables == null) return;
 
                 // Get the selected time from the ComboBox
-                TimeSpan selectedTime = new TimeSpan(0, 0, 0); // Default
-                if (SelectedEditHolidayTime is System.Windows.Controls.ComboBoxItem selectedItem && 
-                    selectedItem.Tag is string timeString)
-                {
-                    if (TimeSpan.TryParse(timeString, out var timeSpan))
-                    {
-                        selectedTime = timeSpan;
-                    }
-                }
+                TimeSpan selectedTime = SelectedEditHolidayTime ?? new TimeSpan(0, 0, 0);
 
                 if (EditingHoliday != null)
                 {
@@ -536,28 +504,6 @@ namespace teams_phonemanager.ViewModels
             catch (Exception ex)
             {
                 _loggingService.Log($"Error in SaveEditHoliday: {ex.Message}", LogLevel.Error);
-            }
-        }
-
-        private void SetSelectedTimeForEdit(TimeSpan time)
-        {
-            try
-            {
-                var timeString = time.ToString(@"hh\:mm");
-                
-                // Find the corresponding ComboBoxItem
-                foreach (var item in GetTimeOptions())
-                {
-                    if (item.Tag?.ToString() == timeString)
-                    {
-                        SelectedEditHolidayTime = item;
-                        break;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _loggingService.Log($"Error in SetSelectedTimeForEdit: {ex.Message}", LogLevel.Error);
             }
         }
 

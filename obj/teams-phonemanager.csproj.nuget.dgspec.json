@@ -5,7 +5,7 @@
   },
   "projects": {
     "C:\\Git\\teams-phonemanager\\teams-phonemanager.csproj": {
-      "version": "2.0.2",
+      "version": "2.1.0",
       "restore": {
         "projectUniqueName": "C:\\Git\\teams-phonemanager\\teams-phonemanager.csproj",
         "projectName": "teams-phonemanager",
@@ -87,11 +87,6 @@
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
-        }
-      },
-      "runtimes": {
-        "win-x64": {
-          "#import": []
         }
       }
     }

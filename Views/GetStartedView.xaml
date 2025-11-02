@@ -23,7 +23,7 @@
                      FontWeight="Bold"/>
 
             <!-- Step 1: PowerShell Modules -->
-            <materialDesign:Card Margin="0,0,0,16" UniformCornerRadius="8" Padding="24">
+            <materialDesign:Card Margin="0,0,0,16" UniformCornerRadius="8" Padding="16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -76,7 +76,7 @@
             </materialDesign:Card>
 
             <!-- Step 2: Teams Connection -->
-            <materialDesign:Card Margin="0,0,0,16" UniformCornerRadius="8" Padding="24">
+            <materialDesign:Card Margin="0,0,0,16" UniformCornerRadius="8" Padding="16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -149,7 +149,7 @@
             </materialDesign:Card>
 
             <!-- Step 3: Graph Connection -->
-            <materialDesign:Card Margin="0,0,0,16" UniformCornerRadius="8" Padding="24">
+            <materialDesign:Card Margin="0,0,0,16" UniformCornerRadius="8" Padding="16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -222,7 +222,7 @@
             </materialDesign:Card>
 
             <!-- Proceed Section -->
-            <materialDesign:Card Margin="0,24,0,0" UniformCornerRadius="12" Padding="32">
+            <materialDesign:Card Margin="0,24,0,0" UniformCornerRadius="12" Padding="16">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
                         <materialDesign:PackIcon Kind="CheckCircle" 
@@ -273,7 +273,7 @@
             <!-- Progress Indicator -->
             <materialDesign:Card Margin="0,24,0,0" 
                                UniformCornerRadius="8" 
-                               Padding="24"
+                               Padding="16"
                                Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <ProgressBar IsIndeterminate="True"

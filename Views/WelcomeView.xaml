@@ -16,7 +16,7 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="24">
             <!-- Header Section -->
-            <materialDesign:Card Margin="0,0,0,24" UniformCornerRadius="12" Padding="32">
+            <materialDesign:Card Margin="0,0,0,24" UniformCornerRadius="12" Padding="16">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
                         <materialDesign:PackIcon Kind="MicrosoftTeams" 
@@ -102,7 +102,7 @@
                 <materialDesign:Card Grid.Row="0" Grid.Column="0" 
                                    Margin="0,0,12,16" 
                                    UniformCornerRadius="8"
-                                   Padding="20">
+                                   Padding="16">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                             <materialDesign:PackIcon Kind="Wrench" 
@@ -128,7 +128,7 @@
                 <materialDesign:Card Grid.Row="0" Grid.Column="1" 
                                    Margin="12,0,0,16" 
                                    UniformCornerRadius="8"
-                                   Padding="20">
+                                   Padding="16">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                             <materialDesign:PackIcon Kind="Cog" 
@@ -154,7 +154,7 @@
                 <materialDesign:Card Grid.Row="1" Grid.Column="0" 
                                    Margin="0,0,12,16" 
                                    UniformCornerRadius="8"
-                                   Padding="20">
+                                   Padding="16">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                             <materialDesign:PackIcon Kind="AccountGroup" 
@@ -180,7 +180,7 @@
                 <materialDesign:Card Grid.Row="1" Grid.Column="1" 
                                    Margin="12,0,0,16" 
                                    UniformCornerRadius="8"
-                                   Padding="20">
+                                   Padding="16">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                             <materialDesign:PackIcon Kind="PhoneInTalk" 
@@ -207,7 +207,7 @@
                 <materialDesign:Card Grid.Row="2" Grid.Column="0" 
                                    Margin="0,0,12,0" 
                                    UniformCornerRadius="8"
-                                   Padding="20">
+                                   Padding="16">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                             <materialDesign:PackIcon Kind="Robot" 
@@ -234,7 +234,7 @@
                 <materialDesign:Card Grid.Row="2" Grid.Column="1" 
                                    Margin="12,0,0,0" 
                                    UniformCornerRadius="8"
-                                   Padding="20">
+                                   Padding="16">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                             <materialDesign:PackIcon Kind="Calendar" 
@@ -258,7 +258,7 @@
             </Grid>
 
             <!-- Quick Start Section -->
-            <materialDesign:Card Margin="0,24,0,0" UniformCornerRadius="12" Padding="24">
+            <materialDesign:Card Margin="0,24,0,0" UniformCornerRadius="12" Padding="16">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
                         <materialDesign:PackIcon Kind="LightningBolt" 
