@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:teams_phonemanager"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:helpers="clr-namespace:teams_phonemanager.Helpers"
+             xmlns:converters="clr-namespace:teams_phonemanager.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -15,8 +15,8 @@
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Value Converters -->
-            <helpers:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-            <helpers:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

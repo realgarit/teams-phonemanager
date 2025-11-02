@@ -55,19 +55,29 @@ if ($bundledModulesPath) {
 }
 
 # Check MicrosoftTeams module
-if (Get-Module -ListAvailable -Name MicrosoftTeams) {
-    $teamsModule = Get-Module -ListAvailable -Name MicrosoftTeams
+if (Get-Module -ListAvailable -Name " + ConstantsService.PowerShellModules.MicrosoftTeams + @") {
+    $teamsModule = Get-Module -ListAvailable -Name " + ConstantsService.PowerShellModules.MicrosoftTeams + @"
     $output += 'MicrosoftTeams module is available: ' + $teamsModule.Version
 } else {
     $output += 'ERROR: MicrosoftTeams module not found in bundled modules'
 }
 
-# Check Microsoft.Graph module
-if (Get-Module -ListAvailable -Name Microsoft.Graph) {
-    $graphModule = Get-Module -ListAvailable -Name Microsoft.Graph
-    $output += 'Microsoft.Graph module is available: ' + $graphModule.Version
-} else {
-    $output += 'ERROR: Microsoft.Graph module not found in bundled modules'
+# Check Microsoft.Graph modules
+$requiredGraphModules = @(
+    """ + ConstantsService.PowerShellModules.MicrosoftGraphAuthentication + @""",
+    """ + ConstantsService.PowerShellModules.MicrosoftGraphUsers + @""",
+    """ + ConstantsService.PowerShellModules.MicrosoftGraphUsersActions + @""",
+    """ + ConstantsService.PowerShellModules.MicrosoftGraphGroups + @""",
+    """ + ConstantsService.PowerShellModules.MicrosoftGraphIdentityDirectoryManagement + @"""
+)
+
+foreach ($moduleName in $requiredGraphModules) {
+    if (Get-Module -ListAvailable -Name $moduleName) {
+        $module = Get-Module -ListAvailable -Name $moduleName
+        $output += ""$moduleName module is available: $($module.Version)""
+    } else {
+        $output += ""ERROR: $moduleName module not found in bundled modules""
+    }
 }
 
 $output | ForEach-Object { Write-Host $_ }
@@ -87,7 +97,7 @@ try {
 }
 catch {
     Write-Error ""Failed to connect to Microsoft Teams: $_""
-    exit 1
+    exit " + ConstantsService.PowerShell.ExitCodeError + @"
 }";
         }
 
@@ -96,10 +106,11 @@ catch {
             return @"
 try {
     # Import Microsoft.Graph modules
-    Import-Module Microsoft.Graph.Authentication -Force
-    Import-Module Microsoft.Graph.Users -Force
-    Import-Module Microsoft.Graph.Groups -Force
-    Import-Module Microsoft.Graph.Identity.DirectoryManagement -Force
+    Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphAuthentication + @" -Force
+    Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphUsers + @" -Force
+    Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphUsersActions + @" -Force
+    Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphGroups + @" -Force
+    Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphIdentityDirectoryManagement + @" -Force
     
     Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All, Group.ReadWrite.All, Directory.ReadWrite.All -ErrorAction Stop -NoWelcome
     $context = Get-MgContext -ErrorAction Stop
@@ -110,7 +121,7 @@ try {
 }
 catch {
     Write-Error ""Failed to connect to Microsoft Graph: $_""
-    exit 1
+    exit " + ConstantsService.PowerShell.ExitCodeError + @"
 }";
         }
 
@@ -123,7 +134,7 @@ try {
 }
 catch {
     Write-Error ""Failed to disconnect from Microsoft Teams: $_""
-    exit 1
+    exit " + ConstantsService.PowerShell.ExitCodeError + @"
 }";
         }
 
@@ -132,23 +143,20 @@ catch {
             return @"
 try {
     # Import Microsoft.Graph modules
-    Import-Module Microsoft.Graph.Authentication -Force
+    Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphAuthentication + @" -Force
     
     Disconnect-MgGraph -ErrorAction Stop
     Write-Host 'SUCCESS: Disconnected from Microsoft Graph'
 }
 catch {
     Write-Error ""Failed to disconnect from Microsoft Graph: $_""
-    exit 1
+    exit " + ConstantsService.PowerShell.ExitCodeError + @"
 }";
         }
 
         public string GetCreateM365GroupCommand(string groupName)
         {
             return $@"
-# Import Microsoft.Graph modules
-Import-Module Microsoft.Graph.Groups -Force
-
 $existingGroup = Get-MgGroup -Filter ""displayName eq '{groupName}'"" -ErrorAction SilentlyContinue
 if ($existingGroup) 
 {{
@@ -179,8 +187,8 @@ catch {{
             return $@"
 New-CsOnlineApplicationInstance -UserPrincipalName {variables.RacqUPN} -ApplicationId {variables.CsAppCqId} -DisplayName {variables.RacqDisplayName}
 
-Write-Host ""{ConstantsService.Messages.WaitingMessage}""
-Start-Sleep -Seconds {ConstantsService.PowerShell.DefaultWaitTimeSeconds}
+Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
+Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
 
 $global:racqid = (Get-CsOnlineUser {variables.RacqUPN}).Identity
 
@@ -191,18 +199,18 @@ New-CsCallQueue `
 -RoutingMethod Attendant `
 -AllowOptOut $true `
 -ConferenceMode $true `
--AgentAlertTime 30 `
+-AgentAlertTime " + ConstantsService.CallQueue.AgentAlertTime + @" `
 -LanguageId {variables.LanguageId} `
 -DistributionLists $global:m365groupId `
--OverflowThreshold 15 `
+-OverflowThreshold " + ConstantsService.CallQueue.OverflowThreshold + @" `
 -OverflowAction Disconnect `
--TimeoutThreshold 30 `
+-TimeoutThreshold " + ConstantsService.CallQueue.TimeoutThreshold + @" `
 -TimeoutAction Disconnect `
 -UseDefaultMusicOnHold $true `
 -PresenceBasedRouting $false
 
-Write-Host ""{ConstantsService.Messages.WaitingMessage}""
-Start-Sleep -Seconds {ConstantsService.PowerShell.DefaultWaitTimeSeconds}
+Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
+Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
 
 $cqapplicationInstanceId = (Get-CsOnlineUser {variables.RacqUPN}).Identity
 $cqautoAttendantId = (Get-CsCallQueue -NameFilter {variables.CqDisplayName}).Identity
@@ -350,14 +358,14 @@ catch {{
         {
             return @"
 try {
-    $groups = Get-MgGroup -Filter ""startswith(displayName,'ttgrp')"" -All
+    $groups = Get-MgGroup -Filter ""startswith(displayName,'" + ConstantsService.Naming.M365GroupPrefix + @"')"" -All
     if ($groups) {
-        Write-Host ""SUCCESS: Found $($groups.Count) groups starting with 'ttgrp'""
+        Write-Host ""SUCCESS: Found $($groups.Count) groups starting with '" + ConstantsService.Naming.M365GroupPrefix + @"'""
         foreach ($group in $groups) {
             Write-Host ""GROUP: $($group.DisplayName)|$($group.Id)|$($group.MailNickname)|$($group.Description)""
         }
     } else {
-        Write-Host ""INFO: No groups found starting with 'ttgrp'""
+        Write-Host ""INFO: No groups found starting with '" + ConstantsService.Naming.M365GroupPrefix + @"'""
     }
 }
 catch {
@@ -369,14 +377,14 @@ catch {
         {
             return @"
 try {
-    $resourceAccounts = Get-MgUser -Filter ""startswith(userPrincipalName,'racq-')"" -Property Id,DisplayName,UserPrincipalName,UsageLocation
+    $resourceAccounts = Get-MgUser -Filter ""startswith(userPrincipalName,'" + ConstantsService.Naming.ResourceAccountCallQueuePrefix + @"')"" -Property Id,DisplayName,UserPrincipalName,UsageLocation
     if ($resourceAccounts) {
-        Write-Host ""SUCCESS: Found $($resourceAccounts.Count) resource accounts starting with 'racq-'""
+        Write-Host ""SUCCESS: Found $($resourceAccounts.Count) resource accounts starting with '" + ConstantsService.Naming.ResourceAccountCallQueuePrefix + @"'""
         foreach ($account in $resourceAccounts) {
             Write-Host ""RESOURCEACCOUNT: $($account.DisplayName)|$($account.UserPrincipalName)|$($account.Id)|$($account.UsageLocation)""
         }
     } else {
-        Write-Host ""INFO: No resource accounts found starting with 'racq-'""
+        Write-Host ""INFO: No resource accounts found starting with '" + ConstantsService.Naming.ResourceAccountCallQueuePrefix + @"'""
     }
 }
 catch {
@@ -388,14 +396,14 @@ catch {
         {
             return @"
 try {
-    $callQueues = Get-CsCallQueue | Where-Object {$_.Name -like '*cq-*'}
+    $callQueues = Get-CsCallQueue | Where-Object {$_.Name -like '*" + ConstantsService.Naming.CallQueuePrefix + @"*'}
     if ($callQueues) {
-        Write-Host ""SUCCESS: Found $($callQueues.Count) call queues containing 'cq-'""
+        Write-Host ""SUCCESS: Found $($callQueues.Count) call queues containing '" + ConstantsService.Naming.CallQueuePrefix + @"'""
         foreach ($queue in $callQueues) {
             Write-Host ""CALLQUEUE: $($queue.Name)|$($queue.Identity)|$($queue.RoutingMethod)|$($queue.AgentAlertTime)""
         }
     } else {
-        Write-Host ""INFO: No call queues found containing 'cq-'""
+        Write-Host ""INFO: No call queues found containing '" + ConstantsService.Naming.CallQueuePrefix + @"'""
     }
 }
 catch {
@@ -483,7 +491,8 @@ catch {{
         {
             return $@"
 try {{
-    Set-MgUserLicense -UserId {userId} -AddLicenses @{{SkuId = ""{skuId}""}} -RemoveLicenses @()
+    $SkuId = ""{skuId}""
+    Set-MgUserLicense -UserId {userId} -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
     Write-Host ""SUCCESS: License assigned to user {userId} successfully""
 }}
 catch {{
@@ -495,14 +504,14 @@ catch {{
         {
             return @"
 try {
-    $resourceAccounts = Get-MgUser -Filter ""startswith(userPrincipalName,'raaa-')"" -Property Id,DisplayName,UserPrincipalName,UsageLocation
+    $resourceAccounts = Get-MgUser -Filter ""startswith(userPrincipalName,'" + ConstantsService.Naming.ResourceAccountAutoAttendantPrefix + @"')"" -Property Id,DisplayName,UserPrincipalName,UsageLocation
     if ($resourceAccounts) {
-        Write-Host ""SUCCESS: Found $($resourceAccounts.Count) resource accounts starting with 'raaa-'""
+        Write-Host ""SUCCESS: Found $($resourceAccounts.Count) resource accounts starting with '" + ConstantsService.Naming.ResourceAccountAutoAttendantPrefix + @"'""
         foreach ($account in $resourceAccounts) {
             Write-Host ""RESOURCEACCOUNT: $($account.DisplayName)|$($account.UserPrincipalName)|$($account.Id)|$($account.UsageLocation)""
         }
     } else {
-        Write-Host ""INFO: No resource accounts found starting with 'raaa-'""
+        Write-Host ""INFO: No resource accounts found starting with '" + ConstantsService.Naming.ResourceAccountAutoAttendantPrefix + @"'""
     }
 }
 catch {
@@ -514,14 +523,14 @@ catch {
         {
             return @"
 try {
-    $autoAttendants = Get-CsAutoAttendant | Where-Object {$_.Name -like '*aa-*'}
+    $autoAttendants = Get-CsAutoAttendant | Where-Object {$_.Name -like '*" + ConstantsService.Naming.AutoAttendantPrefix + @"*'}
     if ($autoAttendants) {
-        Write-Host ""SUCCESS: Found $($autoAttendants.Count) auto attendants containing 'aa-'""
+        Write-Host ""SUCCESS: Found $($autoAttendants.Count) auto attendants containing '" + ConstantsService.Naming.AutoAttendantPrefix + @"'""
         foreach ($aa in $autoAttendants) {
             Write-Host ""AUTOATTENDANT: $($aa.Name)|$($aa.Identity)|$($aa.LanguageId)|$($aa.TimeZoneId)""
         }
     } else {
-        Write-Host ""INFO: No auto attendants found containing 'aa-'""
+        Write-Host ""INFO: No auto attendants found containing '" + ConstantsService.Naming.AutoAttendantPrefix + @"'""
     }
 }
 catch {
@@ -552,7 +561,8 @@ catch {{
         {
             return $@"
 try {{
-    Set-MgUserLicense -UserId {userId} -AddLicenses @{{SkuId = ""{skuId}""}} -RemoveLicenses @()
+    $SkuId = ""{skuId}""
+    Set-MgUserLicense -UserId {userId} -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
     Write-Host ""SUCCESS: License assigned to user {userId} successfully""
 }}
 catch {{

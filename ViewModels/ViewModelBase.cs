@@ -90,37 +90,37 @@ namespace teams_phonemanager.ViewModels
 
         protected void NavigateToVariables()
         {
-            _navigationService.NavigateToVariables();
+            NavigateTo(ConstantsService.Pages.Variables);
         }
 
         protected void NavigateToM365Groups()
         {
-            _navigationService.NavigateToM365Groups();
+            NavigateTo(ConstantsService.Pages.M365Groups);
         }
 
         protected void NavigateToCallQueues()
         {
-            _navigationService.NavigateToCallQueues();
+            NavigateTo(ConstantsService.Pages.CallQueues);
         }
 
         protected void NavigateToAutoAttendants()
         {
-            _navigationService.NavigateToAutoAttendants();
+            NavigateTo(ConstantsService.Pages.AutoAttendants);
         }
 
         protected void NavigateToHolidays()
         {
-            _navigationService.NavigateToHolidays();
+            NavigateTo(ConstantsService.Pages.Holidays);
         }
 
         protected void NavigateToGetStarted()
         {
-            _navigationService.NavigateToGetStarted();
+            NavigateTo(ConstantsService.Pages.GetStarted);
         }
 
         protected void NavigateToWelcome()
         {
-            _navigationService.NavigateToWelcome();
+            NavigateTo(ConstantsService.Pages.Welcome);
         }
     }
-} 
+}

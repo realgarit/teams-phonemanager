@@ -6734,7 +6734,7 @@
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
-    "version": "2.2.0",
+    "version": "2.3.0",
     "restore": {
       "projectUniqueName": "C:\\Git\\teams-phonemanager\\teams-phonemanager.csproj",
       "projectName": "teams-phonemanager",

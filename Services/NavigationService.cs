@@ -6,7 +6,7 @@ namespace teams_phonemanager.Services
     public class NavigationService : ObservableObject
     {
         private static NavigationService? _instance;
-        private string _currentPage = "Welcome";
+        private string _currentPage = ConstantsService.Pages.Welcome;
 
         private NavigationService()
         {
@@ -39,42 +39,6 @@ namespace teams_phonemanager.Services
         public void NavigateTo(string page)
         {
             CurrentPage = page;
-        }
-
-        public void NavigateToVariables()
-        {
-            NavigateTo("Variables");
-        }
-
-        public void NavigateToM365Groups()
-        {
-            NavigateTo("M365 Groups");
-        }
-
-        public void NavigateToCallQueues()
-        {
-            NavigateTo("Call Queues");
-        }
-
-        public void NavigateToAutoAttendants()
-        {
-            NavigateTo("Auto Attendants");
-        }
-
-
-        public void NavigateToHolidays()
-        {
-            NavigateTo("Holidays");
-        }
-
-        public void NavigateToGetStarted()
-        {
-            NavigateTo("Get Started");
-        }
-
-        public void NavigateToWelcome()
-        {
-            NavigateTo("Welcome");
         }
     }
 }

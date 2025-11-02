@@ -26,35 +26,11 @@ public partial class MainWindow : Window
         var dialogHost = sender as MaterialDesignThemes.Wpf.DialogHost;
         DependencyObject searchRoot = dialogHost != null ? (DependencyObject)dialogHost : this;
 
-        // Scroll to end when dialog opens - use multiple dispatcher calls with different priorities
-        // to ensure it happens after rendering and binding updates
-        
-        Dispatcher.BeginInvoke(new Action(() =>
-        {
-            ScrollLogToEnd(searchRoot);
-        }), DispatcherPriority.ContextIdle);
-        
+        // Scroll to end when dialog opens - use dispatcher to ensure it happens after rendering
         Dispatcher.BeginInvoke(new Action(() =>
         {
             ScrollLogToEnd(searchRoot);
         }), DispatcherPriority.Loaded);
-        
-        Dispatcher.BeginInvoke(new Action(() =>
-        {
-            ScrollLogToEnd(searchRoot);
-        }), DispatcherPriority.Input);
-        
-        // Additional delayed attempt to catch cases where binding takes longer
-        var timer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromMilliseconds(100)
-        };
-        timer.Tick += (s, e) =>
-        {
-            timer.Stop();
-            ScrollLogToEnd(searchRoot);
-        };
-        timer.Start();
     }
 
     private void ScrollLogToEnd(DependencyObject? searchRoot = null)

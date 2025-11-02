@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace teams_phonemanager.Helpers
+namespace teams_phonemanager.Converters
 {
     public class TimeSpanConverter : IValueConverter
     {

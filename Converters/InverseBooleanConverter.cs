@@ -1,4 +1,3 @@
-using System;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -24,4 +23,4 @@ namespace teams_phonemanager.Converters
             return value;
         }
     }
-} 
+}

@@ -6,7 +6,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:teams_phonemanager"
         xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
-        xmlns:helpers="clr-namespace:teams_phonemanager.Helpers"
+        xmlns:converters="clr-namespace:teams_phonemanager.Converters"
         xmlns:views="clr-namespace:teams_phonemanager.Views"
         xmlns:services="clr-namespace:teams_phonemanager.Services"
         mc:Ignorable="d"
@@ -161,43 +161,43 @@
             <Grid Grid.Column="1" Margin="16">
                 <ContentControl Content="{Binding CurrentPage}">
                     <ContentControl.ContentTemplateSelector>
-                        <helpers:PageTemplateSelector>
-                            <helpers:PageTemplateSelector.WelcomeTemplate>
+                        <converters:PageTemplateSelector>
+                            <converters:PageTemplateSelector.WelcomeTemplate>
                                 <DataTemplate>
                                     <views:WelcomeView/>
                                 </DataTemplate>
-                            </helpers:PageTemplateSelector.WelcomeTemplate>
-                            <helpers:PageTemplateSelector.GetStartedTemplate>
+                            </converters:PageTemplateSelector.WelcomeTemplate>
+                            <converters:PageTemplateSelector.GetStartedTemplate>
                                 <DataTemplate>
                                     <views:GetStartedView/>
                                 </DataTemplate>
-                            </helpers:PageTemplateSelector.GetStartedTemplate>
-                            <helpers:PageTemplateSelector.VariablesTemplate>
+                            </converters:PageTemplateSelector.GetStartedTemplate>
+                            <converters:PageTemplateSelector.VariablesTemplate>
                                 <DataTemplate>
                                     <views:VariablesView/>
                                 </DataTemplate>
-                            </helpers:PageTemplateSelector.VariablesTemplate>
-                            <helpers:PageTemplateSelector.M365GroupsTemplate>
+                            </converters:PageTemplateSelector.VariablesTemplate>
+                            <converters:PageTemplateSelector.M365GroupsTemplate>
                                 <DataTemplate>
                                     <views:M365GroupsView/>
                                 </DataTemplate>
-                            </helpers:PageTemplateSelector.M365GroupsTemplate>
-                            <helpers:PageTemplateSelector.CallQueuesTemplate>
+                            </converters:PageTemplateSelector.M365GroupsTemplate>
+                            <converters:PageTemplateSelector.CallQueuesTemplate>
                                 <DataTemplate>
                                     <views:CallQueuesView/>
                                 </DataTemplate>
-                            </helpers:PageTemplateSelector.CallQueuesTemplate>
-                            <helpers:PageTemplateSelector.AutoAttendantsTemplate>
+                            </converters:PageTemplateSelector.CallQueuesTemplate>
+                            <converters:PageTemplateSelector.AutoAttendantsTemplate>
                                 <DataTemplate>
                                     <views:AutoAttendantsView/>
                                 </DataTemplate>
-                            </helpers:PageTemplateSelector.AutoAttendantsTemplate>
-                            <helpers:PageTemplateSelector.HolidaysTemplate>
+                            </converters:PageTemplateSelector.AutoAttendantsTemplate>
+                            <converters:PageTemplateSelector.HolidaysTemplate>
                                 <DataTemplate>
                                     <views:HolidaysView/>
                                 </DataTemplate>
-                            </helpers:PageTemplateSelector.HolidaysTemplate>
-                        </helpers:PageTemplateSelector>
+                            </converters:PageTemplateSelector.HolidaysTemplate>
+                        </converters:PageTemplateSelector>
                     </ContentControl.ContentTemplateSelector>
                 </ContentControl>
             </Grid>

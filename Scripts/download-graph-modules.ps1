@@ -16,6 +16,7 @@ $coreModules = @(
     "Microsoft.Graph.Authentication",
     "Microsoft.Graph.Core",
     "Microsoft.Graph.Users",
+    "Microsoft.Graph.Users.Actions",
     "Microsoft.Graph.Groups",
     "Microsoft.Graph.Identity.DirectoryManagement"
 )

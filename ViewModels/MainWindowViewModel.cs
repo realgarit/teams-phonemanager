@@ -32,7 +32,7 @@ namespace teams_phonemanager.ViewModels
         private bool _isDarkTheme;
 
         [ObservableProperty]
-        private string _currentPage = "Welcome";
+        private string _currentPage = ConstantsService.Pages.Welcome;
 
         [ObservableProperty]
         private bool _isSettingsOpen;

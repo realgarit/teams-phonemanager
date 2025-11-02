@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using teams_phonemanager.Services;
 
-namespace teams_phonemanager.Helpers
+namespace teams_phonemanager.Converters
 {
     public class PageTemplateSelector : DataTemplateSelector
     {
@@ -26,15 +26,23 @@ namespace teams_phonemanager.Helpers
             if (item is string pageName)
             {
                 var normalizedPageName = pageName.Replace(" ", "");
+                var normalizedWelcome = ConstantsService.Pages.Welcome.Replace(" ", "");
+                var normalizedGetStarted = ConstantsService.Pages.GetStarted.Replace(" ", "");
+                var normalizedVariables = ConstantsService.Pages.Variables.Replace(" ", "");
+                var normalizedM365Groups = ConstantsService.Pages.M365Groups.Replace(" ", "");
+                var normalizedCallQueues = ConstantsService.Pages.CallQueues.Replace(" ", "");
+                var normalizedAutoAttendants = ConstantsService.Pages.AutoAttendants.Replace(" ", "");
+                var normalizedHolidays = ConstantsService.Pages.Holidays.Replace(" ", "");
+                
                 DataTemplate template = normalizedPageName switch
                 {
-                    "Welcome" => WelcomeTemplate,
-                    "GetStarted" => GetStartedTemplate,
-                    "Variables" => VariablesTemplate,
-                    "M365Groups" => M365GroupsTemplate,
-                    "CallQueues" => CallQueuesTemplate,
-                    "AutoAttendants" => AutoAttendantsTemplate,
-                    "Holidays" => HolidaysTemplate,
+                    var name when name == normalizedWelcome => WelcomeTemplate,
+                    var name when name == normalizedGetStarted => GetStartedTemplate,
+                    var name when name == normalizedVariables => VariablesTemplate,
+                    var name when name == normalizedM365Groups => M365GroupsTemplate,
+                    var name when name == normalizedCallQueues => CallQueuesTemplate,
+                    var name when name == normalizedAutoAttendants => AutoAttendantsTemplate,
+                    var name when name == normalizedHolidays => HolidaysTemplate,
                     _ => WelcomeTemplate
                 };
 
@@ -46,4 +54,4 @@ namespace teams_phonemanager.Helpers
             return WelcomeTemplate;
         }
     }
-} 
+}

@@ -26,7 +26,7 @@ namespace teams_phonemanager.Services
             
             MessageBox.Show(
                 $"An error occurred while executing PowerShell command:\n\n{error}",
-                "PowerShell Error",
+                ConstantsService.ErrorDialogTitles.PowerShellError,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
@@ -38,7 +38,7 @@ namespace teams_phonemanager.Services
             
             MessageBox.Show(
                 message,
-                "Validation Error",
+                ConstantsService.ErrorDialogTitles.ValidationError,
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
         }
@@ -50,7 +50,7 @@ namespace teams_phonemanager.Services
             
             MessageBox.Show(
                 $"Failed to connect to {service}:\n\n{error}",
-                "Connection Error",
+                ConstantsService.ErrorDialogTitles.ConnectionError,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
@@ -62,12 +62,12 @@ namespace teams_phonemanager.Services
             
             MessageBox.Show(
                 message,
-                "Error",
+                ConstantsService.ErrorDialogTitles.Error,
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
 
-        public bool HandleConfirmation(string message, string title = "Confirmation")
+        public bool HandleConfirmation(string message, string title = ConstantsService.ErrorDialogTitles.Confirmation)
         {
             LoggingService.Instance.Log($"User confirmation requested: {title} - {message}", LogLevel.Info);
             
@@ -80,7 +80,7 @@ namespace teams_phonemanager.Services
             return result == MessageBoxResult.Yes;
         }
 
-        public void ShowSuccess(string message, string title = "Success")
+        public void ShowSuccess(string message, string title = ConstantsService.ErrorDialogTitles.Success)
         {
             LoggingService.Instance.Log($"Success: {title} - {message}", LogLevel.Success);
             
@@ -91,7 +91,7 @@ namespace teams_phonemanager.Services
                 MessageBoxImage.Information);
         }
 
-        public void ShowInfo(string message, string title = "Information")
+        public void ShowInfo(string message, string title = ConstantsService.ErrorDialogTitles.Information)
         {
             LoggingService.Instance.Log($"Info: {title} - {message}", LogLevel.Info);
             
