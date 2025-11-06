@@ -2,14 +2,13 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>teams_phonemanager</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UseWPF>true</UseWPF>
-    <Version>2.4.0</Version>
-    <AssemblyVersion>2.4.0</AssemblyVersion>
-    <FileVersion>2.4.0</FileVersion>
+    <Version>3.0.0</Version>
+    <AssemblyVersion>3.0.0</AssemblyVersion>
+    <FileVersion>3.0.0</FileVersion>
     
     <!-- Publish Settings for Framework-Dependent Deployment -->
     <PublishSingleFile>false</PublishSingleFile>
@@ -20,21 +19,28 @@
     
     <!-- Application Settings -->
     <ApplicationTitle>Teams Phone Manager</ApplicationTitle>
-    <ApplicationDescription>A WPF-based Microsoft Teams Phone Manager to simplify admin tasks</ApplicationDescription>
+    <ApplicationDescription>An Avalonia-based Microsoft Teams Phone Manager to simplify admin tasks</ApplicationDescription>
     <Company>Realgar</Company>
     <Product>Teams Phone Manager</Product>
     <Copyright>Copyright © 2025</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.1.5" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.1.5" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.1.5" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.1.5" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
+    <PackageReference Include="Material.Avalonia" Version="3.13.0" />
+    <PackageReference Include="Material.Avalonia.DataGrid" Version="3.13.0" />
+    <PackageReference Include="Material.Avalonia.Dialogs" Version="3.13.0" />
+    <PackageReference Include="Material.Icons.Avalonia" Version="2.2.0" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.4.1" />
     <PackageReference Include="System.Management.Automation" Version="7.4.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\AargauHolidaysReference.png" />
+    <AvaloniaResource Include="Resources\AargauHolidaysReference.png" />
   </ItemGroup>
 
   <ItemGroup>

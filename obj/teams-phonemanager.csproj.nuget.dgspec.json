@@ -1,36 +1,30 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Git\\teams-phonemanager\\teams-phonemanager.csproj": {}
+    "/Users/realgar/Git/teams-phonemanager/teams-phonemanager.csproj": {}
   },
   "projects": {
-    "C:\\Git\\teams-phonemanager\\teams-phonemanager.csproj": {
-      "version": "2.3.0",
+    "/Users/realgar/Git/teams-phonemanager/teams-phonemanager.csproj": {
+      "version": "2.4.0",
       "restore": {
-        "projectUniqueName": "C:\\Git\\teams-phonemanager\\teams-phonemanager.csproj",
+        "projectUniqueName": "/Users/realgar/Git/teams-phonemanager/teams-phonemanager.csproj",
         "projectName": "teams-phonemanager",
-        "projectPath": "C:\\Git\\teams-phonemanager\\teams-phonemanager.csproj",
-        "packagesPath": "C:\\Users\\Realgar\\.nuget\\packages\\",
-        "outputPath": "C:\\Git\\teams-phonemanager\\obj\\",
+        "projectPath": "/Users/realgar/Git/teams-phonemanager/teams-phonemanager.csproj",
+        "packagesPath": "/Users/realgar/.nuget/packages/",
+        "outputPath": "/Users/realgar/Git/teams-phonemanager/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Realgar\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/realgar/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "net8.0-windows"
+          "net8.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net8.0-windows7.0": {
-            "targetAlias": "net8.0-windows",
+          "net8.0": {
+            "targetAlias": "net8.0",
             "projectReferences": {}
           }
         },
@@ -43,20 +37,47 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        },
-        "SdkAnalysisLevel": "9.0.300"
+        }
       },
       "frameworks": {
-        "net8.0-windows7.0": {
-          "targetAlias": "net8.0-windows",
+        "net8.0": {
+          "targetAlias": "net8.0",
           "dependencies": {
+            "Avalonia": {
+              "target": "Package",
+              "version": "[11.1.5, )"
+            },
+            "Avalonia.Desktop": {
+              "target": "Package",
+              "version": "[11.1.5, )"
+            },
+            "Avalonia.Fonts.Inter": {
+              "target": "Package",
+              "version": "[11.1.5, )"
+            },
+            "Avalonia.ReactiveUI": {
+              "target": "Package",
+              "version": "[11.1.5, )"
+            },
             "CommunityToolkit.Mvvm": {
               "target": "Package",
               "version": "[8.2.2, )"
             },
-            "MaterialDesignThemes": {
+            "Material.Avalonia": {
               "target": "Package",
-              "version": "[4.9.0, )"
+              "version": "[3.13.0, )"
+            },
+            "Material.Avalonia.DataGrid": {
+              "target": "Package",
+              "version": "[3.13.0, )"
+            },
+            "Material.Avalonia.Dialogs": {
+              "target": "Package",
+              "version": "[3.13.0, )"
+            },
+            "Material.Icons.Avalonia": {
+              "target": "Package",
+              "version": "[2.2.0, )"
             },
             "Microsoft.PowerShell.SDK": {
               "target": "Package",
@@ -81,12 +102,9 @@
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
-            },
-            "Microsoft.WindowsDesktop.App.WPF": {
-              "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.415/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

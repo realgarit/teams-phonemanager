@@ -1,14 +1,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Windows;
+
 using teams_phonemanager.Services;
 using teams_phonemanager.Models;
 using System;
 using System.Threading.Tasks;
-using System.Windows.Input;
+using Avalonia.Input;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows.Data;
+
 
 namespace teams_phonemanager.ViewModels
 {
@@ -43,7 +43,9 @@ namespace teams_phonemanager.ViewModels
 
         public HolidaysViewModel()
         {
-            _mainWindowViewModel = Application.Current.MainWindow.DataContext as MainWindowViewModel;
+            _mainWindowViewModel = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow?.DataContext as MainWindowViewModel
+                : null;
             _loggingService.Log("Holidays page loaded", LogLevel.Info);
         }
 

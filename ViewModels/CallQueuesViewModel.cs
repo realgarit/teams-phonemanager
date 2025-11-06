@@ -1,14 +1,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Windows;
+
 using teams_phonemanager.Services;
 using teams_phonemanager.Models;
 using System;
 using System.Threading.Tasks;
-using System.Windows.Input;
+using Avalonia.Input;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows.Data;
+
 
 namespace teams_phonemanager.ViewModels
 {
@@ -55,23 +55,23 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private string _m365GroupId = string.Empty;
 
-        public ICollectionView ResourceAccountsView { get; }
-        public ICollectionView CallQueuesView { get; }
+        public ObservableCollection<ResourceAccount> ResourceAccountsView => new ObservableCollection<ResourceAccount>(
+            ResourceAccounts.Where(FilterResourceAccount)
+        );
+        public ObservableCollection<CallQueue> CallQueuesView => new ObservableCollection<CallQueue>(
+            CallQueues.Where(FilterCallQueue)
+        );
 
         public CallQueuesViewModel()
         {
-            _mainWindowViewModel = Application.Current.MainWindow.DataContext as MainWindowViewModel;
+            _mainWindowViewModel = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow?.DataContext as MainWindowViewModel
+                : null;
 
             _loggingService.Log("Call Queues page loaded", LogLevel.Info);
 
-            ResourceAccountsView = CollectionViewSource.GetDefaultView(ResourceAccounts);
-            ResourceAccountsView.Filter = FilterResourceAccount;
-
-            CallQueuesView = CollectionViewSource.GetDefaultView(CallQueues);
-            CallQueuesView.Filter = FilterCallQueue;
-
-            ResourceAccounts.CollectionChanged += (s, e) => ResourceAccountsView.Refresh();
-            CallQueues.CollectionChanged += (s, e) => CallQueuesView.Refresh();
+            ResourceAccounts.CollectionChanged += (s, e) => OnPropertyChanged(nameof(ResourceAccountsView));
+            CallQueues.CollectionChanged += (s, e) => OnPropertyChanged(nameof(CallQueuesView));
         }
 
         [RelayCommand]
@@ -574,7 +574,7 @@ namespace teams_phonemanager.ViewModels
                     }
                 }
             }
-            ResourceAccountsView.Refresh();
+            OnPropertyChanged(nameof(ResourceAccountsView));
         }
 
         private void ParseCallQueuesFromResult(string result)
@@ -598,7 +598,7 @@ namespace teams_phonemanager.ViewModels
                     }
                 }
             }
-            CallQueuesView.Refresh();
+            OnPropertyChanged(nameof(CallQueuesView));
         }
 
         private bool FilterResourceAccount(object obj)
@@ -632,12 +632,12 @@ namespace teams_phonemanager.ViewModels
 
         partial void OnSearchResourceAccountsTextChanged(string value)
         {
-            ResourceAccountsView.Refresh();
+            OnPropertyChanged(nameof(ResourceAccountsView));
         }
 
         partial void OnSearchCallQueuesTextChanged(string value)
         {
-            CallQueuesView.Refresh();
+            OnPropertyChanged(nameof(CallQueuesView));
         }
     }
 } 

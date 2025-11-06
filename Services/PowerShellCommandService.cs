@@ -45,7 +45,8 @@ foreach ($path in $possiblePaths) {
 }
 
 if ($bundledModulesPath) {
-    $env:PSModulePath = $bundledModulesPath + ';' + $env:PSModulePath
+    $pathSeparator = [System.IO.Path]::PathSeparator
+    $env:PSModulePath = $bundledModulesPath + $pathSeparator + $env:PSModulePath
     $output += 'Bundled modules path added to PSModulePath: ' + $bundledModulesPath
 } else {
     $output += 'WARNING: Bundled modules path not found in any expected location'
@@ -422,7 +423,7 @@ Write-Host ""SUCCESS: Resource account {variables.RacqUPN} created successfully"
         {
             return $@"
 try {{
-    Update-MgUser -UserId {upn} -UsageLocation {usageLocation}
+    Update-MgUser -UserId ""{upn}"" -UsageLocation ""{usageLocation}""
     Write-Host ""SUCCESS: Updated usage location for {upn} to {usageLocation}""
 }}
 catch {{
@@ -492,7 +493,7 @@ catch {{
             return $@"
 try {{
     $SkuId = ""{skuId}""
-    Set-MgUserLicense -UserId {userId} -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
+    Set-MgUserLicense -UserId ""{userId}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
     Write-Host ""SUCCESS: License assigned to user {userId} successfully""
 }}
 catch {{
@@ -549,7 +550,7 @@ Write-Host ""SUCCESS: Resource account {variables.RaaaUPN} created successfully"
         {
             return $@"
 try {{
-    Update-MgUser -UserId {upn} -UsageLocation {usageLocation}
+    Update-MgUser -UserId ""{upn}"" -UsageLocation ""{usageLocation}""
     Write-Host ""SUCCESS: Updated usage location for {upn} to {usageLocation}""
 }}
 catch {{
@@ -562,7 +563,7 @@ catch {{
             return $@"
 try {{
     $SkuId = ""{skuId}""
-    Set-MgUserLicense -UserId {userId} -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
+    Set-MgUserLicense -UserId ""{userId}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
     Write-Host ""SUCCESS: License assigned to user {userId} successfully""
 }}
 catch {{

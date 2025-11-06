@@ -1,11 +1,12 @@
-<UserControl x:Class="teams_phonemanager.Views.WelcomeView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:material="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:local="clr-namespace:teams_phonemanager.Views"
              xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
+             x:Class="teams_phonemanager.Views.WelcomeView"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1000">
     
@@ -13,26 +14,25 @@
         <viewmodels:WelcomeViewModel/>
     </UserControl.DataContext>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="24">
             <!-- Header Section -->
-            <materialDesign:Card Margin="0,0,0,24" UniformCornerRadius="12" Padding="16">
+            <material:Card Margin="0,0,0,24" CornerRadius="12" Padding="16">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
-                        <materialDesign:PackIcon Kind="MicrosoftTeams" 
+                        <materialIcons:MaterialIcon Kind="MicrosoftTeams" 
                                                Width="72" 
                                                Height="72"
-                                               Foreground="{DynamicResource PrimaryHueMidBrush}"
                                                Margin="0,0,16,0"/>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock Text="Teams Phone Manager"
-                                     Style="{StaticResource MaterialDesignHeadline3TextBlock}"
+                                     Classes="headline3"
                                      FontWeight="Bold"/>
                         </StackPanel>
                     </StackPanel>
                     
                     <TextBlock Text="Your complete solution for Microsoft Teams Phone"
-                             Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                             Classes="subtitle1"
                              TextAlignment="Center"
                              TextWrapping="Wrap"
                              Opacity="0.87"
@@ -43,17 +43,15 @@
                               HorizontalAlignment="Center"
                               Margin="0,0,0,24">
                         <Button Command="{Binding NavigateToGetStartedCommand}"
-                                Margin="0,0,20,0"
+                                Classes="raised"
+                                Margin="0,0,16,0"
                                 Padding="30,15"
                                 FontSize="16"
                                 FontWeight="Bold"
-                                Background="{DynamicResource PrimaryHueMidBrush}"
-                                Foreground="White"
-                                BorderThickness="0"
                                 MinWidth="200"
                                 Height="50">
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="RocketLaunch" 
+                                <materialIcons:MaterialIcon Kind="RocketLaunch" 
                                                        Width="20" 
                                                        Height="20"
                                                        Margin="0,0,8,0"/>
@@ -61,16 +59,14 @@
                             </StackPanel>
                         </Button>
                         <Button Command="{Binding OpenDocumentationCommand}"
+                                Classes="raised"
                                 Padding="30,15"
                                 FontSize="16"
                                 FontWeight="Bold"
-                                Background="{DynamicResource PrimaryHueMidBrush}"
-                                Foreground="White"
-                                BorderThickness="0"
                                 MinWidth="200"
                                 Height="50">
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="Github" 
+                                <materialIcons:MaterialIcon Kind="Github" 
                                                        Width="20" 
                                                        Height="20"
                                                        Margin="0,0,8,0"/>
@@ -79,195 +75,188 @@
                         </Button>
                     </StackPanel>
                 </StackPanel>
-            </materialDesign:Card>
+            </material:Card>
 
             <!-- Features Grid -->
             <TextBlock Text="What you can do"
-                     Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                     Classes="headline5"
                      Margin="0,0,0,16"
                      FontWeight="Bold"/>
 
-        <Grid>
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
+                <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
                 <!-- Setup & Configuration -->
-                <materialDesign:Card Grid.Row="0" Grid.Column="0" 
-                                   Margin="0,0,12,16" 
-                                   UniformCornerRadius="8"
-                                   Padding="16">
+                <material:Card Grid.Row="0" Grid.Column="0" 
+                               Margin="0,0,12,16" 
+                               CornerRadius="8"
+                               Padding="16">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <materialDesign:PackIcon Kind="Wrench" 
+                            <materialIcons:MaterialIcon Kind="Wrench" 
                                                    Width="32" 
                                                    Height="32"
-                                                   Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                                   Margin="0,0,12,0"
+                                                   Margin="0,0,8,0"
                                                    VerticalAlignment="Center"/>
                             <TextBlock Text="Setup &amp; Config"
-                                     Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                     Classes="subtitle1"
                                      FontWeight="Bold"
                                      VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock TextWrapping="Wrap"
-                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                 Classes="body2"
                                  Opacity="0.87">
                             Install PowerShell modules and connect to Teams and Graph services.
                         </TextBlock>
                     </StackPanel>
-                </materialDesign:Card>
+                </material:Card>
 
                 <!-- Variables Management -->
-                <materialDesign:Card Grid.Row="0" Grid.Column="1" 
-                                   Margin="12,0,0,16" 
-                                   UniformCornerRadius="8"
-                                   Padding="16">
+                <material:Card Grid.Row="0" Grid.Column="1" 
+                               Margin="12,0,0,16" 
+                               CornerRadius="8"
+                               Padding="16">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <materialDesign:PackIcon Kind="Cog" 
+                            <materialIcons:MaterialIcon Kind="Cog" 
                                                    Width="32" 
                                                    Height="32"
-                                                   Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                                   Margin="0,0,12,0"
+                                                   Margin="0,0,8,0"
                                                    VerticalAlignment="Center"/>
                             <TextBlock Text="Variables"
-                                     Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                     Classes="subtitle1"
                                      FontWeight="Bold"
                                      VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock TextWrapping="Wrap"
-                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                 Classes="body2"
                                  Opacity="0.87">
                             Set up customer details, domains, languages, and time zones.
                         </TextBlock>
                     </StackPanel>
-                </materialDesign:Card>
+                </material:Card>
 
                 <!-- M365 Groups -->
-                <materialDesign:Card Grid.Row="1" Grid.Column="0" 
-                                   Margin="0,0,12,16" 
-                                   UniformCornerRadius="8"
-                                   Padding="16">
+                <material:Card Grid.Row="1" Grid.Column="0" 
+                               Margin="0,0,12,16" 
+                               CornerRadius="8"
+                               Padding="16">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <materialDesign:PackIcon Kind="AccountGroup" 
+                            <materialIcons:MaterialIcon Kind="AccountGroup" 
                                                    Width="32" 
                                                    Height="32"
-                                                   Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                                   Margin="0,0,12,0"
+                                                   Margin="0,0,8,0"
                                                    VerticalAlignment="Center"/>
                             <TextBlock Text="M365 Groups"
-                                     Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                     Classes="subtitle1"
                                      FontWeight="Bold"
                                      VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock TextWrapping="Wrap"
-                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                 Classes="body2"
                                  Opacity="0.87">
                             Create and manage Microsoft 365 groups for your phone system.
                         </TextBlock>
                     </StackPanel>
-                </materialDesign:Card>
+                </material:Card>
 
                 <!-- Call Queues -->
-                <materialDesign:Card Grid.Row="1" Grid.Column="1" 
-                                   Margin="12,0,0,16" 
-                                   UniformCornerRadius="8"
-                                   Padding="16">
+                <material:Card Grid.Row="1" Grid.Column="1" 
+                               Margin="12,0,0,16" 
+                               CornerRadius="8"
+                               Padding="16">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <materialDesign:PackIcon Kind="PhoneInTalk" 
+                            <materialIcons:MaterialIcon Kind="PhoneInTalk" 
                                                    Width="32" 
                                                    Height="32"
-                                                   Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                                   Margin="0,0,12,0"
+                                                   Margin="0,0,8,0"
                                                    VerticalAlignment="Center"/>
                             <TextBlock Text="Call Queues"
-                                     Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                     Classes="subtitle1"
                                      FontWeight="Bold"
                                      VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock TextWrapping="Wrap"
-                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                 Classes="body2"
                                  Opacity="0.87">
                             Set up call queues with resource accounts and licensing. 
                             Manage routing methods and agent assignments.
                         </TextBlock>
                     </StackPanel>
-                </materialDesign:Card>
+                </material:Card>
 
                 <!-- Auto Attendants -->
-                <materialDesign:Card Grid.Row="2" Grid.Column="0" 
-                                   Margin="0,0,12,0" 
-                                   UniformCornerRadius="8"
-                                   Padding="16">
+                <material:Card Grid.Row="2" Grid.Column="0" 
+                               Margin="0,0,8,0" 
+                               CornerRadius="8"
+                               Padding="16">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <materialDesign:PackIcon Kind="Robot" 
+                            <materialIcons:MaterialIcon Kind="Robot" 
                                                    Width="32" 
                                                    Height="32"
-                                                   Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                                   Margin="0,0,12,0"
+                                                   Margin="0,0,8,0"
                                                    VerticalAlignment="Center"/>
                             <TextBlock Text="Auto Attendants"
-                                     Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                     Classes="subtitle1"
                                      FontWeight="Bold"
                                      VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock TextWrapping="Wrap"
-                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                 Classes="body2"
                                  Opacity="0.87">
                             Configure auto attendants with call flows and schedules. 
                             Set up business hours and after-hours routing.
                         </TextBlock>
                     </StackPanel>
-                </materialDesign:Card>
+                </material:Card>
 
                 <!-- Holidays -->
-                <materialDesign:Card Grid.Row="2" Grid.Column="1" 
-                                   Margin="12,0,0,0" 
-                                   UniformCornerRadius="8"
-                                   Padding="16">
+                <material:Card Grid.Row="2" Grid.Column="1" 
+                               Margin="12,0,0,0" 
+                               CornerRadius="8"
+                               Padding="16">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <materialDesign:PackIcon Kind="Calendar" 
+                            <materialIcons:MaterialIcon Kind="Calendar" 
                                                    Width="32" 
                                                    Height="32"
-                                                   Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                                   Margin="0,0,12,0"
+                                                   Margin="0,0,8,0"
                                                    VerticalAlignment="Center"/>
                             <TextBlock Text="Holidays"
-                                     Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                     Classes="subtitle1"
                                      FontWeight="Bold"
                                      VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock TextWrapping="Wrap"
-                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                 Classes="body2"
                                  Opacity="0.87">
                             Manage holiday schedules with Swiss holiday support.
                         </TextBlock>
                     </StackPanel>
-                </materialDesign:Card>
+                </material:Card>
             </Grid>
 
             <!-- Quick Start Section -->
-            <materialDesign:Card Margin="0,24,0,0" UniformCornerRadius="12" Padding="16">
+            <material:Card Margin="0,24,0,0" CornerRadius="12" Padding="16">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                        <materialDesign:PackIcon Kind="LightningBolt" 
+                        <materialIcons:MaterialIcon Kind="LightningBolt" 
                                                Width="28" 
                                                Height="28"
-                                               Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                               Margin="0,0,12,0"/>
+                                               Margin="0,0,8,0"/>
                         <TextBlock Text="Quick Start Guide"
-                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                 Classes="subtitle1"
                                  FontWeight="Bold"/>
                     </StackPanel>
                     
@@ -278,13 +267,13 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         
-                        <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                        <StackPanel Grid.Column="0" Margin="0,0,8,0">
                             <TextBlock Text="1. Setup"
-                                     Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                     Classes="subtitle2"
                                      FontWeight="Bold"
                                      Margin="0,0,0,12"/>
                             <TextBlock TextWrapping="Wrap"
-                                     Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                     Classes="body2"
                                      Opacity="0.9"
                                      LineHeight="20">
                                 Start with the Get Started page to install PowerShell modules and connect to Microsoft services.
@@ -293,11 +282,11 @@
                         
                         <StackPanel Grid.Column="1" Margin="6,0">
                             <TextBlock Text="2. Configure"
-                                     Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                     Classes="subtitle2"
                                      FontWeight="Bold"
                                      Margin="0,0,0,12"/>
                             <TextBlock TextWrapping="Wrap"
-                                     Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                     Classes="body2"
                                      Opacity="0.9"
                                      LineHeight="20">
                                 Set up your variables with customer details, domains, and system preferences.
@@ -306,11 +295,11 @@
                         
                         <StackPanel Grid.Column="2" Margin="12,0,0,0">
                             <TextBlock Text="3. Deploy"
-                                     Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                     Classes="subtitle2"
                                      FontWeight="Bold"
                                      Margin="0,0,0,12"/>
                             <TextBlock TextWrapping="Wrap"
-                                     Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                     Classes="body2"
                                      Opacity="0.9"
                                      LineHeight="20">
                                 Create M365 groups, call queues, auto attendants, and configure holiday schedules.
@@ -318,8 +307,9 @@
                         </StackPanel>
                     </Grid>
                 </StackPanel>
-            </materialDesign:Card>
+            </material:Card>
 
         </StackPanel>
     </ScrollViewer>
-</UserControl> 
+</UserControl>
+

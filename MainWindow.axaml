@@ -1,27 +1,31 @@
-﻿<Window x:Class="teams_phonemanager.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:material="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+        xmlns:materialDialogs="clr-namespace:Material.Dialog;assembly=Material.Avalonia.Dialogs"
+        xmlns:materialDialogViews="clr-namespace:Material.Dialog.Views;assembly=Material.Avalonia.Dialogs"
+        xmlns:materialStyles="clr-namespace:Material.Styles;assembly=Material.Styles"
+        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:local="clr-namespace:teams_phonemanager"
         xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
         xmlns:converters="clr-namespace:teams_phonemanager.Converters"
         xmlns:views="clr-namespace:teams_phonemanager.Views"
         xmlns:services="clr-namespace:teams_phonemanager.Services"
         mc:Ignorable="d"
-        Title="Teams Phone Manager" Height="720" Width="1280"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        Background="{DynamicResource MaterialDesignPaper}"
-        TextElement.FontWeight="Medium"
-        TextElement.FontSize="14"
-        FontFamily="{materialDesign:MaterialDesignFont}">
+        x:Class="teams_phonemanager.MainWindow"
+        Title="Teams Phone Manager" 
+        Height="720" 
+        Width="1280"
+        FontWeight="Medium"
+        FontSize="14">
 
     <Window.DataContext>
         <viewmodels:MainWindowViewModel/>
     </Window.DataContext>
 
-    <Grid>
+
+    <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -29,19 +33,20 @@
         </Grid.RowDefinitions>
 
         <!-- Top Bar -->
-        <materialDesign:ColorZone Mode="PrimaryMid" Grid.Row="0" Padding="16">
+        <material:ColorZone Mode="PrimaryMid" Grid.Row="0" Padding="16">
             <DockPanel LastChildFill="False">
                 <TextBlock Text="Teams Phone Manager" 
-                         Style="{StaticResource MaterialDesignHeadline6TextBlock}" 
+                         Classes="headline6" 
                          VerticalAlignment="Center"/>
-                <Button DockPanel.Dock="Right" 
-                        Style="{StaticResource MaterialDesignIconButton}" 
+                <Button x:Name="SettingsButton"
+                        DockPanel.Dock="Right" 
+                        Classes="icon"
                         Command="{Binding ToggleSettingsCommand}"
                         Foreground="White">
-                    <materialDesign:PackIcon Kind="Settings" Width="24" Height="24"/>
+                    <materialIcons:MaterialIcon Kind="Settings" Width="24" Height="24"/>
                 </Button>
             </DockPanel>
-        </materialDesign:ColorZone>
+        </material:ColorZone>
 
         <!-- Main Content -->
         <Grid Grid.Row="1">
@@ -51,30 +56,28 @@
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar -->
-            <materialDesign:Card Grid.Column="0" Margin="16" UniformCornerRadius="8">
+            <material:Card Grid.Column="0" Margin="16" CornerRadius="8">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="0,8">
                         <!-- Main Navigation Section -->
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" 
+                        <Button Classes="flat" 
                                Command="{Binding NavigateToCommand}" 
                                CommandParameter="Welcome"
                                Height="48"
-                               Margin="0,4"
-                               Foreground="{DynamicResource MaterialDesignBody}">
+                               Margin="0,4">
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="Home" Margin="0,0,12,0" Width="24" Height="24"/>
+                                <materialIcons:MaterialIcon Kind="Home" Margin="0,0,12,0" Width="24" Height="24"/>
                                 <TextBlock Text="Welcome" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" 
+                        <Button Classes="flat" 
                                Command="{Binding NavigateToCommand}" 
                                CommandParameter="GetStarted"
                                Height="48"
-                               Margin="0,4"
-                               Foreground="{DynamicResource MaterialDesignBody}">
+                               Margin="0,4">
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="PlayCircle" Margin="0,0,12,0" Width="24" Height="24"/>
+                                <materialIcons:MaterialIcon Kind="PlayCircle" Margin="0,0,12,0" Width="24" Height="24"/>
                                 <TextBlock Text="Get Started" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -83,17 +86,16 @@
                         <Separator Margin="16,16,16,8"/>
                         <TextBlock Text="VARIABLES" 
                                  Margin="16,0,16,8" 
-                                 Foreground="{DynamicResource MaterialDesignBodyLight}"
-                                 FontSize="12"/>
+                                 FontSize="12"
+                                 Opacity="0.7"/>
 
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" 
+                        <Button Classes="flat" 
                                Command="{Binding NavigateToCommand}" 
                                CommandParameter="Variables"
                                Height="48"
-                               Margin="0,4"
-                               Foreground="{DynamicResource MaterialDesignBody}">
+                               Margin="0,4">
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="Variable" Margin="0,0,12,0" Width="24" Height="24"/>
+                                <materialIcons:MaterialIcon Kind="Variable" Margin="0,0,12,0" Width="24" Height="24"/>
                                 <TextBlock Text="Variables" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -102,65 +104,60 @@
                         <Separator Margin="16,16,16,8"/>
                         <TextBlock Text="VOICE CONFIGURATION" 
                                  Margin="16,0,16,8" 
-                                 Foreground="{DynamicResource MaterialDesignBodyLight}"
-                                 FontSize="12"/>
+                                 FontSize="12"
+                                 Opacity="0.7"/>
 
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" 
+                        <Button Classes="flat" 
                                Command="{Binding NavigateToCommand}" 
                                CommandParameter="M365Groups"
                                Height="48"
-                               Margin="0,4"
-                               Foreground="{DynamicResource MaterialDesignBody}">
+                               Margin="0,4">
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="AccountGroup" Margin="0,0,12,0" Width="24" Height="24"/>
+                                <materialIcons:MaterialIcon Kind="AccountGroup" Margin="0,0,12,0" Width="24" Height="24"/>
                                 <TextBlock Text="M365 Groups" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" 
+                        <Button Classes="flat" 
                                Command="{Binding NavigateToCommand}" 
                                CommandParameter="CallQueues"
                                Height="48"
-                               Margin="0,4"
-                               Foreground="{DynamicResource MaterialDesignBody}">
+                               Margin="0,4">
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="Phone" Margin="0,0,12,0" Width="24" Height="24"/>
+                                <materialIcons:MaterialIcon Kind="Phone" Margin="0,0,12,0" Width="24" Height="24"/>
                                 <TextBlock Text="Call Queues" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" 
+                        <Button Classes="flat" 
                                Command="{Binding NavigateToCommand}" 
                                CommandParameter="AutoAttendants"
                                Height="48"
-                               Margin="0,4"
-                               Foreground="{DynamicResource MaterialDesignBody}">
+                               Margin="0,4">
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="PhoneInTalk" Margin="0,0,12,0" Width="24" Height="24"/>
+                                <materialIcons:MaterialIcon Kind="PhoneInTalk" Margin="0,0,12,0" Width="24" Height="24"/>
                                 <TextBlock Text="Auto Attendants" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
 
-
-                        <Button Style="{StaticResource MaterialDesignFlatButton}" 
+                        <Button Classes="flat" 
                                Command="{Binding NavigateToCommand}" 
                                CommandParameter="Holidays"
                                Height="48"
-                               Margin="0,4"
-                               Foreground="{DynamicResource MaterialDesignBody}">
+                               Margin="0,4">
                             <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="Calendar" Margin="0,0,12,0" Width="24" Height="24"/>
+                                <materialIcons:MaterialIcon Kind="Calendar" Margin="0,0,12,0" Width="24" Height="24"/>
                                 <TextBlock Text="Holidays" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
                 </ScrollViewer>
-            </materialDesign:Card>
+            </material:Card>
 
             <!-- Content Area -->
             <Grid Grid.Column="1" Margin="16">
                 <ContentControl Content="{Binding CurrentPage}">
-                    <ContentControl.ContentTemplateSelector>
+                    <ContentControl.ContentTemplate>
                         <converters:PageTemplateSelector>
                             <converters:PageTemplateSelector.WelcomeTemplate>
                                 <DataTemplate>
@@ -198,13 +195,13 @@
                                 </DataTemplate>
                             </converters:PageTemplateSelector.HolidaysTemplate>
                         </converters:PageTemplateSelector>
-                    </ContentControl.ContentTemplateSelector>
+                    </ContentControl.ContentTemplate>
                 </ContentControl>
             </Grid>
         </Grid>
 
         <!-- Bottom Bar -->
-        <materialDesign:ColorZone Mode="Standard" Grid.Row="2" Padding="16">
+        <material:ColorZone Mode="Standard" Grid.Row="2" Padding="16">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -218,11 +215,11 @@
                 <!-- Latest Log Entry - Clickable Log Area -->
                 <Button Grid.Column="1" 
                         Command="{Binding ToggleLogDialogCommand}"
-                        Style="{StaticResource MaterialDesignFlatButton}"
+                        Classes="flat"
                         Margin="16,0"
                         Padding="12,8"
                         HorizontalAlignment="Stretch"
-                        ToolTip="Click to view full log">
+                        ToolTip.Tip="Click to view full log">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -230,7 +227,7 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         
-                        <materialDesign:PackIcon Grid.Column="0" 
+                        <materialIcons:MaterialIcon Grid.Column="0" 
                                                Kind="Console" 
                                                Width="20" 
                                                Height="20"
@@ -242,7 +239,7 @@
                                  VerticalAlignment="Center"
                                  FontFamily="Consolas"
                                  FontSize="12"/>
-                        <materialDesign:PackIcon Grid.Column="2" 
+                        <materialIcons:MaterialIcon Grid.Column="2" 
                                                Kind="ChevronRight" 
                                                Width="16" 
                                                Height="16"
@@ -253,16 +250,19 @@
                 </Button>
                 
                 <!-- Copyright -->
-                <TextBlock Grid.Column="2" Text="Realgar © 2025. Licensed under the MIT License." VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="Realgar © 2025. MIT License." VerticalAlignment="Center"/>
             </Grid>
-        </materialDesign:ColorZone>
+        </material:ColorZone>
 
         <!-- Log Viewer Dialog -->
-        <materialDesign:DialogHost Grid.RowSpan="3" 
-                                   IsOpen="{Binding IsLogDialogOpen}"
-                                   DialogOpened="LogDialogHost_DialogOpened">
-            <materialDesign:DialogHost.DialogContent>
-                <materialDesign:Card Padding="0" Margin="16" MaxWidth="1000" MaxHeight="600">
+        <Popup IsOpen="{Binding IsLogDialogOpen}"
+               Placement="Center"
+               PlacementTarget="#MainGrid"
+               HorizontalOffset="0"
+               VerticalOffset="0"
+               OverlayDismissEventPassThrough="True">
+            <Popup.Child>
+                <material:Card Padding="0" Margin="16" MaxWidth="1000" MaxHeight="600">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -271,20 +271,20 @@
                         </Grid.RowDefinitions>
                         
                         <!-- Dialog Header -->
-                        <materialDesign:ColorZone Mode="PrimaryMid" Grid.Row="0" Padding="16">
+                        <material:ColorZone Mode="PrimaryMid" Grid.Row="0" Padding="16">
                             <DockPanel LastChildFill="False">
                                 <TextBlock Text="Log Viewer" 
-                                         Style="{StaticResource MaterialDesignHeadline6TextBlock}" 
+                                         Classes="headline6" 
                                          Foreground="White"
                                          VerticalAlignment="Center"/>
                                 <Button DockPanel.Dock="Right" 
-                                        Style="{StaticResource MaterialDesignIconButton}" 
+                                        Classes="icon"
                                         Command="{Binding CloseLogDialogCommand}"
                                         Foreground="White">
-                                    <materialDesign:PackIcon Kind="Close" Width="24" Height="24"/>
+                                    <materialIcons:MaterialIcon Kind="Close" Width="24" Height="24"/>
                                 </Button>
                             </DockPanel>
-                        </materialDesign:ColorZone>
+                        </material:ColorZone>
                         
                         <!-- Log Content -->
                         <ScrollViewer x:Name="LogScrollViewer"
@@ -300,42 +300,12 @@
                                    IsReadOnly="True"
                                    AcceptsReturn="True"
                                    AcceptsTab="True"
-                                   BorderThickness="1"
                                    Padding="8"
-                                   Background="{DynamicResource MaterialDesignPaper}"
-                                   Foreground="{DynamicResource MaterialDesignBody}"
-                                   SelectionBrush="{DynamicResource MaterialDesignSelection}"
-                                   materialDesign:TextFieldAssist.DecorationVisibility="Hidden"
                                    TextChanged="LogView_TextChanged">
-                                <TextBox.Style>
-                                    <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignOutlinedTextBox}">
-                                        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}"/>
-                                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-                                    </Style>
-                                </TextBox.Style>
                                 <TextBox.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="Select All" 
-                                                Command="ApplicationCommands.SelectAll"
-                                                CommandTarget="{Binding RelativeSource={RelativeSource AncestorType=TextBox}}">
-                                            <MenuItem.Icon>
-                                                <materialDesign:PackIcon Kind="SelectAll"/>
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                        <MenuItem Header="Copy" 
-                                                Command="ApplicationCommands.Copy"
-                                                CommandTarget="{Binding RelativeSource={RelativeSource AncestorType=TextBox}}">
-                                            <MenuItem.Icon>
-                                                <materialDesign:PackIcon Kind="ContentCopy"/>
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                        <Separator/>
                                         <MenuItem Header="Clear Log" 
-                                                Command="{Binding ClearLogCommand}">
-                                            <MenuItem.Icon>
-                                                <materialDesign:PackIcon Kind="Delete"/>
-                                            </MenuItem.Icon>
-                                        </MenuItem>
+                                                Command="{Binding ClearLogCommand}"/>
                                     </ContextMenu>
                                 </TextBox.ContextMenu>
                             </TextBox>
@@ -346,47 +316,100 @@
                                    Orientation="Horizontal" 
                                    HorizontalAlignment="Right"
                                    Margin="16,8,16,16">
-                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                            <Button Classes="flat"
                                     Command="{Binding ClearLogCommand}"
                                     Margin="0,0,8,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="Delete" Margin="0,0,8,0" Width="16" Height="16"/>
+                                    <materialIcons:MaterialIcon Kind="Delete" Margin="0,0,8,0" Width="16" Height="16"/>
                                     <TextBlock Text="Clear Log"/>
                                 </StackPanel>
                             </Button>
-                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                            <Button Classes="raised"
                                     Command="{Binding CloseLogDialogCommand}">
                                 <TextBlock Text="Close"/>
                             </Button>
                         </StackPanel>
                     </Grid>
-                </materialDesign:Card>
-            </materialDesign:DialogHost.DialogContent>
-        </materialDesign:DialogHost>
+                </material:Card>
+            </Popup.Child>
+        </Popup>
 
-        <!-- Settings Flyout -->
-        <materialDesign:DrawerHost Grid.RowSpan="3" IsRightDrawerOpen="{Binding IsSettingsOpen}">
-            <materialDesign:DrawerHost.RightDrawerContent>
-                <StackPanel Width="300" Margin="16">
-                    <DockPanel Margin="0,0,0,16">
-                        <Button DockPanel.Dock="Right" 
-                                Style="{StaticResource MaterialDesignIconButton}" 
-                                Command="{Binding CloseSettingsCommand}">
-                            <materialDesign:PackIcon Kind="Close"/>
-                        </Button>
-                        <TextBlock Text="Settings" 
-                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}" 
-                                 VerticalAlignment="Center"/>
-                    </DockPanel>
+        <!-- Settings Side Panel -->
+        <!-- Overlay backdrop -->
+        <Border Grid.RowSpan="3"
+                Background="#80000000"
+                IsVisible="{Binding IsSettingsOpen}"
+                ZIndex="1000"
+                PointerPressed="SettingsOverlay_PointerPressed">
+            <Border.Styles>
+                <Style Selector="Border">
+                    <Style.Animations>
+                        <Animation Duration="0:0:0.2">
+                            <KeyFrame Cue="0%">
+                                <Setter Property="Opacity" Value="0"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="100%">
+                                <Setter Property="Opacity" Value="1"/>
+                            </KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+            </Border.Styles>
+        </Border>
+        
+        <!-- Side panel -->
+        <Border Grid.RowSpan="3"
+                Background="{DynamicResource MaterialDesignPaper}"
+                Width="360"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Stretch"
+                IsVisible="{Binding IsSettingsOpen}"
+                ZIndex="1001"
+                ClipToBounds="True">
+            <material:Card Padding="0" Margin="0" CornerRadius="0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
                     
-                    <DockPanel Margin="0,8">
-                        <TextBlock Text="Dark Theme" VerticalAlignment="Center"/>
-                        <ToggleButton DockPanel.Dock="Right" 
-                                    IsChecked="{Binding IsDarkTheme}"
-                                    Style="{StaticResource MaterialDesignSwitchToggleButton}"/>
-                    </DockPanel>
-                </StackPanel>
-            </materialDesign:DrawerHost.RightDrawerContent>
-        </materialDesign:DrawerHost>
+                    <!-- Header -->
+                    <material:ColorZone Mode="PrimaryMid" Grid.Row="0" Padding="24">
+                        <DockPanel LastChildFill="False">
+                            <TextBlock Text="Settings" 
+                                     Classes="headline6" 
+                                     Foreground="White"
+                                     VerticalAlignment="Center"/>
+                            <Button DockPanel.Dock="Right" 
+                                    Classes="icon"
+                                    Foreground="White"
+                                    Command="{Binding CloseSettingsCommand}">
+                                <materialIcons:MaterialIcon Kind="Close" Width="24" Height="24"/>
+                            </Button>
+                        </DockPanel>
+                    </material:ColorZone>
+                    
+                    <!-- Content -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="24" Spacing="24">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Appearance" 
+                                         Classes="subtitle1"
+                                         Margin="0,0,0,8"/>
+                                
+                                <DockPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Dark Theme" 
+                                             VerticalAlignment="Center"
+                                             Margin="0,0,16,0"/>
+                                    <ToggleSwitch DockPanel.Dock="Right" 
+                                                IsChecked="{Binding IsDarkTheme}"/>
+                                </DockPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </material:Card>
+        </Border>
     </Grid>
 </Window>
+

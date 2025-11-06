@@ -49,35 +49,35 @@ namespace teams_phonemanager.ViewModels
                 // Only treat as error if result contains ERROR: and not SUCCESS
                 if (result.Contains("ERROR:") && !result.Contains("SUCCESS"))
                 {
-                    _errorHandlingService.HandlePowerShellError(command, result, context);
+                    await _errorHandlingService.HandlePowerShellError(command, result, context);
                 }
                 
                 return result;
             }
             catch (Exception ex)
             {
-                _errorHandlingService.HandlePowerShellError(command, ex.Message, context);
+                await _errorHandlingService.HandlePowerShellError(command, ex.Message, context);
                 return $"ERROR: {ex.Message}";
             }
         }
 
-        protected bool ValidatePrerequisites()
+        protected async Task<bool> ValidatePrerequisites()
         {
             var validationResult = _validationService.ValidatePrerequisites();
             if (!validationResult.IsValid)
             {
-                _errorHandlingService.HandleValidationError(validationResult.GetErrorMessage(), GetType().Name);
+                await _errorHandlingService.HandleValidationError(validationResult.GetErrorMessage(), GetType().Name);
                 return false;
             }
             return true;
         }
 
-        protected bool ValidateVariables(Models.PhoneManagerVariables variables)
+        protected async Task<bool> ValidateVariables(Models.PhoneManagerVariables variables)
         {
             var validationResult = _validationService.ValidateVariables(variables);
             if (!validationResult.IsValid)
             {
-                _errorHandlingService.HandleValidationError(validationResult.GetErrorMessage(), GetType().Name);
+                await _errorHandlingService.HandleValidationError(validationResult.GetErrorMessage(), GetType().Name);
                 return false;
             }
             return true;

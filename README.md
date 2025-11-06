@@ -1,6 +1,6 @@
 # Teams Phone Manager
 
-A WPF-based Microsoft Teams Phone Manager application built with .NET 8 to simplify Microsoft Teams Phone System administration tasks.
+An Avalonia-based Microsoft Teams Phone Manager application built with .NET 8 to simplify Microsoft Teams Phone System administration tasks. Cross-platform support for Windows and macOS.
 
 ## Features
 
@@ -13,7 +13,7 @@ A WPF-based Microsoft Teams Phone Manager application built with .NET 8 to simpl
 
 ## Prerequisites
 
-- Windows 10/11 or Windows Server 2019+
+- Windows 10/11, Windows Server 2019+, or macOS 10.15+
 - .NET 8 Runtime (Desktop) - [Download here](https://dotnet.microsoft.com/download/dotnet/8.0)
 - Microsoft Teams & Graph PowerShell Module (included with the app)
 - PowerShell 7.4+ (included with the app)
@@ -43,12 +43,14 @@ A WPF-based Microsoft Teams Phone Manager application built with .NET 8 to simpl
 ## Usage
 
 1. Download from the latest release
-2. Run `teams-phonemanager.exe`
+2. Run the application:
+   - Windows: `teams-phonemanager.exe`
+   - macOS: `teams-phonemanager` (or the .app bundle)
 
 ## Architecture
 
-- .NET 8 WPF
-- Material Design for WPF
+- .NET 8 Avalonia (cross-platform UI framework)
+- Material Design for Avalonia
 - MVVM Pattern
 - Microsoft.PowerShell.SDK
 - Custom logging service for debugging and monitoring
@@ -59,7 +61,7 @@ A WPF-based Microsoft Teams Phone Manager application built with .NET 8 to simpl
 teams-phonemanager/
 ├── Models/              # Data models
 ├── ViewModels/          # MVVM ViewModels
-├── Views/               # WPF Views (XAML)
+├── Views/               # Avalonia Views (AXAML)
 ├── Services/            # Business logic services
 ├── Helpers/             # Utility classes and converters
 ├── Resources/           # Application resources

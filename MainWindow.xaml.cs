@@ -1,15 +1,9 @@
-using System.Text;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
-using System.Windows.Media.Animation;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using teams_phonemanager.Services;
 
 namespace teams_phonemanager;
@@ -21,31 +15,26 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
-    private void LogDialogHost_DialogOpened(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
+    private void LogPopup_Opened(object? sender, EventArgs e)
     {
-        var dialogHost = sender as MaterialDesignThemes.Wpf.DialogHost;
-        DependencyObject searchRoot = dialogHost != null ? (DependencyObject)dialogHost : this;
-
         // Scroll to end when dialog opens - use dispatcher to ensure it happens after rendering
-        Dispatcher.BeginInvoke(new Action(() =>
+        Dispatcher.UIThread.Post(() =>
         {
-            ScrollLogToEnd(searchRoot);
-        }), DispatcherPriority.Loaded);
+            ScrollLogToEnd();
+        }, DispatcherPriority.Loaded);
     }
 
-    private void ScrollLogToEnd(DependencyObject? searchRoot = null)
+    private void ScrollLogToEnd()
     {
         try
         {
-            searchRoot ??= this;
-
             // Try to find TextBox by name first (if accessible)
-            TextBox? textBox = LogView;
+            var textBox = this.FindControl<TextBox>("LogView");
 
             // If not accessible by name, try to find it in the visual tree
             if (textBox == null)
             {
-                textBox = FindVisualChild<TextBox>(searchRoot);
+                textBox = this.FindDescendantOfType<TextBox>();
             }
 
             if (textBox != null)
@@ -57,16 +46,17 @@ public partial class MainWindow : Window
                 }
 
                 // Find the parent ScrollViewer
-                ScrollViewer? scrollViewer = FindVisualParent<ScrollViewer>(textBox);
+                var scrollViewer = textBox.FindAncestorOfType<ScrollViewer>();
 
                 // Move caret to end
-                textBox.CaretIndex = textBox.Text.Length;
-                textBox.ScrollToEnd();
+                textBox.CaretIndex = textBox.Text?.Length ?? 0;
+                textBox.SelectionStart = textBox.CaretIndex;
+                textBox.SelectionEnd = textBox.CaretIndex;
                 
                 // Also scroll the ScrollViewer parent if available
                 if (scrollViewer != null)
                 {
-                    scrollViewer.ScrollToEnd();
+                    scrollViewer.Offset = new Avalonia.Vector(0, scrollViewer.Extent.Height);
                 }
             }
         }
@@ -76,56 +66,33 @@ public partial class MainWindow : Window
         }
     }
 
-    private static T? FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
-    {
-        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
-        {
-            var child = VisualTreeHelper.GetChild(parent, i);
-            if (child is T t)
-            {
-                return t;
-            }
-            
-            var childOfChild = FindVisualChild<T>(child);
-            if (childOfChild != null)
-            {
-                return childOfChild;
-            }
-        }
-        return null;
-    }
-
-    private static T? FindVisualParent<T>(DependencyObject child) where T : DependencyObject
-    {
-        var parent = VisualTreeHelper.GetParent(child);
-        while (parent != null)
-        {
-            if (parent is T t)
-            {
-                return t;
-            }
-            parent = VisualTreeHelper.GetParent(parent);
-        }
-        return null;
-    }
-
-    private void LogView_TextChanged(object sender, TextChangedEventArgs e)
+    private void LogView_TextChanged(object? sender, TextChangedEventArgs e)
     {
         if (sender is TextBox textBox)
         {
             // Scroll to end when text changes (new log entries)
-            Dispatcher.BeginInvoke(new Action(() =>
+            Dispatcher.UIThread.Post(() =>
             {
-                textBox.CaretIndex = textBox.Text.Length;
-                textBox.ScrollToEnd();
+                textBox.CaretIndex = textBox.Text?.Length ?? 0;
+                textBox.SelectionStart = textBox.CaretIndex;
+                textBox.SelectionEnd = textBox.CaretIndex;
                 
                 // Find the parent ScrollViewer and scroll it too
-                var scrollViewer = FindVisualParent<ScrollViewer>(textBox);
+                var scrollViewer = textBox.FindAncestorOfType<ScrollViewer>();
                 if (scrollViewer != null)
                 {
-                    scrollViewer.ScrollToEnd();
+                    scrollViewer.Offset = new Avalonia.Vector(0, scrollViewer.Extent.Height);
                 }
-            }), DispatcherPriority.Background);
+            }, DispatcherPriority.Background);
+        }
+    }
+
+    private void SettingsOverlay_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        // Close settings when clicking on the overlay
+        if (DataContext is ViewModels.MainWindowViewModel viewModel)
+        {
+            viewModel.CloseSettingsCommand.Execute(null);
         }
     }
 

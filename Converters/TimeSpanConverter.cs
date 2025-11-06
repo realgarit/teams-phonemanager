@@ -1,12 +1,12 @@
 using System;
 using System.Globalization;
-using System.Windows.Data;
+using Avalonia.Data.Converters;
 
 namespace teams_phonemanager.Converters
 {
     public class TimeSpanConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is TimeSpan timeSpan)
             {
@@ -15,7 +15,7 @@ namespace teams_phonemanager.Converters
             return string.Empty;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is string stringValue && !string.IsNullOrEmpty(stringValue))
             {

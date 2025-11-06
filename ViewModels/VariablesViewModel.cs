@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Windows;
+
 using teams_phonemanager.Services;
 using System;
 using System.Threading.Tasks;
@@ -73,7 +73,9 @@ namespace teams_phonemanager.ViewModels
 
         public VariablesViewModel()
         {
-            _mainWindowViewModel = Application.Current.MainWindow.DataContext as MainWindowViewModel;
+            _mainWindowViewModel = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow?.DataContext as MainWindowViewModel
+                : null;
 
             _loggingService.Log("Variables page loaded", LogLevel.Info);
         }
@@ -114,21 +116,12 @@ namespace teams_phonemanager.ViewModels
                 await File.WriteAllTextAsync(filePath, json);
 
                 _loggingService.Log($"Variables saved to: {filePath}", LogLevel.Info);
-                
-                MessageBox.Show(
-                    $"Variables saved successfully to:\n{filePath}",
-                    "Save Successful",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                await _errorHandlingService.ShowSuccess($"Variables saved successfully to:\n{filePath}", "Save Successful");
             }
             catch (Exception ex)
             {
                 _loggingService.Log($"Error saving variables: {ex.Message}", LogLevel.Error);
-                MessageBox.Show(
-                    $"Error saving variables:\n{ex.Message}",
-                    "Save Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                await _errorHandlingService.HandleGenericError($"Error saving variables:\n{ex.Message}", "SaveVariables");
             }
         }
 
@@ -137,52 +130,52 @@ namespace teams_phonemanager.ViewModels
         {
             try
             {
-                var openFileDialog = new OpenFileDialog
+                var window = Avalonia.Application.Current?.ApplicationLifetime as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime;
+                if (window?.MainWindow != null)
                 {
-                    Title = "Load Variables from File",
-                    Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*",
-                    InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads"
-                };
-
-                if (openFileDialog.ShowDialog() == true)
-                {
-                    var json = await File.ReadAllTextAsync(openFileDialog.FileName);
-                    var jsonOptions = new JsonSerializerOptions
-                    {
-                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                    };
-
-                    var loadedVariables = JsonSerializer.Deserialize<PhoneManagerVariables>(json, jsonOptions);
+                    var storageProvider = window.MainWindow.StorageProvider;
+                    var downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+                    var suggestedLocation = await storageProvider.TryGetFolderFromPathAsync(new Uri(downloadsPath));
                     
-                    if (loadedVariables != null)
+                    var file = await storageProvider.OpenFilePickerAsync(new Avalonia.Platform.Storage.FilePickerOpenOptions
                     {
-                        Variables = loadedVariables;
-                        _loggingService.Log($"Variables loaded from: {openFileDialog.FileName}", LogLevel.Info);
+                        Title = "Load Variables from File",
+                        FileTypeFilter = new[]
+                        {
+                            new Avalonia.Platform.Storage.FilePickerFileType("JSON files") { Patterns = new[] { "*.json" } },
+                            new Avalonia.Platform.Storage.FilePickerFileType("All files") { Patterns = new[] { "*" } }
+                        },
+                        SuggestedStartLocation = suggestedLocation
+                    });
+
+                    if (file != null && file.Count > 0)
+                    {
+                        var fileName = file[0].Path.LocalPath;
+                        var json = await File.ReadAllTextAsync(fileName);
+                        var jsonOptions = new JsonSerializerOptions
+                        {
+                            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                        };
+
+                        var loadedVariables = JsonSerializer.Deserialize<PhoneManagerVariables>(json, jsonOptions);
                         
-                        MessageBox.Show(
-                            $"Variables loaded successfully from:\n{openFileDialog.FileName}",
-                            "Load Successful",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Information);
-                    }
-                    else
-                    {
-                        MessageBox.Show(
-                            "Failed to load variables from the selected file.",
-                            "Load Error",
-                            MessageBoxButton.OK,
-                            MessageBoxImage.Error);
+                        if (loadedVariables != null)
+                        {
+                            Variables = loadedVariables;
+                            _loggingService.Log($"Variables loaded from: {fileName}", LogLevel.Info);
+                            await _errorHandlingService.ShowSuccess($"Variables loaded successfully from:\n{fileName}", "Load Successful");
+                        }
+                        else
+                        {
+                            await _errorHandlingService.HandleGenericError("Failed to load variables from the selected file.", "LoadVariables");
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
                 _loggingService.Log($"Error loading variables: {ex.Message}", LogLevel.Error);
-                MessageBox.Show(
-                    $"Error loading variables:\n{ex.Message}",
-                    "Load Error",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+                await _errorHandlingService.HandleGenericError($"Error loading variables:\n{ex.Message}", "LoadVariables");
             }
         }
 

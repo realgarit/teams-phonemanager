@@ -1,4 +1,5 @@
-using System.Windows.Controls;
+using Avalonia.Controls;
+using Avalonia.Input;
 
 namespace teams_phonemanager.Views
 {
@@ -8,6 +9,58 @@ namespace teams_phonemanager.Views
         {
             InitializeComponent();
             DataContext = new ViewModels.CallQueuesViewModel();
+        }
+
+        private void CreateResourceAccountBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (DataContext is ViewModels.CallQueuesViewModel viewModel)
+            {
+                viewModel.CloseCreateResourceAccountDialogCommand.Execute(null);
+            }
+        }
+
+        private void CreateResourceAccountCard_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void UpdateUsageLocationBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (DataContext is ViewModels.CallQueuesViewModel viewModel)
+            {
+                viewModel.CloseUpdateUsageLocationDialogCommand.Execute(null);
+            }
+        }
+
+        private void UpdateUsageLocationCard_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void CreateCallQueueBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (DataContext is ViewModels.CallQueuesViewModel viewModel)
+            {
+                viewModel.CloseCreateCallQueueDialogCommand.Execute(null);
+            }
+        }
+
+        private void CreateCallQueueCard_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void AssociateResourceAccountBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (DataContext is ViewModels.CallQueuesViewModel viewModel)
+            {
+                viewModel.CloseAssociateDialogCommand.Execute(null);
+            }
+        }
+
+        private void AssociateResourceAccountCard_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            e.Handled = true;
         }
     }
 } 

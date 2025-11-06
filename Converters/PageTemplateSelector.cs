@@ -1,10 +1,10 @@
-using System.Windows;
-using System.Windows.Controls;
+using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using teams_phonemanager.Services;
 
 namespace teams_phonemanager.Converters
 {
-    public class PageTemplateSelector : DataTemplateSelector
+    public class PageTemplateSelector : IDataTemplate
     {
         private readonly LoggingService _loggingService;
 
@@ -13,15 +13,15 @@ namespace teams_phonemanager.Converters
             _loggingService = LoggingService.Instance;
         }
 
-        public required DataTemplate WelcomeTemplate { get; set; }
-        public required DataTemplate GetStartedTemplate { get; set; }
-        public required DataTemplate VariablesTemplate { get; set; }
-        public required DataTemplate M365GroupsTemplate { get; set; }
-        public required DataTemplate CallQueuesTemplate { get; set; }
-        public required DataTemplate AutoAttendantsTemplate { get; set; }
-        public required DataTemplate HolidaysTemplate { get; set; }
+        public required IDataTemplate WelcomeTemplate { get; set; }
+        public required IDataTemplate GetStartedTemplate { get; set; }
+        public required IDataTemplate VariablesTemplate { get; set; }
+        public required IDataTemplate M365GroupsTemplate { get; set; }
+        public required IDataTemplate CallQueuesTemplate { get; set; }
+        public required IDataTemplate AutoAttendantsTemplate { get; set; }
+        public required IDataTemplate HolidaysTemplate { get; set; }
 
-        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        public IDataTemplate SelectTemplate(object? item, Control? container)
         {
             if (item is string pageName)
             {
@@ -34,7 +34,7 @@ namespace teams_phonemanager.Converters
                 var normalizedAutoAttendants = ConstantsService.Pages.AutoAttendants.Replace(" ", "");
                 var normalizedHolidays = ConstantsService.Pages.Holidays.Replace(" ", "");
                 
-                DataTemplate template = normalizedPageName switch
+                IDataTemplate template = normalizedPageName switch
                 {
                     var name when name == normalizedWelcome => WelcomeTemplate,
                     var name when name == normalizedGetStarted => GetStartedTemplate,
@@ -52,6 +52,17 @@ namespace teams_phonemanager.Converters
 
             _loggingService.Log("Item was not a string, defaulting to WelcomeTemplate", LogLevel.Warning);
             return WelcomeTemplate;
+        }
+
+        public Control? Build(object? param)
+        {
+            var template = SelectTemplate(param, null);
+            return template?.Build(param);
+        }
+
+        public bool Match(object? data)
+        {
+            return data is string;
         }
     }
 }
