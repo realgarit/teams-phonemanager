@@ -1,15 +1,15 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Windows;
+
 using teams_phonemanager.Services;
 using teams_phonemanager.Models;
 using System;
 using System.Threading.Tasks;
-using System.Windows.Input;
+using Avalonia.Input;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.ComponentModel;
-using System.Windows.Data;
+
 
 namespace teams_phonemanager.ViewModels
 {
@@ -50,23 +50,24 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
-        public ICollectionView GroupsView { get; }
+        public ObservableCollection<M365Group> GroupsView => new ObservableCollection<M365Group>(
+            Groups.Where(FilterGroup)
+        );
 
         public M365GroupsViewModel()
         {
-            _mainWindowViewModel = Application.Current.MainWindow.DataContext as MainWindowViewModel;
+            _mainWindowViewModel = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow?.DataContext as MainWindowViewModel
+                : null;
 
             _loggingService.Log("M365 Groups page loaded", LogLevel.Info);
             
             // Initialize with auto-generated group name if variables are available
             UpdateNewGroupName();
 
-            GroupsView = CollectionViewSource.GetDefaultView(Groups);
-            GroupsView.Filter = FilterGroup;
-
             Groups.CollectionChanged += (s, e) =>
             {
-                GroupsView.Refresh();
+                OnPropertyChanged(nameof(GroupsView));
             };
         }
 
@@ -207,7 +208,7 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
 
-                if (!ValidateVariables(variables))
+                if (!await ValidateVariables(variables))
                 {
                     return;
                 }
@@ -264,7 +265,7 @@ namespace teams_phonemanager.ViewModels
                     }
                 }
             }
-            GroupsView.Refresh();
+            OnPropertyChanged(nameof(GroupsView));
         }
 
         private void UpdateNewGroupName()
@@ -297,7 +298,7 @@ namespace teams_phonemanager.ViewModels
 
         partial void OnSearchTextChanged(string value)
         {
-            GroupsView.Refresh();
+            OnPropertyChanged(nameof(GroupsView));
         }
     }
 } 

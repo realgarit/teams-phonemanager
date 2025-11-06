@@ -56,8 +56,22 @@ namespace teams_phonemanager.ViewModels
                 var command = _powerShellCommandService.GetCheckModulesCommand();
                 var result = await ExecutePowerShellCommandAsync(command, "CheckModules");
                 
-                ModulesChecked = (result.Contains("MicrosoftTeams module is available") || result.Contains("MicrosoftTeams module installed successfully")) && 
-                                (result.Contains("Microsoft.Graph module is available") || result.Contains("Microsoft.Graph module installed successfully"));
+                // Check for Teams module
+                bool teamsAvailable = result.Contains("MicrosoftTeams module is available") || result.Contains("MicrosoftTeams module installed successfully");
+                
+                // Check for all required Graph modules
+                bool graphAuthAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphAuthentication + " module is available");
+                bool graphUsersAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphUsers + " module is available");
+                bool graphUsersActionsAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphUsersActions + " module is available");
+                bool graphGroupsAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphGroups + " module is available");
+                bool graphIdentityAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphIdentityDirectoryManagement + " module is available");
+                
+                ModulesChecked = teamsAvailable && 
+                                graphAuthAvailable && 
+                                graphUsersAvailable && 
+                                graphUsersActionsAvailable && 
+                                graphGroupsAvailable && 
+                                graphIdentityAvailable;
                 
                 _sessionManager.UpdateModulesChecked(ModulesChecked);
                 

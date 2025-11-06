@@ -1,9 +1,11 @@
 <UserControl x:Class="teams_phonemanager.Views.CallQueuesView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:material="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:materialStyles="clr-namespace:Material.Styles;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:local="clr-namespace:teams_phonemanager.Views"
              xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
              mc:Ignorable="d" 
@@ -13,7 +15,7 @@
         <viewmodels:CallQueuesViewModel/>
     </UserControl.DataContext>
 
-    <materialDesign:Card Margin="32" UniformCornerRadius="8">
+    <material:Card Margin="32" CornerRadius="8">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -30,13 +32,12 @@
                 <!-- Status Message -->
                 <StackPanel Grid.Row="0" Margin="0,0,0,16">
                     <TextBlock Text="{Binding StatusMessage}"
-                             Style="{StaticResource MaterialDesignBody1TextBlock}"
-                             Foreground="{DynamicResource PrimaryHueMidBrush}"
+                             Classes="body1"
                              TextWrapping="Wrap"/>
                 </StackPanel>
 
                 <!-- Tab Control -->
-                <TabControl Grid.Row="1" Style="{StaticResource MaterialDesignTabControl}">
+                <TabControl Grid.Row="1">
                     
                     <!-- Resource Accounts Tab -->
                     <TabItem Header="Resource Accounts">
@@ -56,30 +57,31 @@
                                 </Grid.ColumnDefinitions>
 
                                 <Button Grid.Column="0"
-                                        Style="{StaticResource MaterialDesignRaisedButton}"
+                                        Classes="raised"
                                         Command="{Binding RetrieveResourceAccountsCommand}"
+                                        Height="40"
                                         Margin="0,0,16,0">
                                     <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon Kind="Refresh" Margin="0,0,8,0"/>
+                                        <materialIcons:MaterialIcon Kind="Refresh" Margin="0,0,8,0"/>
                                         <TextBlock Text="Retrieve Accounts"/>
                                     </StackPanel>
                                 </Button>
 
                                 <Button Grid.Column="1"
-                                        Style="{StaticResource MaterialDesignRaisedButton}"
+                                        Classes="raised"
                                         Command="{Binding OpenCreateResourceAccountDialogCommand}"
-                                        Background="{DynamicResource SecondaryHueMidBrush}"
+                                        Height="40"
                                         Margin="0,0,16,0">
                                     <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon Kind="AccountPlus" Margin="0,0,8,0"/>
+                                        <materialIcons:MaterialIcon Kind="AccountPlus" Margin="0,0,8,0"/>
                                         <TextBlock Text="Create Account"/>
                                     </StackPanel>
                                 </Button>
 
                                 <TextBox Grid.Column="2"
-                                         Text="{Binding SearchResourceAccountsText, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                                         materialDesign:HintAssist.Hint="Search resource accounts"/>
+                                         Text="{Binding SearchResourceAccountsText}"
+                                         Classes="outlined"
+                                         Watermark="Search resource accounts..."/>
                             </Grid>
 
                             <!-- Resource Accounts List -->
@@ -87,16 +89,13 @@
                                       ItemsSource="{Binding ResourceAccountsView}"
                                       AutoGenerateColumns="False"
                                       HeadersVisibility="Column"
-                                      CanUserAddRows="False"
-                                      CanUserDeleteRows="False"
+                                      
+                                      
                                       IsReadOnly="True"
                                       GridLinesVisibility="None"
                                       SelectionMode="Single"
-                                      SelectionUnit="FullRow"
-                                      VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Auto"
-                                      materialDesign:DataGridAssist.CellPadding="12,8,12,8"
-                                      materialDesign:DataGridAssist.ColumnHeaderPadding="12,8,12,8">
+                                      
+                                      HorizontalScrollBarVisibility="Auto">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" Width="2*"/>
                                     <DataGridTextColumn Header="UPN" Binding="{Binding UserPrincipalName}" Width="2*"/>
@@ -125,30 +124,31 @@
                                 </Grid.ColumnDefinitions>
 
                                 <Button Grid.Column="0"
-                                        Style="{StaticResource MaterialDesignRaisedButton}"
+                                        Classes="raised"
                                         Command="{Binding RetrieveCallQueuesCommand}"
+                                        Height="40"
                                         Margin="0,0,16,0">
                                     <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon Kind="Refresh" Margin="0,0,8,0"/>
+                                        <materialIcons:MaterialIcon Kind="Refresh" Margin="0,0,8,0"/>
                                         <TextBlock Text="Retrieve Queues"/>
                                     </StackPanel>
                                 </Button>
 
                                 <Button Grid.Column="1"
-                        Style="{StaticResource MaterialDesignRaisedButton}"
+                                        Classes="raised"
                                         Command="{Binding OpenCreateCallQueueDialogCommand}"
-                                        Background="{DynamicResource SecondaryHueMidBrush}"
+                                        Height="40"
                                         Margin="0,0,16,0">
                                     <StackPanel Orientation="Horizontal">
-                                        <materialDesign:PackIcon Kind="PhonePlus" Margin="0,0,8,0"/>
+                                        <materialIcons:MaterialIcon Kind="PhonePlus" Margin="0,0,8,0"/>
                                         <TextBlock Text="Create Queue"/>
                                     </StackPanel>
                                 </Button>
 
                                 <TextBox Grid.Column="2"
-                                         Text="{Binding SearchCallQueuesText, UpdateSourceTrigger=PropertyChanged}"
-                                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
-                                         materialDesign:HintAssist.Hint="Search call queues"/>
+                                         Text="{Binding SearchCallQueuesText}"
+                                         Classes="outlined"
+                                         Watermark="Search call queues..."/>
                             </Grid>
 
                             <!-- Call Queues List -->
@@ -156,16 +156,13 @@
                                       ItemsSource="{Binding CallQueuesView}"
                                       AutoGenerateColumns="False"
                                       HeadersVisibility="Column"
-                                      CanUserAddRows="False"
-                                      CanUserDeleteRows="False"
+                                      
+                                      
                                       IsReadOnly="True"
                                       GridLinesVisibility="None"
                                       SelectionMode="Single"
-                                      SelectionUnit="FullRow"
-                                      VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Auto"
-                                      materialDesign:DataGridAssist.CellPadding="12,8,12,8"
-                                      materialDesign:DataGridAssist.ColumnHeaderPadding="12,8,12,8">
+                                      
+                                      HorizontalScrollBarVisibility="Auto">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*"/>
                                     <DataGridTextColumn Header="Identity" Binding="{Binding Identity}" Width="2*"/>
@@ -178,346 +175,421 @@
 
                     <!-- Step-by-Step Creation Tab -->
                     <TabItem Header="Step-by-Step Creation">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="16">
+                        <ScrollViewer Margin="16">
                             <StackPanel>
                                 <TextBlock Text="Follow these steps in order to create a complete call queue setup:"
-                                         Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                         Classes="subtitle1"
                                          Margin="0,0,0,24"/>
 
                                 <!-- Step 1: Create Resource Account -->
-                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                <material:Card Margin="0,0,0,16" Padding="16">
                                     <StackPanel>
                                         <TextBlock Text="Step 1: Create Resource Account"
-                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 Classes="subtitle1"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Create a resource account for the call queue. This account will handle the call queue functionality."
-                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 Classes="body2"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                        <Button Classes="raised"
                                                 Command="{Binding OpenCreateResourceAccountDialogCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialDesign:PackIcon Kind="AccountPlus" Margin="0,0,8,0"/>
+                                                <materialIcons:MaterialIcon Kind="AccountPlus" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Create Resource Account"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </materialDesign:Card>
+                                </material:Card>
 
                                 <!-- Step 2: Update Usage Location -->
-                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                <material:Card Margin="0,0,0,16" Padding="16">
                                     <StackPanel>
                                         <TextBlock Text="Step 2: Update Usage Location"
-                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 Classes="subtitle1"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Set the usage location for the resource account. This is required for licensing."
-                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 Classes="body2"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                        <Button Classes="raised"
                                                 Command="{Binding OpenUpdateUsageLocationDialogCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialDesign:PackIcon Kind="MapMarker" Margin="0,0,8,0"/>
+                                                <materialIcons:MaterialIcon Kind="MapMarker" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Update Usage Location"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </materialDesign:Card>
+                                </material:Card>
 
                                 <!-- Step 3: Assign License -->
-                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                <material:Card Margin="0,0,0,16" Padding="16">
                                     <StackPanel>
                                         <TextBlock Text="Step 3: Assign License"
-                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 Classes="subtitle1"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Assign a license to the resource account. This is required for the resource account to function properly."
-                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 Classes="body2"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                        <Button Classes="raised"
                                                 Command="{Binding AssignLicenseCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialDesign:PackIcon Kind="Certificate" Margin="0,0,8,0"/>
+                                                <materialIcons:MaterialIcon Kind="Certificate" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Assign License"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </materialDesign:Card>
+                                </material:Card>
 
                                 <!-- Step 4: Get M365 Group ID -->
-                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                <material:Card Margin="0,0,0,16" Padding="16">
                                     <StackPanel>
                                         <TextBlock Text="Step 4: Get M365 Group ID"
-                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 Classes="subtitle1"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Retrieve the M365 Group ID from the group name. This is required before creating the call queue."
-                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 Classes="body2"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                        <Button Classes="raised"
                                                 Command="{Binding GetM365GroupIdCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialDesign:PackIcon Kind="AccountSearch" Margin="0,0,8,0"/>
+                                                <materialIcons:MaterialIcon Kind="AccountSearch" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Get M365 Group ID"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </materialDesign:Card>
+                                </material:Card>
 
                                 <!-- Step 5: Create Call Queue -->
-                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                <material:Card Margin="0,0,0,16" Padding="16">
                                     <StackPanel>
                                         <TextBlock Text="Step 5: Create Call Queue"
-                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 Classes="subtitle1"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Create the actual call queue with routing settings and distribution lists."
-                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 Classes="body2"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                        <Button Classes="raised"
                                                 Command="{Binding OpenCreateCallQueueDialogCommand}"
                                                 HorizontalAlignment="Left">
                     <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="PhonePlus" Margin="0,0,8,0"/>
+                        <materialIcons:MaterialIcon Kind="PhonePlus" Margin="0,0,8,0"/>
                         <TextBlock Text="Create Call Queue"/>
                     </StackPanel>
                 </Button>
                                     </StackPanel>
-                                </materialDesign:Card>
+                                </material:Card>
 
                                 <!-- Step 6: Associate Resource Account -->
-                                <materialDesign:Card Margin="0,0,0,16" Padding="16">
+                                <material:Card Margin="0,0,0,16" Padding="16">
                                     <StackPanel>
                                         <TextBlock Text="Step 6: Associate Resource Account"
-                                                 Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                                                 Classes="subtitle1"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Associate the resource account with the call queue to complete the setup."
-                                                 Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                 Classes="body2"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                                        <Button Classes="raised"
                                                 Command="{Binding OpenAssociateDialogCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialDesign:PackIcon Kind="Link" Margin="0,0,8,0"/>
+                                                <materialIcons:MaterialIcon Kind="Link" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Associate Account"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </materialDesign:Card>
+                                </material:Card>
                             </StackPanel>
                         </ScrollViewer>
                     </TabItem>
                 </TabControl>
             </Grid>
 
-            <!-- Create Resource Account Dialog -->
-            <materialDesign:DialogHost Grid.RowSpan="2" 
-                                     IsOpen="{Binding ShowCreateResourceAccountDialog}">
-                <materialDesign:DialogHost.DialogContent>
-                    <StackPanel Margin="16" MinWidth="400">
+            <!-- Create Resource Account Dialog - Border overlay -->
+            <Border IsVisible="{Binding ShowCreateResourceAccountDialog}"
+                    Background="#80000000"
+                    ZIndex="1000"
+                    PointerPressed="CreateResourceAccountBackdrop_PointerPressed">
+                <Border.Styles>
+                    <Style Selector="Border">
+                        <Style.Animations>
+                            <Animation Duration="0:0:0.2">
+                                <KeyFrame Cue="0%">
+                                    <Setter Property="Opacity" Value="0"/>
+                                </KeyFrame>
+                                <KeyFrame Cue="100%">
+                                    <Setter Property="Opacity" Value="1"/>
+                                </KeyFrame>
+                            </Animation>
+                        </Style.Animations>
+                    </Style>
+                </Border.Styles>
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+                      PointerPressed="CreateResourceAccountCard_PointerPressed">
+                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                        <StackPanel>
                         <TextBlock Text="Create Resource Account"
-                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Classes="headline6"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="UPN:"
-                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Classes="subtitle2"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding ResourceAccountUpn}"
-                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Classes="outlined"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Display Name:"
-                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Classes="subtitle2"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding ResourceAccountDisplayName}"
-                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Classes="outlined"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="The values are auto-generated from your variables. You can modify them if needed."
-                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Classes="caption"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                            <Button Classes="flat"
                                     Command="{Binding CloseCreateResourceAccountDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                            <Button Classes="raised"
                                     Command="{Binding CreateResourceAccountCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="AccountPlus" Margin="0,0,8,0"/>
+                                    <materialIcons:MaterialIcon Kind="AccountPlus" Margin="0,0,8,0"/>
                                     <TextBlock Text="Create Account"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                </materialDesign:DialogHost.DialogContent>
-            </materialDesign:DialogHost>
+                    </material:Card>
+                </Grid>
+            </Border>
 
-            <!-- Update Usage Location Dialog -->
-            <materialDesign:DialogHost Grid.RowSpan="2" 
-                                     IsOpen="{Binding ShowUpdateUsageLocationDialog}">
-                <materialDesign:DialogHost.DialogContent>
-                    <StackPanel Margin="16" MinWidth="400">
+            <!-- Update Usage Location Dialog - Border overlay -->
+            <Border IsVisible="{Binding ShowUpdateUsageLocationDialog}"
+                    Background="#80000000"
+                    ZIndex="1000"
+                    PointerPressed="UpdateUsageLocationBackdrop_PointerPressed">
+                <Border.Styles>
+                    <Style Selector="Border">
+                        <Style.Animations>
+                            <Animation Duration="0:0:0.2">
+                                <KeyFrame Cue="0%">
+                                    <Setter Property="Opacity" Value="0"/>
+                                </KeyFrame>
+                                <KeyFrame Cue="100%">
+                                    <Setter Property="Opacity" Value="1"/>
+                                </KeyFrame>
+                            </Animation>
+                        </Style.Animations>
+                    </Style>
+                </Border.Styles>
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+                      PointerPressed="UpdateUsageLocationCard_PointerPressed">
+                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                        <StackPanel>
                         <TextBlock Text="Update Usage Location"
-                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Classes="headline6"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Resource Account UPN:"
-                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Classes="subtitle2"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding ResourceAccountUpn}"
-                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Classes="outlined"
                                IsReadOnly="True"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="This will update the usage location for the resource account. The value is taken from your variables."
-                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Classes="caption"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                            <Button Classes="flat"
                                     Command="{Binding CloseUpdateUsageLocationDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                            <Button Classes="raised"
                                     Command="{Binding UpdateUsageLocationCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="MapMarker" Margin="0,0,8,0"/>
+                                    <materialIcons:MaterialIcon Kind="MapMarker" Margin="0,0,8,0"/>
                                     <TextBlock Text="Update Location"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                </materialDesign:DialogHost.DialogContent>
-            </materialDesign:DialogHost>
+                    </material:Card>
+                </Grid>
+            </Border>
 
-            <!-- Create Call Queue Dialog -->
-            <materialDesign:DialogHost Grid.RowSpan="2" 
-                                     IsOpen="{Binding ShowCreateCallQueueDialog}">
-                <materialDesign:DialogHost.DialogContent>
-                    <StackPanel Margin="16" MinWidth="400">
+            <!-- Create Call Queue Dialog - Border overlay -->
+            <Border IsVisible="{Binding ShowCreateCallQueueDialog}"
+                    Background="#80000000"
+                    ZIndex="1000"
+                    PointerPressed="CreateCallQueueBackdrop_PointerPressed">
+                <Border.Styles>
+                    <Style Selector="Border">
+                        <Style.Animations>
+                            <Animation Duration="0:0:0.2">
+                                <KeyFrame Cue="0%">
+                                    <Setter Property="Opacity" Value="0"/>
+                                </KeyFrame>
+                                <KeyFrame Cue="100%">
+                                    <Setter Property="Opacity" Value="1"/>
+                                </KeyFrame>
+                            </Animation>
+                        </Style.Animations>
+                    </Style>
+                </Border.Styles>
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+                      PointerPressed="CreateCallQueueCard_PointerPressed">
+                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                        <StackPanel>
                         <TextBlock Text="Create Call Queue"
-                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Classes="headline6"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Call Queue Name:"
-                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Classes="subtitle2"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding CallQueueName}"
-                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Classes="outlined"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="M365 Group ID:"
-                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Classes="subtitle2"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding M365GroupId}"
-                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Classes="outlined"
                                Margin="0,0,0,8"/>
                         <TextBlock Text="Note: Use 'Get M365 Group ID' button to retrieve the Group ID before creating the call queue."
-                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Classes="caption"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="The call queue name is auto-generated from your variables. Use the 'Get M365 Group ID' button to retrieve the Group ID."
-                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Classes="caption"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                            <Button Classes="flat"
                                     Command="{Binding CloseCreateCallQueueDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                            <Button Classes="raised"
                                     Command="{Binding CreateCallQueueCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="PhonePlus" Margin="0,0,8,0"/>
+                                    <materialIcons:MaterialIcon Kind="PhonePlus" Margin="0,0,8,0"/>
                                     <TextBlock Text="Create Queue"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                </materialDesign:DialogHost.DialogContent>
-            </materialDesign:DialogHost>
+                    </material:Card>
+                </Grid>
+            </Border>
 
-            <!-- Associate Resource Account Dialog -->
-            <materialDesign:DialogHost Grid.RowSpan="2" 
-                                     IsOpen="{Binding ShowAssociateDialog}">
-                <materialDesign:DialogHost.DialogContent>
-                    <StackPanel Margin="16" MinWidth="400">
+            <!-- Associate Resource Account Dialog - Border overlay -->
+            <Border IsVisible="{Binding ShowAssociateDialog}"
+                    Background="#80000000"
+                    ZIndex="1000"
+                    PointerPressed="AssociateResourceAccountBackdrop_PointerPressed">
+                <Border.Styles>
+                    <Style Selector="Border">
+                        <Style.Animations>
+                            <Animation Duration="0:0:0.2">
+                                <KeyFrame Cue="0%">
+                                    <Setter Property="Opacity" Value="0"/>
+                                </KeyFrame>
+                                <KeyFrame Cue="100%">
+                                    <Setter Property="Opacity" Value="1"/>
+                                </KeyFrame>
+                            </Animation>
+                        </Style.Animations>
+                    </Style>
+                </Border.Styles>
+                <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+                      PointerPressed="AssociateResourceAccountCard_PointerPressed">
+                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                        <StackPanel>
                         <TextBlock Text="Associate Resource Account with Call Queue"
-                                 Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                 Classes="headline6"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Resource Account UPN:"
-                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Classes="subtitle2"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding ResourceAccountUpn}"
-                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Classes="outlined"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Call Queue Name:"
-                                 Style="{StaticResource MaterialDesignSubtitle2TextBlock}"
+                                 Classes="subtitle2"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding CallQueueName}"
-                               Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                                 Classes="outlined"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="This will associate the resource account with the call queue to complete the setup."
-                                 Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                 Classes="caption"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Style="{StaticResource MaterialDesignFlatButton}"
+                            <Button Classes="flat"
                                     Command="{Binding CloseAssociateDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                            <Button Classes="raised"
                                     Command="{Binding AssociateResourceAccountWithCallQueueCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="Link" Margin="0,0,8,0"/>
+                                    <materialIcons:MaterialIcon Kind="Link" Margin="0,0,8,0"/>
                                     <TextBlock Text="Associate"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                </materialDesign:DialogHost.DialogContent>
-            </materialDesign:DialogHost>
+                    </material:Card>
+                </Grid>
+            </Border>
 
             <!-- Progress Indicator -->
-            <Grid Grid.RowSpan="2"
-                  Background="{DynamicResource MaterialDesignBackground}"
+            <Grid 
                   Opacity="0.8"
-                  Visibility="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                  IsVisible="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <ProgressBar Classes="circular"
                            Value="0"
                            IsIndeterminate="True"
                            Width="50"
@@ -526,12 +598,11 @@
                 
                 <!-- Waiting Message -->
                 <TextBlock Text="{Binding WaitingMessage, TargetNullValue=''}"
-                           Style="{StaticResource MaterialDesignBody2TextBlock}"
+                           Classes="body2"
                            TextWrapping="Wrap"
                            Margin="0,8,0,0"
-                           TextAlignment="Center"
-                           Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+                           TextAlignment="Center"/>
             </Grid>
         </Grid>
-    </materialDesign:Card>
+    </material:Card>
 </UserControl> 

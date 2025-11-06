@@ -1,0 +1,886 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             x:Class="teams_phonemanager.Views.VariablesView"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:material="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:materialStyles="clr-namespace:Material.Styles;assembly=Material.Styles"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:local="clr-namespace:teams_phonemanager.Views"
+             xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
+             xmlns:converters="clr-namespace:teams_phonemanager.Converters"
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    <UserControl.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <converters:TimeSpanConverter x:Key="TimeSpanConverter"/>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        
+    </UserControl.Resources>
+
+    <Grid>
+        <material:Card Margin="16" CornerRadius="8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Status Message -->
+                <StackPanel Grid.Row="0" Margin="16,16,16,8">
+                    <TextBlock Text="{Binding WelcomeMessage}"
+                             Classes="body1"
+                             TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <!-- Tab Control -->
+                <TabControl Grid.Row="1" >
+                    
+                    <!-- General Tab -->
+                    <TabItem Header="General">
+                        <ScrollViewer Margin="8">
+                            <Grid IsEnabled="{Binding CanProceed}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,8,4,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.CustomerLegalName}"
+                                             Classes="outlined"/>
+                                    <TextBlock Text="Example: Acme Corp" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,8,0,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.MsFallbackDomain}"
+                                             Classes="outlined"/>
+                                    <TextBlock Text="Example: @acme.onmicrosoft.com" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,4,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.Customer}"
+                                             Classes="outlined"/>
+                                    <TextBlock Text="Example: acm-luc" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Row="1" Grid.Column="1" Margin="4,0,0,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.CustomerGroupName}"
+                                             Classes="outlined"/>
+                                    <TextBlock Text="Example: immo" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,4,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.LanguageId}"
+                                             Classes="outlined"/>
+                                    <TextBlock Text="Example: de-DE" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Row="2" Grid.Column="1" Margin="4,0,0,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.TimeZoneId}"
+                                             Classes="outlined"/>
+                                    <TextBlock Text="Example: W. Europe Standard Time" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,0,4,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.UsageLocation}"
+                                             Classes="outlined"/>
+                                    <TextBlock Text="Example: CH" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Row="3" Grid.Column="1" Margin="4,0,0,8">
+                                    <Grid>
+                                        <TextBox 
+                                                 Text="{Binding Variables.SkuId}"
+                                                 IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                                 Classes="outlined"/>
+                                        <materialIcons:MaterialIcon Kind="Lock" 
+                                                               HorizontalAlignment="Right" 
+                                                               VerticalAlignment="Center" 
+                                                               Margin="0,0,8,0"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- Call Queues Tab -->
+                    <TabItem Header="Call Queues">
+                        <ScrollViewer Margin="8">
+                            <Grid IsEnabled="{Binding CanProceed}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,8,4,8">
+                                    <Grid>
+                                        <TextBox 
+                                                 Text="{Binding Variables.CsAppCqId}"
+                                                 IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                                 Classes="outlined"/>
+                                        <materialIcons:MaterialIcon Kind="Lock" 
+                                                               HorizontalAlignment="Right" 
+                                                               VerticalAlignment="Center" 
+                                                               Margin="0,0,8,0"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- Auto Attendants Tab -->
+                    <TabItem Header="Auto Attendants">
+                        <ScrollViewer Margin="8">
+                            <Grid IsEnabled="{Binding CanProceed}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,8,4,8">
+                                    <Grid>
+                                        <TextBox 
+                                                 Text="{Binding Variables.CsAppAaId}"
+                                                 IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                                 Classes="outlined"/>
+                                        <materialIcons:MaterialIcon Kind="Lock" 
+                                                               HorizontalAlignment="Right" 
+                                                               VerticalAlignment="Center" 
+                                                               Margin="0,0,8,0"/>
+                                    </Grid>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,8,0,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.PhoneNumberType}"
+                                             Classes="outlined"/>
+                                    <TextBlock Text="Example: DirectRouting" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.RaaAnrName}"
+                                             Classes="outlined"/>
+                                    <TextBlock Text="Example: hn for 'Hauptnummer'" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.RaaAnr}"
+                                             Classes="outlined"/>
+                                    <TextBlock Text="Example: +41413290024" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.DefaultCallFlowGreetingPromptDE}"
+                                             Classes="outlined"/>
+                                    <TextBlock Text="Example: Herzlich Willkommen bei der Acme Corp!" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.AfterHoursCallFlowGreetingPromptDE}"
+                                             Classes="outlined"/>
+                                    <TextBlock Text="Example: Herzlich Willkommen bei der Acme Corp, Sie rufen ausserhalb der Öffnungszeiten." FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+                                         Text="Opening Hours 1"
+                                         Classes="subtitle1"
+                                         Margin="0,0,0,8"/>
+
+                                <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                                         Text="Note: Both Opening Hours 1 and 2 currently apply to Monday through Friday."
+                                         FontSize="11"
+                                         Margin="0,4,0,8"/>
+
+                                <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
+                                    <StackPanel MinWidth="100" MaxWidth="150" Margin="0,0,8,0">
+                                        <TextBox 
+                                                 Text="{Binding Variables.OpeningHours1Start, Converter={StaticResource TimeSpanConverter}}"
+                                                 Classes="outlined"/>
+                                        <TextBlock Text="Example: 08:00" FontSize="11" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel MinWidth="100" MaxWidth="150" Margin="0,0,0,0">
+                                        <TextBox 
+                                                 Text="{Binding Variables.OpeningHours1End, Converter={StaticResource TimeSpanConverter}}"
+                                                 Classes="outlined"/>
+                                        <TextBlock Text="Example: 12:00" FontSize="11" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2"
+                                         Text="Opening Hours 2"
+                                         Classes="subtitle1"
+                                         Margin="0,0,0,8"/>
+
+                                <StackPanel Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
+                                    <StackPanel MinWidth="100" MaxWidth="150" Margin="0,0,8,0">
+                                        <TextBox 
+                                                 Text="{Binding Variables.OpeningHours2Start, Converter={StaticResource TimeSpanConverter}}"
+                                                 Classes="outlined"/>
+                                        <TextBlock Text="Example: 13:30" FontSize="11" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel MinWidth="100" MaxWidth="150">
+                                        <TextBox 
+                                                 Text="{Binding Variables.OpeningHours2End, Converter={StaticResource TimeSpanConverter}}"
+                                                 Classes="outlined"/>
+                                        <TextBlock Text="Example: 17:00" FontSize="11" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- Holidays Tab -->
+                    <TabItem Header="Holidays">
+                        <ScrollViewer Margin="8">
+                            <Grid IsEnabled="{Binding CanProceed}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,8,4,8">
+                                    <Grid>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Variables.Customer, StringFormat=hd-\{0\}-, FallbackValue=hd-}" 
+                                                       Opacity="0.7"
+                                                       VerticalAlignment="Center"
+                                                       Margin="12,0,4,0"/>
+                                            <TextBox Text="{Binding Variables.HolidayNameSuffix}"
+                                                     Background="Transparent"
+                                                     MinWidth="200"
+                                                     Classes="outlined"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock Text="Example: kantonal-2025" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,8,0,8">
+                                    <Button Classes="raised"
+                                            Command="{Binding OpenHolidaySeriesManagerCommand}"
+                                            HorizontalAlignment="Stretch">
+                                        <StackPanel Orientation="Horizontal">
+                                            <materialIcons:MaterialIcon Kind="CalendarMultiple" Margin="0,0,8,0"/>
+                                            <TextBlock Text="Manage Holiday Series"/>
+                                            <TextBlock Text="{Binding Variables.HolidaySeries.Count, StringFormat=' ({0} holidays)'}"
+                                                     Margin="8,0,0,0"
+                                                     Opacity="0.7"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <TextBlock Text="Click to manage multiple holiday dates and times" FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.HolidayGreetingPromptDE}"
+                                             Classes="outlined"/>
+                                    <TextBlock Text="Example: Herzlich Willkommen bei der Acme Corp. Leider können wir Ihren Anruf derzeit nicht entgegennehmen, da Sie uns an einem Feiertag anrufen." FontSize="11" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <!-- Auto-generated Tab -->
+                    <TabItem Header="Auto-generated">
+                        <ScrollViewer Margin="8">
+                            <Grid IsEnabled="{Binding CanProceed}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0" Grid.Column="0" Margin="0,8,4,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.M365Group, Mode=OneWay}"
+                                             IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             Classes="outlined"/>
+                                    <materialIcons:MaterialIcon Kind="Lock" 
+                                                           HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center" 
+                                                           Margin="0,0,8,0"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="0" Grid.Column="1" Margin="4,8,0,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.RacqUPN, Mode=OneWay}"
+                                             IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             Classes="outlined"/>
+                                    <materialIcons:MaterialIcon Kind="Lock" 
+                                                           HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center" 
+                                                           Margin="0,0,8,0"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="1" Grid.Column="0" Margin="0,0,4,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.RacqDisplayName, Mode=OneWay}"
+                                             IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             Classes="outlined"/>
+                                    <materialIcons:MaterialIcon Kind="Lock" 
+                                                           HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center" 
+                                                           Margin="0,0,8,0"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="1" Grid.Column="1" Margin="4,0,0,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.CqDisplayName, Mode=OneWay}"
+                                             IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             Classes="outlined"/>
+                                    <materialIcons:MaterialIcon Kind="Lock" 
+                                                           HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center" 
+                                                           Margin="0,0,8,0"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="2" Grid.Column="0" Margin="0,0,4,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.RaaaUPN, Mode=OneWay}"
+                                             IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             Classes="outlined"/>
+                                    <materialIcons:MaterialIcon Kind="Lock" 
+                                                           HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center" 
+                                                           Margin="0,0,8,0"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="2" Grid.Column="1" Margin="4,0,0,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.RaaaDisplayName, Mode=OneWay}"
+                                             IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             Classes="outlined"/>
+                                    <materialIcons:MaterialIcon Kind="Lock" 
+                                                           HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center" 
+                                                           Margin="0,0,8,0"/>
+                                </Grid>
+                                
+                                <Grid Grid.Row="3" Grid.Column="0" Margin="0,0,4,8">
+                                    <TextBox 
+                                             Text="{Binding Variables.AaDisplayName, Mode=OneWay}"
+                                             IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             Classes="outlined"/>
+                                    <materialIcons:MaterialIcon Kind="Lock" 
+                                                           HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center" 
+                                                           Margin="0,0,8,0"/>
+                                </Grid>
+                            </Grid>
+                        </ScrollViewer>
+                    </TabItem>
+                </TabControl>
+
+                <!-- Save and Load Buttons -->
+                <StackPanel Grid.Row="2"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Margin="16,8,16,16">
+                    <Button Classes="raised"
+                            Command="{Binding LoadVariablesFromFileCommand}"
+                            Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <materialIcons:MaterialIcon Kind="FolderOpen" Margin="0,0,8,0"/>
+                            <TextBlock Text="Load Variables from File"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="raised"
+                            Command="{Binding SaveVariablesToFileCommand}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialIcons:MaterialIcon Kind="ContentSave" Margin="0,0,8,0"/>
+                            <TextBlock Text="Save Variables to File"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </material:Card>
+        
+        <!-- Holiday Time Picker Dialog - Border overlay -->
+        <Border IsVisible="{Binding ShowHolidayTimePicker}"
+                Background="#80000000"
+                ZIndex="1000"
+                PointerPressed="HolidayTimePickerBackdrop_PointerPressed">
+            <Border.Styles>
+                <Style Selector="Border">
+                    <Style.Animations>
+                        <Animation Duration="0:0:0.2">
+                            <KeyFrame Cue="0%">
+                                <Setter Property="Opacity" Value="0"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="100%">
+                                <Setter Property="Opacity" Value="1"/>
+                            </KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+            </Border.Styles>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+                  PointerPressed="HolidayTimePickerCard_PointerPressed">
+                <material:Card Padding="16" MinWidth="400" Margin="16">
+                    <StackPanel>
+                        <TextBlock Text="Select Holiday Time"
+                                 Classes="headline6"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="Choose a time that aligns with 15-minute boundaries:"
+                                 Classes="body2"
+                                 TextWrapping="Wrap"
+                                 Margin="0,0,0,16"/>
+                        
+                        <ComboBox ItemsSource="{Binding TimeOptions}"
+                                SelectedItem="{Binding SelectedHolidayTime, Mode=TwoWay}"
+                                Classes="outlined"
+                                Margin="0,0,0,16">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding StringFormat='{}{0:hh\\:mm}'}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        
+                        <StackPanel Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Classes="flat"
+                                    Command="{Binding CloseHolidayTimePickerCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Classes="raised"
+                                    Command="{Binding SaveHolidayTimeCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialIcons:MaterialIcon Kind="Check" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Save Time"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </material:Card>
+            </Grid>
+        </Border>
+        
+        <!-- Holiday Series Manager Dialog - Border overlay (not Popup to avoid macOS window issues) -->
+        <Border IsVisible="{Binding ShowHolidaySeriesManager}"
+                Background="#80000000"
+                ZIndex="1000"
+                PointerPressed="HolidaySeriesManagerBackdrop_PointerPressed">
+            <Border.Styles>
+                <Style Selector="Border">
+                    <Style.Animations>
+                        <Animation Duration="0:0:0.2">
+                            <KeyFrame Cue="0%">
+                                <Setter Property="Opacity" Value="0"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="100%">
+                                <Setter Property="Opacity" Value="1"/>
+                            </KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+            </Border.Styles>
+            <!-- Centered dialog card -->
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+                  PointerPressed="HolidaySeriesManagerCard_PointerPressed">
+                <material:Card Padding="16" MinWidth="600" MaxWidth="800" MaxHeight="700" Margin="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0"
+                                 Text="Manage Holiday Series"
+                                 Classes="headline6"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Grid.Row="1"
+                                 Text="Add, edit, or remove holiday dates and times. Each holiday will be created with the specified date and time."
+                                 Classes="body2"
+                                 TextWrapping="Wrap"
+                                 Margin="0,0,0,8"/>
+
+                        <TextBlock Grid.Row="2"
+                                 Text="If no time is selected, 00:00 will be used by default."
+                                 Classes="caption"
+                                 Opacity="0.7"
+                                 Margin="0,0,0,16"/>
+                        
+                        <!-- Holiday List - Scrollable with proper constraints -->
+                        <ScrollViewer Grid.Row="3"
+                                    VerticalScrollBarVisibility="Auto"
+                                    HorizontalScrollBarVisibility="Disabled"
+                                    Margin="0,0,0,16">
+                            <ItemsControl ItemsSource="{Binding Variables.HolidaySeries}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderThickness="0,0,0,1"
+                                                Padding="0,8">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <StackPanel Grid.Column="0">
+                                                    <TextBlock Text="{Binding DisplayText}"
+                                                             Classes="subtitle2"/>
+                                                    <TextBlock Text="{Binding Name, StringFormat='Holiday: {0}'}"
+                                                             Classes="caption"
+                                                             Opacity="0.7"
+                                                             IsVisible="{Binding Name, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                </StackPanel>
+                                                
+                                                <Button Grid.Column="1"
+                                                        Classes="icon"
+                                                        Command="{Binding DataContext.EditHolidayCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Margin="8,0">
+                                                    <materialIcons:MaterialIcon Kind="Edit"/>
+                                                </Button>
+                                                
+                                                <Button Grid.Column="2"
+                                                        Classes="icon"
+                                                        Command="{Binding DataContext.RemoveHolidayCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                        CommandParameter="{Binding}"
+                                                        Margin="8,0">
+                                                    <materialIcons:MaterialIcon Kind="Delete"/>
+                                                </Button>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        
+                        <!-- Add Holiday and Delete All Buttons -->
+                        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,0,0,16">
+                            <Button Classes="raised"
+                                    Command="{Binding AddHolidayCommand}"
+                                    Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialIcons:MaterialIcon Kind="Plus" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Add Holiday"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Classes="raised"
+                                    Command="{Binding DeleteAllHolidaysCommand}"
+                                    Background="{DynamicResource MaterialDesignValidationErrorBrush}"
+                                    Foreground="White">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialIcons:MaterialIcon Kind="DeleteSweep" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Delete All"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        
+                        <!-- Use Predefined Sets Button -->
+                        <Button Grid.Row="5"
+                                Classes="raised"
+                                Command="{Binding OpenPredefinedHolidaysWizardCommand}"
+                                HorizontalAlignment="Left"
+                                Margin="0,0,0,16">
+                            <StackPanel Orientation="Horizontal">
+                                <materialIcons:MaterialIcon Kind="PlaylistPlus" Margin="0,0,8,0"/>
+                                <TextBlock Text="Use Predefined Sets…"/>
+                            </StackPanel>
+                        </Button>
+                        
+                        <!-- Action Buttons -->
+                        <StackPanel Grid.Row="6"
+                                  Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Classes="flat"
+                                    Command="{Binding CancelHolidaySeriesManagerCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Classes="raised"
+                                    Command="{Binding SaveHolidaySeriesCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialIcons:MaterialIcon Kind="Check" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Save Series"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </material:Card>
+            </Grid>
+        </Border>
+        
+        <!-- Edit Holiday Dialog - Border overlay -->
+        <Border IsVisible="{Binding ShowEditHolidayDialog}"
+                Background="#80000000"
+                ZIndex="1000"
+                PointerPressed="EditHolidayBackdrop_PointerPressed">
+            <Border.Styles>
+                <Style Selector="Border">
+                    <Style.Animations>
+                        <Animation Duration="0:0:0.2">
+                            <KeyFrame Cue="0%">
+                                <Setter Property="Opacity" Value="0"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="100%">
+                                <Setter Property="Opacity" Value="1"/>
+                            </KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+            </Border.Styles>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+                  PointerPressed="EditHolidayCard_PointerPressed">
+                <material:Card Padding="16" MinWidth="400" Margin="16">
+                    <StackPanel>
+                        <TextBlock Text="Edit Holiday"
+                                 Classes="headline6"
+                                 Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="Holiday Date:"
+                                 Classes="subtitle2"
+                                 Margin="0,0,0,8"/>
+                        <DatePicker SelectedDate="{Binding DialogHolidayDate, TargetNullValue={x:Static sys:DateTime.Today}}"
+                                  Classes="outlined"
+                                  Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="Holiday Time:"
+                                 Classes="subtitle2"
+                                 Margin="0,0,0,8"/>
+                        <ComboBox ItemsSource="{Binding TimeOptions}"
+                                 SelectedItem="{Binding SelectedEditHolidayTime, Mode=TwoWay}"
+                                 Classes="outlined"
+                                 Margin="0,0,0,16">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding StringFormat='{}{0:hh\\:mm}'}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        
+                        <StackPanel Orientation="Horizontal" 
+                                  HorizontalAlignment="Right">
+                            <Button Classes="flat"
+                                    Command="{Binding CancelEditHolidayCommand}"
+                                    Margin="0,0,8,0">
+                                <TextBlock Text="Cancel"/>
+                            </Button>
+                            <Button Classes="raised"
+                                    Command="{Binding SaveEditHolidayCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialIcons:MaterialIcon Kind="Check" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Save"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </material:Card>
+            </Grid>
+        </Border>
+
+        <!-- Predefined Holidays Wizard Dialog - Border overlay -->
+        <Border IsVisible="{Binding ShowPredefinedHolidaysWizard}"
+                Background="#80000000"
+                ZIndex="1000"
+                PointerPressed="PredefinedHolidaysWizardBackdrop_PointerPressed">
+            <Border.Styles>
+                <Style Selector="Border">
+                    <Style.Animations>
+                        <Animation Duration="0:0:0.2">
+                            <KeyFrame Cue="0%">
+                                <Setter Property="Opacity" Value="0"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="100%">
+                                <Setter Property="Opacity" Value="1"/>
+                            </KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+            </Border.Styles>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+                  PointerPressed="PredefinedHolidaysWizardCard_PointerPressed">
+                <material:Card Padding="16" MinWidth="500" MaxWidth="700" Margin="16">
+                    <StackPanel>
+                        <TextBlock Text="Predefined Holiday Sets"
+                                   Classes="headline6"
+                                   Margin="0,0,0,16"/>
+
+                    <StackPanel Spacing="8">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Country" Classes="subtitle2"/>
+                            <ComboBox ItemsSource="{Binding Countries}"
+                                      SelectedItem="{Binding SelectedCountry}"
+                                      Classes="outlined"/>
+                        </StackPanel>
+
+                        <StackPanel IsVisible="{Binding IsSwitzerlandSelected, Converter={StaticResource BooleanToVisibilityConverter}}" Spacing="8">
+                            <StackPanel Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <TextBlock Text="Canton" Classes="subtitle2" VerticalAlignment="Center"/>
+                                    <Button Classes="icon"
+                                            Command="{Binding ShowAargauInfoCommand}"
+                                            IsVisible="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            ToolTip.Tip="Aargau Holiday Reference Information">
+                                        <materialIcons:MaterialIcon Kind="Information" Foreground="#FFD700"/>
+                                    </Button>
+                                    <!-- Animated arrow pointing to info button -->
+                                    <StackPanel Orientation="Horizontal" 
+                                                IsVisible="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                Spacing="4"
+                                                VerticalAlignment="Center">
+                                        <materialIcons:MaterialIcon Kind="ArrowLeft" 
+                                                                     Foreground="#FFD700" 
+                                                                     Width="16" 
+                                                                     Height="16"
+                                                                     VerticalAlignment="Center"/>
+                                        <TextBlock Text="Click for reference" 
+                                                   Classes="body2"
+                                                   Foreground="#FFD700"
+                                                   Opacity="0.9"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <ComboBox ItemsSource="{Binding Cantons}"
+                                          SelectedItem="{Binding SelectedCanton}"
+                                          Classes="outlined"/>
+                            </StackPanel>
+
+                            <StackPanel IsVisible="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}" Spacing="4">
+                                <TextBlock Text="Bezirk" Classes="subtitle2"/>
+                                <ComboBox ItemsSource="{Binding Bezirke}"
+                                          SelectedItem="{Binding SelectedBezirk}"
+                                          Classes="outlined"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Year" Classes="subtitle2"/>
+                            <ComboBox ItemsSource="{Binding Years}"
+                                      SelectedItem="{Binding SelectedYear}"
+                                      Classes="outlined"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+                        <Button Classes="flat"
+                                Command="{Binding CancelPredefinedHolidaysWizardCommand}"
+                                Margin="0,0,8,0">
+                            <TextBlock Text="Cancel"/>
+                        </Button>
+                        <Button Classes="raised"
+                                Command="{Binding ApplyPredefinedHolidaysCommand}"
+                                IsEnabled="{Binding CanApplyPredefinedSelection}">
+                            <StackPanel Orientation="Horizontal">
+                                <materialIcons:MaterialIcon Kind="Check" Margin="0,0,8,0"/>
+                                <TextBlock Text="Add Holidays"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+                </material:Card>
+            </Grid>
+        </Border>
+
+        <!-- Aargau Info Dialog - Border overlay -->
+        <Border IsVisible="{Binding ShowAargauInfoDialog}"
+                Background="#80000000"
+                ZIndex="1000"
+                PointerPressed="AargauInfoBackdrop_PointerPressed">
+            <Border.Styles>
+                <Style Selector="Border">
+                    <Style.Animations>
+                        <Animation Duration="0:0:0.2">
+                            <KeyFrame Cue="0%">
+                                <Setter Property="Opacity" Value="0"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="100%">
+                                <Setter Property="Opacity" Value="1"/>
+                            </KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+            </Border.Styles>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+                  PointerPressed="AargauInfoCard_PointerPressed">
+                <material:Card Padding="16" MinWidth="600" MaxWidth="800" Margin="16">
+                    <StackPanel>
+                        <TextBlock Text="Aargau Holiday Reference"
+                                   Classes="headline6"
+                                   Margin="0,0,0,16"/>
+
+                        <TextBlock Text="Use this as a reference image because the holidays in Aargau can vary yearly. Please look up the official page of the DEPARTEMENT VOLKSWIRTSCHAFT UND INNERES, Amt für Wirtschaft und Arbeit of Kanton Aargau to get the newest list."
+                                   Classes="body2"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,16"/>
+
+                        <Border BorderThickness="1"
+                                CornerRadius="4"
+                                Margin="0,0,0,16">
+                            <Image Source="avares://teams-phonemanager/Resources/AargauHolidaysReference.png"
+                                   Stretch="Uniform"
+                                   MaxHeight="400"/>
+                        </Border>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Classes="raised"
+                                    Command="{Binding CloseAargauInfoCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialIcons:MaterialIcon Kind="Check" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Close"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </material:Card>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

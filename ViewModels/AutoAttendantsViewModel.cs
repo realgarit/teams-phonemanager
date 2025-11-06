@@ -1,14 +1,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Windows;
+
 using teams_phonemanager.Services;
 using teams_phonemanager.Models;
 using System;
 using System.Threading.Tasks;
-using System.Windows.Input;
+using Avalonia.Input;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Windows.Data;
+
 
 namespace teams_phonemanager.ViewModels
 {
@@ -76,23 +76,23 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private string _m365GroupId = string.Empty;
 
-        public ICollectionView ResourceAccountsView { get; }
-        public ICollectionView AutoAttendantsView { get; }
+        public ObservableCollection<ResourceAccount> ResourceAccountsView => new ObservableCollection<ResourceAccount>(
+            ResourceAccounts.Where(FilterResourceAccount)
+        );
+        public ObservableCollection<AutoAttendant> AutoAttendantsView => new ObservableCollection<AutoAttendant>(
+            AutoAttendants.Where(FilterAutoAttendant)
+        );
 
         public AutoAttendantsViewModel()
         {
-            _mainWindowViewModel = Application.Current.MainWindow.DataContext as MainWindowViewModel;
+            _mainWindowViewModel = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow?.DataContext as MainWindowViewModel
+                : null;
 
             _loggingService.Log("Auto Attendants page loaded", LogLevel.Info);
 
-            ResourceAccountsView = CollectionViewSource.GetDefaultView(ResourceAccounts);
-            ResourceAccountsView.Filter = FilterResourceAccount;
-
-            AutoAttendantsView = CollectionViewSource.GetDefaultView(AutoAttendants);
-            AutoAttendantsView.Filter = FilterAutoAttendant;
-
-            ResourceAccounts.CollectionChanged += (s, e) => ResourceAccountsView.Refresh();
-            AutoAttendants.CollectionChanged += (s, e) => AutoAttendantsView.Refresh();
+            ResourceAccounts.CollectionChanged += (s, e) => OnPropertyChanged(nameof(ResourceAccountsView));
+            AutoAttendants.CollectionChanged += (s, e) => OnPropertyChanged(nameof(AutoAttendantsView));
         }
 
         [RelayCommand]
@@ -847,7 +847,7 @@ namespace teams_phonemanager.ViewModels
                     }
                 }
             }
-            ResourceAccountsView.Refresh();
+            OnPropertyChanged(nameof(ResourceAccountsView));
         }
 
         private void ParseAutoAttendantsFromResult(string result)
@@ -871,7 +871,7 @@ namespace teams_phonemanager.ViewModels
                     }
                 }
             }
-            AutoAttendantsView.Refresh();
+            OnPropertyChanged(nameof(AutoAttendantsView));
         }
 
         private bool FilterResourceAccount(object obj)
@@ -906,12 +906,12 @@ namespace teams_phonemanager.ViewModels
 
         partial void OnSearchResourceAccountsTextChanged(string value)
         {
-            ResourceAccountsView.Refresh();
+            OnPropertyChanged(nameof(ResourceAccountsView));
         }
 
         partial void OnSearchAutoAttendantsTextChanged(string value)
         {
-            AutoAttendantsView.Refresh();
+            OnPropertyChanged(nameof(AutoAttendantsView));
         }
     }
 } 
