@@ -254,14 +254,28 @@
             </Grid>
         </material:ColorZone>
 
-        <!-- Log Viewer Dialog -->
-        <Popup IsOpen="{Binding IsLogDialogOpen}"
-               Placement="Center"
-               PlacementTarget="#MainGrid"
-               HorizontalOffset="0"
-               VerticalOffset="0"
-               OverlayDismissEventPassThrough="True">
-            <Popup.Child>
+        <!-- Log Viewer Dialog - Border overlay -->
+        <Border Grid.RowSpan="3"
+                IsVisible="{Binding IsLogDialogOpen}"
+                Background="#80000000"
+                ZIndex="1000"
+                PointerPressed="LogDialogBackdrop_PointerPressed">
+            <Border.Styles>
+                <Style Selector="Border">
+                    <Style.Animations>
+                        <Animation Duration="0:0:0.2">
+                            <KeyFrame Cue="0%">
+                                <Setter Property="Opacity" Value="0"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="100%">
+                                <Setter Property="Opacity" Value="1"/>
+                            </KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+            </Border.Styles>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+                  PointerPressed="LogDialogCard_PointerPressed">
                 <material:Card Padding="0" Margin="16" MaxWidth="1000" MaxHeight="600">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -331,8 +345,8 @@
                         </StackPanel>
                     </Grid>
                 </material:Card>
-            </Popup.Child>
-        </Popup>
+            </Grid>
+        </Border>
 
         <!-- Settings Side Panel -->
         <!-- Overlay backdrop -->

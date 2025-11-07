@@ -90,6 +90,76 @@ namespace teams_phonemanager.Models
         [ObservableProperty]
         private ObservableCollection<HolidayEntry> _holidaySeries = new ObservableCollection<HolidayEntry>();
 
+        // Call Queue Configuration Properties
+        [ObservableProperty]
+        private string? _cqGreetingType; // "None", "AudioFile", "TextToSpeech"
+
+        [ObservableProperty]
+        private string? _cqGreetingAudioFileId;
+
+        [ObservableProperty]
+        private string? _cqGreetingTextToSpeechPrompt;
+
+        [ObservableProperty]
+        private string? _cqMusicOnHoldType; // "Default", "AudioFile"
+
+        [ObservableProperty]
+        private string? _cqMusicOnHoldAudioFileId;
+
+        [ObservableProperty]
+        private int? _cqOverflowThreshold;
+
+        [ObservableProperty]
+        private string? _cqOverflowAction; // "Disconnect", "TransferToTarget", "TransferToVoicemail"
+
+        [ObservableProperty]
+        private string? _cqOverflowActionTarget;
+
+        [ObservableProperty]
+        private string? _cqOverflowActionAudioFileId;
+
+        [ObservableProperty]
+        private string? _cqOverflowActionTextToSpeechPrompt;
+
+        [ObservableProperty]
+        private string? _cqOverflowDisconnectAction; // "None", "AudioFile", "TextToSpeech" - for UI only, determines what to show
+
+        [ObservableProperty]
+        private int? _cqTimeoutThreshold;
+
+        [ObservableProperty]
+        private string? _cqTimeoutAction; // "Disconnect", "TransferToTarget", "TransferToVoicemail"
+
+        [ObservableProperty]
+        private string? _cqTimeoutActionTarget;
+
+        [ObservableProperty]
+        private string? _cqTimeoutActionAudioFileId;
+
+        [ObservableProperty]
+        private string? _cqTimeoutActionTextToSpeechPrompt;
+
+        [ObservableProperty]
+        private string? _cqTimeoutDisconnectAction; // "None", "AudioFile", "TextToSpeech" - for UI only, determines what to show
+
+        [ObservableProperty]
+        private string? _cqNoAgentAction; // "QueueCall", "Disconnect", "TransferToTarget", "TransferToVoicemail"
+
+        [ObservableProperty]
+        private string? _cqNoAgentActionTarget;
+
+        [ObservableProperty]
+        private string? _cqNoAgentActionAudioFileId;
+
+        [ObservableProperty]
+        private string? _cqNoAgentActionTextToSpeechPrompt;
+
+        [ObservableProperty]
+        private string? _cqNoAgentDisconnectAction; // "None", "AudioFile", "TextToSpeech" - for UI only, determines what to show
+
+        [ObservableProperty]
+        private bool _cqNoAgentApplyToNewCallsOnly;
+
         public string M365Group => $"ttgrp-{Customer}-{CustomerGroupName}";
         public string RacqUPN => $"racq-{Customer}-{CustomerGroupName}{MsFallbackDomain}";
         public string RacqDisplayName => $"racq-{Customer}-{CustomerGroupName}";
@@ -183,6 +253,23 @@ namespace teams_phonemanager.Models
         partial void OnOpeningHours2EndChanged(TimeSpan value)
         {
             OnPropertyChanged();
+        }
+
+        partial void OnM365GroupIdChanged(string value)
+        {
+            // Prefill target fields if they are empty
+            if (string.IsNullOrWhiteSpace(CqOverflowActionTarget) && !string.IsNullOrWhiteSpace(value))
+            {
+                CqOverflowActionTarget = value;
+            }
+            if (string.IsNullOrWhiteSpace(CqTimeoutActionTarget) && !string.IsNullOrWhiteSpace(value))
+            {
+                CqTimeoutActionTarget = value;
+            }
+            if (string.IsNullOrWhiteSpace(CqNoAgentActionTarget) && !string.IsNullOrWhiteSpace(value))
+            {
+                CqNoAgentActionTarget = value;
+            }
         }
     }
 } 

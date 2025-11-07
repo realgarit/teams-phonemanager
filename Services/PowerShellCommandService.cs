@@ -185,6 +185,8 @@ catch {{
 
         public string GetCreateCallQueueCommand(PhoneManagerVariables variables)
         {
+            var callQueueParams = BuildCallQueueParameters(variables);
+            
             return $@"
 New-CsOnlineApplicationInstance -UserPrincipalName {variables.RacqUPN} -ApplicationId {variables.CsAppCqId} -DisplayName {variables.RacqDisplayName}
 
@@ -203,11 +205,7 @@ New-CsCallQueue `
 -AgentAlertTime " + ConstantsService.CallQueue.AgentAlertTime + @" `
 -LanguageId {variables.LanguageId} `
 -DistributionLists $global:m365groupId `
--OverflowThreshold " + ConstantsService.CallQueue.OverflowThreshold + @" `
--OverflowAction Disconnect `
--TimeoutThreshold " + ConstantsService.CallQueue.TimeoutThreshold + @" `
--TimeoutAction Disconnect `
--UseDefaultMusicOnHold $true `
+{callQueueParams}
 -PresenceBasedRouting $false
 
 Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
@@ -217,6 +215,146 @@ $cqapplicationInstanceId = (Get-CsOnlineUser {variables.RacqUPN}).Identity
 $cqautoAttendantId = (Get-CsCallQueue -NameFilter {variables.CqDisplayName}).Identity
 New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceId) -ConfigurationId $cqautoAttendantId -ConfigurationType CallQueue";
         }
+
+        private string BuildCallQueueParameters(PhoneManagerVariables variables)
+        {
+            var parameters = new System.Text.StringBuilder();
+
+            // Greeting
+            if (variables.CqGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqGreetingAudioFileId))
+            {
+                parameters.AppendLine($"-WelcomeMusicAudioFileId {variables.CqGreetingAudioFileId} `");
+            }
+            else if (variables.CqGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqGreetingTextToSpeechPrompt))
+            {
+                parameters.AppendLine($"-WelcomeTextToSpeechPrompt \"{variables.CqGreetingTextToSpeechPrompt}\" `");
+            }
+            // If None or not set, omit greeting parameters (Teams defaults to no greeting)
+
+            // Music on Hold
+            if (variables.CqMusicOnHoldType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqMusicOnHoldAudioFileId))
+            {
+                parameters.AppendLine($"-MusicOnHoldAudioFileId {variables.CqMusicOnHoldAudioFileId} `");
+                parameters.AppendLine($"-UseDefaultMusicOnHold $false `");
+            }
+            else
+            {
+                // Default behavior
+                parameters.AppendLine($"-UseDefaultMusicOnHold $true `");
+            }
+
+            // Overflow
+            var overflowThreshold = variables.CqOverflowThreshold ?? ConstantsService.CallQueue.OverflowThreshold;
+            parameters.AppendLine($"-OverflowThreshold {overflowThreshold} `");
+            
+            if (!string.IsNullOrWhiteSpace(variables.CqOverflowAction))
+            {
+                if (variables.CqOverflowAction == "Disconnect")
+                {
+                    parameters.AppendLine($"-OverflowAction Disconnect `");
+                    // Note: Disconnect with audio/text prompts must be set via Set-CsCallQueue after creation
+                }
+                else if (variables.CqOverflowAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTarget))
+                {
+                    parameters.AppendLine($"-OverflowAction TransferToTarget `");
+                    parameters.AppendLine($"-OverflowActionTarget {variables.CqOverflowActionTarget} `");
+                }
+                else if (variables.CqOverflowAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTarget))
+                {
+                    parameters.AppendLine($"-OverflowAction TransferToVoicemail `");
+                    parameters.AppendLine($"-OverflowActionTarget {variables.CqOverflowActionTarget} `");
+                }
+            }
+            else
+            {
+                // Default behavior
+                parameters.AppendLine($"-OverflowAction Disconnect `");
+            }
+
+            // Timeout
+            var timeoutThreshold = variables.CqTimeoutThreshold ?? ConstantsService.CallQueue.TimeoutThreshold;
+            if (timeoutThreshold < ConstantsService.CallQueue.MinTimeoutThreshold)
+            {
+                timeoutThreshold = ConstantsService.CallQueue.MinTimeoutThreshold;
+            }
+            parameters.AppendLine($"-TimeoutThreshold {timeoutThreshold} `");
+            
+            if (!string.IsNullOrWhiteSpace(variables.CqTimeoutAction))
+            {
+                if (variables.CqTimeoutAction == "Disconnect")
+                {
+                    parameters.AppendLine($"-TimeoutAction Disconnect `");
+                    // Note: Disconnect with audio/text prompts must be set via Set-CsCallQueue after creation
+                }
+                else if (variables.CqTimeoutAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTarget))
+                {
+                    parameters.AppendLine($"-TimeoutAction TransferToTarget `");
+                    parameters.AppendLine($"-TimeoutActionTarget {variables.CqTimeoutActionTarget} `");
+                }
+                else if (variables.CqTimeoutAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTarget))
+                {
+                    parameters.AppendLine($"-TimeoutAction TransferToVoicemail `");
+                    parameters.AppendLine($"-TimeoutActionTarget {variables.CqTimeoutActionTarget} `");
+                }
+            }
+            else
+            {
+                // Default behavior
+                parameters.AppendLine($"-TimeoutAction Disconnect `");
+            }
+
+            // No Agent
+            if (!string.IsNullOrWhiteSpace(variables.CqNoAgentAction))
+            {
+                if (variables.CqNoAgentAction == "QueueCall")
+                {
+                    parameters.AppendLine($"-NoAgentAction Queue `");
+                }
+                else if (variables.CqNoAgentAction == "Disconnect")
+                {
+                    parameters.AppendLine($"-NoAgentAction Disconnect `");
+                    // Note: Disconnect with audio/text prompts must be set via Set-CsCallQueue after creation
+                }
+                else if (variables.CqNoAgentAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTarget))
+                {
+                    parameters.AppendLine($"-NoAgentAction Forward `");
+                    parameters.AppendLine($"-NoAgentActionTarget {variables.CqNoAgentActionTarget} `");
+                }
+                else if (variables.CqNoAgentAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTarget))
+                {
+                    parameters.AppendLine($"-NoAgentAction Voicemail `");
+                    parameters.AppendLine($"-NoAgentActionTarget {variables.CqNoAgentActionTarget} `");
+                }
+
+                // NoAgentApplyTo: NewCalls (only new calls) or AllCalls (all calls in queue)
+                if (variables.CqNoAgentApplyToNewCallsOnly)
+                {
+                    parameters.AppendLine($"-NoAgentApplyTo NewCalls `");
+                }
+                else
+                {
+                    // Default is AllCalls, but we can explicitly set it for clarity
+                    parameters.AppendLine($"-NoAgentApplyTo AllCalls `");
+                }
+            }
+            // If not set, omit NoAgentAction parameter (Teams will use default)
+
+            // Return the parameters string - each line should end with backtick and newline
+            // Only remove the final trailing backtick and whitespace from the very end
+            var result = parameters.ToString();
+            if (result.EndsWith("`"))
+            {
+                // Remove trailing backtick and any whitespace after it
+                result = result.TrimEnd('`', ' ', '\r', '\n');
+            }
+            else
+            {
+                // Just trim trailing whitespace
+                result = result.TrimEnd();
+            }
+            return result;
+        }
+
 
         public string GetCreateAutoAttendantCommand(PhoneManagerVariables variables)
         {
@@ -431,8 +569,10 @@ catch {{
 }}";
         }
 
-        public string GetCreateCallQueueCommand(string name, string languageId, string m365GroupId)
+        public string GetCreateCallQueueCommand(string name, string languageId, string m365GroupId, PhoneManagerVariables? variables = null)
         {
+            var callQueueParams = variables != null ? BuildCallQueueParameters(variables) : BuildDefaultCallQueueParameters();
+            
             return $@"
 try {{
     New-CsCallQueue `
@@ -443,17 +583,58 @@ try {{
     -AgentAlertTime 30 `
     -LanguageId {languageId} `
     -DistributionLists {m365GroupId} `
-    -OverflowThreshold 15 `
-    -OverflowAction Disconnect `
-    -TimeoutThreshold 30 `
-    -TimeoutAction Disconnect `
-    -UseDefaultMusicOnHold $true `
+    {callQueueParams}
     -PresenceBasedRouting $false
     
     Write-Host ""SUCCESS: Call queue {name} created successfully""
 }}
 catch {{
     Write-Host ""ERROR: Failed to create call queue {name}: $_""
+}}";
+        }
+
+        private string BuildDefaultCallQueueParameters()
+        {
+            return $@"-OverflowThreshold " + ConstantsService.CallQueue.OverflowThreshold + @" `
+-OverflowAction Disconnect `
+-TimeoutThreshold " + ConstantsService.CallQueue.TimeoutThreshold + @" `
+-TimeoutAction Disconnect `
+-UseDefaultMusicOnHold $true `";
+        }
+
+        public string GetImportAudioFileCommand(string filePath)
+        {
+            // Escape single quotes for PowerShell (use single quotes to avoid issues with spaces and special chars)
+            var escapedPath = filePath.Replace("'", "''");
+            // Extract just the filename from the path
+            var fileName = System.IO.Path.GetFileName(filePath).Replace("'", "''");
+            
+            return $@"
+try {{
+    # Read the audio file content as bytes (compatible with both PowerShell 5.x and 6+)
+    $fileContent = $null
+    if ($PSVersionTable.PSVersion.Major -ge 6) {{
+        $fileContent = Get-Content -Path '{escapedPath}' -AsByteStream -ReadCount 0
+    }} else {{
+        $fileContent = Get-Content -Path '{escapedPath}' -Encoding Byte -ReadCount 0
+    }}
+    
+    if (-not $fileContent) {{
+        Write-Host ""ERROR: Failed to read audio file content""
+        exit
+    }}
+    
+    # Import the audio file (using HuntGroup ApplicationId for Call Queues)
+    $audioFile = Import-CsOnlineAudioFile -ApplicationId HuntGroup -FileName '{fileName}' -Content $fileContent
+    if ($audioFile) {{
+        Write-Host ""SUCCESS: Audio file imported successfully""
+        Write-Host ""AUDIOFILEID: $($audioFile.Id)""
+    }} else {{
+        Write-Host ""ERROR: Failed to import audio file - no result returned""
+    }}
+}}
+catch {{
+    Write-Host ""ERROR: Failed to import audio file: $_""
 }}";
         }
 

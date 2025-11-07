@@ -5,7 +5,7 @@
   },
   "projects": {
     "/Users/realgar/Git/teams-phonemanager/teams-phonemanager.csproj": {
-      "version": "3.0.0",
+      "version": "3.1.0",
       "restore": {
         "projectUniqueName": "/Users/realgar/Git/teams-phonemanager/teams-phonemanager.csproj",
         "projectName": "teams-phonemanager",
@@ -99,23 +99,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.NETCore.App.Host.win-x64",
-              "version": "[8.0.21, 8.0.21]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
           "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.415/PortableRuntimeIdentifierGraph.json"
-        }
-      },
-      "runtimes": {
-        "win-x64": {
-          "#import": []
         }
       }
     }

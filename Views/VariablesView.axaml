@@ -123,16 +123,10 @@
                     <!-- Call Queues Tab -->
                     <TabItem Header="Call Queues">
                         <ScrollViewer Margin="8">
-                            <Grid IsEnabled="{Binding CanProceed}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-
-                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,8,4,8">
+                            <StackPanel IsEnabled="{Binding CanProceed}" Spacing="16">
+                                
+                                <!-- Application ID (Read-only) -->
+                                <StackPanel Margin="0,0,0,8">
                                     <Grid>
                                         <TextBox 
                                                  Text="{Binding Variables.CsAppCqId}"
@@ -144,7 +138,18 @@
                                                                Margin="0,0,8,0"/>
                                     </Grid>
                                 </StackPanel>
-                            </Grid>
+
+                                <!-- Call Queue Configuration Button -->
+                                <Button Classes="raised"
+                                        Command="{Binding OpenCallQueueConfigurationDialogCommand}"
+                                        HorizontalAlignment="Left">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialIcons:MaterialIcon Kind="Plus" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Configure Call Queue Settings"/>
+                                    </StackPanel>
+                                </Button>
+
+                            </StackPanel>
                         </ScrollViewer>
                     </TabItem>
 
@@ -879,6 +884,221 @@
                             </Button>
                         </StackPanel>
                     </StackPanel>
+                </material:Card>
+            </Grid>
+        </Border>
+
+        <!-- Call Queue Configuration Dialog - Border overlay -->
+        <Border IsVisible="{Binding ShowCallQueueConfigurationDialog}"
+                Background="#80000000"
+                ZIndex="1000"
+                PointerPressed="CallQueueConfigurationBackdrop_PointerPressed">
+            <Border.Styles>
+                <Style Selector="Border">
+                    <Style.Animations>
+                        <Animation Duration="0:0:0.2">
+                            <KeyFrame Cue="0%">
+                                <Setter Property="Opacity" Value="0"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="100%">
+                                <Setter Property="Opacity" Value="1"/>
+                            </KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+            </Border.Styles>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+                  PointerPressed="CallQueueConfigurationCard_PointerPressed">
+                <material:Card Padding="32"
+                        MinWidth="800"
+                        MaxWidth="1000"
+                        MaxHeight="900"
+                        Margin="16">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0">
+                        <StackPanel Spacing="24" Margin="0">
+                            <TextBlock Text="Call Queue Configuration"
+                                     Classes="headline6"
+                                     Margin="0,0,0,8"/>
+                            
+                            <!-- Greeting and Music Section -->
+                            <StackPanel Spacing="24">
+                                <TextBlock Text="Greeting and Music" Classes="subtitle1"/>
+                                
+                                <StackPanel Spacing="16">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Greeting" Classes="subtitle2"/>
+                                        <ComboBox ItemsSource="{Binding GreetingTypeOptions}"
+                                                  SelectedItem="{Binding Variables.CqGreetingType}"
+                                                  Classes="outlined"
+                                                  HorizontalAlignment="Left"
+                                                  Width="200"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel IsVisible="{Binding ShowGreetingAudioFile}" Spacing="8">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <StackPanel Spacing="4" HorizontalAlignment="Stretch">
+                                                <TextBlock Text="Audio File" Classes="subtitle2"/>
+                                                <TextBox Text="{Binding Variables.CqGreetingAudioFileId}"
+                                                         Classes="outlined"
+                                                         Watermark="No file selected"
+                                                         IsReadOnly="True"
+                                                         HorizontalAlignment="Stretch"/>
+                                            </StackPanel>
+                                            <Button Classes="raised"
+                                                    Command="{Binding SelectGreetingAudioFileCommand}"
+                                                    Content="Select File"
+                                                    VerticalAlignment="Bottom"
+                                                    Height="56"/>
+                                        </StackPanel>
+                                        <TextBlock Text="Select a WAV file (max 5MB). It will be uploaded automatically." 
+                                                   FontSize="11" 
+                                                   Opacity="0.7"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel IsVisible="{Binding ShowGreetingTextToSpeech}" Spacing="4">
+                                        <TextBlock Text="Text to Speech Prompt" Classes="subtitle2"/>
+                                        <TextBox Text="{Binding Variables.CqGreetingTextToSpeechPrompt}"
+                                                 Classes="outlined"
+                                                 Watermark="Enter greeting message"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                
+                                <StackPanel Spacing="16">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Music on Hold" Classes="subtitle2"/>
+                                        <ComboBox ItemsSource="{Binding MusicOnHoldTypeOptions}"
+                                                  SelectedItem="{Binding Variables.CqMusicOnHoldType}"
+                                                  Classes="outlined"
+                                                  HorizontalAlignment="Left"
+                                                  Width="200"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel IsVisible="{Binding ShowMusicOnHoldAudioFile}" Spacing="8">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <StackPanel Spacing="4" HorizontalAlignment="Stretch">
+                                                <TextBlock Text="Audio File" Classes="subtitle2"/>
+                                                <TextBox Text="{Binding Variables.CqMusicOnHoldAudioFileId}"
+                                                         Classes="outlined"
+                                                         Watermark="No file selected"
+                                                         IsReadOnly="True"
+                                                         HorizontalAlignment="Stretch"/>
+                                            </StackPanel>
+                                            <Button Classes="raised"
+                                                    Command="{Binding SelectMusicOnHoldAudioFileCommand}"
+                                                    Content="Select File"
+                                                    VerticalAlignment="Bottom"
+                                                    Height="56"/>
+                                        </StackPanel>
+                                        <TextBlock Text="Select a WAV file (max 5MB). It will be uploaded automatically." 
+                                                   FontSize="11" 
+                                                   Opacity="0.7"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            
+                            <!-- Exception Handling Section -->
+                            <StackPanel Spacing="24">
+                                <TextBlock Text="Exception Handling" Classes="subtitle1"/>
+                                
+                                <!-- Call Overflow -->
+                                <StackPanel Spacing="16">
+                                    <TextBlock Text="Call Overflow" Classes="subtitle2"/>
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Maximum calls in queue" Classes="subtitle2"/>
+                                        <NumericUpDown Value="{Binding Variables.CqOverflowThreshold}"
+                                                      Minimum="1"
+                                                      Classes="outlined"
+                                                      HorizontalAlignment="Left"
+                                                      Width="200"/>
+                                    </StackPanel>
+                                    <TextBlock Text="When the maximum number of calls is reached" FontSize="11" Opacity="0.7"/>
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Action" Classes="subtitle2"/>
+                                        <ComboBox ItemsSource="{Binding OverflowActionOptions}"
+                                                  SelectedItem="{Binding Variables.CqOverflowAction}"
+                                                  Classes="outlined"
+                                                  HorizontalAlignment="Left"
+                                                  Width="200"/>
+                                    </StackPanel>
+                                    <StackPanel IsVisible="{Binding ShowOverflowTarget}" Spacing="4">
+                                        <TextBlock Text="Target" Classes="subtitle2"/>
+                                        <TextBox Text="{Binding Variables.CqOverflowActionTarget}"
+                                                 Classes="outlined"
+                                                 Watermark="Resource Account UPN or M365 Group ID"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                
+                                <!-- Call Timeout -->
+                                <StackPanel Spacing="16">
+                                    <TextBlock Text="Call Timeout" Classes="subtitle2"/>
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Maximum wait time (seconds, min 30)" Classes="subtitle2"/>
+                                        <NumericUpDown Value="{Binding Variables.CqTimeoutThreshold}"
+                                                      Minimum="30"
+                                                      Classes="outlined"
+                                                      HorizontalAlignment="Left"
+                                                      Width="250"/>
+                                    </StackPanel>
+                                    <TextBlock Text="When call times out" FontSize="11" Opacity="0.7"/>
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Action" Classes="subtitle2"/>
+                                        <ComboBox ItemsSource="{Binding TimeoutActionOptions}"
+                                                  SelectedItem="{Binding Variables.CqTimeoutAction}"
+                                                  Classes="outlined"
+                                                  HorizontalAlignment="Left"
+                                                  Width="200"/>
+                                    </StackPanel>
+                                    <StackPanel IsVisible="{Binding ShowTimeoutTarget}" Spacing="4">
+                                        <TextBlock Text="Target" Classes="subtitle2"/>
+                                        <TextBox Text="{Binding Variables.CqTimeoutActionTarget}"
+                                                 Classes="outlined"
+                                                 Watermark="Resource Account UPN or M365 Group ID"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                
+                                <!-- No Agents Available -->
+                                <StackPanel Spacing="16">
+                                    <TextBlock Text="No Agents Available" Classes="subtitle2"/>
+                                    <CheckBox Content="Apply settings only to new incoming calls"
+                                              IsChecked="{Binding Variables.CqNoAgentApplyToNewCallsOnly}"/>
+                                    <TextBlock Text="When no agents are available" FontSize="11" Opacity="0.7"/>
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Action" Classes="subtitle2"/>
+                                        <ComboBox ItemsSource="{Binding NoAgentActionOptions}"
+                                                  SelectedItem="{Binding Variables.CqNoAgentAction}"
+                                                  Classes="outlined"
+                                                  HorizontalAlignment="Left"
+                                                  Width="200"/>
+                                    </StackPanel>
+                                    <StackPanel IsVisible="{Binding ShowNoAgentTarget}" Spacing="4">
+                                        <TextBlock Text="Target" Classes="subtitle2"/>
+                                        <TextBox Text="{Binding Variables.CqNoAgentActionTarget}"
+                                                 Classes="outlined"
+                                                 Watermark="Resource Account UPN or M365 Group ID"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            
+                            <!-- Action Buttons -->
+                            <StackPanel Orientation="Horizontal" 
+                                      HorizontalAlignment="Right"
+                                      Margin="0,24,0,0"
+                                      Spacing="8">
+                                <Button Classes="flat"
+                                        Command="{Binding CancelCallQueueConfigurationCommand}"
+                                        Margin="0,0,8,0">
+                                    <TextBlock Text="Cancel"/>
+                                </Button>
+                                <Button Classes="raised"
+                                        Command="{Binding SaveCallQueueConfigurationCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialIcons:MaterialIcon Kind="Check" Margin="0,0,8,0"/>
+                                        <TextBlock Text="Save"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
                 </material:Card>
             </Grid>
         </Border>

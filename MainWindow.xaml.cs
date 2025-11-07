@@ -15,13 +15,19 @@ public partial class MainWindow : Window
         InitializeComponent();
     }
 
-    private void LogPopup_Opened(object? sender, EventArgs e)
+    private void LogDialogBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        // Scroll to end when dialog opens - use dispatcher to ensure it happens after rendering
-        Dispatcher.UIThread.Post(() =>
+        // Close dialog when clicking on backdrop
+        if (DataContext is ViewModels.MainWindowViewModel viewModel)
         {
-            ScrollLogToEnd();
-        }, DispatcherPriority.Loaded);
+            viewModel.CloseLogDialogCommand.Execute(null);
+        }
+    }
+
+    private void LogDialogCard_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        // Stop event propagation so clicking on card doesn't close the dialog
+        e.Handled = true;
     }
 
     private void ScrollLogToEnd()
