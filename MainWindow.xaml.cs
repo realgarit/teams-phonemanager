@@ -102,6 +102,17 @@ public partial class MainWindow : Window
         }
     }
 
+    private void NavigationListBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (sender is ListBox listBox && listBox.SelectedItem is ListBoxItem item && item.Tag is string page)
+        {
+            if (DataContext is ViewModels.MainWindowViewModel viewModel)
+            {
+                viewModel.NavigateToCommand.Execute(page);
+            }
+        }
+    }
+
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);

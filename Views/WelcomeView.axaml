@@ -19,7 +19,7 @@
             <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Padding" Value="16"/>
         </Style>
     </UserControl.Styles>
@@ -29,13 +29,12 @@
             <!-- Header Section -->
             <Border Classes="card" Margin="0,0,0,24">
                 <StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
-                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PeopleTeam}" FontSize="72" Margin="0,0,16,0"/>
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Teams Phone Manager"
-                                     FontSize="32"
-                                     FontWeight="Bold"/>
-                        </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16" VerticalAlignment="Center">
+                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PeopleTeam}" FontSize="72" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Teams Phone Manager"
+                                 FontSize="32"
+                                 FontWeight="Bold"
+                                 VerticalAlignment="Center"/>
                     </StackPanel>
                     
                     <TextBlock Text="Your complete solution for Microsoft Teams Phone"
@@ -99,7 +98,7 @@
                        Margin="0,0,12,16"
                        CornerRadius="8">
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
                             <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Settings}}" FontSize="32" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Setup &amp; Config"
                                      FontSize="18"
@@ -120,7 +119,7 @@
                        Margin="12,0,0,16"
                        CornerRadius="8">
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
                             <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Code}" FontSize="32" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Variables"
                                      FontSize="18"
@@ -141,7 +140,7 @@
                        Margin="0,0,12,16"
                        CornerRadius="8">
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
                             <fi:SymbolIcon Symbol="{x:Static fic:Symbol.People}}" FontSize="32" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="M365 Groups"
                                      FontSize="18"
@@ -162,7 +161,7 @@
                        Margin="12,0,0,16"
                        CornerRadius="8">
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
                             <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallInbound}}" FontSize="32" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Call Queues"
                                      FontSize="18"
@@ -184,7 +183,7 @@
                        Margin="0,0,8,0" 
                        CornerRadius="8">
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
                             <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Bot}}" FontSize="32" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Auto Attendants"
                                      FontSize="18"
@@ -206,7 +205,7 @@
                        Margin="12,0,0,0" 
                        CornerRadius="8">
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
                             <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Calendar}}" FontSize="32" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <TextBlock Text="Holidays"
                                      FontSize="18"
@@ -225,12 +224,13 @@
             <!-- Quick Start Section -->
             <Border Classes="card" Margin="0,24,0,0">
                 <StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Flash}}" FontSize="28" Margin="0,0,8,0"/>
-                        <TextBlock Text="Quick Start Guide"
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16" VerticalAlignment="Center">
+                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Flash}}" FontSize="28" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Quick Start Guide"
                                  FontSize="18"
-                                 FontWeight="Bold"/>
-                    </StackPanel>
+                                 FontWeight="Bold"
+                                 VerticalAlignment="Center"/>
+                        </StackPanel>
                     
                     <Grid>
                         <Grid.ColumnDefinitions>

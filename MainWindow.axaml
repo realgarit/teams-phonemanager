@@ -13,31 +13,20 @@
         x:Class="teams_phonemanager.MainWindow"
         Title="Teams Phone Manager" 
         Height="720" 
-        Width="1280"
-        FontWeight="Medium"
-        FontSize="14">
+        Width="1280">
 
     <Window.DataContext>
         <viewmodels:MainWindowViewModel/>
     </Window.DataContext>
 
     <Window.Styles>
-        <Style Selector="Border.card">
-            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="16"/>
-        </Style>
         <Style Selector="Border.header">
             <Setter Property="Background" Value="{DynamicResource TeamsPrimaryBrush}"/>
             <Setter Property="Padding" Value="16"/>
         </Style>
-        <Style Selector="Button.nav">
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
-            <Setter Property="Padding" Value="12,8"/>
-            <Setter Property="Margin" Value="0,4"/>
-            <Setter Property="Height" Value="48"/>
+        <Style Selector="fi|SymbolIcon">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,-2,0,0"/>
         </Style>
     </Window.Styles>
 
@@ -76,89 +65,83 @@
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar -->
-            <Border Grid.Column="0" Classes="card" Margin="16">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="0,8">
-                        <!-- Main Navigation Section -->
-                        <Button Classes="nav" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="Welcome">
-                            <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Home}" FontSize="20" Margin="0,0,12,0"/>
-                                <TextBlock Text="Welcome" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button Classes="nav" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="GetStarted">
-                            <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Play}" FontSize="20" Margin="0,0,12,0"/>
-                                <TextBlock Text="Get Started" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- Variables Section -->
-                        <Separator Margin="16,16,16,8"/>
-                        <TextBlock Text="VARIABLES" 
-                                 Margin="16,0,16,8" 
-                                 FontSize="12"
-                                 Opacity="0.7"/>
-
-                        <Button Classes="nav" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="Variables">
-                            <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Code}" FontSize="20" Margin="0,0,12,0"/>
-                                <TextBlock Text="Variables" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- Voice Configuration Section -->
-                        <Separator Margin="16,16,16,8"/>
-                        <TextBlock Text="VOICE CONFIGURATION" 
-                                 Margin="16,0,16,8" 
-                                 FontSize="12"
-                                 Opacity="0.7"/>
-
-                        <Button Classes="nav" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="M365Groups">
-                            <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.People}" FontSize="20" Margin="0,0,12,0"/>
-                                <TextBlock Text="M365 Groups" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button Classes="nav" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="CallQueues">
-                            <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Call}" FontSize="20" Margin="0,0,12,0"/>
-                                <TextBlock Text="Call Queues" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button Classes="nav" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="AutoAttendants">
-                            <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallInbound}" FontSize="20" Margin="0,0,12,0"/>
-                                <TextBlock Text="Auto Attendants" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button Classes="nav" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="Holidays">
-                            <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Calendar}" FontSize="20" Margin="0,0,12,0"/>
-                                <TextBlock Text="Holidays" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </ScrollViewer>
-            </Border>
+            <Grid Grid.Column="0" Margin="16,16,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <ListBox x:Name="NavigationListBox" Grid.Column="0" SelectionChanged="NavigationListBox_SelectionChanged">
+                    <ListBoxItem Tag="Welcome" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
+                                      Data="{StaticResource HomeIconPath}"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Welcome" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    
+                    <ListBoxItem Tag="GetStarted" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
+                                      Data="{StaticResource RocketIconPath}"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Get Started" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    
+                    <ListBoxItem Tag="Variables" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
+                                      Data="{StaticResource CodeIconPath}"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Variables" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    
+                    <ListBoxItem Tag="M365Groups" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
+                                      Data="{StaticResource PeopleTeamIconPath}"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="M365 Groups" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    
+                    <ListBoxItem Tag="CallQueues" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
+                                      Data="{StaticResource CallInboundIconPath}"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Call Queues" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    
+                    <ListBoxItem Tag="AutoAttendants" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
+                                      Data="{StaticResource BotIconPath}"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Auto Attendants" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    
+                    <ListBoxItem Tag="Holidays" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
+                                      Data="{StaticResource CalendarIconPath}"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Holidays" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                </ListBox>
+                
+                <Border Grid.Column="1" 
+                        Background="Gray"
+                        Width="2"
+                        Margin="8,0,0,0"
+                        Opacity="0.6"/>
+            </Grid>
 
             <!-- Content Area -->
             <Grid Grid.Column="1" Margin="16">
@@ -284,7 +267,11 @@
             </Border.Styles>
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                   PointerPressed="LogDialogCard_PointerPressed">
-                <Border Classes="card" Margin="16" MaxWidth="1000" MaxHeight="600" Padding="0">
+                <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                        BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Margin="16" MaxWidth="1000" MaxHeight="600" Padding="0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
