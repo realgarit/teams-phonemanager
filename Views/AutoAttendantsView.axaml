@@ -2,12 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:material="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:materialStyles="clr-namespace:Material.Styles;assembly=Material.Styles"
-             xmlns:materialAvalonia="clr-namespace:Material.Avalonia;assembly=Material.Avalonia"
-             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:fi="using:FluentIcons.Avalonia"
+             xmlns:fic="using:FluentIcons.Common"
              xmlns:local="clr-namespace:teams_phonemanager.Views"
              xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
+             xmlns:converters="clr-namespace:teams_phonemanager.Converters"
              x:Class="teams_phonemanager.Views.AutoAttendantsView"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -16,8 +15,29 @@
         <viewmodels:AutoAttendantsViewModel/>
     </UserControl.DataContext>
 
+    <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+        <Style Selector="Border.dialog">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+    </UserControl.Styles>
+
     <Grid>
-    <material:Card Margin="32" CornerRadius="8">
+    <Border Classes="card" Margin="32">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -34,7 +54,7 @@
                 <!-- Status Message -->
                 <StackPanel Grid.Row="0" Margin="0,0,0,16">
                     <TextBlock Text="{Binding StatusMessage}"
-                             Classes="body1"
+                             FontSize="14"
                              TextWrapping="Wrap"/>
                 </StackPanel>
 
@@ -59,30 +79,27 @@
                                 </Grid.ColumnDefinitions>
 
                                 <Button Grid.Column="0"
-                                        Classes="raised"
                                         Command="{Binding RetrieveResourceAccountsCommand}"
                                         Height="40"
                                         Margin="0,0,16,0">
                                     <StackPanel Orientation="Horizontal">
-                                        <materialIcons:MaterialIcon Kind="Refresh" Margin="0,0,8,0"/>
+                                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.ArrowSync}" FontSize="20" Margin="0,0,8,0"/>
                                         <TextBlock Text="Retrieve Accounts"/>
                                     </StackPanel>
                                 </Button>
 
                                 <Button Grid.Column="1"
-                                        Classes="raised"
                                         Command="{Binding OpenCreateResourceAccountDialogCommand}"
                                         Height="40"
                                         Margin="0,0,16,0">
                                     <StackPanel Orientation="Horizontal">
-                                        <materialIcons:MaterialIcon Kind="AccountPlus" Margin="0,0,8,0"/>
+                                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PersonAdd}" FontSize="20" Margin="0,0,8,0"/>
                                         <TextBlock Text="Create Account"/>
                                     </StackPanel>
                                 </Button>
 
                                 <TextBox Grid.Column="2"
                                          Text="{Binding SearchResourceAccountsText}"
-                                         Classes="outlined"
                                          Watermark="Search resource accounts..."/>
                             </Grid>
 
@@ -128,30 +145,27 @@
                                 </Grid.ColumnDefinitions>
 
                                 <Button Grid.Column="0"
-                                        Classes="raised"
                                         Command="{Binding RetrieveAutoAttendantsCommand}"
                                         Height="40"
                                         Margin="0,0,16,0">
                                     <StackPanel Orientation="Horizontal">
-                                        <materialIcons:MaterialIcon Kind="Refresh" Margin="0,0,8,0"/>
+                                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.ArrowSync}" FontSize="20" Margin="0,0,8,0"/>
                                         <TextBlock Text="Retrieve Auto Attendants"/>
                                     </StackPanel>
                                 </Button>
 
                                 <Button Grid.Column="1"
-                                        Classes="raised"
                                         Command="{Binding OpenCreateAutoAttendantDialogCommand}"
                                         Height="40"
                                         Margin="0,0,16,0">
                                     <StackPanel Orientation="Horizontal">
-                                        <materialIcons:MaterialIcon Kind="PhoneInTalk" Margin="0,0,8,0"/>
+                                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallInbound}" FontSize="20" Margin="0,0,8,0"/>
                                         <TextBlock Text="Create Auto Attendant"/>
                                     </StackPanel>
                                 </Button>
 
                                 <TextBox Grid.Column="2"
                                          Text="{Binding SearchAutoAttendantsText}"
-                                         Classes="outlined"
                                          Watermark="Search auto attendants..."/>
                             </Grid>
 
@@ -184,250 +198,251 @@
                         <ScrollViewer Margin="16">
                             <StackPanel>
                                 <TextBlock Text="Follow these steps in order to create a complete auto attendant setup:"
-                                         Classes="subtitle1"
+                                         FontSize="18"
+                                 FontWeight="SemiBold"
                                          Margin="0,0,0,24"/>
 
                                 <!-- Step 1: Create Resource Account -->
-                                <material:Card Margin="0,0,0,16" Padding="16">
+                                <Border Classes="card" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 1: Create Resource Account"
-                                                 Classes="subtitle1"
+                                                 FontSize="18"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Create a resource account for the auto attendant. This account will handle the auto attendant functionality."
-                                                 Classes="body2"
+                                                 FontSize="14"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Classes="raised"
+                                        <Button
                                                 Command="{Binding OpenCreateResourceAccountDialogCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialIcons:MaterialIcon Kind="AccountPlus" Margin="0,0,8,0"/>
+                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PersonAdd}" FontSize="20" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Create Resource Account"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </material:Card>
+                                </Border>
 
                                 <!-- Step 2: Update Usage Location -->
-                                <material:Card Margin="0,0,0,16" Padding="16">
+                                <Border Classes="card" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 2: Update Usage Location"
-                                                 Classes="subtitle1"
+                                                 FontSize="18"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Set the usage location for the resource account. This is required for licensing."
-                                                 Classes="body2"
+                                                 FontSize="14"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Classes="raised"
+                                        <Button
                                                 Command="{Binding OpenUpdateUsageLocationDialogCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialIcons:MaterialIcon Kind="MapMarker" Margin="0,0,8,0"/>
+                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Location}" FontSize="20" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Update Usage Location"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </material:Card>
+                                </Border>
 
                                 <!-- Step 3: Assign License -->
-                                <material:Card Margin="0,0,0,16" Padding="16">
+                                <Border Classes="card" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 3: Assign License"
-                                                 Classes="subtitle1"
+                                                 FontSize="18"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Assign a license to the resource account. This is required for the resource account to function properly."
-                                                 Classes="body2"
+                                                 FontSize="14"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Classes="raised"
+                                        <Button
                                                 Command="{Binding AssignLicenseCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialIcons:MaterialIcon Kind="Certificate" Margin="0,0,8,0"/>
+                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Certificate}" FontSize="20" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Assign License"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </material:Card>
+                                </Border>
 
                                 <!-- Step 4: Validate Call Queue Resource Account -->
-                                <material:Card Margin="0,0,0,16" Padding="16">
+                                <Border Classes="card" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 4: Validate Call Queue Resource Account"
-                                                 Classes="subtitle1"
+                                                 FontSize="18"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Validate that the Call Queue resource account exists and can be used as the call target for the auto attendant."
-                                                 Classes="body2"
+                                                 FontSize="14"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Classes="raised"
+                                        <Button
                                                 Command="{Binding OpenValidateCallQueueDialogCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialIcons:MaterialIcon Kind="AccountCheck" Margin="0,0,8,0"/>
+                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Person}" FontSize="20" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Validate Call Queue Account"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </material:Card>
+                                </Border>
 
                                 <!-- Step 5: Create Call Target -->
-                                <material:Card Margin="0,0,0,16" Padding="16">
+                                <Border Classes="card" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 5: Create Call Target"
-                                                 Classes="subtitle1"
+                                                 FontSize="18"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Create the callable entity that will be used as the call target for the auto attendant."
-                                                 Classes="body2"
+                                                 FontSize="14"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Classes="raised"
+                                        <Button
                                                 Command="{Binding OpenCreateCallTargetDialogCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialIcons:MaterialIcon Kind="AccountArrowRight" Margin="0,0,8,0"/>
+                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PersonArrowRight}" FontSize="20" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Create Call Target"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </material:Card>
+                                </Border>
 
                                 <!-- Step 6: Create Default Call Flow -->
-                                <material:Card Margin="0,0,0,16" Padding="16">
+                                <Border Classes="card" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 6: Create Default Call Flow"
-                                                 Classes="subtitle1"
+                                                 FontSize="18"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Create the default call flow with menu options for the auto attendant."
-                                                 Classes="body2"
+                                                 FontSize="14"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Classes="raised"
+                                        <Button
                                                 Command="{Binding OpenCreateDefaultCallFlowDialogCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialIcons:MaterialIcon Kind="PhoneForward" Margin="0,0,8,0"/>
+                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallForward}" FontSize="20" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Create Default Call Flow"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </material:Card>
+                                </Border>
 
                                 <!-- Step 7: Create After Hours Call Flow -->
-                                <material:Card Margin="0,0,0,16" Padding="16">
+                                <Border Classes="card" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 7: Create After Hours Call Flow"
-                                                 Classes="subtitle1"
+                                                 FontSize="18"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Create the after hours call flow with disconnect option."
-                                                 Classes="body2"
+                                                 FontSize="14"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Classes="raised"
+                                        <Button
                                                 Command="{Binding OpenCreateAfterHoursCallFlowDialogCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialIcons:MaterialIcon Kind="PhoneHangup" Margin="0,0,8,0"/>
+                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallEnd}" FontSize="20" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Create After Hours Call Flow"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </material:Card>
+                                </Border>
 
                                 <!-- Step 8: Create After Hours Schedule -->
-                                <material:Card Margin="0,0,0,16" Padding="16">
+                                <Border Classes="card" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 8: Create After Hours Schedule"
-                                                 Classes="subtitle1"
+                                                 FontSize="18"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Create the schedule that defines when the after hours call flow should be active."
-                                                 Classes="body2"
+                                                 FontSize="14"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Classes="raised"
+                                        <Button
                                                 Command="{Binding OpenCreateAfterHoursScheduleDialogCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialIcons:MaterialIcon Kind="ClockOutline" Margin="0,0,8,0"/>
+                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Clock}" FontSize="20" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Create After Hours Schedule"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </material:Card>
+                                </Border>
 
                                 <!-- Step 9: Create Call Handling Association -->
-                                <material:Card Margin="0,0,0,16" Padding="16">
+                                <Border Classes="card" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 9: Create Call Handling Association"
-                                                 Classes="subtitle1"
+                                                 FontSize="18"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Associate the after hours schedule with the after hours call flow."
-                                                 Classes="body2"
+                                                 FontSize="14"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Classes="raised"
+                                        <Button
                                                 Command="{Binding OpenCreateCallHandlingAssociationDialogCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialIcons:MaterialIcon Kind="Link" Margin="0,0,8,0"/>
+                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Link}" FontSize="20" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Create Call Handling Association"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </material:Card>
+                                </Border>
 
                                 <!-- Step 10: Create Auto Attendant -->
-                                <material:Card Margin="0,0,0,16" Padding="16">
+                                <Border Classes="card" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 10: Create Auto Attendant"
-                                                 Classes="subtitle1"
+                                                 FontSize="18"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Create the actual auto attendant with all the configured call flows and associations."
-                                                 Classes="body2"
+                                                 FontSize="14"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Classes="raised"
+                                        <Button
                                                 Command="{Binding OpenCreateAutoAttendantDialogCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialIcons:MaterialIcon Kind="PhoneInTalk" Margin="0,0,8,0"/>
+                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallInbound}" FontSize="20" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Create Auto Attendant"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </material:Card>
+                                </Border>
 
                                 <!-- Step 11: Associate Resource Account -->
-                                <material:Card Margin="0,0,0,16" Padding="16">
+                                <Border Classes="card" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 11: Associate Resource Account"
-                                                 Classes="subtitle1"
+                                                 FontSize="18"
                                                  FontWeight="Bold"
                                                  Margin="0,0,0,8"/>
                                         <TextBlock Text="Associate the resource account with the auto attendant to complete the setup."
-                                                 Classes="body2"
+                                                 FontSize="14"
                                                  TextWrapping="Wrap"
                                                  Margin="0,0,0,16"/>
-                                        <Button Classes="raised"
+                                        <Button
                                                 Command="{Binding OpenAssociateDialogCommand}"
                                                 HorizontalAlignment="Left">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialIcons:MaterialIcon Kind="Link" Margin="0,0,8,0"/>
+                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Link}" FontSize="20" Margin="0,0,8,0"/>
                                                 <TextBlock Text="Associate Account"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
-                                </material:Card>
+                                </Border>
                             </StackPanel>
                         </ScrollViewer>
                     </TabItem>
@@ -441,7 +456,7 @@
                          Height="4"
                          Margin="32,0,32,16"/>
         </Grid>
-    </material:Card>
+    </Border>
 
             <!-- Create Resource Account Dialog - Border overlay -->
             <Border IsVisible="{Binding ShowCreateResourceAccountDialog}"
@@ -464,49 +479,50 @@
                 </Border.Styles>
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                       PointerPressed="CreateResourceAccountCard_PointerPressed">
-                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                    <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Resource Account"
-                                 Classes="headline6"
+                                 FontSize="20"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="UPN:"
-                                 Classes="subtitle2"
+                                 FontSize="16"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding ResourceAccountUpn}"
-                                 Classes="outlined"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Display Name:"
-                                 Classes="subtitle2"
+                                 FontSize="16"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding ResourceAccountDisplayName}"
-                                 Classes="outlined"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="The values are auto-generated from your variables. You can modify them if needed."
-                                 Classes="caption"
+                                 FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Classes="flat"
+                            <Button Background="Transparent"
                                     Command="{Binding CloseCreateResourceAccountDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Classes="raised"
+                            <Button
                                     Command="{Binding CreateResourceAccountCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="AccountPlus" Margin="0,0,8,0"/>
+                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PersonAdd}" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="Create Account"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                    </material:Card>
+                    </Border>
                 </Grid>
             </Border>
 
@@ -531,43 +547,44 @@
                 </Border.Styles>
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                       PointerPressed="UpdateUsageLocationCard_PointerPressed">
-                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                    <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Update Usage Location"
-                                 Classes="headline6"
+                                 FontSize="20"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Resource Account UPN:"
-                                 Classes="subtitle2"
+                                 FontSize="16"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding ResourceAccountUpn}"
-                                 Classes="outlined"
                                IsReadOnly="True"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="This will update the usage location for the resource account. The value is taken from your variables."
-                                 Classes="caption"
+                                 FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Classes="flat"
+                            <Button Background="Transparent"
                                     Command="{Binding CloseUpdateUsageLocationDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Classes="raised"
+                            <Button
                                     Command="{Binding UpdateUsageLocationCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="MapMarker" Margin="0,0,8,0"/>
+                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Location}" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="Update Location"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                    </material:Card>
+                    </Border>
                 </Grid>
             </Border>
 
@@ -592,42 +609,43 @@
                 </Border.Styles>
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                       PointerPressed="CreateAutoAttendantCard_PointerPressed">
-                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                    <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Auto Attendant"
-                                 Classes="headline6"
+                                 FontSize="20"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Auto Attendant Name:"
-                                 Classes="subtitle2"
+                                 FontSize="16"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding AutoAttendantName}"
-                                 Classes="outlined"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="The auto attendant name is auto-generated from your variables. Make sure to validate the Call Queue resource account before creating the auto attendant."
-                                 Classes="caption"
+                                 FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Classes="flat"
+                            <Button Background="Transparent"
                                     Command="{Binding CloseCreateAutoAttendantDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Classes="raised"
+                            <Button
                                     Command="{Binding CreateAutoAttendantCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="PhoneInTalk" Margin="0,0,8,0"/>
+                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallInbound}" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="Create Auto Attendant"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                    </material:Card>
+                    </Border>
                 </Grid>
             </Border>
 
@@ -652,49 +670,50 @@
                 </Border.Styles>
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                       PointerPressed="AssociateResourceAccountCard_PointerPressed">
-                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                    <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Associate Resource Account with Auto Attendant"
-                                 Classes="headline6"
+                                 FontSize="20"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Resource Account UPN:"
-                                 Classes="subtitle2"
+                                 FontSize="16"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding ResourceAccountUpn}"
-                                 Classes="outlined"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Auto Attendant Name:"
-                                 Classes="subtitle2"
+                                 FontSize="16"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding AutoAttendantName}"
-                                 Classes="outlined"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="This will associate the resource account with the auto attendant to complete the setup."
-                                 Classes="caption"
+                                 FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Classes="flat"
+                            <Button Background="Transparent"
                                     Command="{Binding CloseAssociateDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Classes="raised"
+                            <Button
                                     Command="{Binding AssociateResourceAccountWithAutoAttendantCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="Link" Margin="0,0,8,0"/>
+                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Link}" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="Associate"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                    </material:Card>
+                    </Border>
                 </Grid>
             </Border>
 
@@ -719,42 +738,43 @@
                 </Border.Styles>
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                       PointerPressed="ValidateCallQueueCard_PointerPressed">
-                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                    <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Validate Call Queue Resource Account"
-                                 Classes="headline6"
+                                 FontSize="20"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Call Queue Resource Account UPN:"
-                                 Classes="subtitle2"
+                                 FontSize="16"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding CallQueueUpn}"
-                                 Classes="outlined"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="This will validate that the Call Queue resource account exists and can be used as the call target for the auto attendant. The value is auto-generated from your variables, but you can modify it if needed."
-                                 Classes="caption"
+                                 FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Classes="flat"
+                            <Button Background="Transparent"
                                     Command="{Binding CloseValidateCallQueueDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Classes="raised"
+                            <Button
                                     Command="{Binding ValidateCallQueueResourceAccountCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="AccountCheck" Margin="0,0,8,0"/>
+                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Person}" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="Validate Account"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                    </material:Card>
+                    </Border>
                 </Grid>
             </Border>
 
@@ -779,35 +799,36 @@
                 </Border.Styles>
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                       PointerPressed="CreateCallTargetCard_PointerPressed">
-                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                    <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Call Target"
-                                 Classes="headline6"
+                                 FontSize="20"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="This will create the callable entity that will be used as the call target for the auto attendant."
-                                 Classes="caption"
+                                 FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Classes="flat"
+                            <Button Background="Transparent"
                                     Command="{Binding CloseCreateCallTargetDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Classes="raised"
+                            <Button
                                     Command="{Binding CreateCallTargetCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="AccountArrowRight" Margin="0,0,8,0"/>
+                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PersonArrowRight}" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="Create Call Target"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                    </material:Card>
+                    </Border>
                 </Grid>
             </Border>
 
@@ -832,35 +853,36 @@
                 </Border.Styles>
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                       PointerPressed="CreateDefaultCallFlowCard_PointerPressed">
-                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                    <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Default Call Flow"
-                                 Classes="headline6"
+                                 FontSize="20"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="This will create the default call flow with menu options for the auto attendant."
-                                 Classes="caption"
+                                 FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Classes="flat"
+                            <Button Background="Transparent"
                                     Command="{Binding CloseCreateDefaultCallFlowDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Classes="raised"
+                            <Button
                                     Command="{Binding CreateDefaultCallFlowCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="PhoneForward" Margin="0,0,8,0"/>
+                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallForward}" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="Create Default Call Flow"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                    </material:Card>
+                    </Border>
                 </Grid>
             </Border>
 
@@ -885,35 +907,36 @@
                 </Border.Styles>
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                       PointerPressed="CreateAfterHoursCallFlowCard_PointerPressed">
-                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                    <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create After Hours Call Flow"
-                                 Classes="headline6"
+                                 FontSize="20"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="This will create the after hours call flow with disconnect option."
-                                 Classes="caption"
+                                 FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Classes="flat"
+                            <Button Background="Transparent"
                                     Command="{Binding CloseCreateAfterHoursCallFlowDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Classes="raised"
+                            <Button
                                     Command="{Binding CreateAfterHoursCallFlowCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="PhoneHangup" Margin="0,0,8,0"/>
+                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallEnd}" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="Create After Hours Call Flow"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                    </material:Card>
+                    </Border>
                 </Grid>
             </Border>
 
@@ -938,35 +961,36 @@
                 </Border.Styles>
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                       PointerPressed="CreateAfterHoursScheduleCard_PointerPressed">
-                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                    <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create After Hours Schedule"
-                                 Classes="headline6"
+                                 FontSize="20"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="This will create the schedule that defines when the after hours call flow should be active."
-                                 Classes="caption"
+                                 FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Classes="flat"
+                            <Button Background="Transparent"
                                     Command="{Binding CloseCreateAfterHoursScheduleDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Classes="raised"
+                            <Button
                                     Command="{Binding CreateAfterHoursScheduleCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="ClockOutline" Margin="0,0,8,0"/>
+                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Clock}" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="Create After Hours Schedule"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                    </material:Card>
+                    </Border>
                 </Grid>
             </Border>
 
@@ -991,42 +1015,43 @@
                 </Border.Styles>
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                       PointerPressed="CreateCallHandlingAssociationCard_PointerPressed">
-                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                    <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Call Handling Association"
-                                 Classes="headline6"
+                                 FontSize="20"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="This will associate the after hours schedule with the after hours call flow."
-                                 Classes="caption"
+                                 FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Classes="flat"
+                            <Button Background="Transparent"
                                     Command="{Binding CloseCreateCallHandlingAssociationDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Classes="raised"
+                            <Button
                                     Command="{Binding CreateCallHandlingAssociationCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="Link" Margin="0,0,8,0"/>
+                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Link}" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="Create Call Handling Association"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                    </material:Card>
+                    </Border>
                 </Grid>
             </Border>
 
             <!-- Progress Indicator -->
             <Grid Opacity="0.8"
                   IsVisible="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <ProgressBar Classes="circular"
+                <ProgressBar
                            Value="0"
                            IsIndeterminate="True"
                            Width="50"
@@ -1035,7 +1060,7 @@
                 
                 <!-- Waiting Message -->
                 <TextBlock Text="{Binding WaitingMessage, TargetNullValue=''}"
-                           Classes="body2"
+                           FontSize="14"
                            TextWrapping="Wrap"
                            Margin="0,8,0,0"
                            TextAlignment="Center"/>

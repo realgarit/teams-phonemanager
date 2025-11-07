@@ -2,11 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:material="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:materialStyles="clr-namespace:Material.Styles;assembly=Material.Styles"
-             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:fi="using:FluentIcons.Avalonia"
+             xmlns:fic="using:FluentIcons.Common"
              xmlns:local="clr-namespace:teams_phonemanager.Views"
              xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
+             xmlns:converters="clr-namespace:teams_phonemanager.Converters"
              x:Class="teams_phonemanager.Views.M365GroupsView"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
@@ -15,7 +15,28 @@
         <viewmodels:M365GroupsViewModel/>
     </UserControl.DataContext>
 
-    <material:Card Margin="32" CornerRadius="8">
+    <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+        <Style Selector="Border.dialog">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Border Classes="card" Margin="32">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -34,13 +55,14 @@
                 <!-- Group Status -->
                 <StackPanel Grid.Row="0" Margin="0,16">
                     <TextBlock Text="Group Status"
-                             Classes="subtitle1"
+                             FontSize="18"
+                             FontWeight="SemiBold"
                              Margin="0,0,0,8"/>
                     <TextBlock Text="{Binding GroupStatus}"
-                             Classes="body1"
+                             FontSize="14"
                              Margin="0,0,0,4"/>
                     <TextBlock Text="{Binding GroupId, StringFormat='Group ID: {0}'}"
-                             Classes="body2"
+                             FontSize="12"
                              IsVisible="{Binding IsGroupChecked, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 </StackPanel>
 
@@ -53,30 +75,27 @@
                     </Grid.ColumnDefinitions>
 
                     <Button Grid.Column="0"
-                            Classes="raised"
                             Command="{Binding RetrieveM365GroupsCommand}"
                             Height="40"
                             Margin="0,0,16,0">
                         <StackPanel Orientation="Horizontal">
-                            <materialIcons:MaterialIcon Kind="Refresh" Margin="0,0,8,0"/>
+                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.ArrowSync}" FontSize="20" Margin="0,0,8,0"/>
                             <TextBlock Text="Retrieve Groups"/>
                         </StackPanel>
                     </Button>
                     
                     <Button Grid.Column="1"
-                            Classes="raised"
                             Command="{Binding OpenCreateGroupDialogCommand}"
                             Height="40"
                             Margin="0,0,16,0">
                         <StackPanel Orientation="Horizontal">
-                            <materialIcons:MaterialIcon Kind="Plus" Margin="0,0,8,0"/>
+                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Add}" FontSize="20" Margin="0,0,8,0"/>
                             <TextBlock Text="Create New Group"/>
                         </StackPanel>
                     </Button>
 
                     <TextBox Grid.Column="2"
                              Text="{Binding SearchText}"
-                             Classes="outlined"
                              Watermark="Search groups..."/>
                 </Grid>
 
@@ -86,12 +105,9 @@
                           ItemsSource="{Binding GroupsView}"
                           AutoGenerateColumns="False"
                           HeadersVisibility="Column"
-                          
-                          
                           IsReadOnly="True"
                           GridLinesVisibility="None"
                           SelectionMode="Single"
-                          
                           HorizontalScrollBarVisibility="Auto">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" Width="2*"/>
@@ -125,35 +141,34 @@
                 </Border.Styles>
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                       PointerPressed="ConfirmVariablesCard_PointerPressed">
-                    <material:Card Padding="16" Margin="16">
+                    <Border Classes="dialog" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Confirm Variables"
-                                 Classes="headline6"
+                                 FontSize="20"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         <TextBlock Text="Please confirm that you have set up all required variables in the Variables page before proceeding."
-                                 Classes="body1"
+                                 FontSize="14"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Classes="raised"
-                                    Command="{Binding NavigateToVariablesPageCommand}"
+                            <Button Command="{Binding NavigateToVariablesPageCommand}"
                                     Margin="0,0,8,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="Variable" Margin="0,0,8,0"/>
+                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Code}" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="Go to Variables"/>
                                 </StackPanel>
                             </Button>
-                            <Button Classes="raised"
-                                    Command="{Binding CheckM365GroupCommand}">
+                            <Button Command="{Binding CheckM365GroupCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="Check" Margin="0,0,8,0"/>
+                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Checkmark}" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="Continue"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                    </material:Card>
+                    </Border>
                 </Grid>
             </Border>
 
@@ -178,52 +193,52 @@
                 </Border.Styles>
                 <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                       PointerPressed="CreateGroupCard_PointerPressed">
-                    <material:Card Padding="16" MinWidth="400" Margin="16">
+                    <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create New M365 Group"
-                                 Classes="headline6"
+                                 FontSize="20"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Group Name:"
-                                 Classes="subtitle2"
+                                 FontSize="16"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding NewGroupName}"
-                                 Classes="outlined"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Description (Optional):"
-                                 Classes="subtitle2"
+                                 FontSize="16"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding NewGroupDescription}"
-                                 Classes="outlined"
                                AcceptsReturn="True"
                                TextWrapping="Wrap"
                                Height="60"
                                Margin="0,0,0,16"/>
                         
                         <TextBlock Text="The group name is auto-generated from your variables. You can modify it if needed."
-                                 Classes="caption"
+                                 FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
-                            <Button Classes="flat"
+                            <Button Background="Transparent"
                                     Command="{Binding CloseCreateGroupDialogCommand}"
                                     Margin="0,0,8,0">
                                 <TextBlock Text="Cancel"/>
                             </Button>
-                            <Button Classes="raised"
-                                    Command="{Binding CreateNewGroupCommand}">
+                            <Button Command="{Binding CreateNewGroupCommand}">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="Plus" Margin="0,0,8,0"/>
+                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Add}" FontSize="20" Margin="0,0,8,0"/>
                                     <TextBlock Text="Create Group"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                    </material:Card>
+                    </Border>
                 </Grid>
             </Border>
 
@@ -231,11 +246,11 @@
             <Grid 
                   Opacity="0.8"
                   IsVisible="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <ProgressBar Classes="circular"
-                           Value="0"
-                           IsIndeterminate="True"/>
+                <ProgressBar Value="0"
+                           IsIndeterminate="True"
+                           Width="50"
+                           Height="50"/>
             </Grid>
         </Grid>
-    </material:Card>
+    </Border>
 </UserControl>
-

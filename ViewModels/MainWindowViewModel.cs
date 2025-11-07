@@ -7,8 +7,7 @@ using System.Text;
 using System.Linq;
 using System;
 using teams_phonemanager.Models;
-using Material.Styles.Themes;
-using Material.Styles.Themes.Base;
+using FluentAvalonia.Styling;
 
 namespace teams_phonemanager.ViewModels
 {
@@ -71,15 +70,12 @@ namespace teams_phonemanager.ViewModels
 
         partial void OnIsDarkThemeChanged(bool value)
         {
-            // Update Material.Avalonia theme
+            // Update FluentAvalonia theme
             var app = Avalonia.Application.Current;
             if (app != null)
             {
-                var materialTheme = app.Styles.OfType<MaterialTheme>().FirstOrDefault();
-                if (materialTheme != null)
-                {
-                    materialTheme.BaseTheme = value ? BaseThemeMode.Dark : BaseThemeMode.Light;
-                }
+                var faTheme = app.RequestedThemeVariant;
+                app.RequestedThemeVariant = value ? Avalonia.Styling.ThemeVariant.Dark : Avalonia.Styling.ThemeVariant.Light;
             }
             _loggingService.Log($"Theme changed to {(value ? "Dark" : "Light")}", LogLevel.Info);
         }

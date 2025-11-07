@@ -45,39 +45,31 @@
           "dependencies": {
             "Avalonia": {
               "target": "Package",
-              "version": "[11.1.5, )"
+              "version": "[11.2.5, )"
             },
             "Avalonia.Desktop": {
               "target": "Package",
-              "version": "[11.1.5, )"
+              "version": "[11.2.5, )"
             },
             "Avalonia.Fonts.Inter": {
               "target": "Package",
-              "version": "[11.1.5, )"
+              "version": "[11.2.5, )"
             },
             "Avalonia.ReactiveUI": {
               "target": "Package",
-              "version": "[11.1.5, )"
+              "version": "[11.2.5, )"
             },
             "CommunityToolkit.Mvvm": {
               "target": "Package",
               "version": "[8.2.2, )"
             },
-            "Material.Avalonia": {
+            "FluentAvaloniaUI": {
               "target": "Package",
-              "version": "[3.13.0, )"
+              "version": "[2.4.0, )"
             },
-            "Material.Avalonia.DataGrid": {
+            "FluentIcons.Avalonia": {
               "target": "Package",
-              "version": "[3.13.0, )"
-            },
-            "Material.Avalonia.Dialogs": {
-              "target": "Package",
-              "version": "[3.13.0, )"
-            },
-            "Material.Icons.Avalonia": {
-              "target": "Package",
-              "version": "[2.2.0, )"
+              "version": "[1.1.223, )"
             },
             "Microsoft.PowerShell.SDK": {
               "target": "Package",

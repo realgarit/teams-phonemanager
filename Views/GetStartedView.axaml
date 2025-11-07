@@ -2,10 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:material="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:fi="using:FluentIcons.Avalonia"
+             xmlns:fic="using:FluentIcons.Common"
              xmlns:local="clr-namespace:teams_phonemanager.Views"
              xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
+             xmlns:converters="clr-namespace:teams_phonemanager.Converters"
              x:Class="teams_phonemanager.Views.GetStartedView"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1000">
@@ -14,17 +15,32 @@
         <viewmodels:GetStartedViewModel/>
     </UserControl.DataContext>
 
+    <UserControl.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+    </UserControl.Styles>
+
     <ScrollViewer HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="24">
 
             <!-- Setup Steps -->
             <TextBlock Text="Setup Steps"
-                     Classes="headline5"
+                     FontSize="24"
                      Margin="0,0,0,16"
                      FontWeight="Bold"/>
 
             <!-- Step 1: PowerShell Modules -->
-            <material:Card Margin="0,0,0,16" CornerRadius="8" Padding="16">
+            <Border Classes="card" Margin="0,0,0,16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -33,20 +49,19 @@
                     </Grid.ColumnDefinitions>
                     
                     <!-- Step Number -->
-                    <materialIcons:MaterialIcon Kind="Numeric1Box" 
-                                           Width="48" 
-                                           Height="48"
-                                           VerticalAlignment="Center"
-                                           Margin="0,0,16,0"/>
+                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.NumberCircle1}" 
+                               FontSize="48" 
+                               VerticalAlignment="Center"
+                               Margin="0,0,16,0"/>
                     
                     <!-- Step Content -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                         <TextBlock Text="Check PowerShell Modules"
-                                 Classes="subtitle1"
+                                 FontSize="18"
                                  FontWeight="Bold"
                                  Margin="0,0,0,8"/>
                         <TextBlock Text="Verify that Microsoft Teams and Microsoft Graph PowerShell modules are installed and available."
-                                 Classes="body2"
+                                 FontSize="14"
                                  TextWrapping="Wrap"
                                  Opacity="0.87"/>
                     </StackPanel>
@@ -55,26 +70,24 @@
                     <StackPanel Grid.Column="2" Orientation="Vertical">
                         <Button Command="{Binding CheckModulesCommand}"
                                 IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"
-                                Classes="raised"
                                 Padding="30,15"
                                 FontSize="16"
                                 FontWeight="Bold"
                                 MinWidth="200"
                                 Height="50">
                             <StackPanel Orientation="Horizontal">
-                                <materialIcons:MaterialIcon Kind="Package" 
-                                                       Width="20" 
-                                                       Height="20"
-                                                       Margin="0,0,8,0"/>
+                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Box}" 
+                                           FontSize="20" 
+                                           Margin="0,0,8,0"/>
                                 <TextBlock Text="Check Modules"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
                 </Grid>
-            </material:Card>
+            </Border>
 
             <!-- Step 2: Teams Connection -->
-            <material:Card Margin="0,0,0,16" CornerRadius="8" Padding="16">
+            <Border Classes="card" Margin="0,0,0,16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -83,20 +96,19 @@
                     </Grid.ColumnDefinitions>
                     
                     <!-- Step Number -->
-                    <materialIcons:MaterialIcon Kind="Numeric2Box" 
-                                           Width="48" 
-                                           Height="48"
-                                           VerticalAlignment="Center"
-                                           Margin="0,0,16,0"/>
+                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.NumberCircle2}" 
+                               FontSize="48" 
+                               VerticalAlignment="Center"
+                               Margin="0,0,16,0"/>
                     
                     <!-- Step Content -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                         <TextBlock Text="Connect to Microsoft Teams"
-                                 Classes="subtitle1"
+                                 FontSize="18"
                                  FontWeight="Bold"
                                  Margin="0,0,0,8"/>
                         <TextBlock Text="Establish a connection to your Microsoft Teams tenant using PowerShell."
-                                 Classes="body2"
+                                 FontSize="14"
                                  TextWrapping="Wrap"
                                  Opacity="0.87"/>
                     </StackPanel>
@@ -105,7 +117,6 @@
                     <StackPanel Grid.Column="2" Orientation="Vertical">
                         <Button Command="{Binding ConnectTeamsCommand}"
                                 IsEnabled="{Binding CanConnectTeams}"
-                                Classes="raised"
                                 Padding="30,15"
                                 FontSize="16"
                                 FontWeight="Bold"
@@ -113,36 +124,33 @@
                                 Height="50"
                                 Margin="0,0,0,8">
                             <StackPanel Orientation="Horizontal">
-                                <materialIcons:MaterialIcon Kind="MicrosoftTeams" 
-                                                       Width="20" 
-                                                       Height="20"
-                                                       Margin="0,0,8,0"/>
+                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PeopleTeam}" 
+                                           FontSize="20" 
+                                           Margin="0,0,8,0"/>
                                 <TextBlock Text="Connect Teams"/>
                             </StackPanel>
                         </Button>
                         
                         <Button Command="{Binding DisconnectTeamsCommand}"
                                 IsEnabled="{Binding TeamsConnected}"
-                                Classes="raised"
                                 Padding="30,15"
                                 FontSize="16"
                                 FontWeight="Bold"
                                 MinWidth="200"
                                 Height="50">
                             <StackPanel Orientation="Horizontal">
-                                <materialIcons:MaterialIcon Kind="Logout" 
-                                                       Width="20" 
-                                                       Height="20"
-                                                       Margin="0,0,8,0"/>
+                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.SignOut}" 
+                                           FontSize="20" 
+                                           Margin="0,0,8,0"/>
                                 <TextBlock Text="Disconnect Teams"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
                 </Grid>
-            </material:Card>
+            </Border>
 
             <!-- Step 3: Graph Connection -->
-            <material:Card Margin="0,0,0,16" CornerRadius="8" Padding="16">
+            <Border Classes="card" Margin="0,0,0,16">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -151,20 +159,19 @@
                     </Grid.ColumnDefinitions>
                     
                     <!-- Step Number -->
-                    <materialIcons:MaterialIcon Kind="Numeric3Box" 
-                                           Width="48" 
-                                           Height="48"
-                                           VerticalAlignment="Center"
-                                           Margin="0,0,16,0"/>
+                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.NumberCircle3}" 
+                               FontSize="48" 
+                               VerticalAlignment="Center"
+                               Margin="0,0,16,0"/>
                     
                     <!-- Step Content -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
                         <TextBlock Text="Connect to Microsoft Graph"
-                                 Classes="subtitle1"
+                                 FontSize="18"
                                  FontWeight="Bold"
                                  Margin="0,0,0,8"/>
                         <TextBlock Text="Establish a connection to Microsoft Graph for managing M365 groups and resources."
-                                 Classes="body2"
+                                 FontSize="14"
                                  TextWrapping="Wrap"
                                  Opacity="0.87"/>
                     </StackPanel>
@@ -173,7 +180,6 @@
                     <StackPanel Grid.Column="2" Orientation="Vertical">
                         <Button Command="{Binding ConnectGraphCommand}"
                                 IsEnabled="{Binding CanConnectGraph}"
-                                Classes="raised"
                                 Padding="30,15"
                                 FontSize="16"
                                 FontWeight="Bold"
@@ -181,54 +187,50 @@
                                 Height="50"
                                 Margin="0,0,0,8">
                             <StackPanel Orientation="Horizontal">
-                                <materialIcons:MaterialIcon Kind="MicrosoftAzure" 
-                                                       Width="20" 
-                                                       Height="20"
-                                                       Margin="0,0,8,0"/>
+                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Cloud}" 
+                                           FontSize="20" 
+                                           Margin="0,0,8,0"/>
                                 <TextBlock Text="Connect Graph"/>
                             </StackPanel>
                         </Button>
                         
                         <Button Command="{Binding DisconnectGraphCommand}"
                                 IsEnabled="{Binding GraphConnected}"
-                                Classes="raised"
                                 Padding="30,15"
                                 FontSize="16"
                                 FontWeight="Bold"
                                 MinWidth="200"
                                 Height="50">
                             <StackPanel Orientation="Horizontal">
-                                <materialIcons:MaterialIcon Kind="Logout" 
-                                                       Width="20" 
-                                                       Height="20"
-                                                       Margin="0,0,8,0"/>
+                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.SignOut}" 
+                                           FontSize="20" 
+                                           Margin="0,0,8,0"/>
                                 <TextBlock Text="Disconnect Graph"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
                 </Grid>
-            </material:Card>
+            </Border>
 
             <!-- Proceed Section -->
-            <material:Card Margin="0,24,0,0" CornerRadius="12" Padding="16">
+            <Border Classes="card" Margin="0,24,0,0">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
-                        <materialIcons:MaterialIcon Kind="CheckCircle" 
-                                               Width="48" 
-                                               Height="48"
-                                               Margin="0,0,16,0"/>
+                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CheckmarkCircle}" 
+                                   FontSize="48" 
+                                   Margin="0,0,16,0"/>
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock Text="Ready to Continue"
-                                     Classes="subtitle1"
+                                     FontSize="18"
                                      FontWeight="Bold"/>
                             <TextBlock Text="All prerequisites completed"
-                                     Classes="caption"
+                                     FontSize="12"
                                      Opacity="0.7"/>
                         </StackPanel>
                     </StackPanel>
                     
                     <TextBlock Text="Once all connections are established, you can proceed to configure your phone system variables."
-                             Classes="body1"
+                             FontSize="14"
                              TextAlignment="Center"
                              TextWrapping="Wrap"
                              Opacity="0.87"
@@ -238,40 +240,35 @@
                             CommandParameter="Variables"
                             IsEnabled="{Binding CanProceed}"
                             HorizontalAlignment="Center"
-                            Classes="raised"
                             Padding="30,15"
                             FontSize="16"
                             FontWeight="Bold"
                             MinWidth="200"
                             Height="50">
                         <StackPanel Orientation="Horizontal">
-                            <materialIcons:MaterialIcon Kind="ArrowRight" 
-                                                   Width="20" 
-                                                   Height="20"
-                                                   Margin="0,0,8,0"/>
+                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.ArrowRight}" 
+                                       FontSize="20" 
+                                       Margin="0,0,8,0"/>
                             <TextBlock Text="Proceed to Variables"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
-            </material:Card>
+            </Border>
 
             <!-- Progress Indicator -->
-            <material:Card Margin="0,24,0,0" 
-                           CornerRadius="8" 
-                           Padding="16"
-                           IsVisible="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border Classes="card" 
+                   Margin="0,24,0,0" 
+                   IsVisible="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <ProgressBar IsIndeterminate="True"
-                               Classes="circular"
                                Width="24"
                                Height="24"
                                Margin="0,0,16,0"/>
                     <TextBlock Text="Processing..."
-                             Classes="subtitle2"
+                             FontSize="16"
                              VerticalAlignment="Center"/>
                 </StackPanel>
-            </material:Card>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
-

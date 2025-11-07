@@ -1,20 +1,22 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:teams_phonemanager"
-             xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
-             xmlns:material="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:converters="clr-namespace:teams_phonemanager.Converters"
+             xmlns:fa="using:FluentAvalonia.Styling"
              x:Class="teams_phonemanager.App"
              RequestedThemeVariant="Dark">
     <Application.Styles>
-        <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Indigo" SecondaryColor="Indigo" />
-        <materialIcons:MaterialIconStyles />
+        <fa:FluentAvaloniaTheme />
     </Application.Styles>
     
     <Application.Resources>
         <!-- Value Converters -->
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        
+        <!-- Teams Violet Color Palette -->
+        <SolidColorBrush x:Key="TeamsPrimaryBrush" Color="#6264A7"/>
+        <SolidColorBrush x:Key="TeamsPrimaryLightBrush" Color="#8B8FC7"/>
+        <SolidColorBrush x:Key="TeamsPrimaryDarkBrush" Color="#464775"/>
     </Application.Resources>
 </Application>
