@@ -39,6 +39,7 @@ namespace teams_phonemanager.ViewModels
         private bool _showHolidaySeriesManager = false;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DialogHolidayDate))]
         private HolidayEntry? _editingHoliday;
 
         [ObservableProperty]
@@ -49,6 +50,7 @@ namespace teams_phonemanager.ViewModels
 
         // Simple properties for Add/Edit dialogs
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DialogHolidayDate))]
         private DateTime _newHolidayDate = DateTime.Now;
 
         [ObservableProperty]
@@ -58,15 +60,18 @@ namespace teams_phonemanager.ViewModels
         private TimeSpan _editHolidayTime = new TimeSpan(0, 0, 0);
 
         // Computed properties for the dialog
-        public DateTime DialogHolidayDate
+        public DateTime? DialogHolidayDate
         {
             get => EditingHoliday?.Date ?? NewHolidayDate;
             set
             {
-                if (EditingHoliday != null)
-                    EditingHoliday.Date = value;
-                else
-                    NewHolidayDate = value;
+                if (value.HasValue)
+                {
+                    if (EditingHoliday != null)
+                        EditingHoliday.Date = value.Value;
+                    else
+                        NewHolidayDate = value.Value;
+                }
             }
         }
 

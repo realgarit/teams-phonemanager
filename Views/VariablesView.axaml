@@ -20,6 +20,21 @@
 
     <UserControl.Styles>
         <!-- Local styles removed, using App.axaml styles -->
+        <Style Selector="fi|SymbolIcon.AnimatedArrow">
+            <Style.Animations>
+                <Animation Duration="0:0:1" IterationCount="Infinite">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="TranslateTransform.X" Value="0"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="50%">
+                        <Setter Property="TranslateTransform.X" Value="-5"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="TranslateTransform.X" Value="0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
     </UserControl.Styles>
 
     <Grid>
@@ -111,9 +126,11 @@
                                         <TextBox 
                                                  Text="{Binding Variables.SkuId}"
                                                  IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                                 VerticalContentAlignment="Center"
                                                  />
                                         <fi:SymbolIcon  Symbol="LockClosed" Foreground="{DynamicResource TextFillColorPrimaryBrush}" 
                                                                HorizontalAlignment="Right" 
+                                                               VerticalAlignment="Center"
                                                                />
                                     </Grid>
                                 </StackPanel>
@@ -132,9 +149,11 @@
                                         <TextBox 
                                                  Text="{Binding Variables.CsAppCqId}"
                                                  IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                                 VerticalContentAlignment="Center"
                                                  />
                                         <fi:SymbolIcon  Symbol="LockClosed" Foreground="{DynamicResource TextFillColorPrimaryBrush}" 
                                                                HorizontalAlignment="Right" 
+                                                               VerticalAlignment="Center"
                                                                />
                                     </Grid>
                                 </StackPanel>
@@ -178,9 +197,11 @@
                                         <TextBox 
                                                  Text="{Binding Variables.CsAppAaId}"
                                                  IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                                 VerticalContentAlignment="Center"
                                                  />
                                         <fi:SymbolIcon  Symbol="LockClosed" Foreground="{DynamicResource TextFillColorPrimaryBrush}" 
                                                                HorizontalAlignment="Right" 
+                                                               VerticalAlignment="Center"
                                                                />
                                     </Grid>
                                 </StackPanel>
@@ -231,16 +252,18 @@
                                          FontSize="11"
                                          Margin="0,4,0,8"/>
 
-                                <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
+                                <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8" Spacing="16">
                                     <StackPanel MinWidth="100" MaxWidth="150" >
                                         <TextBox 
                                                  Text="{Binding Variables.OpeningHours1Start, Converter={StaticResource TimeSpanConverter}}"
+                                                 VerticalContentAlignment="Center"
                                                  />
                                         <TextBlock Text="Example: 08:00" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                     </StackPanel>
-                                    <StackPanel MinWidth="100" MaxWidth="150" Margin="0,0,0,0">
+                                    <StackPanel MinWidth="100" MaxWidth="150">
                                         <TextBox 
                                                  Text="{Binding Variables.OpeningHours1End, Converter={StaticResource TimeSpanConverter}}"
+                                                 VerticalContentAlignment="Center"
                                                  />
                                         <TextBlock Text="Example: 12:00" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                     </StackPanel>
@@ -252,16 +275,18 @@
                                          FontWeight="SemiBold"
                                          Margin="0,0,0,8"/>
 
-                                <StackPanel Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8">
+                                <StackPanel Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8" Spacing="16">
                                     <StackPanel MinWidth="100" MaxWidth="150" >
                                         <TextBox 
                                                  Text="{Binding Variables.OpeningHours2Start, Converter={StaticResource TimeSpanConverter}}"
+                                                 VerticalContentAlignment="Center"
                                                  />
                                         <TextBlock Text="Example: 13:30" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     <StackPanel MinWidth="100" MaxWidth="150">
                                         <TextBox 
                                                  Text="{Binding Variables.OpeningHours2End, Converter={StaticResource TimeSpanConverter}}"
+                                                 VerticalContentAlignment="Center"
                                                  />
                                         <TextBlock Text="Example: 17:00" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                     </StackPanel>
@@ -344,9 +369,11 @@
                                     <TextBox 
                                              Text="{Binding Variables.M365Group, Mode=OneWay}"
                                              IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             VerticalContentAlignment="Center"
                                              />
                                     <fi:SymbolIcon  Symbol="LockClosed" Foreground="{DynamicResource TextFillColorPrimaryBrush}" 
                                                            HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center"
                                                            />
                                 </Grid>
                                 
@@ -354,9 +381,11 @@
                                     <TextBox 
                                              Text="{Binding Variables.RacqUPN, Mode=OneWay}"
                                              IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             VerticalContentAlignment="Center"
                                              />
                                     <fi:SymbolIcon  Symbol="LockClosed" Foreground="{DynamicResource TextFillColorPrimaryBrush}" 
                                                            HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center"
                                                            />
                                 </Grid>
                                 
@@ -364,9 +393,11 @@
                                     <TextBox 
                                              Text="{Binding Variables.RacqDisplayName, Mode=OneWay}"
                                              IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             VerticalContentAlignment="Center"
                                              />
                                     <fi:SymbolIcon  Symbol="LockClosed" Foreground="{DynamicResource TextFillColorPrimaryBrush}" 
                                                            HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center"
                                                            />
                                 </Grid>
                                 
@@ -374,9 +405,11 @@
                                     <TextBox 
                                              Text="{Binding Variables.CqDisplayName, Mode=OneWay}"
                                              IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             VerticalContentAlignment="Center"
                                              />
                                     <fi:SymbolIcon  Symbol="LockClosed" Foreground="{DynamicResource TextFillColorPrimaryBrush}" 
                                                            HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center"
                                                            />
                                 </Grid>
                                 
@@ -384,9 +417,11 @@
                                     <TextBox 
                                              Text="{Binding Variables.RaaaUPN, Mode=OneWay}"
                                              IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             VerticalContentAlignment="Center"
                                              />
                                     <fi:SymbolIcon  Symbol="LockClosed" Foreground="{DynamicResource TextFillColorPrimaryBrush}" 
                                                            HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center"
                                                            />
                                 </Grid>
                                 
@@ -394,9 +429,11 @@
                                     <TextBox 
                                              Text="{Binding Variables.RaaaDisplayName, Mode=OneWay}"
                                              IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             VerticalContentAlignment="Center"
                                              />
                                     <fi:SymbolIcon  Symbol="LockClosed" Foreground="{DynamicResource TextFillColorPrimaryBrush}" 
                                                            HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center"
                                                            />
                                 </Grid>
                                 
@@ -404,9 +441,11 @@
                                     <TextBox 
                                              Text="{Binding Variables.AaDisplayName, Mode=OneWay}"
                                              IsReadOnly="True" Opacity="0.7" Background="Transparent"
+                                             VerticalContentAlignment="Center"
                                              />
                                     <fi:SymbolIcon  Symbol="LockClosed" Foreground="{DynamicResource TextFillColorPrimaryBrush}" 
                                                            HorizontalAlignment="Right" 
+                                                           VerticalAlignment="Center"
                                                            />
                                 </Grid>
                             </Grid>
@@ -419,7 +458,8 @@
                             Orientation="Horizontal"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
-                            Margin="16,8,16,16">
+                            Margin="16,8,16,16"
+                            Spacing="16">
                     <Button Command="{Binding LoadVariablesFromFileCommand}"
                              Classes="IconText">
                         <StackPanel Orientation="Horizontal">
@@ -481,11 +521,14 @@
                         </ComboBox>
                         
                         <StackPanel Orientation="Horizontal" 
-                                  HorizontalAlignment="Right">
-                            <Button Background="Transparent"
-                                    Command="{Binding CloseHolidayTimePickerCommand}"
-                                    >
-                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                  HorizontalAlignment="Right"
+                                  Spacing="16">
+                            <Button Command="{Binding CloseHolidayTimePickerCommand}"
+                                    Classes="IconText">
+                                <StackPanel Orientation="Horizontal">
+                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </Button>
                             <Button Command="{Binding SaveHolidayTimeCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
@@ -605,7 +648,7 @@
                         </ScrollViewer>
                         
                         <!-- Add Holiday and Delete All Buttons -->
-                        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,0,0,16">
+                        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,0,0,16" Spacing="16">
                             <Button Command="{Binding AddHolidayCommand}"
                                      Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
@@ -635,11 +678,14 @@
                         <!-- Action Buttons -->
                         <StackPanel Grid.Row="6"
                                   Orientation="Horizontal" 
-                                  HorizontalAlignment="Right">
-                            <Button Background="Transparent"
-                                    Command="{Binding CancelHolidaySeriesManagerCommand}"
-                                    >
-                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                  HorizontalAlignment="Right"
+                                  Spacing="16">
+                            <Button Command="{Binding CancelHolidaySeriesManagerCommand}"
+                                    Classes="IconText">
+                                <StackPanel Orientation="Horizontal">
+                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </Button>
                             <Button Command="{Binding SaveHolidaySeriesCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
@@ -703,11 +749,14 @@
                         </ComboBox>
                         
                         <StackPanel Orientation="Horizontal" 
-                                  HorizontalAlignment="Right">
-                            <Button Background="Transparent"
-                                    Command="{Binding CancelEditHolidayCommand}"
-                                    >
-                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                  HorizontalAlignment="Right"
+                                  Spacing="16">
+                            <Button Command="{Binding CancelEditHolidayCommand}"
+                                    Classes="IconText">
+                                <StackPanel Orientation="Horizontal">
+                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </Button>
                             <Button Command="{Binding SaveEditHolidayCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
@@ -753,7 +802,8 @@
                         <StackPanel Spacing="4">
                             <TextBlock Text="Country" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                             <ComboBox ItemsSource="{Binding Countries}"
-                                      SelectedItem="{Binding SelectedCountry}"/>
+                                      SelectedItem="{Binding SelectedCountry}"
+                                      VerticalContentAlignment="Center"/>
                         </StackPanel>
 
                         <StackPanel IsVisible="{Binding IsSwitzerlandSelected, Converter={StaticResource BooleanToVisibilityConverter}}" Spacing="8">
@@ -766,14 +816,14 @@
                                             ToolTip.Tip="Aargau Holiday Reference Information"
                                             Width="40"
                                             >
-                                        <fi:SymbolIcon  Symbol="Info" Foreground="#FFD700"/>
+                                        <fi:SymbolIcon  Symbol="Info" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                                     </Button>
                                     <!-- Animated arrow pointing to info button -->
                                     <StackPanel Orientation="Horizontal" 
                                                 IsVisible="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                 Spacing="4"
                                                 VerticalAlignment="Center">
-                                        <fi:SymbolIcon  Symbol="ArrowLeft" Foreground="#FFD700"/>
+                                        <fi:SymbolIcon  Symbol="ArrowLeft" Foreground="#FFD700" Classes="AnimatedArrow"/>
                                         <TextBlock Text="Click for reference" 
                                                    FontSize="14"
                                                    Foreground="#FFD700"
@@ -782,28 +832,33 @@
                                     </StackPanel>
                                 </StackPanel>
                                 <ComboBox ItemsSource="{Binding Cantons}"
-                                          SelectedItem="{Binding SelectedCanton}"/>
+                                          SelectedItem="{Binding SelectedCanton}"
+                                          VerticalContentAlignment="Center"/>
                             </StackPanel>
 
                             <StackPanel IsVisible="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}" Spacing="4">
                                 <TextBlock Text="Bezirk" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                 <ComboBox ItemsSource="{Binding Bezirke}"
-                                          SelectedItem="{Binding SelectedBezirk}"/>
+                                          SelectedItem="{Binding SelectedBezirk}"
+                                          VerticalContentAlignment="Center"/>
                             </StackPanel>
                         </StackPanel>
 
                         <StackPanel Spacing="4">
                             <TextBlock Text="Year" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                             <ComboBox ItemsSource="{Binding Years}"
-                                      SelectedItem="{Binding SelectedYear}"/>
+                                      SelectedItem="{Binding SelectedYear}"
+                                      VerticalContentAlignment="Center"/>
                         </StackPanel>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-                        <Button Background="Transparent"
-                                Command="{Binding CancelPredefinedHolidaysWizardCommand}"
-                                >
-                            <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0" Spacing="16">
+                        <Button Command="{Binding CancelPredefinedHolidaysWizardCommand}"
+                                Classes="IconText">
+                            <StackPanel Orientation="Horizontal">
+                                <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                            </StackPanel>
                         </Button>
                         <Button Command="{Binding ApplyPredefinedHolidaysCommand}"
                                 IsEnabled="{Binding CanApplyPredefinedSelection}" Classes="IconText">
@@ -1055,11 +1110,13 @@
                             <StackPanel Orientation="Horizontal" 
                                       HorizontalAlignment="Right"
                                       Margin="0,24,0,0"
-                                      Spacing="8">
-                                <Button Background="Transparent"
-                                        Command="{Binding CancelCallQueueConfigurationCommand}"
-                                        >
-                                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                      Spacing="16">
+                                <Button Command="{Binding CancelCallQueueConfigurationCommand}"
+                                        Classes="IconText">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                    </StackPanel>
                                 </Button>
                                 <Button Command="{Binding SaveCallQueueConfigurationCommand}" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">

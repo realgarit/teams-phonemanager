@@ -268,7 +268,7 @@
             </Border.Styles>
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                   PointerPressed="LogDialogCard_PointerPressed">
-                <Border Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                <Border Background="{DynamicResource SolidBackgroundFillColorBase}"
                         BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
                         BorderThickness="1"
                         CornerRadius="8"
@@ -330,10 +330,10 @@
                         <StackPanel Grid.Row="2" 
                                    Orientation="Horizontal" 
                                    HorizontalAlignment="Right"
-                                   Margin="16,8,16,16">
-                            <Button Background="Transparent"
-                                    Command="{Binding ClearLogCommand}"
-                                    >
+                                   Margin="16,8,16,16"
+                                   Spacing="16">
+                            <Button Command="{Binding ClearLogCommand}"
+                                    Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
                                     <fi:SymbolIcon FontSize="16"
                                              Symbol="Delete"
@@ -342,8 +342,15 @@
                                     <TextBlock Text="Clear Log" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
-                            <Button Command="{Binding CloseLogDialogCommand}">
-                                <TextBlock Text="Close" VerticalAlignment="Center"/>
+                            <Button Command="{Binding CloseLogDialogCommand}"
+                                    Classes="IconText">
+                                <StackPanel Orientation="Horizontal">
+                                    <fi:SymbolIcon FontSize="16"
+                                             Symbol="Dismiss"
+                                             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                             />
+                                    <TextBlock Text="Close" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </Button>
                         </StackPanel>
                     </Grid>
@@ -376,7 +383,7 @@
         
         <!-- Side panel -->
         <Border Grid.RowSpan="3"
-                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                Background="{DynamicResource SolidBackgroundFillColorBase}"
                 Width="360"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Stretch"
