@@ -24,10 +24,6 @@
             <Setter Property="Background" Value="{DynamicResource TeamsPrimaryBrush}"/>
             <Setter Property="Padding" Value="16"/>
         </Style>
-        <Style Selector="fi|SymbolIcon">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="0,-2,0,0"/>
-        </Style>
     </Window.Styles>
 
     <Grid x:Name="MainGrid">
@@ -41,7 +37,7 @@
         <Border Grid.Row="0" Classes="header">
             <DockPanel LastChildFill="False">
                 <TextBlock Text="Teams Phone Manager" 
-                         FontSize="20"
+                         
                          FontWeight="SemiBold"
                          VerticalAlignment="Center"
                          Foreground="White"/>
@@ -51,8 +47,11 @@
                         Background="Transparent"
                         Foreground="White"
                         Width="40"
-                        Height="40">
-                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Settings}" FontSize="20"/>
+                        Height="40"
+                        Classes="IconOnly">
+                    <fi:SymbolIcon 
+                              Symbol="Settings"
+                              Foreground="White"/>
                 </Button>
             </DockPanel>
         </Border>
@@ -74,8 +73,8 @@
                 <ListBox x:Name="NavigationListBox" Grid.Column="0" SelectionChanged="NavigationListBox_SelectionChanged">
                     <ListBoxItem Tag="Welcome" VerticalContentAlignment="Center">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
-                                      Data="{StaticResource HomeIconPath}"
+                            <fi:SymbolIcon 
+                                      Symbol="Home"
                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                             <TextBlock Text="Welcome" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -83,8 +82,8 @@
                     
                     <ListBoxItem Tag="GetStarted" VerticalContentAlignment="Center">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
-                                      Data="{StaticResource RocketIconPath}"
+                            <fi:SymbolIcon 
+                                      Symbol="Rocket"
                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                             <TextBlock Text="Get Started" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -92,8 +91,8 @@
                     
                     <ListBoxItem Tag="Variables" VerticalContentAlignment="Center">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
-                                      Data="{StaticResource CodeIconPath}"
+                            <fi:SymbolIcon 
+                                      Symbol="Code"
                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                             <TextBlock Text="Variables" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -101,8 +100,8 @@
                     
                     <ListBoxItem Tag="M365Groups" VerticalContentAlignment="Center">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
-                                      Data="{StaticResource PeopleTeamIconPath}"
+                            <fi:SymbolIcon 
+                                      Symbol="PeopleTeam"
                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                             <TextBlock Text="M365 Groups" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -110,8 +109,8 @@
                     
                     <ListBoxItem Tag="CallQueues" VerticalContentAlignment="Center">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
-                                      Data="{StaticResource CallInboundIconPath}"
+                            <fi:SymbolIcon 
+                                      Symbol="CallInbound"
                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                             <TextBlock Text="Call Queues" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -119,8 +118,8 @@
                     
                     <ListBoxItem Tag="AutoAttendants" VerticalContentAlignment="Center">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
-                                      Data="{StaticResource BotIconPath}"
+                            <fi:SymbolIcon 
+                                      Symbol="Bot"
                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                             <TextBlock Text="Auto Attendants" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -128,8 +127,8 @@
                     
                     <ListBoxItem Tag="Holidays" VerticalContentAlignment="Center">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <PathIcon Width="20" Height="20" VerticalAlignment="Center"
-                                      Data="{StaticResource CalendarIconPath}"
+                            <fi:SymbolIcon 
+                                      Symbol="Calendar"
                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                             <TextBlock Text="Holidays" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -221,10 +220,11 @@
                         </Grid.ColumnDefinitions>
                         
                         <fi:SymbolIcon Grid.Column="0" 
-                                       Symbol="{x:Static fic:Symbol.Code}" 
-                                       FontSize="16"
-                                       Margin="0,0,8,0"
-                                       VerticalAlignment="Center"/>
+                                  FontSize="16"
+                                  Symbol="Code"
+                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                  
+                                  VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="1" 
                                  Text="{Binding LatestLogEntry}" 
                                  TextTrimming="CharacterEllipsis" 
@@ -232,11 +232,12 @@
                                  FontFamily="Consolas"
                                  FontSize="12"/>
                         <fi:SymbolIcon Grid.Column="2" 
-                                       Symbol="{x:Static fic:Symbol.ChevronRight}" 
-                                       FontSize="14"
-                                       Margin="8,0,0,0"
-                                       Opacity="0.6"
-                                       VerticalAlignment="Center"/>
+                                  FontSize="14"
+                                  Symbol="ChevronRight"
+                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                  Margin="8,0,0,0"
+                                  Opacity="0.6"
+                                  VerticalAlignment="Center"/>
                     </Grid>
                 </Button>
                 
@@ -283,7 +284,7 @@
                         <Border Grid.Row="0" Classes="header" Padding="16">
                             <DockPanel LastChildFill="False">
                                 <TextBlock Text="Log Viewer" 
-                                         FontSize="20"
+                                         
                                          FontWeight="SemiBold"
                                          Foreground="White"
                                          VerticalAlignment="Center"/>
@@ -293,7 +294,9 @@
                                         Command="{Binding CloseLogDialogCommand}"
                                         Width="40"
                                         Height="40">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Dismiss}" FontSize="20"/>
+                                    <fi:SymbolIcon 
+                                             Symbol="Dismiss"
+                                             Foreground="White"/>
                                 </Button>
                             </DockPanel>
                         </Border>
@@ -330,14 +333,17 @@
                                    Margin="16,8,16,16">
                             <Button Background="Transparent"
                                     Command="{Binding ClearLogCommand}"
-                                    Margin="0,0,8,0">
+                                    >
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Delete}" FontSize="16" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Clear Log"/>
+                                    <fi:SymbolIcon FontSize="16"
+                                             Symbol="Delete"
+                                             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                             />
+                                    <TextBlock Text="Clear Log" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                             <Button Command="{Binding CloseLogDialogCommand}">
-                                <TextBlock Text="Close"/>
+                                <TextBlock Text="Close" VerticalAlignment="Center"/>
                             </Button>
                         </StackPanel>
                     </Grid>
@@ -389,7 +395,7 @@
                 <Border Grid.Row="0" Classes="header" Padding="24">
                     <DockPanel LastChildFill="False">
                         <TextBlock Text="Settings" 
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Foreground="White"
                                  VerticalAlignment="Center"/>
@@ -399,7 +405,9 @@
                                 Command="{Binding CloseSettingsCommand}"
                                 Width="40"
                                 Height="40">
-                            <fi:SymbolIcon Symbol="Dismiss" FontSize="20"/>
+                            <fi:SymbolIcon 
+                                     Symbol="Dismiss"
+                                     Foreground="White"/>
                         </Button>
                     </DockPanel>
                 </Border>

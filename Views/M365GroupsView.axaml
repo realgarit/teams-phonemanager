@@ -20,23 +20,10 @@
     </UserControl.Resources>
 
     <UserControl.Styles>
-        <Style Selector="Border.card">
-            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="16"/>
-        </Style>
-        <Style Selector="Border.dialog">
-            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="16"/>
-        </Style>
+        <!-- Local styles removed, using App.axaml styles -->
     </UserControl.Styles>
 
-    <Border Classes="card" Margin="32">
+    <Border Classes="card" Margin="24">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -76,21 +63,21 @@
 
                     <Button Grid.Column="0"
                             Command="{Binding RetrieveM365GroupsCommand}"
-                            Height="40"
-                            Margin="0,0,16,0">
+                            
+                            Margin="0,0,16,0" Classes="IconText">
                         <StackPanel Orientation="Horizontal">
-                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.ArrowSync}" FontSize="20" Margin="0,0,8,0"/>
-                            <TextBlock Text="Retrieve Groups"/>
+                            <fi:SymbolIcon  Symbol="ArrowSync" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Retrieve Groups" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
                     
                     <Button Grid.Column="1"
                             Command="{Binding OpenCreateGroupDialogCommand}"
-                            Height="40"
-                            Margin="0,0,16,0">
+                            
+                            Margin="0,0,16,0" Classes="IconText">
                         <StackPanel Orientation="Horizontal">
-                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Add}" FontSize="20" Margin="0,0,8,0"/>
-                            <TextBlock Text="Create New Group"/>
+                            <fi:SymbolIcon  Symbol="Add" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Create New Group" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
 
@@ -144,7 +131,7 @@
                     <Border Classes="dialog" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Confirm Variables"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         <TextBlock Text="Please confirm that you have set up all required variables in the Variables page before proceeding."
@@ -154,16 +141,16 @@
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right">
                             <Button Command="{Binding NavigateToVariablesPageCommand}"
-                                    Margin="0,0,8,0">
+                                     Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Code}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Go to Variables"/>
+                                    <fi:SymbolIcon  Symbol="Code" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Go to Variables" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
-                            <Button Command="{Binding CheckM365GroupCommand}">
+                            <Button Command="{Binding CheckM365GroupCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Checkmark}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Continue"/>
+                                    <fi:SymbolIcon  Symbol="Checkmark" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Continue" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -196,7 +183,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create New M365 Group"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -227,13 +214,13 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseCreateGroupDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
-                            <Button Command="{Binding CreateNewGroupCommand}">
+                            <Button Command="{Binding CreateNewGroupCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Add}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Create Group"/>
+                                    <fi:SymbolIcon  Symbol="Add" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Create Group" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -249,7 +236,7 @@
                 <ProgressBar Value="0"
                            IsIndeterminate="True"
                            Width="50"
-                           Height="50"/>
+                           />
             </Grid>
         </Grid>
     </Border>

@@ -15,13 +15,7 @@
     </UserControl.DataContext>
 
     <UserControl.Styles>
-        <Style Selector="Border.card">
-            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="16"/>
-        </Style>
+        <!-- Local styles removed, using App.axaml styles -->
     </UserControl.Styles>
 
     <ScrollViewer HorizontalScrollBarVisibility="Disabled">
@@ -30,7 +24,9 @@
             <Border Classes="card" Margin="0,0,0,24">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16" VerticalAlignment="Center">
-                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PeopleTeam}" FontSize="72" Margin="0,0,16,0" VerticalAlignment="Center"/>
+                        <fi:SymbolIcon Symbol="PeopleTeam" FontSize="72"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                      Margin="0,0,16,0"/>
                         <TextBlock Text="Teams Phone Manager"
                                  FontSize="32"
                                  FontWeight="Bold"
@@ -49,25 +45,25 @@
                               HorizontalAlignment="Center"
                               Margin="0,0,0,24">
                         <Button Command="{Binding NavigateToGetStartedCommand}"
+                                Classes="IconTextCentered"
                                 Margin="0,0,16,0"
-                                Padding="30,15"
                                 FontSize="16"
                                 FontWeight="Bold"
-                                MinWidth="200"
-                                Height="50">
+                                MinWidth="200">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Rocket}}" FontSize="20" Margin="0,0,8,0"/>
+                                <fi:SymbolIcon Symbol="Rocket" 
+                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                                 <TextBlock Text="Get Started"/>
                             </StackPanel>
                         </Button>
                         <Button Command="{Binding OpenDocumentationCommand}"
-                                Padding="30,15"
+                                Classes="IconTextCentered"
                                 FontSize="16"
                                 FontWeight="Bold"
-                                MinWidth="200"
-                                Height="50">
+                                MinWidth="200">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Code}}" FontSize="20" Margin="0,0,8,0"/>
+                                <fi:SymbolIcon Symbol="Code" 
+                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                                 <TextBlock Text="GitHub"/>
                             </StackPanel>
                         </Button>
@@ -99,7 +95,9 @@
                        CornerRadius="8">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Settings}}" FontSize="32" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <fi:SymbolIcon Symbol="Settings" FontSize="32"
+                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                     />
                             <TextBlock Text="Setup &amp; Config"
                                      FontSize="18"
                                      FontWeight="Bold"
@@ -120,7 +118,9 @@
                        CornerRadius="8">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Code}" FontSize="32" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <fi:SymbolIcon Symbol="Code" FontSize="32"
+                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                     />
                             <TextBlock Text="Variables"
                                      FontSize="18"
                                      FontWeight="Bold"
@@ -141,7 +141,9 @@
                        CornerRadius="8">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.People}}" FontSize="32" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <fi:SymbolIcon Symbol="People" FontSize="32"
+                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                     />
                             <TextBlock Text="M365 Groups"
                                      FontSize="18"
                                      FontWeight="Bold"
@@ -162,7 +164,9 @@
                        CornerRadius="8">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallInbound}}" FontSize="32" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <fi:SymbolIcon Symbol="CallInbound" FontSize="32"
+                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                     />
                             <TextBlock Text="Call Queues"
                                      FontSize="18"
                                      FontWeight="Bold"
@@ -180,11 +184,13 @@
                 <!-- Auto Attendants -->
                 <Border Grid.Row="2" Grid.Column="0" 
                        Classes="card"
-                       Margin="0,0,8,0" 
+                        
                        CornerRadius="8">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Bot}}" FontSize="32" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <fi:SymbolIcon Symbol="Bot" FontSize="32"
+                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                     />
                             <TextBlock Text="Auto Attendants"
                                      FontSize="18"
                                      FontWeight="Bold"
@@ -206,7 +212,9 @@
                        CornerRadius="8">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Calendar}}" FontSize="32" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <fi:SymbolIcon Symbol="Calendar" FontSize="32"
+                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                     />
                             <TextBlock Text="Holidays"
                                      FontSize="18"
                                      FontWeight="Bold"
@@ -225,7 +233,9 @@
             <Border Classes="card" Margin="0,24,0,0">
                 <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,16" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Flash}}" FontSize="28" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <fi:SymbolIcon Symbol="Flash" FontSize="28"
+                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                     />
                             <TextBlock Text="Quick Start Guide"
                                  FontSize="18"
                                  FontWeight="Bold"
@@ -239,7 +249,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         
-                        <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                        <StackPanel Grid.Column="0" >
                             <TextBlock Text="1. Setup"
                                      FontSize="16"
                                      FontWeight="Bold"

@@ -20,24 +20,11 @@
     </UserControl.Resources>
 
     <UserControl.Styles>
-        <Style Selector="Border.card">
-            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="16"/>
-        </Style>
-        <Style Selector="Border.dialog">
-            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="16"/>
-        </Style>
+        <!-- Local styles removed, using App.axaml styles -->
     </UserControl.Styles>
 
     <Grid>
-    <Border Classes="card" Margin="32">
+    <Border Classes="card" Margin="24">
         <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -79,10 +66,10 @@
                                              Margin="0,0,0,16"/>
                                     <Button
                                             Command="{Binding OpenCreateHolidayDialogCommand}"
-                                            HorizontalAlignment="Left">
+                                            HorizontalAlignment="Left" Classes="IconText">
                                         <StackPanel Orientation="Horizontal">
-                                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CalendarAdd}" FontSize="20" Margin="0,0,8,0"/>
-                                            <TextBlock Text="Create Holiday"/>
+                                            <fi:SymbolIcon  Symbol="CalendarAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                            <TextBlock Text="Create Holiday" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
@@ -101,10 +88,10 @@
                                              Margin="0,0,0,16"/>
                                     <Button
                                             Command="{Binding OpenCheckAutoAttendantDialogCommand}"
-                                            HorizontalAlignment="Left">
+                                            HorizontalAlignment="Left" Classes="IconText">
                                         <StackPanel Orientation="Horizontal">
-                                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallCheckmark}" FontSize="20" Margin="0,0,8,0"/>
-                                            <TextBlock Text="Check Auto Attendant"/>
+                                            <fi:SymbolIcon  Symbol="CallCheckmark" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                            <TextBlock Text="Check Auto Attendant" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
@@ -124,10 +111,10 @@
                                     <StackPanel Orientation="Horizontal">
                                         <Button
                                                 Command="{Binding OpenAttachHolidayDialogCommand}"
-                                                Margin="0,0,16,0">
+                                                Margin="0,0,16,0" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Link}" FontSize="20" Margin="0,0,8,0"/>
-                                                <TextBlock Text="Attach to Auto Attendant"/>
+                                                <fi:SymbolIcon  Symbol="Link" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <TextBlock Text="Attach to Auto Attendant" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -170,7 +157,7 @@
                 <Border Classes="dialog" MinWidth="400" Margin="16">
                     <StackPanel>
                         <TextBlock Text="Create Holiday"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -187,14 +174,14 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseCreateHolidayDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
                             <Button
-                                    Command="{Binding CreateHolidayCommand}">
+                                    Command="{Binding CreateHolidayCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CalendarAdd}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Create Holiday"/>
+                                    <fi:SymbolIcon  Symbol="CalendarAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Create Holiday" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -227,7 +214,7 @@
                 <Border Classes="dialog" MinWidth="400" Margin="16">
                     <StackPanel>
                         <TextBlock Text="Check Auto Attendant"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -248,14 +235,14 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseCheckAutoAttendantDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
                             <Button
-                                    Command="{Binding VerifyAutoAttendantCommand}">
+                                    Command="{Binding VerifyAutoAttendantCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Checkmark}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Verify &amp; Confirm"/>
+                                    <fi:SymbolIcon  Symbol="Checkmark" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Verify &amp; Confirm" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -288,7 +275,7 @@
                 <Border Classes="dialog" MinWidth="400" Margin="16">
                     <StackPanel>
                         <TextBlock Text="Attach Holiday to Auto Attendant"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -316,14 +303,14 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseAttachHolidayDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
                             <Button
-                                    Command="{Binding AttachHolidayToAutoAttendantCommand}">
+                                    Command="{Binding AttachHolidayToAutoAttendantCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Link}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Attach Holiday"/>
+                                    <fi:SymbolIcon  Symbol="Link" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Attach Holiday" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -340,7 +327,7 @@
                        Value="0"
                        IsIndeterminate="True"
                        Width="50"
-                       Height="50"
+                       
                        Margin="0,16,0,0"/>
             
             <!-- Waiting Message -->

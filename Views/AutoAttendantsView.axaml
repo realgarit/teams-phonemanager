@@ -80,21 +80,21 @@
 
                                 <Button Grid.Column="0"
                                         Command="{Binding RetrieveResourceAccountsCommand}"
-                                        Height="40"
-                                        Margin="0,0,16,0">
+                                        
+                                        Margin="0,0,16,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
-                                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.ArrowSync}" FontSize="20" Margin="0,0,8,0"/>
-                                        <TextBlock Text="Retrieve Accounts"/>
+                                        <fi:SymbolIcon  Symbol="ArrowSync" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <TextBlock Text="Retrieve Accounts" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
 
                                 <Button Grid.Column="1"
                                         Command="{Binding OpenCreateResourceAccountDialogCommand}"
-                                        Height="40"
-                                        Margin="0,0,16,0">
+                                        
+                                        Margin="0,0,16,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
-                                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PersonAdd}" FontSize="20" Margin="0,0,8,0"/>
-                                        <TextBlock Text="Create Account"/>
+                                        <fi:SymbolIcon  Symbol="PersonAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <TextBlock Text="Create Account" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
 
@@ -146,21 +146,21 @@
 
                                 <Button Grid.Column="0"
                                         Command="{Binding RetrieveAutoAttendantsCommand}"
-                                        Height="40"
-                                        Margin="0,0,16,0">
+                                        
+                                        Margin="0,0,16,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
-                                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.ArrowSync}" FontSize="20" Margin="0,0,8,0"/>
-                                        <TextBlock Text="Retrieve Auto Attendants"/>
+                                        <fi:SymbolIcon  Symbol="ArrowSync" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <TextBlock Text="Retrieve Auto Attendants" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
 
                                 <Button Grid.Column="1"
                                         Command="{Binding OpenCreateAutoAttendantDialogCommand}"
-                                        Height="40"
-                                        Margin="0,0,16,0">
+                                        
+                                        Margin="0,0,16,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
-                                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallInbound}" FontSize="20" Margin="0,0,8,0"/>
-                                        <TextBlock Text="Create Auto Attendant"/>
+                                        <fi:SymbolIcon  Symbol="CallInbound" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <TextBlock Text="Create Auto Attendant" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
 
@@ -215,10 +215,10 @@
                                                  Margin="0,0,0,16"/>
                                         <Button
                                                 Command="{Binding OpenCreateResourceAccountDialogCommand}"
-                                                HorizontalAlignment="Left">
+                                                HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PersonAdd}" FontSize="20" Margin="0,0,8,0"/>
-                                                <TextBlock Text="Create Resource Account"/>
+                                                <fi:SymbolIcon  Symbol="PersonAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <TextBlock Text="Create Resource Account" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -237,10 +237,10 @@
                                                  Margin="0,0,0,16"/>
                                         <Button
                                                 Command="{Binding OpenUpdateUsageLocationDialogCommand}"
-                                                HorizontalAlignment="Left">
+                                                HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Location}" FontSize="20" Margin="0,0,8,0"/>
-                                                <TextBlock Text="Update Usage Location"/>
+                                                <fi:SymbolIcon  Symbol="Location" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <TextBlock Text="Update Usage Location" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -259,10 +259,10 @@
                                                  Margin="0,0,0,16"/>
                                         <Button
                                                 Command="{Binding AssignLicenseCommand}"
-                                                HorizontalAlignment="Left">
+                                                HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Certificate}" FontSize="20" Margin="0,0,8,0"/>
-                                                <TextBlock Text="Assign License"/>
+                                                <fi:SymbolIcon  Symbol="Certificate" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <TextBlock Text="Assign License" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -281,10 +281,10 @@
                                                  Margin="0,0,0,16"/>
                                         <Button
                                                 Command="{Binding OpenValidateCallQueueDialogCommand}"
-                                                HorizontalAlignment="Left">
+                                                HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Person}" FontSize="20" Margin="0,0,8,0"/>
-                                                <TextBlock Text="Validate Call Queue Account"/>
+                                                <fi:SymbolIcon  Symbol="Person" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <TextBlock Text="Validate Call Queue Account" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -303,10 +303,10 @@
                                                  Margin="0,0,0,16"/>
                                         <Button
                                                 Command="{Binding OpenCreateCallTargetDialogCommand}"
-                                                HorizontalAlignment="Left">
+                                                HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PersonArrowRight}" FontSize="20" Margin="0,0,8,0"/>
-                                                <TextBlock Text="Create Call Target"/>
+                                                <fi:SymbolIcon  Symbol="PersonArrowRight" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <TextBlock Text="Create Call Target" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -325,10 +325,10 @@
                                                  Margin="0,0,0,16"/>
                                         <Button
                                                 Command="{Binding OpenCreateDefaultCallFlowDialogCommand}"
-                                                HorizontalAlignment="Left">
+                                                HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallForward}" FontSize="20" Margin="0,0,8,0"/>
-                                                <TextBlock Text="Create Default Call Flow"/>
+                                                <fi:SymbolIcon  Symbol="CallForward" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <TextBlock Text="Create Default Call Flow" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -347,10 +347,10 @@
                                                  Margin="0,0,0,16"/>
                                         <Button
                                                 Command="{Binding OpenCreateAfterHoursCallFlowDialogCommand}"
-                                                HorizontalAlignment="Left">
+                                                HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallEnd}" FontSize="20" Margin="0,0,8,0"/>
-                                                <TextBlock Text="Create After Hours Call Flow"/>
+                                                <fi:SymbolIcon  Symbol="CallEnd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <TextBlock Text="Create After Hours Call Flow" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -369,10 +369,10 @@
                                                  Margin="0,0,0,16"/>
                                         <Button
                                                 Command="{Binding OpenCreateAfterHoursScheduleDialogCommand}"
-                                                HorizontalAlignment="Left">
+                                                HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Clock}" FontSize="20" Margin="0,0,8,0"/>
-                                                <TextBlock Text="Create After Hours Schedule"/>
+                                                <fi:SymbolIcon  Symbol="Clock" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <TextBlock Text="Create After Hours Schedule" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -391,10 +391,10 @@
                                                  Margin="0,0,0,16"/>
                                         <Button
                                                 Command="{Binding OpenCreateCallHandlingAssociationDialogCommand}"
-                                                HorizontalAlignment="Left">
+                                                HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Link}" FontSize="20" Margin="0,0,8,0"/>
-                                                <TextBlock Text="Create Call Handling Association"/>
+                                                <fi:SymbolIcon  Symbol="Link" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <TextBlock Text="Create Call Handling Association" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -413,10 +413,10 @@
                                                  Margin="0,0,0,16"/>
                                         <Button
                                                 Command="{Binding OpenCreateAutoAttendantDialogCommand}"
-                                                HorizontalAlignment="Left">
+                                                HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallInbound}" FontSize="20" Margin="0,0,8,0"/>
-                                                <TextBlock Text="Create Auto Attendant"/>
+                                                <fi:SymbolIcon  Symbol="CallInbound" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <TextBlock Text="Create Auto Attendant" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -435,10 +435,10 @@
                                                  Margin="0,0,0,16"/>
                                         <Button
                                                 Command="{Binding OpenAssociateDialogCommand}"
-                                                HorizontalAlignment="Left">
+                                                HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Link}" FontSize="20" Margin="0,0,8,0"/>
-                                                <TextBlock Text="Associate Account"/>
+                                                <fi:SymbolIcon  Symbol="Link" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <TextBlock Text="Associate Account" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -482,7 +482,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Resource Account"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -510,14 +510,14 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseCreateResourceAccountDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
                             <Button
-                                    Command="{Binding CreateResourceAccountCommand}">
+                                    Command="{Binding CreateResourceAccountCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PersonAdd}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Create Account"/>
+                                    <fi:SymbolIcon  Symbol="PersonAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Create Account" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -550,7 +550,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Update Usage Location"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -572,14 +572,14 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseUpdateUsageLocationDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
                             <Button
-                                    Command="{Binding UpdateUsageLocationCommand}">
+                                    Command="{Binding UpdateUsageLocationCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Location}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Update Location"/>
+                                    <fi:SymbolIcon  Symbol="Location" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Update Location" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -612,7 +612,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Auto Attendant"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -633,14 +633,14 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseCreateAutoAttendantDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
                             <Button
-                                    Command="{Binding CreateAutoAttendantCommand}">
+                                    Command="{Binding CreateAutoAttendantCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallInbound}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Create Auto Attendant"/>
+                                    <fi:SymbolIcon  Symbol="CallInbound" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Create Auto Attendant" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -673,7 +673,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Associate Resource Account with Auto Attendant"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -701,14 +701,14 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseAssociateDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
                             <Button
-                                    Command="{Binding AssociateResourceAccountWithAutoAttendantCommand}">
+                                    Command="{Binding AssociateResourceAccountWithAutoAttendantCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Link}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Associate"/>
+                                    <fi:SymbolIcon  Symbol="Link" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Associate" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -741,7 +741,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Validate Call Queue Resource Account"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -762,14 +762,14 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseValidateCallQueueDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
                             <Button
-                                    Command="{Binding ValidateCallQueueResourceAccountCommand}">
+                                    Command="{Binding ValidateCallQueueResourceAccountCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Person}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Validate Account"/>
+                                    <fi:SymbolIcon  Symbol="Person" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Validate Account" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -802,7 +802,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Call Target"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -816,14 +816,14 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseCreateCallTargetDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
                             <Button
-                                    Command="{Binding CreateCallTargetCommand}">
+                                    Command="{Binding CreateCallTargetCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PersonArrowRight}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Create Call Target"/>
+                                    <fi:SymbolIcon  Symbol="PersonArrowRight" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Create Call Target" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -856,7 +856,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Default Call Flow"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -870,14 +870,14 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseCreateDefaultCallFlowDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
                             <Button
-                                    Command="{Binding CreateDefaultCallFlowCommand}">
+                                    Command="{Binding CreateDefaultCallFlowCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallForward}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Create Default Call Flow"/>
+                                    <fi:SymbolIcon  Symbol="CallForward" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Create Default Call Flow" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -910,7 +910,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create After Hours Call Flow"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -924,14 +924,14 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseCreateAfterHoursCallFlowDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
                             <Button
-                                    Command="{Binding CreateAfterHoursCallFlowCommand}">
+                                    Command="{Binding CreateAfterHoursCallFlowCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CallEnd}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Create After Hours Call Flow"/>
+                                    <fi:SymbolIcon  Symbol="CallEnd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Create After Hours Call Flow" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -964,7 +964,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create After Hours Schedule"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -978,14 +978,14 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseCreateAfterHoursScheduleDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
                             <Button
-                                    Command="{Binding CreateAfterHoursScheduleCommand}">
+                                    Command="{Binding CreateAfterHoursScheduleCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Clock}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Create After Hours Schedule"/>
+                                    <fi:SymbolIcon  Symbol="Clock" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Create After Hours Schedule" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -1018,7 +1018,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Call Handling Association"
-                                 FontSize="20"
+                                 
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
@@ -1032,14 +1032,14 @@
                                   HorizontalAlignment="Right">
                             <Button Background="Transparent"
                                     Command="{Binding CloseCreateCallHandlingAssociationDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
+                                    >
+                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                             </Button>
                             <Button
-                                    Command="{Binding CreateCallHandlingAssociationCommand}">
+                                    Command="{Binding CreateCallHandlingAssociationCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Link}" FontSize="20" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Create Call Handling Association"/>
+                                    <fi:SymbolIcon  Symbol="Link" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Create Call Handling Association" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
@@ -1055,7 +1055,7 @@
                            Value="0"
                            IsIndeterminate="True"
                            Width="50"
-                           Height="50"
+                           
                            Margin="0,16,0,0"/>
                 
                 <!-- Waiting Message -->

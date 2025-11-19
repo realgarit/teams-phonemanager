@@ -21,13 +21,7 @@
     </UserControl.Resources>
 
     <UserControl.Styles>
-        <Style Selector="Border.card">
-            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="16"/>
-        </Style>
+        <!-- Local styles removed, using App.axaml styles -->
     </UserControl.Styles>
 
     <ScrollViewer HorizontalScrollBarVisibility="Disabled">
@@ -49,10 +43,18 @@
                     </Grid.ColumnDefinitions>
                     
                     <!-- Step Number -->
-                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.NumberCircle1}" 
-                               FontSize="48" 
-                               VerticalAlignment="Center"
-                               Margin="0,0,16,0"/>
+                    <Border Width="48" Height="48" 
+                            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                            CornerRadius="24"
+                            VerticalAlignment="Center"
+                            Margin="0,0,16,0">
+                        <TextBlock Text="1" 
+                                 FontSize="24" 
+                                 FontWeight="Bold"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                    </Border>
                     
                     <!-- Step Content -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -70,16 +72,15 @@
                     <StackPanel Grid.Column="2" Orientation="Vertical">
                         <Button Command="{Binding CheckModulesCommand}"
                                 IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"
-                                Padding="30,15"
-                                FontSize="16"
+                                Classes="IconTextLarge"
                                 FontWeight="Bold"
-                                MinWidth="200"
-                                Height="50">
+                                MinWidth="200">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Box}" 
-                                           FontSize="20" 
-                                           Margin="0,0,8,0"/>
-                                <TextBlock Text="Check Modules"/>
+                                <fi:SymbolIcon 
+                                         Symbol="Box"
+                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                         />
+                                <TextBlock Text="Check Modules" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -96,10 +97,18 @@
                     </Grid.ColumnDefinitions>
                     
                     <!-- Step Number -->
-                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.NumberCircle2}" 
-                               FontSize="48" 
-                               VerticalAlignment="Center"
-                               Margin="0,0,16,0"/>
+                    <Border Width="48" Height="48" 
+                            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                            CornerRadius="24"
+                            VerticalAlignment="Center"
+                            Margin="0,0,16,0">
+                        <TextBlock Text="2" 
+                                 FontSize="24" 
+                                 FontWeight="Bold"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                    </Border>
                     
                     <!-- Step Content -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -117,32 +126,34 @@
                     <StackPanel Grid.Column="2" Orientation="Vertical">
                         <Button Command="{Binding ConnectTeamsCommand}"
                                 IsEnabled="{Binding CanConnectTeams}"
-                                Padding="30,15"
-                                FontSize="16"
+                                
+                                
                                 FontWeight="Bold"
                                 MinWidth="200"
-                                Height="50"
-                                Margin="0,0,0,8">
+                                
+                                Margin="0,0,0,8" Classes="IconTextLarge">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.PeopleTeam}" 
-                                           FontSize="20" 
-                                           Margin="0,0,8,0"/>
-                                <TextBlock Text="Connect Teams"/>
+                                <fi:SymbolIcon 
+                                         Symbol="PeopleTeam"
+                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                         />
+                                <TextBlock Text="Connect Teams" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                         
                         <Button Command="{Binding DisconnectTeamsCommand}"
                                 IsEnabled="{Binding TeamsConnected}"
-                                Padding="30,15"
-                                FontSize="16"
+                                
+                                
                                 FontWeight="Bold"
                                 MinWidth="200"
-                                Height="50">
+                                 Classes="IconTextLarge">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.SignOut}" 
-                                           FontSize="20" 
-                                           Margin="0,0,8,0"/>
-                                <TextBlock Text="Disconnect Teams"/>
+                                <fi:SymbolIcon 
+                                         Symbol="SignOut"
+                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                         />
+                                <TextBlock Text="Disconnect Teams" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -159,10 +170,18 @@
                     </Grid.ColumnDefinitions>
                     
                     <!-- Step Number -->
-                    <fi:SymbolIcon Symbol="{x:Static fic:Symbol.NumberCircle3}" 
-                               FontSize="48" 
-                               VerticalAlignment="Center"
-                               Margin="0,0,16,0"/>
+                    <Border Width="48" Height="48" 
+                            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                            CornerRadius="24"
+                            VerticalAlignment="Center"
+                            Margin="0,0,16,0">
+                        <TextBlock Text="3" 
+                                 FontSize="24" 
+                                 FontWeight="Bold"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                    </Border>
                     
                     <!-- Step Content -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -180,32 +199,34 @@
                     <StackPanel Grid.Column="2" Orientation="Vertical">
                         <Button Command="{Binding ConnectGraphCommand}"
                                 IsEnabled="{Binding CanConnectGraph}"
-                                Padding="30,15"
-                                FontSize="16"
+                                
+                                
                                 FontWeight="Bold"
                                 MinWidth="200"
-                                Height="50"
-                                Margin="0,0,0,8">
+                                
+                                Margin="0,0,0,8" Classes="IconTextLarge">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.Cloud}" 
-                                           FontSize="20" 
-                                           Margin="0,0,8,0"/>
-                                <TextBlock Text="Connect Graph"/>
+                                <fi:SymbolIcon 
+                                         Symbol="Cloud"
+                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                         />
+                                <TextBlock Text="Connect Graph" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                         
                         <Button Command="{Binding DisconnectGraphCommand}"
                                 IsEnabled="{Binding GraphConnected}"
-                                Padding="30,15"
-                                FontSize="16"
+                                
+                                
                                 FontWeight="Bold"
                                 MinWidth="200"
-                                Height="50">
+                                 Classes="IconTextLarge">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="{x:Static fic:Symbol.SignOut}" 
-                                           FontSize="20" 
-                                           Margin="0,0,8,0"/>
-                                <TextBlock Text="Disconnect Graph"/>
+                                <fi:SymbolIcon 
+                                         Symbol="SignOut"
+                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                         />
+                                <TextBlock Text="Disconnect Graph" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -216,9 +237,10 @@
             <Border Classes="card" Margin="0,24,0,0">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
-                        <fi:SymbolIcon Symbol="{x:Static fic:Symbol.CheckmarkCircle}" 
-                                   FontSize="48" 
-                                   Margin="0,0,16,0"/>
+                        <fi:SymbolIcon FontSize="28"
+                                 Symbol="CheckmarkCircle"
+                                 Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                 />
                         <StackPanel VerticalAlignment="Center">
                             <TextBlock Text="Ready to Continue"
                                      FontSize="18"
@@ -240,18 +262,19 @@
                             CommandParameter="Variables"
                             IsEnabled="{Binding CanProceed}"
                             HorizontalAlignment="Center"
-                            Padding="30,15"
-                            FontSize="16"
+                            
+                            
                             FontWeight="Bold"
                             MinWidth="200"
-                            Height="50">
+                             Classes="IconTextLarge">
                         <StackPanel Orientation="Horizontal">
-                            <fi:SymbolIcon Symbol="{x:Static fic:Symbol.ArrowRight}" 
-                                       FontSize="20" 
-                                       Margin="0,0,8,0"/>
-                            <TextBlock Text="Proceed to Variables"/>
-                        </StackPanel>
-                    </Button>
+                            <fi:SymbolIcon 
+                                         Symbol="ArrowRight"
+                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                         />
+                                <TextBlock Text="Proceed to Variables" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
                 </StackPanel>
             </Border>
 
@@ -265,7 +288,7 @@
                                Height="24"
                                Margin="0,0,16,0"/>
                     <TextBlock Text="Processing..."
-                             FontSize="16"
+                             
                              VerticalAlignment="Center"/>
                 </StackPanel>
             </Border>
