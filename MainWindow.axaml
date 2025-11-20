@@ -293,7 +293,8 @@
                                         Foreground="White"
                                         Command="{Binding CloseLogDialogCommand}"
                                         Width="40"
-                                        Height="40">
+                                        Height="40"
+                                        Classes="IconOnly">
                                     <fi:SymbolIcon 
                                              Symbol="Dismiss"
                                              Foreground="White"/>
@@ -316,6 +317,7 @@
                                    AcceptsReturn="True"
                                    AcceptsTab="True"
                                    Padding="8"
+                                   VerticalContentAlignment="Top"
                                    TextChanged="LogView_TextChanged">
                                 <TextBox.ContextMenu>
                                     <ContextMenu>
@@ -411,7 +413,8 @@
                                 Foreground="White"
                                 Command="{Binding CloseSettingsCommand}"
                                 Width="40"
-                                Height="40">
+                                Height="40"
+                                Classes="IconOnly">
                             <fi:SymbolIcon 
                                      Symbol="Dismiss"
                                      Foreground="White"/>

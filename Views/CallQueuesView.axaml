@@ -20,20 +20,7 @@
     </UserControl.Resources>
 
     <UserControl.Styles>
-        <Style Selector="Border.card">
-            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="16"/>
-        </Style>
-        <Style Selector="Border.dialog">
-            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="CornerRadius" Value="8"/>
-            <Setter Property="Padding" Value="16"/>
-        </Style>
+        <!-- Local styles removed, using App.axaml styles -->
     </UserControl.Styles>
 
     <Border Classes="card" Margin="32">
@@ -383,11 +370,13 @@
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
-                                  HorizontalAlignment="Right">
-                            <Button Background="Transparent"
-                                    Command="{Binding CloseCreateResourceAccountDialogCommand}"
-                                    >
-                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                  HorizontalAlignment="Right"
+                                  Spacing="16">
+                            <Button Command="{Binding CloseCreateResourceAccountDialogCommand}" Classes="IconText">
+                                <StackPanel Orientation="Horizontal">
+                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </Button>
                             <Button
                                     Command="{Binding CreateResourceAccountCommand}" Classes="IconText">
@@ -445,11 +434,13 @@
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
-                                  HorizontalAlignment="Right">
-                            <Button Background="Transparent"
-                                    Command="{Binding CloseUpdateUsageLocationDialogCommand}"
-                                    >
-                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                  HorizontalAlignment="Right"
+                                  Spacing="16">
+                            <Button Command="{Binding CloseUpdateUsageLocationDialogCommand}" Classes="IconText">
+                                <StackPanel Orientation="Horizontal">
+                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </Button>
                             <Button
                                     Command="{Binding UpdateUsageLocationCommand}" Classes="IconText">
@@ -518,11 +509,13 @@
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
-                                  HorizontalAlignment="Right">
-                            <Button Background="Transparent"
-                                    Command="{Binding CloseCreateCallQueueDialogCommand}"
-                                    >
-                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                  HorizontalAlignment="Right"
+                                  Spacing="16">
+                            <Button Command="{Binding CloseCreateCallQueueDialogCommand}" Classes="IconText">
+                                <StackPanel Orientation="Horizontal">
+                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </Button>
                             <Button
                                     Command="{Binding CreateCallQueueCommand}" Classes="IconText">
@@ -586,11 +579,13 @@
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
-                                  HorizontalAlignment="Right">
-                            <Button Background="Transparent"
-                                    Command="{Binding CloseAssociateDialogCommand}"
-                                    >
-                                <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                  HorizontalAlignment="Right"
+                                  Spacing="16">
+                            <Button Command="{Binding CloseAssociateDialogCommand}" Classes="IconText">
+                                <StackPanel Orientation="Horizontal">
+                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </Button>
                             <Button
                                     Command="{Binding AssociateResourceAccountWithCallQueueCommand}" Classes="IconText">

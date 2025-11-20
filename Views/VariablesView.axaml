@@ -622,23 +622,35 @@
                                                 </StackPanel>
                                                 
                                                 <Button Grid.Column="1"
-                                                        Background="Transparent"
                                                         Command="{Binding DataContext.EditHolidayCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                         CommandParameter="{Binding}"
                                                         Margin="8,0"
                                                         Width="40"
+                                                        Height="40"
+                                                        Classes="IconOnly"
+                                                        Padding="0"
                                                         >
-                                                    <fi:SymbolIcon  Symbol="Edit" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                    <fi:SymbolIcon  Symbol="Edit" 
+                                                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                  Margin="0,-2,0,0"
+                                                                  HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
                                                 </Button>
                                                 
                                                 <Button Grid.Column="2"
-                                                        Background="Transparent"
                                                         Command="{Binding DataContext.RemoveHolidayCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                         CommandParameter="{Binding}"
                                                         Margin="8,0"
                                                         Width="40"
+                                                        Height="40"
+                                                        Classes="IconOnly"
+                                                        Padding="0"
                                                         >
-                                                    <fi:SymbolIcon  Symbol="Delete" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                    <fi:SymbolIcon  Symbol="Delete" 
+                                                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                                  Margin="0,-2,0,0"
+                                                                  HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
                                                 </Button>
                                             </Grid>
                                         </Border>
@@ -652,7 +664,7 @@
                             <Button Command="{Binding AddHolidayCommand}"
                                      Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon  Symbol="Add" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <fi:SymbolIcon  Symbol="CalendarAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                                     <TextBlock Text="Add Holiday" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
@@ -670,7 +682,7 @@
                                 HorizontalAlignment="Left"
                                 Margin="0,0,0,16" Classes="IconText">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon  Symbol="Add" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                <fi:SymbolIcon  Symbol="Globe" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                                 <TextBlock Text="Use Predefined Sets…" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -731,8 +743,10 @@
                                  FontSize="16"
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
-                        <DatePicker SelectedDate="{Binding DialogHolidayDate, TargetNullValue={x:Static sys:DateTime.Today}}"
-                                  Margin="0,0,0,16"/>
+                        <CalendarDatePicker SelectedDate="{Binding DialogHolidayDate, TargetNullValue={x:Static sys:DateTime.Today}}"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalContentAlignment="Center"
+                                          Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Holiday Time:"
                                  FontSize="16"
@@ -803,44 +817,72 @@
                             <TextBlock Text="Country" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                             <ComboBox ItemsSource="{Binding Countries}"
                                       SelectedItem="{Binding SelectedCountry}"
-                                      VerticalContentAlignment="Center"/>
+                                      HorizontalAlignment="Stretch"
+                                      VerticalContentAlignment="Center">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" VerticalAlignment="Center" Margin="2"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                         </StackPanel>
 
                         <StackPanel IsVisible="{Binding IsSwitzerlandSelected, Converter={StaticResource BooleanToVisibilityConverter}}" Spacing="8">
                             <StackPanel Spacing="4">
                                 <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                                     <TextBlock Text="Canton" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                    <Button Background="Transparent"
-                                            Command="{Binding ShowAargauInfoCommand}"
+                                    <Button Command="{Binding ShowAargauInfoCommand}"
                                             IsVisible="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             ToolTip.Tip="Aargau Holiday Reference Information"
-                                            Width="40"
-                                            >
-                                        <fi:SymbolIcon  Symbol="Info" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                            Background="Transparent"
+                                            VerticalAlignment="Center"
+                                            Classes="IconOnly"
+                                            Width="30"
+                                            Height="30"
+                                            Padding="0">
+                                        <fi:SymbolIcon  Symbol="Info" 
+                                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                      Margin="0,-2,0,0"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"/>
                                     </Button>
                                     <!-- Animated arrow pointing to info button -->
                                     <StackPanel Orientation="Horizontal" 
                                                 IsVisible="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                 Spacing="4"
                                                 VerticalAlignment="Center">
-                                        <fi:SymbolIcon  Symbol="ArrowLeft" Foreground="#FFD700" Classes="AnimatedArrow"/>
+                                        <fi:SymbolIcon  Symbol="ArrowLeft" Foreground="{DynamicResource TeamsPrimaryBrush}" Classes="AnimatedArrow"/>
                                         <TextBlock Text="Click for reference" 
                                                    FontSize="14"
-                                                   Foreground="#FFD700"
+                                                   Foreground="{DynamicResource TeamsPrimaryBrush}"
                                                    Opacity="0.9"
                                                    VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </StackPanel>
                                 <ComboBox ItemsSource="{Binding Cantons}"
                                           SelectedItem="{Binding SelectedCanton}"
-                                          VerticalContentAlignment="Center"/>
+                                          HorizontalAlignment="Stretch"
+                                          VerticalContentAlignment="Center">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" VerticalAlignment="Center" Margin="2"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
                             </StackPanel>
 
                             <StackPanel IsVisible="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}" Spacing="4">
                                 <TextBlock Text="Bezirk" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                 <ComboBox ItemsSource="{Binding Bezirke}"
                                           SelectedItem="{Binding SelectedBezirk}"
-                                          VerticalContentAlignment="Center"/>
+                                          HorizontalAlignment="Stretch"
+                                          VerticalContentAlignment="Center">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" VerticalAlignment="Center" TextWrapping="Wrap" Margin="2"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
                             </StackPanel>
                         </StackPanel>
 
@@ -848,7 +890,14 @@
                             <TextBlock Text="Year" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                             <ComboBox ItemsSource="{Binding Years}"
                                       SelectedItem="{Binding SelectedYear}"
-                                      VerticalContentAlignment="Center"/>
+                                      HorizontalAlignment="Stretch"
+                                      VerticalContentAlignment="Center">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" VerticalAlignment="Center" Margin="2"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
                         </StackPanel>
                     </StackPanel>
 
