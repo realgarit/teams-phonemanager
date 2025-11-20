@@ -98,6 +98,10 @@ namespace teams_phonemanager.ViewModels
                     {
                         PrefillCallQueueTargets();
                     }
+                    else if (e.PropertyName?.StartsWith("Aa") == true)
+                    {
+                        UpdateAutoAttendantVisibility();
+                    }
                 };
                 
                 // Prefill target fields if M365GroupId is already set
@@ -149,6 +153,10 @@ namespace teams_phonemanager.ViewModels
                             else if (e.PropertyName == nameof(PhoneManagerVariables.M365GroupId))
                             {
                                 PrefillCallQueueTargets();
+                            }
+                            else if (e.PropertyName?.StartsWith("Aa") == true)
+                            {
+                                UpdateAutoAttendantVisibility();
                             }
                         };
                         
@@ -653,6 +661,20 @@ namespace teams_phonemanager.ViewModels
             "TransferToVoicemail"
         };
 
+        public ObservableCollection<string> AaGreetingTypeOptions { get; } = new ObservableCollection<string>
+        {
+            "None",
+            "AudioFile",
+            "TextToSpeech"
+        };
+
+        public ObservableCollection<string> AaActionOptions { get; } = new ObservableCollection<string>
+        {
+            "Disconnect",
+            "TransferToTarget",
+            "TransferToVoicemail"
+        };
+
         // Conditional visibility properties
         public bool ShowGreetingAudioFile => Variables.CqGreetingType == "AudioFile";
         public bool ShowGreetingTextToSpeech => Variables.CqGreetingType == "TextToSpeech";
@@ -660,6 +682,15 @@ namespace teams_phonemanager.ViewModels
         public bool ShowOverflowTarget => Variables.CqOverflowAction == "TransferToTarget" || Variables.CqOverflowAction == "TransferToVoicemail";
         public bool ShowTimeoutTarget => Variables.CqTimeoutAction == "TransferToTarget" || Variables.CqTimeoutAction == "TransferToVoicemail";
         public bool ShowNoAgentTarget => Variables.CqNoAgentAction == "TransferToTarget" || Variables.CqNoAgentAction == "TransferToVoicemail";
+
+        // AA Conditional visibility properties
+        public bool ShowAaDefaultGreetingAudioFile => Variables.AaDefaultGreetingType == "AudioFile";
+        public bool ShowAaDefaultGreetingTextToSpeech => Variables.AaDefaultGreetingType == "TextToSpeech";
+        public bool ShowAaDefaultTarget => Variables.AaDefaultAction == "TransferToTarget" || Variables.AaDefaultAction == "TransferToVoicemail";
+
+        public bool ShowAaAfterHoursGreetingAudioFile => Variables.AaAfterHoursGreetingType == "AudioFile";
+        public bool ShowAaAfterHoursGreetingTextToSpeech => Variables.AaAfterHoursGreetingType == "TextToSpeech";
+        public bool ShowAaAfterHoursTarget => Variables.AaAfterHoursAction == "TransferToTarget" || Variables.AaAfterHoursAction == "TransferToVoicemail";
 
 
         private void UpdateCallQueueVisibility()
@@ -671,6 +702,17 @@ namespace teams_phonemanager.ViewModels
             OnPropertyChanged(nameof(ShowTimeoutTarget));
             OnPropertyChanged(nameof(ShowNoAgentTarget));
         }
+
+        private void UpdateAutoAttendantVisibility()
+        {
+            OnPropertyChanged(nameof(ShowAaDefaultGreetingAudioFile));
+            OnPropertyChanged(nameof(ShowAaDefaultGreetingTextToSpeech));
+            OnPropertyChanged(nameof(ShowAaDefaultTarget));
+            OnPropertyChanged(nameof(ShowAaAfterHoursGreetingAudioFile));
+            OnPropertyChanged(nameof(ShowAaAfterHoursGreetingTextToSpeech));
+            OnPropertyChanged(nameof(ShowAaAfterHoursTarget));
+        }
+
 
 
         // Call Queue Configuration Dialog
@@ -710,6 +752,45 @@ namespace teams_phonemanager.ViewModels
             await SelectAndImportAudioFile(
                 audioFileId => Variables.CqMusicOnHoldAudioFileId = audioFileId,
                 "Music on Hold");
+        }
+
+        // Auto Attendant Configuration Dialog
+        [ObservableProperty]
+        private bool _showAutoAttendantConfigurationDialog = false;
+
+        [RelayCommand]
+        private void OpenAutoAttendantConfigurationDialog()
+        {
+            ShowAutoAttendantConfigurationDialog = true;
+        }
+
+        [RelayCommand]
+        private void CancelAutoAttendantConfiguration()
+        {
+            ShowAutoAttendantConfigurationDialog = false;
+        }
+
+        [RelayCommand]
+        private void SaveAutoAttendantConfiguration()
+        {
+            _loggingService.Log("Auto Attendant configuration saved", LogLevel.Info);
+            ShowAutoAttendantConfigurationDialog = false;
+        }
+
+        [RelayCommand]
+        private async Task SelectAaDefaultGreetingAudioFile()
+        {
+            await SelectAndImportAudioFile(
+                audioFileId => Variables.AaDefaultGreetingAudioFileId = audioFileId,
+                "AA Default Greeting");
+        }
+
+        [RelayCommand]
+        private async Task SelectAaAfterHoursGreetingAudioFile()
+        {
+            await SelectAndImportAudioFile(
+                audioFileId => Variables.AaAfterHoursGreetingAudioFileId = audioFileId,
+                "AA After Hours Greeting");
         }
 
 

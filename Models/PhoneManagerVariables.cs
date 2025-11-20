@@ -54,11 +54,44 @@ namespace teams_phonemanager.Models
         [ObservableProperty]
         private string _phoneNumberType = string.Empty;
 
+        // Auto Attendant Configuration Properties
+        // Default Call Flow
         [ObservableProperty]
-        private string _defaultCallFlowGreetingPromptDE = string.Empty;
+        private string? _aaDefaultGreetingType; // "None", "AudioFile", "TextToSpeech"
 
         [ObservableProperty]
-        private string _afterHoursCallFlowGreetingPromptDE = string.Empty;
+        private string? _aaDefaultGreetingAudioFileId;
+
+        [ObservableProperty]
+        private string? _aaDefaultGreetingTextToSpeechPrompt;
+
+        [ObservableProperty]
+        private string? _aaDefaultAction; // "Disconnect", "TransferToTarget", "TransferToVoicemail"
+
+        [ObservableProperty]
+        private string? _aaDefaultActionTarget;
+
+        [ObservableProperty]
+        private string? _aaDefaultDisconnectAction; // "None", "AudioFile", "TextToSpeech" - for UI only
+
+        // After Hours Call Flow
+        [ObservableProperty]
+        private string? _aaAfterHoursGreetingType; // "None", "AudioFile", "TextToSpeech"
+
+        [ObservableProperty]
+        private string? _aaAfterHoursGreetingAudioFileId;
+
+        [ObservableProperty]
+        private string? _aaAfterHoursGreetingTextToSpeechPrompt;
+
+        [ObservableProperty]
+        private string? _aaAfterHoursAction; // "Disconnect", "TransferToTarget", "TransferToVoicemail"
+
+        [ObservableProperty]
+        private string? _aaAfterHoursActionTarget;
+
+        [ObservableProperty]
+        private string? _aaAfterHoursDisconnectAction; // "None", "AudioFile", "TextToSpeech" - for UI only
 
         [ObservableProperty]
         private TimeSpan _openingHours1Start = new TimeSpan(0, 0, 0);

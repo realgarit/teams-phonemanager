@@ -89,14 +89,24 @@ namespace teams_phonemanager.Services
                 result.AddError("Phone number type is required.");
             }
 
-            if (string.IsNullOrWhiteSpace(variables.DefaultCallFlowGreetingPromptDE))
+            // Validate Default Call Flow Greeting
+            if (variables.AaDefaultGreetingType == "TextToSpeech" && string.IsNullOrWhiteSpace(variables.AaDefaultGreetingTextToSpeechPrompt))
             {
-                result.AddError("Default call flow greeting prompt is required.");
+                result.AddError("Default call flow greeting text is required when using Text-to-Speech.");
+            }
+            else if (variables.AaDefaultGreetingType == "AudioFile" && string.IsNullOrWhiteSpace(variables.AaDefaultGreetingAudioFileId))
+            {
+                result.AddError("Default call flow audio file is required when using Audio File.");
             }
 
-            if (string.IsNullOrWhiteSpace(variables.AfterHoursCallFlowGreetingPromptDE))
+            // Validate After Hours Call Flow Greeting
+            if (variables.AaAfterHoursGreetingType == "TextToSpeech" && string.IsNullOrWhiteSpace(variables.AaAfterHoursGreetingTextToSpeechPrompt))
             {
-                result.AddError("After hours call flow greeting prompt is required.");
+                result.AddError("After hours call flow greeting text is required when using Text-to-Speech.");
+            }
+            else if (variables.AaAfterHoursGreetingType == "AudioFile" && string.IsNullOrWhiteSpace(variables.AaAfterHoursGreetingAudioFileId))
+            {
+                result.AddError("After hours call flow audio file is required when using Audio File.");
             }
 
             if (string.IsNullOrWhiteSpace(variables.HolidayNameSuffix))

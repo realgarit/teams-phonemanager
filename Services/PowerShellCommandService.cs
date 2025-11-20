@@ -358,6 +358,9 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceI
 
         public string GetCreateAutoAttendantCommand(PhoneManagerVariables variables)
         {
+            var defaultCallFlow = BuildCallFlow(variables, "Default", variables.AaDefaultGreetingType, variables.AaDefaultGreetingTextToSpeechPrompt, variables.AaDefaultGreetingAudioFileId, variables.AaDefaultAction, variables.AaDefaultActionTarget);
+            var afterHoursCallFlow = BuildCallFlow(variables, "After Hours", variables.AaAfterHoursGreetingType, variables.AaAfterHoursGreetingTextToSpeechPrompt, variables.AaAfterHoursGreetingAudioFileId, variables.AaAfterHoursAction, variables.AaAfterHoursActionTarget);
+
             return $@"
 New-CsOnlineApplicationInstance -UserPrincipalName ""{variables.RaaaUPN}"" -ApplicationId ""{variables.CsAppAaId}"" -DisplayName ""{variables.RaaaDisplayName}""
 
@@ -368,21 +371,13 @@ Set-MgUserLicense -UserId ""{variables.RaaaUPN}"" -AddLicenses @{{SkuId = $SkuId
 
 Set-CsPhoneNumberAssignment -Identity ""{variables.RaaaUPN}"" -PhoneNumber ""{variables.RaaAnr}"" -PhoneNumberType ""{variables.PhoneNumberType}""
 
-$racqUser = Get-CsOnlineUser ""{variables.RacqUPN}""
-if (-not $racqUser) {{
-    throw ""Resource account {variables.RacqUPN} not found. Please ensure it was created successfully.""
-}}
-$racqid = $racqUser.Identity
-$aacalltarget = New-CsAutoAttendantCallableEntity -Identity $racqid -Type ApplicationEndpoint
-$aamenuOptionDisconnect = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -CallTarget $aacalltarget -DtmfResponse Automatic
-$aadefaultMenu = New-CsAutoAttendantMenu -Name ""Default menu"" -MenuOptions $aamenuOptionDisconnect
-$aadefaultCallFlow = New-CsAutoAttendantCallFlow -Name ""Default call flow"" -Greetings @(""{variables.DefaultCallFlowGreetingPromptDE}"") -Menu $aadefaultMenu
+{defaultCallFlow}
 
-$aaafterHoursMenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic
-$aaafterHoursMenu = New-CsAutoAttendantMenu -Name ""After Hours menu"" -MenuOptions @($aaafterHoursMenuOption)
-$aaafterHoursCallFlow = New-CsAutoAttendantCallFlow -Name ""After Hours call flow"" -Greetings @(""{variables.AfterHoursCallFlowGreetingPromptDE}"") -Menu $aaafterHoursMenu
+{afterHoursCallFlow}
+
 $aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -TuesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -WednesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -ThursdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -FridayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -Complement
 $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
+
 New-CsAutoAttendant `
 -Name ""{variables.AaDisplayName}"" `
 -DefaultCallFlow $aadefaultCallFlow `
@@ -394,6 +389,61 @@ New-CsAutoAttendant `
 $aaapplicationInstanceId = (Get-CsOnlineUser ""{variables.RaaaUPN}"").Identity
 $aaautoAttendantId = (Get-CsAutoAttendant -NameFilter ""{variables.AaDisplayName}"").Identity
 New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceId) -ConfigurationId $aaautoAttendantId -ConfigurationType AutoAttendant";
+        }
+
+        private string BuildCallFlow(PhoneManagerVariables variables, string flowName, string? greetingType, string? ttsPrompt, string? audioFileId, string? action, string? actionTarget)
+        {
+            var sb = new System.Text.StringBuilder();
+            var prefix = flowName.Replace(" ", "").ToLower();
+            
+            // Greeting
+            string greetingVar = "$null";
+            if (greetingType == "AudioFile" && !string.IsNullOrWhiteSpace(audioFileId))
+            {
+                sb.AppendLine($"${prefix}Greeting = New-CsAutoAttendantPrompt -AudioFilePrompt \"{audioFileId}\"");
+                greetingVar = $"@(${prefix}Greeting)";
+            }
+            else if (greetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(ttsPrompt))
+            {
+                sb.AppendLine($"${prefix}Greeting = New-CsAutoAttendantPrompt -TextToSpeechPrompt \"{ttsPrompt}\"");
+                greetingVar = $"@(${prefix}Greeting)";
+            }
+            // If None, greetingVar remains $null (or empty array for cmdlet)
+            
+            // Action
+            sb.AppendLine($"${prefix}MenuOption = $null");
+            if (action == "TransferToTarget" && !string.IsNullOrWhiteSpace(actionTarget))
+            {
+                // Check if target is a resource account to get Identity
+                sb.AppendLine($"$targetUser = Get-CsOnlineUser \"{actionTarget}\" -ErrorAction SilentlyContinue");
+                sb.AppendLine($"if ($targetUser) {{ $targetId = $targetUser.Identity }} else {{ $targetId = \"{actionTarget}\" }}"); // Fallback if not found or is object ID
+                sb.AppendLine($"${prefix}CallTarget = New-CsAutoAttendantCallableEntity -Identity $targetId -Type ApplicationEndpoint");
+                sb.AppendLine($"${prefix}MenuOption = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -CallTarget ${prefix}CallTarget -DtmfResponse Automatic");
+            }
+            else if (action == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(actionTarget))
+            {
+                 // Shared Voicemail (M365 Group)
+                sb.AppendLine($"${prefix}CallTarget = New-CsAutoAttendantCallableEntity -Identity \"{actionTarget}\" -Type SharedVoicemail");
+                sb.AppendLine($"${prefix}MenuOption = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -CallTarget ${prefix}CallTarget -DtmfResponse Automatic");
+            }
+            else
+            {
+                // Default to Disconnect
+                sb.AppendLine($"${prefix}MenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic");
+            }
+
+            sb.AppendLine($"${prefix}Menu = New-CsAutoAttendantMenu -Name \"{flowName} menu\" -MenuOptions @(${prefix}MenuOption)");
+            
+            if (greetingVar != "$null")
+            {
+                sb.AppendLine($"$aa{prefix}CallFlow = New-CsAutoAttendantCallFlow -Name \"{flowName} call flow\" -Greetings {greetingVar} -Menu ${prefix}Menu");
+            }
+            else
+            {
+                 sb.AppendLine($"$aa{prefix}CallFlow = New-CsAutoAttendantCallFlow -Name \"{flowName} call flow\" -Menu ${prefix}Menu");
+            }
+
+            return sb.ToString();
         }
 
         public string GetCreateHolidayCommand(string holidayName, DateTime holidayDate)
@@ -800,13 +850,12 @@ catch {{
 }}";
         }
 
-        public string GetCreateDefaultCallFlowCommand(string greetingText)
+        public string GetCreateDefaultCallFlowCommand(PhoneManagerVariables variables)
         {
+            var callFlowScript = BuildCallFlow(variables, "Default", variables.AaDefaultGreetingType, variables.AaDefaultGreetingTextToSpeechPrompt, variables.AaDefaultGreetingAudioFileId, variables.AaDefaultAction, variables.AaDefaultActionTarget);
             return $@"
 try {{
-    $aamenuOptionDisconnect = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -CallTarget $aacalltarget -DtmfResponse Automatic
-    $aadefaultMenu = New-CsAutoAttendantMenu -Name ""Default menu"" -MenuOptions $aamenuOptionDisconnect
-    $aadefaultCallFlow = New-CsAutoAttendantCallFlow -Name ""Default call flow"" -Greetings @(""{greetingText}"") -Menu $aadefaultMenu
+{callFlowScript}
     Write-Host ""SUCCESS: Created default call flow""
 }}
 catch {{
@@ -814,13 +863,12 @@ catch {{
 }}";
         }
 
-        public string GetCreateAfterHoursCallFlowCommand(string greetingText)
+        public string GetCreateAfterHoursCallFlowCommand(PhoneManagerVariables variables)
         {
+            var callFlowScript = BuildCallFlow(variables, "After Hours", variables.AaAfterHoursGreetingType, variables.AaAfterHoursGreetingTextToSpeechPrompt, variables.AaAfterHoursGreetingAudioFileId, variables.AaAfterHoursAction, variables.AaAfterHoursActionTarget);
             return $@"
 try {{
-    $aaafterHoursMenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic
-    $aaafterHoursMenu = New-CsAutoAttendantMenu -Name ""After Hours menu"" -MenuOptions @($aaafterHoursMenuOption)
-    $aaafterHoursCallFlow = New-CsAutoAttendantCallFlow -Name ""After Hours call flow"" -Greetings @(""{greetingText}"") -Menu $aaafterHoursMenu
+{callFlowScript}
     Write-Host ""SUCCESS: Created after hours call flow""
 }}
 catch {{
@@ -833,7 +881,12 @@ catch {{
             return $@"
 try {{
     $aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -TuesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -WednesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -ThursdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -FridayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -Complement
-    Write-Host ""SUCCESS: Created after hours schedule""
+    
+    if ($aaafterHoursSchedule) {{
+        Write-Host ""SUCCESS: Created after hours schedule with ID: $($aaafterHoursSchedule.Id)""
+    }} else {{
+        Write-Host ""ERROR: Failed to retrieve ID after creating schedule""
+    }}
 }}
 catch {{
     Write-Host ""ERROR: Failed to create after hours schedule: $_""
@@ -844,8 +897,12 @@ catch {{
         {
             return $@"
 try {{
-    $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
-    Write-Host ""SUCCESS: Created call handling association""
+    if ($aaafterHoursSchedule.Id) {{
+        $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
+        Write-Host ""SUCCESS: Created call handling association""
+    }} else {{
+        Write-Host ""ERROR: Failed to create call handling association: ScheduleId is empty""
+    }}
 }}
 catch {{
     Write-Host ""ERROR: Failed to create call handling association: $_""

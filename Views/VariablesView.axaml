@@ -162,7 +162,7 @@
                                 <Button Command="{Binding OpenCallQueueConfigurationDialogCommand}"
                                         HorizontalAlignment="Left" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
-                                        <fi:SymbolIcon  Symbol="Add" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <fi:SymbolIcon  Symbol="Settings" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                                         <TextBlock Text="Configure Call Queue Settings" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
@@ -228,17 +228,14 @@
                                 </StackPanel>
 
                                 <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
-                                    <TextBox 
-                                             Text="{Binding Variables.DefaultCallFlowGreetingPromptDE}"
-                                             />
-                                    <TextBlock Text="Example: Herzlich Willkommen bei der Acme Corp!" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
-                                    <TextBox 
-                                             Text="{Binding Variables.AfterHoursCallFlowGreetingPromptDE}"
-                                             />
-                                    <TextBlock Text="Example: Herzlich Willkommen bei der Acme Corp, Sie rufen ausserhalb der Öffnungszeiten." FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
+                                    <Button Command="{Binding OpenAutoAttendantConfigurationDialogCommand}"
+                                            HorizontalAlignment="Left" Classes="IconText">
+                                        <StackPanel Orientation="Horizontal">
+                                            <fi:SymbolIcon  Symbol="Settings" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                            <TextBlock Text="Configure Auto Attendant Settings" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <TextBlock Text="Configure greetings and actions for Default and After Hours call flows" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
 
                                 <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
@@ -1168,6 +1165,171 @@
                                     </StackPanel>
                                 </Button>
                                 <Button Command="{Binding SaveCallQueueConfigurationCommand}" Classes="IconText">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fi:SymbolIcon  Symbol="Checkmark" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <TextBlock Text="Save" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Auto Attendant Configuration Dialog - Border overlay -->
+        <Border IsVisible="{Binding ShowAutoAttendantConfigurationDialog}"
+                Background="#80000000"
+                ZIndex="1000"
+                PointerPressed="AutoAttendantConfigurationBackdrop_PointerPressed">
+            <Border.Styles>
+                <Style Selector="Border">
+                    <Style.Animations>
+                        <Animation Duration="0:0:0.2">
+                            <KeyFrame Cue="0%">
+                                <Setter Property="Opacity" Value="0"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="100%">
+                                <Setter Property="Opacity" Value="1"/>
+                            </KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+            </Border.Styles>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+                  PointerPressed="AutoAttendantConfigurationCard_PointerPressed">
+                <Border Classes="dialog"
+                        Padding="32"
+                        MinWidth="800"
+                        MaxWidth="1000"
+                        MaxHeight="900"
+                        Margin="16">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0">
+                        <StackPanel Spacing="24" Margin="0">
+                            <TextBlock Text="Auto Attendant Configuration"
+                                     
+                                     FontWeight="SemiBold"
+                                     Margin="0,0,0,8"/>
+                            
+                            <!-- Default Call Flow Section -->
+                            <StackPanel Spacing="24">
+                                <TextBlock Text="Default Call Flow (Business Hours)" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                
+                                <StackPanel Spacing="16">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Greeting" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <ComboBox ItemsSource="{Binding AaGreetingTypeOptions}"
+                                                  SelectedItem="{Binding Variables.AaDefaultGreetingType}"
+                                                  HorizontalAlignment="Left"
+                                                  Width="200"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel IsVisible="{Binding ShowAaDefaultGreetingAudioFile}" Spacing="8">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <StackPanel Spacing="4" HorizontalAlignment="Stretch">
+                                                <TextBlock Text="Audio File" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                <TextBox Text="{Binding Variables.AaDefaultGreetingAudioFileId}"
+                                                         Watermark="No file selected"
+                                                         IsReadOnly="True"
+                                                         HorizontalAlignment="Stretch"/>
+                                            </StackPanel>
+                                            <Button Command="{Binding SelectAaDefaultGreetingAudioFileCommand}"
+                                                    Content="Select File"
+                                                    VerticalAlignment="Bottom"
+                                                    Height="56"/>
+                                        </StackPanel>
+                                        <TextBlock Text="Select a WAV file (max 5MB). It will be uploaded automatically." 
+                                                   FontSize="11" 
+                                                   Opacity="0.7"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel IsVisible="{Binding ShowAaDefaultGreetingTextToSpeech}" Spacing="4">
+                                        <TextBlock Text="Text to Speech Prompt" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <TextBox Text="{Binding Variables.AaDefaultGreetingTextToSpeechPrompt}"
+                                                 Watermark="Enter greeting message"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Action" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <ComboBox ItemsSource="{Binding AaActionOptions}"
+                                                  SelectedItem="{Binding Variables.AaDefaultAction}"
+                                                  HorizontalAlignment="Left"
+                                                  Width="200"/>
+                                    </StackPanel>
+                                    <StackPanel IsVisible="{Binding ShowAaDefaultTarget}" Spacing="4">
+                                        <TextBlock Text="Target" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <TextBox Text="{Binding Variables.AaDefaultActionTarget}"
+                                                 Watermark="Resource Account UPN or M365 Group ID"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            
+                            <!-- After Hours Call Flow Section -->
+                            <StackPanel Spacing="24">
+                                <TextBlock Text="After Hours Call Flow" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                
+                                <StackPanel Spacing="16">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Greeting" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <ComboBox ItemsSource="{Binding AaGreetingTypeOptions}"
+                                                  SelectedItem="{Binding Variables.AaAfterHoursGreetingType}"
+                                                  HorizontalAlignment="Left"
+                                                  Width="200"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel IsVisible="{Binding ShowAaAfterHoursGreetingAudioFile}" Spacing="8">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <StackPanel Spacing="4" HorizontalAlignment="Stretch">
+                                                <TextBlock Text="Audio File" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                <TextBox Text="{Binding Variables.AaAfterHoursGreetingAudioFileId}"
+                                                         Watermark="No file selected"
+                                                         IsReadOnly="True"
+                                                         HorizontalAlignment="Stretch"/>
+                                            </StackPanel>
+                                            <Button Command="{Binding SelectAaAfterHoursGreetingAudioFileCommand}"
+                                                    Content="Select File"
+                                                    VerticalAlignment="Bottom"
+                                                    Height="56"/>
+                                        </StackPanel>
+                                        <TextBlock Text="Select a WAV file (max 5MB). It will be uploaded automatically." 
+                                                   FontSize="11" 
+                                                   Opacity="0.7"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel IsVisible="{Binding ShowAaAfterHoursGreetingTextToSpeech}" Spacing="4">
+                                        <TextBlock Text="Text to Speech Prompt" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <TextBox Text="{Binding Variables.AaAfterHoursGreetingTextToSpeechPrompt}"
+                                                 Watermark="Enter greeting message"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Action" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <ComboBox ItemsSource="{Binding AaActionOptions}"
+                                                  SelectedItem="{Binding Variables.AaAfterHoursAction}"
+                                                  HorizontalAlignment="Left"
+                                                  Width="200"/>
+                                    </StackPanel>
+                                    <StackPanel IsVisible="{Binding ShowAaAfterHoursTarget}" Spacing="4">
+                                        <TextBlock Text="Target" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <TextBox Text="{Binding Variables.AaAfterHoursActionTarget}"
+                                                 Watermark="Resource Account UPN or M365 Group ID"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            
+                            <!-- Action Buttons -->
+                            <StackPanel Orientation="Horizontal" 
+                                      HorizontalAlignment="Right"
+                                      Margin="0,24,0,0"
+                                      Spacing="16">
+                                <Button Command="{Binding CancelAutoAttendantConfigurationCommand}"
+                                        Classes="IconText">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Command="{Binding SaveAutoAttendantConfigurationCommand}" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
                                         <fi:SymbolIcon  Symbol="Checkmark" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                                         <TextBlock Text="Save" VerticalAlignment="Center"/>
