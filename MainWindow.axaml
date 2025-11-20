@@ -133,6 +133,7 @@
                             <TextBlock Text="Holidays" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
+
                 </ListBox>
                 
                 <Border Grid.Column="1" 

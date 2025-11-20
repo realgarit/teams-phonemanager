@@ -61,18 +61,6 @@ namespace teams_phonemanager.Services
         public static class Pages
         {
             public const string Welcome = "Welcome";
-            public const string GetStarted = "Get Started";
-            public const string Variables = "Variables";
-            public const string M365Groups = "M365 Groups";
-            public const string CallQueues = "Call Queues";
-            public const string AutoAttendants = "Auto Attendants";
-            public const string Holidays = "Holidays";
-        }
-
-        public static class ErrorDialogTitles
-        {
-            public const string PowerShellError = "PowerShell Error";
-            public const string ValidationError = "Validation Error";
             public const string ConnectionError = "Connection Error";
             public const string Error = "Error";
             public const string Confirmation = "Confirmation";
