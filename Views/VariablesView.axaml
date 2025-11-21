@@ -1018,7 +1018,13 @@
                                         <ComboBox ItemsSource="{Binding GreetingTypeOptions}"
                                                   SelectedItem="{Binding Variables.CqGreetingType}"
                                                   HorizontalAlignment="Left"
-                                                  Width="200"/>
+                                                  Width="200">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
                                     </StackPanel>
                                     
                                     <StackPanel IsVisible="{Binding ShowGreetingAudioFile}" Spacing="8">
@@ -1031,9 +1037,13 @@
                                                          HorizontalAlignment="Stretch"/>
                                             </StackPanel>
                                             <Button Command="{Binding SelectGreetingAudioFileCommand}"
-                                                    Content="Select File"
-                                                    VerticalAlignment="Bottom"
-                                                    Height="56"/>
+                                                    Classes="IconText"
+                                                    VerticalAlignment="Bottom">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <fi:SymbolIcon Symbol="FolderOpen" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                    <TextBlock Text="Select File" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button>
                                         </StackPanel>
                                         <TextBlock Text="Select a WAV file (max 5MB). It will be uploaded automatically." 
                                                    FontSize="11" 
@@ -1053,7 +1063,13 @@
                                         <ComboBox ItemsSource="{Binding MusicOnHoldTypeOptions}"
                                                   SelectedItem="{Binding Variables.CqMusicOnHoldType}"
                                                   HorizontalAlignment="Left"
-                                                  Width="200"/>
+                                                  Width="200">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
                                     </StackPanel>
                                     
                                     <StackPanel IsVisible="{Binding ShowMusicOnHoldAudioFile}" Spacing="8">
@@ -1066,9 +1082,13 @@
                                                          HorizontalAlignment="Stretch"/>
                                             </StackPanel>
                                             <Button Command="{Binding SelectMusicOnHoldAudioFileCommand}"
-                                                    Content="Select File"
-                                                    VerticalAlignment="Bottom"
-                                                    Height="56"/>
+                                                    Classes="IconText"
+                                                    VerticalAlignment="Bottom">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <fi:SymbolIcon Symbol="FolderOpen" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                    <TextBlock Text="Select File" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button>
                                         </StackPanel>
                                         <TextBlock Text="Select a WAV file (max 5MB). It will be uploaded automatically." 
                                                    FontSize="11" 
@@ -1097,12 +1117,65 @@
                                         <ComboBox ItemsSource="{Binding OverflowActionOptions}"
                                                   SelectedItem="{Binding Variables.CqOverflowAction}"
                                                   HorizontalAlignment="Left"
-                                                  Width="200"/>
+                                                  Width="200">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
                                     </StackPanel>
                                     <StackPanel IsVisible="{Binding ShowOverflowTarget}" Spacing="4">
                                         <TextBlock Text="Target" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                         <TextBox Text="{Binding Variables.CqOverflowActionTarget}"
                                                  Watermark="Resource Account UPN or M365 Group ID"/>
+                                    </StackPanel>
+                                    
+                                    <!-- Voicemail Greeting (required for SharedVoicemail) -->
+                                    <StackPanel IsVisible="{Binding ShowOverflowVoicemailGreeting}" Spacing="8">
+                                        <TextBlock Text="Voicemail Greeting (Required)" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <StackPanel Spacing="4">
+                                            <TextBlock Text="Greeting Type" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                            <ComboBox ItemsSource="{Binding VoicemailGreetingTypeOptions}"
+                                                      SelectedItem="{Binding Variables.CqOverflowVoicemailGreetingType}"
+                                                      HorizontalAlignment="Left"
+                                                      Width="200">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+                                        </StackPanel>
+                                        
+                                        <StackPanel IsVisible="{Binding ShowOverflowVoicemailAudioFile}" Spacing="8">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <StackPanel Spacing="4" HorizontalAlignment="Stretch">
+                                                    <TextBlock Text="Audio File" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                    <TextBox Text="{Binding Variables.CqOverflowActionAudioFileId}"
+                                                             Watermark="No file selected"
+                                                             IsReadOnly="True"
+                                                             HorizontalAlignment="Stretch"/>
+                                                </StackPanel>
+                                                <Button Command="{Binding SelectOverflowVoicemailAudioFileCommand}"
+                                                        Classes="IconText"
+                                                        VerticalAlignment="Bottom">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <fi:SymbolIcon Symbol="FolderOpen" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                        <TextBlock Text="Select File" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                            </StackPanel>
+                                            <TextBlock Text="Select a WAV file (max 5MB). It will be uploaded automatically." 
+                                                       FontSize="11" 
+                                                       Opacity="0.7"/>
+                                        </StackPanel>
+                                        
+                                        <StackPanel IsVisible="{Binding ShowOverflowVoicemailTextToSpeech}" Spacing="4">
+                                            <TextBlock Text="Text to Speech Prompt" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                            <TextBox Text="{Binding Variables.CqOverflowActionTextToSpeechPrompt}"
+                                                     Watermark="Enter voicemail greeting message"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
                                 
@@ -1122,12 +1195,65 @@
                                         <ComboBox ItemsSource="{Binding TimeoutActionOptions}"
                                                   SelectedItem="{Binding Variables.CqTimeoutAction}"
                                                   HorizontalAlignment="Left"
-                                                  Width="200"/>
+                                                  Width="200">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
                                     </StackPanel>
                                     <StackPanel IsVisible="{Binding ShowTimeoutTarget}" Spacing="4">
                                         <TextBlock Text="Target" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                         <TextBox Text="{Binding Variables.CqTimeoutActionTarget}"
                                                  Watermark="Resource Account UPN or M365 Group ID"/>
+                                    </StackPanel>
+                                    
+                                    <!-- Voicemail Greeting (required for SharedVoicemail) -->
+                                    <StackPanel IsVisible="{Binding ShowTimeoutVoicemailGreeting}" Spacing="8">
+                                        <TextBlock Text="Voicemail Greeting (Required)" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <StackPanel Spacing="4">
+                                            <TextBlock Text="Greeting Type" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                            <ComboBox ItemsSource="{Binding VoicemailGreetingTypeOptions}"
+                                                      SelectedItem="{Binding Variables.CqTimeoutVoicemailGreetingType}"
+                                                      HorizontalAlignment="Left"
+                                                      Width="200">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+                                        </StackPanel>
+                                        
+                                        <StackPanel IsVisible="{Binding ShowTimeoutVoicemailAudioFile}" Spacing="8">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <StackPanel Spacing="4" HorizontalAlignment="Stretch">
+                                                    <TextBlock Text="Audio File" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                    <TextBox Text="{Binding Variables.CqTimeoutActionAudioFileId}"
+                                                             Watermark="No file selected"
+                                                             IsReadOnly="True"
+                                                             HorizontalAlignment="Stretch"/>
+                                                </StackPanel>
+                                                <Button Command="{Binding SelectTimeoutVoicemailAudioFileCommand}"
+                                                        Classes="IconText"
+                                                        VerticalAlignment="Bottom">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <fi:SymbolIcon Symbol="FolderOpen" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                        <TextBlock Text="Select File" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                            </StackPanel>
+                                            <TextBlock Text="Select a WAV file (max 5MB). It will be uploaded automatically." 
+                                                       FontSize="11" 
+                                                       Opacity="0.7"/>
+                                        </StackPanel>
+                                        
+                                        <StackPanel IsVisible="{Binding ShowTimeoutVoicemailTextToSpeech}" Spacing="4">
+                                            <TextBlock Text="Text to Speech Prompt" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                            <TextBox Text="{Binding Variables.CqTimeoutActionTextToSpeechPrompt}"
+                                                     Watermark="Enter voicemail greeting message"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
                                 
@@ -1142,12 +1268,65 @@
                                         <ComboBox ItemsSource="{Binding NoAgentActionOptions}"
                                                   SelectedItem="{Binding Variables.CqNoAgentAction}"
                                                   HorizontalAlignment="Left"
-                                                  Width="200"/>
+                                                  Width="200">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
                                     </StackPanel>
                                     <StackPanel IsVisible="{Binding ShowNoAgentTarget}" Spacing="4">
                                         <TextBlock Text="Target" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                                         <TextBox Text="{Binding Variables.CqNoAgentActionTarget}"
                                                  Watermark="Resource Account UPN or M365 Group ID"/>
+                                    </StackPanel>
+                                    
+                                    <!-- Voicemail Greeting (required for SharedVoicemail) -->
+                                    <StackPanel IsVisible="{Binding ShowNoAgentVoicemailGreeting}" Spacing="8">
+                                        <TextBlock Text="Voicemail Greeting (Required)" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <StackPanel Spacing="4">
+                                            <TextBlock Text="Greeting Type" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                            <ComboBox ItemsSource="{Binding VoicemailGreetingTypeOptions}"
+                                                      SelectedItem="{Binding Variables.CqNoAgentVoicemailGreetingType}"
+                                                      HorizontalAlignment="Left"
+                                                      Width="200">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+                                        </StackPanel>
+                                        
+                                        <StackPanel IsVisible="{Binding ShowNoAgentVoicemailAudioFile}" Spacing="8">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <StackPanel Spacing="4" HorizontalAlignment="Stretch">
+                                                    <TextBlock Text="Audio File" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                    <TextBox Text="{Binding Variables.CqNoAgentActionAudioFileId}"
+                                                             Watermark="No file selected"
+                                                             IsReadOnly="True"
+                                                             HorizontalAlignment="Stretch"/>
+                                                </StackPanel>
+                                                <Button Command="{Binding SelectNoAgentVoicemailAudioFileCommand}"
+                                                        Classes="IconText"
+                                                        VerticalAlignment="Bottom">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <fi:SymbolIcon Symbol="FolderOpen" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                        <TextBlock Text="Select File" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                            </StackPanel>
+                                            <TextBlock Text="Select a WAV file (max 5MB). It will be uploaded automatically." 
+                                                       FontSize="11" 
+                                                       Opacity="0.7"/>
+                                        </StackPanel>
+                                        
+                                        <StackPanel IsVisible="{Binding ShowNoAgentVoicemailTextToSpeech}" Spacing="4">
+                                            <TextBlock Text="Text to Speech Prompt" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                            <TextBox Text="{Binding Variables.CqNoAgentActionTextToSpeechPrompt}"
+                                                     Watermark="Enter voicemail greeting message"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
                             </StackPanel>
@@ -1221,7 +1400,13 @@
                                         <ComboBox ItemsSource="{Binding AaGreetingTypeOptions}"
                                                   SelectedItem="{Binding Variables.AaDefaultGreetingType}"
                                                   HorizontalAlignment="Left"
-                                                  Width="200"/>
+                                                  Width="200">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
                                     </StackPanel>
                                     
                                     <StackPanel IsVisible="{Binding ShowAaDefaultGreetingAudioFile}" Spacing="8">
@@ -1234,9 +1419,13 @@
                                                          HorizontalAlignment="Stretch"/>
                                             </StackPanel>
                                             <Button Command="{Binding SelectAaDefaultGreetingAudioFileCommand}"
-                                                    Content="Select File"
-                                                    VerticalAlignment="Bottom"
-                                                    Height="56"/>
+                                                    Classes="IconText"
+                                                    VerticalAlignment="Bottom">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <fi:SymbolIcon Symbol="FolderOpen" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                    <TextBlock Text="Select File" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button>
                                         </StackPanel>
                                         <TextBlock Text="Select a WAV file (max 5MB). It will be uploaded automatically." 
                                                    FontSize="11" 
@@ -1254,7 +1443,13 @@
                                         <ComboBox ItemsSource="{Binding AaActionOptions}"
                                                   SelectedItem="{Binding Variables.AaDefaultAction}"
                                                   HorizontalAlignment="Left"
-                                                  Width="200"/>
+                                                  Width="200">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
                                     </StackPanel>
                                     <StackPanel IsVisible="{Binding ShowAaDefaultTarget}" Spacing="4">
                                         <TextBlock Text="Target" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
@@ -1274,7 +1469,13 @@
                                         <ComboBox ItemsSource="{Binding AaGreetingTypeOptions}"
                                                   SelectedItem="{Binding Variables.AaAfterHoursGreetingType}"
                                                   HorizontalAlignment="Left"
-                                                  Width="200"/>
+                                                  Width="200">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
                                     </StackPanel>
                                     
                                     <StackPanel IsVisible="{Binding ShowAaAfterHoursGreetingAudioFile}" Spacing="8">
@@ -1287,9 +1488,13 @@
                                                          HorizontalAlignment="Stretch"/>
                                             </StackPanel>
                                             <Button Command="{Binding SelectAaAfterHoursGreetingAudioFileCommand}"
-                                                    Content="Select File"
-                                                    VerticalAlignment="Bottom"
-                                                    Height="56"/>
+                                                    Classes="IconText"
+                                                    VerticalAlignment="Bottom">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <fi:SymbolIcon Symbol="FolderOpen" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                    <TextBlock Text="Select File" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button>
                                         </StackPanel>
                                         <TextBlock Text="Select a WAV file (max 5MB). It will be uploaded automatically." 
                                                    FontSize="11" 
@@ -1307,7 +1512,13 @@
                                         <ComboBox ItemsSource="{Binding AaActionOptions}"
                                                   SelectedItem="{Binding Variables.AaAfterHoursAction}"
                                                   HorizontalAlignment="Left"
-                                                  Width="200"/>
+                                                  Width="200">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
                                     </StackPanel>
                                     <StackPanel IsVisible="{Binding ShowAaAfterHoursTarget}" Spacing="4">
                                         <TextBlock Text="Target" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>

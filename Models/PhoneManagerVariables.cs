@@ -149,6 +149,9 @@ namespace teams_phonemanager.Models
         private string? _cqOverflowActionTarget;
 
         [ObservableProperty]
+        private string? _cqOverflowVoicemailGreetingType; // "AudioFile", "TextToSpeech" - for UI only
+
+        [ObservableProperty]
         private string? _cqOverflowActionAudioFileId;
 
         [ObservableProperty]
@@ -167,6 +170,9 @@ namespace teams_phonemanager.Models
         private string? _cqTimeoutActionTarget;
 
         [ObservableProperty]
+        private string? _cqTimeoutVoicemailGreetingType; // "AudioFile", "TextToSpeech" - for UI only
+
+        [ObservableProperty]
         private string? _cqTimeoutActionAudioFileId;
 
         [ObservableProperty]
@@ -180,6 +186,9 @@ namespace teams_phonemanager.Models
 
         [ObservableProperty]
         private string? _cqNoAgentActionTarget;
+
+        [ObservableProperty]
+        private string? _cqNoAgentVoicemailGreetingType; // "AudioFile", "TextToSpeech" - for UI only
 
         [ObservableProperty]
         private string? _cqNoAgentActionAudioFileId;

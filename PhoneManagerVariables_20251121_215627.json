@@ -1,0 +1,162 @@
+{
+  "m365Group": "ttgrp-acm-luc-immo",
+  "racqUPN": "racq-acm-luc-immo@prika.onmicrosoft.com",
+  "racqDisplayName": "racq-acm-luc-immo",
+  "cqDisplayName": "cq-acm-luc-immo",
+  "raaaUPN": "raaa-acm-luc-hn-immo@prika.onmicrosoft.com",
+  "raaaDisplayName": "raaa-acm-luc-hn-immo",
+  "aaDisplayName": "aa-acm-luc-hn-immo",
+  "holidayName": "hd-acm-luc-kantonal-2026",
+  "groupName": "",
+  "groupDescription": "",
+  "customer": "acm-luc",
+  "customerGroupName": "immo",
+  "msFallbackDomain": "@prika.onmicrosoft.com",
+  "raaAnrName": "hn",
+  "customerLegalName": "Acme Corp",
+  "languageId": "de-DE",
+  "timeZoneId": "W. Europe Standard Time",
+  "usageLocation": "CH",
+  "skuId": "440eaaa8-b3e0-484b-a8be-62870b9ba70a",
+  "csAppCqId": "11cd3e2e-fccb-42ad-ad00-878b93575e07",
+  "csAppAaId": "ce933385-9390-45d1-9512-c8d228074e07",
+  "raaAnr": "\u002B41414141",
+  "phoneNumberType": "DirectRouting",
+  "aaDefaultGreetingType": "TextToSpeech",
+  "aaDefaultGreetingAudioFileId": null,
+  "aaDefaultGreetingTextToSpeechPrompt": "Das ist ein Test.",
+  "aaDefaultAction": "TransferToVoicemail",
+  "aaDefaultActionTarget": "ttgrp-acm-luc-immo",
+  "aaDefaultDisconnectAction": null,
+  "aaAfterHoursGreetingType": "TextToSpeech",
+  "aaAfterHoursGreetingAudioFileId": null,
+  "aaAfterHoursGreetingTextToSpeechPrompt": "Das ist ein Test.",
+  "aaAfterHoursAction": "TransferToTarget",
+  "aaAfterHoursActionTarget": "racq-pri-cha-immo@prika.onmicrosoft.com",
+  "aaAfterHoursDisconnectAction": null,
+  "openingHours1Start": "08:00:00",
+  "openingHours1End": "12:00:00",
+  "openingHours2Start": "13:00:00",
+  "openingHours2End": "17:00:00",
+  "holidayNameSuffix": "kantonal-2026",
+  "m365GroupId": "66cdc45b-04c8-465b-88cd-53cf14a004e6",
+  "holidayGreetingPromptDE": "Das ist ein Test.",
+  "holidayDate": "2025-11-02T18:46:32.8158747+01:00",
+  "holidayTime": "09:00:00",
+  "holidaySeries": [
+    {
+      "dateTime": "2025-01-01T00:00:00",
+      "displayText": "01.01.2025 00:00 - Neujahr",
+      "date": "2025-01-01T00:00:00",
+      "time": "00:00:00",
+      "name": "Neujahr"
+    },
+    {
+      "dateTime": "2025-01-02T00:00:00",
+      "displayText": "02.01.2025 00:00 - Berchtoldstag",
+      "date": "2025-01-02T00:00:00",
+      "time": "00:00:00",
+      "name": "Berchtoldstag"
+    },
+    {
+      "dateTime": "2025-04-18T00:00:00",
+      "displayText": "18.04.2025 00:00 - Karfreitag",
+      "date": "2025-04-18T00:00:00",
+      "time": "00:00:00",
+      "name": "Karfreitag"
+    },
+    {
+      "dateTime": "2025-04-21T00:00:00",
+      "displayText": "21.04.2025 00:00 - Ostermontag",
+      "date": "2025-04-21T00:00:00",
+      "time": "00:00:00",
+      "name": "Ostermontag"
+    },
+    {
+      "dateTime": "2025-05-29T00:00:00",
+      "displayText": "29.05.2025 00:00 - Auffahrt",
+      "date": "2025-05-29T00:00:00",
+      "time": "00:00:00",
+      "name": "Auffahrt"
+    },
+    {
+      "dateTime": "2025-06-09T00:00:00",
+      "displayText": "09.06.2025 00:00 - Pfingstmontag",
+      "date": "2025-06-09T00:00:00",
+      "time": "00:00:00",
+      "name": "Pfingstmontag"
+    },
+    {
+      "dateTime": "2025-06-19T00:00:00",
+      "displayText": "19.06.2025 00:00 - Fronleichnam",
+      "date": "2025-06-19T00:00:00",
+      "time": "00:00:00",
+      "name": "Fronleichnam"
+    },
+    {
+      "dateTime": "2025-08-01T00:00:00",
+      "displayText": "01.08.2025 00:00 - Bundesfeier",
+      "date": "2025-08-01T00:00:00",
+      "time": "00:00:00",
+      "name": "Bundesfeier"
+    },
+    {
+      "dateTime": "2025-08-15T00:00:00",
+      "displayText": "15.08.2025 00:00 - Mari\u00E4 Himmelfahrt",
+      "date": "2025-08-15T00:00:00",
+      "time": "00:00:00",
+      "name": "Mari\u00E4 Himmelfahrt"
+    },
+    {
+      "dateTime": "2025-11-01T00:00:00",
+      "displayText": "01.11.2025 00:00 - Allerheiligen",
+      "date": "2025-11-01T00:00:00",
+      "time": "00:00:00",
+      "name": "Allerheiligen"
+    },
+    {
+      "dateTime": "2025-12-08T00:00:00",
+      "displayText": "08.12.2025 00:00 - Mari\u00E4 Empf\u00E4ngnis",
+      "date": "2025-12-08T00:00:00",
+      "time": "00:00:00",
+      "name": "Mari\u00E4 Empf\u00E4ngnis"
+    },
+    {
+      "dateTime": "2025-12-25T00:00:00",
+      "displayText": "25.12.2025 00:00 - Weihnachtstag",
+      "date": "2025-12-25T00:00:00",
+      "time": "00:00:00",
+      "name": "Weihnachtstag"
+    },
+    {
+      "dateTime": "2025-12-26T00:00:00",
+      "displayText": "26.12.2025 00:00 - Stephanstag",
+      "date": "2025-12-26T00:00:00",
+      "time": "00:00:00",
+      "name": "Stephanstag"
+    }
+  ],
+  "cqGreetingType": "None",
+  "cqGreetingAudioFileId": "5fafdcc058e440ccb79bebc0938b3547",
+  "cqGreetingTextToSpeechPrompt": null,
+  "cqMusicOnHoldType": "Default",
+  "cqMusicOnHoldAudioFileId": "b05d83eb28bb4a69bc6c87fba3c6a79a",
+  "cqOverflowThreshold": 35,
+  "cqOverflowAction": "TransferToVoicemail",
+  "cqOverflowActionTarget": "66cdc45b-04c8-465b-88cd-53cf14a004e6",
+  "cqOverflowActionAudioFileId": "d970bc2e12bc429ab47fc19a7652e282",
+  "cqOverflowActionTextToSpeechPrompt": null,
+  "cqOverflowDisconnectAction": "AudioFile",
+  "cqTimeoutThreshold": 30,
+  "cqTimeoutAction": "TransferToVoicemail",
+  "cqTimeoutActionTarget": "66cdc45b-04c8-465b-88cd-53cf14a004e6",
+  "cqTimeoutActionAudioFileId": "2eeca1bb94d245efbcd1fe3b63b834b8",
+  "cqTimeoutActionTextToSpeechPrompt": null,
+  "cqTimeoutDisconnectAction": "AudioFile",
+  "cqNoAgentAction": "QueueCall",
+  "cqNoAgentActionTarget": "66cdc45b-04c8-465b-88cd-53cf14a004e6",
+  "cqNoAgentActionAudioFileId": "2661e433125748259a2ab23c0a80fd2b",
+  "cqNoAgentActionTextToSpeechPrompt": null,
+  "cqNoAgentDisconnectAction": "AudioFile",
+  "cqNoAgentApplyToNewCallsOnly": true
+}

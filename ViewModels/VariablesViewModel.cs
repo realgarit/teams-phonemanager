@@ -661,6 +661,12 @@ namespace teams_phonemanager.ViewModels
             "TransferToVoicemail"
         };
 
+        public ObservableCollection<string> VoicemailGreetingTypeOptions { get; } = new ObservableCollection<string>
+        {
+            "AudioFile",
+            "TextToSpeech"
+        };
+
         public ObservableCollection<string> AaGreetingTypeOptions { get; } = new ObservableCollection<string>
         {
             "None",
@@ -682,6 +688,25 @@ namespace teams_phonemanager.ViewModels
         public bool ShowOverflowTarget => Variables.CqOverflowAction == "TransferToTarget" || Variables.CqOverflowAction == "TransferToVoicemail";
         public bool ShowTimeoutTarget => Variables.CqTimeoutAction == "TransferToTarget" || Variables.CqTimeoutAction == "TransferToVoicemail";
         public bool ShowNoAgentTarget => Variables.CqNoAgentAction == "TransferToTarget" || Variables.CqNoAgentAction == "TransferToVoicemail";
+        
+        // Voicemail greeting visibility (only show when TransferToVoicemail is selected AND target is a GUID)
+        public bool ShowOverflowVoicemailGreeting => Variables.CqOverflowAction == "TransferToVoicemail" && 
+            !string.IsNullOrWhiteSpace(Variables.CqOverflowActionTarget) && 
+            System.Guid.TryParse(Variables.CqOverflowActionTarget, out _);
+        public bool ShowTimeoutVoicemailGreeting => Variables.CqTimeoutAction == "TransferToVoicemail" && 
+            !string.IsNullOrWhiteSpace(Variables.CqTimeoutActionTarget) && 
+            System.Guid.TryParse(Variables.CqTimeoutActionTarget, out _);
+        public bool ShowNoAgentVoicemailGreeting => Variables.CqNoAgentAction == "TransferToVoicemail" && 
+            !string.IsNullOrWhiteSpace(Variables.CqNoAgentActionTarget) && 
+            System.Guid.TryParse(Variables.CqNoAgentActionTarget, out _);
+        
+        // Voicemail greeting type visibility
+        public bool ShowOverflowVoicemailAudioFile => Variables.CqOverflowVoicemailGreetingType == "AudioFile";
+        public bool ShowOverflowVoicemailTextToSpeech => Variables.CqOverflowVoicemailGreetingType == "TextToSpeech";
+        public bool ShowTimeoutVoicemailAudioFile => Variables.CqTimeoutVoicemailGreetingType == "AudioFile";
+        public bool ShowTimeoutVoicemailTextToSpeech => Variables.CqTimeoutVoicemailGreetingType == "TextToSpeech";
+        public bool ShowNoAgentVoicemailAudioFile => Variables.CqNoAgentVoicemailGreetingType == "AudioFile";
+        public bool ShowNoAgentVoicemailTextToSpeech => Variables.CqNoAgentVoicemailGreetingType == "TextToSpeech";
 
         // AA Conditional visibility properties
         public bool ShowAaDefaultGreetingAudioFile => Variables.AaDefaultGreetingType == "AudioFile";
@@ -701,6 +726,15 @@ namespace teams_phonemanager.ViewModels
             OnPropertyChanged(nameof(ShowOverflowTarget));
             OnPropertyChanged(nameof(ShowTimeoutTarget));
             OnPropertyChanged(nameof(ShowNoAgentTarget));
+            OnPropertyChanged(nameof(ShowOverflowVoicemailGreeting));
+            OnPropertyChanged(nameof(ShowTimeoutVoicemailGreeting));
+            OnPropertyChanged(nameof(ShowNoAgentVoicemailGreeting));
+            OnPropertyChanged(nameof(ShowOverflowVoicemailAudioFile));
+            OnPropertyChanged(nameof(ShowOverflowVoicemailTextToSpeech));
+            OnPropertyChanged(nameof(ShowTimeoutVoicemailAudioFile));
+            OnPropertyChanged(nameof(ShowTimeoutVoicemailTextToSpeech));
+            OnPropertyChanged(nameof(ShowNoAgentVoicemailAudioFile));
+            OnPropertyChanged(nameof(ShowNoAgentVoicemailTextToSpeech));
         }
 
         private void UpdateAutoAttendantVisibility()
@@ -752,6 +786,30 @@ namespace teams_phonemanager.ViewModels
             await SelectAndImportAudioFile(
                 audioFileId => Variables.CqMusicOnHoldAudioFileId = audioFileId,
                 "Music on Hold");
+        }
+
+        [RelayCommand]
+        private async Task SelectOverflowVoicemailAudioFile()
+        {
+            await SelectAndImportAudioFile(
+                audioFileId => Variables.CqOverflowActionAudioFileId = audioFileId,
+                "Overflow Voicemail Greeting");
+        }
+
+        [RelayCommand]
+        private async Task SelectTimeoutVoicemailAudioFile()
+        {
+            await SelectAndImportAudioFile(
+                audioFileId => Variables.CqTimeoutActionAudioFileId = audioFileId,
+                "Timeout Voicemail Greeting");
+        }
+
+        [RelayCommand]
+        private async Task SelectNoAgentVoicemailAudioFile()
+        {
+            await SelectAndImportAudioFile(
+                audioFileId => Variables.CqNoAgentActionAudioFileId = audioFileId,
+                "No Agent Voicemail Greeting");
         }
 
         // Auto Attendant Configuration Dialog

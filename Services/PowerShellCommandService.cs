@@ -169,7 +169,7 @@ if ($existingGroup)
 
 try {{
     $newGroup = New-MgGroup -DisplayName ""{groupName}"" `
-        -MailEnabled:$False `
+        -MailEnabled:$True `
         -MailNickName ""{groupName}"" `
         -SecurityEnabled `
         -GroupTypes @(""Unified"")
@@ -223,23 +223,22 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceI
             // Greeting
             if (variables.CqGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqGreetingAudioFileId))
             {
-                parameters.AppendLine($"-WelcomeMusicAudioFileId {variables.CqGreetingAudioFileId} `");
+                parameters.AppendLine($"-WelcomeMusicAudioFileId \"{variables.CqGreetingAudioFileId}\" `");
             }
             else if (variables.CqGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqGreetingTextToSpeechPrompt))
             {
                 parameters.AppendLine($"-WelcomeTextToSpeechPrompt \"{variables.CqGreetingTextToSpeechPrompt}\" `");
             }
-            // If None or not set, omit greeting parameters (Teams defaults to no greeting)
 
             // Music on Hold
             if (variables.CqMusicOnHoldType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqMusicOnHoldAudioFileId))
             {
-                parameters.AppendLine($"-MusicOnHoldAudioFileId {variables.CqMusicOnHoldAudioFileId} `");
+                parameters.AppendLine($"-MusicOnHoldAudioFileId \"{variables.CqMusicOnHoldAudioFileId}\" `");
                 parameters.AppendLine($"-UseDefaultMusicOnHold $false `");
             }
             else
             {
-                // Default behavior
+                // Explicitly set UseDefaultMusicOnHold to true when "Default" is selected
                 parameters.AppendLine($"-UseDefaultMusicOnHold $true `");
             }
 
@@ -251,24 +250,38 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceI
             {
                 if (variables.CqOverflowAction == "Disconnect")
                 {
-                    parameters.AppendLine($"-OverflowAction Disconnect `");
-                    // Note: Disconnect with audio/text prompts must be set via Set-CsCallQueue after creation
+                    parameters.AppendLine($"-OverflowAction DisconnectWithBusy `");
                 }
                 else if (variables.CqOverflowAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTarget))
                 {
-                    parameters.AppendLine($"-OverflowAction TransferToTarget `");
-                    parameters.AppendLine($"-OverflowActionTarget {variables.CqOverflowActionTarget} `");
+                    parameters.AppendLine($"-OverflowAction Forward `");
+                    parameters.AppendLine($"-OverflowActionTarget \"{variables.CqOverflowActionTarget}\" `");
                 }
                 else if (variables.CqOverflowAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTarget))
                 {
-                    parameters.AppendLine($"-OverflowAction TransferToVoicemail `");
-                    parameters.AppendLine($"-OverflowActionTarget {variables.CqOverflowActionTarget} `");
+                    if (System.Guid.TryParse(variables.CqOverflowActionTarget, out _))
+                    {
+                        parameters.AppendLine($"-OverflowAction SharedVoicemail `");
+                        parameters.AppendLine($"-OverflowActionTarget \"{variables.CqOverflowActionTarget}\" `");
+                        if (variables.CqOverflowVoicemailGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTextToSpeechPrompt))
+                        {
+                            parameters.AppendLine($"-OverflowSharedVoicemailTextToSpeechPrompt \"{variables.CqOverflowActionTextToSpeechPrompt}\" `");
+                        }
+                        else if (variables.CqOverflowVoicemailGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionAudioFileId))
+                        {
+                            parameters.AppendLine($"-OverflowSharedVoicemailAudioFilePrompt \"{variables.CqOverflowActionAudioFileId}\" `");
+                        }
+                    }
+                    else
+                    {
+                        parameters.AppendLine($"-OverflowAction Voicemail `");
+                        parameters.AppendLine($"-OverflowActionTarget \"{variables.CqOverflowActionTarget}\" `");
+                    }
                 }
             }
             else
             {
-                // Default behavior
-                parameters.AppendLine($"-OverflowAction Disconnect `");
+                parameters.AppendLine($"-OverflowAction DisconnectWithBusy `");
             }
 
             // Timeout
@@ -284,75 +297,84 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceI
                 if (variables.CqTimeoutAction == "Disconnect")
                 {
                     parameters.AppendLine($"-TimeoutAction Disconnect `");
-                    // Note: Disconnect with audio/text prompts must be set via Set-CsCallQueue after creation
                 }
                 else if (variables.CqTimeoutAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTarget))
                 {
-                    parameters.AppendLine($"-TimeoutAction TransferToTarget `");
-                    parameters.AppendLine($"-TimeoutActionTarget {variables.CqTimeoutActionTarget} `");
+                    parameters.AppendLine($"-TimeoutAction Forward `");
+                    parameters.AppendLine($"-TimeoutActionTarget \"{variables.CqTimeoutActionTarget}\" `");
                 }
                 else if (variables.CqTimeoutAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTarget))
                 {
-                    parameters.AppendLine($"-TimeoutAction TransferToVoicemail `");
-                    parameters.AppendLine($"-TimeoutActionTarget {variables.CqTimeoutActionTarget} `");
+                    if (System.Guid.TryParse(variables.CqTimeoutActionTarget, out _))
+                    {
+                        parameters.AppendLine($"-TimeoutAction SharedVoicemail `");
+                        parameters.AppendLine($"-TimeoutActionTarget \"{variables.CqTimeoutActionTarget}\" `");
+                        if (variables.CqTimeoutVoicemailGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTextToSpeechPrompt))
+                        {
+                            parameters.AppendLine($"-TimeoutSharedVoicemailTextToSpeechPrompt \"{variables.CqTimeoutActionTextToSpeechPrompt}\" `");
+                        }
+                        else if (variables.CqTimeoutVoicemailGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionAudioFileId))
+                        {
+                            parameters.AppendLine($"-TimeoutSharedVoicemailAudioFilePrompt \"{variables.CqTimeoutActionAudioFileId}\" `");
+                        }
+                    }
+                    else
+                    {
+                        parameters.AppendLine($"-TimeoutAction Voicemail `");
+                        parameters.AppendLine($"-TimeoutActionTarget \"{variables.CqTimeoutActionTarget}\" `");
+                    }
                 }
             }
             else
             {
-                // Default behavior
                 parameters.AppendLine($"-TimeoutAction Disconnect `");
             }
 
             // No Agent
-            if (!string.IsNullOrWhiteSpace(variables.CqNoAgentAction))
+            if (!string.IsNullOrWhiteSpace(variables.CqNoAgentAction) && variables.CqNoAgentAction != "QueueCall")
             {
-                if (variables.CqNoAgentAction == "QueueCall")
-                {
-                    parameters.AppendLine($"-NoAgentAction Queue `");
-                }
-                else if (variables.CqNoAgentAction == "Disconnect")
+                if (variables.CqNoAgentAction == "Disconnect")
                 {
                     parameters.AppendLine($"-NoAgentAction Disconnect `");
-                    // Note: Disconnect with audio/text prompts must be set via Set-CsCallQueue after creation
                 }
                 else if (variables.CqNoAgentAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTarget))
                 {
                     parameters.AppendLine($"-NoAgentAction Forward `");
-                    parameters.AppendLine($"-NoAgentActionTarget {variables.CqNoAgentActionTarget} `");
+                    parameters.AppendLine($"-NoAgentActionTarget \"{variables.CqNoAgentActionTarget}\" `");
                 }
                 else if (variables.CqNoAgentAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTarget))
                 {
-                    parameters.AppendLine($"-NoAgentAction Voicemail `");
-                    parameters.AppendLine($"-NoAgentActionTarget {variables.CqNoAgentActionTarget} `");
+                    if (System.Guid.TryParse(variables.CqNoAgentActionTarget, out _))
+                    {
+                        parameters.AppendLine($"-NoAgentAction SharedVoicemail `");
+                        parameters.AppendLine($"-NoAgentActionTarget \"{variables.CqNoAgentActionTarget}\" `");
+                        if (variables.CqNoAgentVoicemailGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTextToSpeechPrompt))
+                        {
+                            parameters.AppendLine($"-NoAgentSharedVoicemailTextToSpeechPrompt \"{variables.CqNoAgentActionTextToSpeechPrompt}\" `");
+                        }
+                        else if (variables.CqNoAgentVoicemailGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionAudioFileId))
+                        {
+                            parameters.AppendLine($"-NoAgentSharedVoicemailAudioFilePrompt \"{variables.CqNoAgentActionAudioFileId}\" `");
+                        }
+                    }
+                    else
+                    {
+                        parameters.AppendLine($"-NoAgentAction Voicemail `");
+                        parameters.AppendLine($"-NoAgentActionTarget \"{variables.CqNoAgentActionTarget}\" `");
+                    }
                 }
 
-                // NoAgentApplyTo: NewCalls (only new calls) or AllCalls (all calls in queue)
                 if (variables.CqNoAgentApplyToNewCallsOnly)
                 {
                     parameters.AppendLine($"-NoAgentApplyTo NewCalls `");
                 }
                 else
                 {
-                    // Default is AllCalls, but we can explicitly set it for clarity
                     parameters.AppendLine($"-NoAgentApplyTo AllCalls `");
                 }
             }
-            // If not set, omit NoAgentAction parameter (Teams will use default)
 
-            // Return the parameters string - each line should end with backtick and newline
-            // Only remove the final trailing backtick and whitespace from the very end
-            var result = parameters.ToString();
-            if (result.EndsWith("`"))
-            {
-                // Remove trailing backtick and any whitespace after it
-                result = result.TrimEnd('`', ' ', '\r', '\n');
-            }
-            else
-            {
-                // Just trim trailing whitespace
-                result = result.TrimEnd();
-            }
-            return result;
+            return parameters.ToString().TrimEnd();
         }
 
 
@@ -625,14 +647,15 @@ catch {{
             
             return $@"
 try {{
+    # Create Call Queue in one step
     New-CsCallQueue `
-    -Name {name} `
+    -Name ""{name}"" `
     -RoutingMethod Attendant `
     -AllowOptOut $true `
     -ConferenceMode $true `
     -AgentAlertTime 30 `
-    -LanguageId {languageId} `
-    -DistributionLists {m365GroupId} `
+    -LanguageId ""{languageId}"" `
+    -DistributionLists @(""{m365GroupId}"") `
     {callQueueParams}
     -PresenceBasedRouting $false
     
@@ -646,7 +669,7 @@ catch {{
         private string BuildDefaultCallQueueParameters()
         {
             return $@"-OverflowThreshold " + ConstantsService.CallQueue.OverflowThreshold + @" `
--OverflowAction Disconnect `
+-OverflowAction DisconnectWithBusy `
 -TimeoutThreshold " + ConstantsService.CallQueue.TimeoutThreshold + @" `
 -TimeoutAction Disconnect `
 -UseDefaultMusicOnHold $true `";
