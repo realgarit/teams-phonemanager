@@ -3,13 +3,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fi="using:FluentIcons.Avalonia"
-             xmlns:fic="using:FluentIcons.Common"
              xmlns:local="clr-namespace:teams_phonemanager.Views"
              xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
              xmlns:converters="clr-namespace:teams_phonemanager.Converters"
              x:Class="teams_phonemanager.Views.GetStartedView"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="1000">
+             d:DesignHeight="800" d:DesignWidth="1000">
     
     <UserControl.DataContext>
         <viewmodels:GetStartedViewModel/>
@@ -20,66 +19,64 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </UserControl.Resources>
 
-    <UserControl.Styles>
-        <!-- Local styles removed, using App.axaml styles -->
-    </UserControl.Styles>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" Padding="0,0,0,32">
+        <StackPanel Margin="32" MaxWidth="850" HorizontalAlignment="Center" Spacing="24">
 
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-        <StackPanel Margin="24">
-
-            <!-- Setup Steps -->
-            <TextBlock Text="Setup Steps"
-                     FontSize="24"
-                     Margin="0,0,0,16"
-                     FontWeight="Bold"/>
+            <!-- Header Section -->
+            <StackPanel Spacing="8" Margin="0,0,0,16">
+                <TextBlock Text="Setup Steps"
+                         FontSize="32"
+                         FontWeight="SemiBold"/>
+                <TextBlock Text="Follow these steps to connect to your Microsoft 365 environment and configure the phone manager."
+                         FontSize="16"
+                         Opacity="0.7"
+                         TextWrapping="Wrap"/>
+            </StackPanel>
 
             <!-- Step 1: PowerShell Modules -->
-            <Border Classes="card" Margin="0,0,0,16">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+            <Border Classes="card">
+                <Grid ColumnDefinitions="Auto,*,Auto" Margin="8">
+                    <!-- Step Indicator -->
+                    <Panel Grid.Column="0" Width="32" Height="32" VerticalAlignment="Center" Margin="0,0,24,0">
+                        <!-- Pending State: Ring with Number -->
+                        <Border CornerRadius="16" 
+                                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                BorderThickness="2"
+                                IsVisible="{Binding !ModulesChecked}">
+                            <TextBlock Text="1" 
+                                     FontSize="18" 
+                                     FontWeight="Bold"
+                                     HorizontalAlignment="Center" 
+                                     VerticalAlignment="Center"/>
+                        </Border>
+                        <!-- Completed State: Clean Icon -->
+                        <fi:SymbolIcon Symbol="CheckmarkCircle" 
+                                     FontSize="28"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Center"
+                                     Foreground="{DynamicResource SystemFillColorSuccessBrush}"
+                                     IsVisible="{Binding ModulesChecked}"/>
+                    </Panel>
                     
-                    <!-- Step Number -->
-                    <Border Width="48" Height="48" 
-                            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                            CornerRadius="24"
-                            VerticalAlignment="Center"
-                            Margin="0,0,16,0">
-                        <TextBlock Text="1" 
-                                 FontSize="24" 
-                                 FontWeight="Bold"
-                                 HorizontalAlignment="Center"
-                                 VerticalAlignment="Center"
-                                 Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                    </Border>
-                    
-                    <!-- Step Content -->
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <!-- Content -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
                         <TextBlock Text="Check PowerShell Modules"
                                  FontSize="18"
-                                 FontWeight="Bold"
-                                 Margin="0,0,0,8"/>
-                        <TextBlock Text="Verify that Microsoft Teams and Microsoft Graph PowerShell modules are installed and available."
+                                 FontWeight="SemiBold"/>
+                        <TextBlock Text="Verify that Microsoft Teams and Microsoft Graph PowerShell modules are installed."
                                  FontSize="14"
-                                 TextWrapping="Wrap"
-                                 Opacity="0.87"/>
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"/>
                     </StackPanel>
                     
-                    <!-- Action Button -->
-                    <StackPanel Grid.Column="2" Orientation="Vertical">
+                    <!-- Action -->
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="24,0,0,0">
                         <Button Command="{Binding CheckModulesCommand}"
                                 IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBooleanConverter}}"
-                                Classes="IconTextLarge"
-                                FontWeight="Bold"
-                                MinWidth="200">
+                                Classes="IconText"
+                                MinWidth="160">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon 
-                                         Symbol="Box"
-                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                         />
+                                <fi:SymbolIcon Symbol="BoxToolbox"/>
                                 <TextBlock Text="Check Modules" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -88,72 +85,59 @@
             </Border>
 
             <!-- Step 2: Teams Connection -->
-            <Border Classes="card" Margin="0,0,0,16">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+            <Border Classes="card">
+                <Grid ColumnDefinitions="Auto,*,Auto" Margin="8">
+                    <!-- Step Indicator -->
+                    <Panel Grid.Column="0" Width="32" Height="32" VerticalAlignment="Center" Margin="0,0,24,0">
+                        <Border CornerRadius="16" 
+                                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                BorderThickness="2"
+                                IsVisible="{Binding !TeamsConnected}">
+                            <TextBlock Text="2" 
+                                     FontSize="18" 
+                                     FontWeight="Bold"
+                                     HorizontalAlignment="Center" 
+                                     VerticalAlignment="Center"/>
+                        </Border>
+                        <fi:SymbolIcon Symbol="CheckmarkCircle" 
+                                     FontSize="28"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Center"
+                                     Foreground="{DynamicResource SystemFillColorSuccessBrush}"
+                                     IsVisible="{Binding TeamsConnected}"/>
+                    </Panel>
                     
-                    <!-- Step Number -->
-                    <Border Width="48" Height="48" 
-                            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                            CornerRadius="24"
-                            VerticalAlignment="Center"
-                            Margin="0,0,16,0">
-                        <TextBlock Text="2" 
-                                 FontSize="24" 
-                                 FontWeight="Bold"
-                                 HorizontalAlignment="Center"
-                                 VerticalAlignment="Center"
-                                 Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                    </Border>
-                    
-                    <!-- Step Content -->
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <!-- Content -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
                         <TextBlock Text="Connect to Microsoft Teams"
                                  FontSize="18"
-                                 FontWeight="Bold"
-                                 Margin="0,0,0,8"/>
-                        <TextBlock Text="Establish a connection to your Microsoft Teams tenant using PowerShell."
+                                 FontWeight="SemiBold"/>
+                        <TextBlock Text="Establish a secure connection to your Microsoft Teams tenant."
                                  FontSize="14"
-                                 TextWrapping="Wrap"
-                                 Opacity="0.87"/>
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"/>
                     </StackPanel>
                     
-                    <!-- Action Buttons -->
-                    <StackPanel Grid.Column="2" Orientation="Vertical">
+                    <!-- Action -->
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="24,0,0,0">
                         <Button Command="{Binding ConnectTeamsCommand}"
+                                IsVisible="{Binding !TeamsConnected}"
                                 IsEnabled="{Binding CanConnectTeams}"
-                                
-                                
-                                FontWeight="Bold"
-                                MinWidth="200"
-                                
-                                Margin="0,0,0,8" Classes="IconTextLarge">
+                                Classes="IconText"
+                                MinWidth="160">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon 
-                                         Symbol="PeopleTeam"
-                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                         />
-                                <TextBlock Text="Connect Teams" VerticalAlignment="Center"/>
+                                <fi:SymbolIcon Symbol="Person"/>
+                                <TextBlock Text="Connect" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                        
                         <Button Command="{Binding DisconnectTeamsCommand}"
-                                IsEnabled="{Binding TeamsConnected}"
-                                
-                                
-                                FontWeight="Bold"
-                                MinWidth="200"
-                                 Classes="IconTextLarge">
+                                IsVisible="{Binding TeamsConnected}"
+                                Classes="IconText"
+                                Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                                MinWidth="160">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon 
-                                         Symbol="SignOut"
-                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                         />
-                                <TextBlock Text="Disconnect Teams" VerticalAlignment="Center"/>
+                                <fi:SymbolIcon Symbol="SignOut"/>
+                                <TextBlock Text="Disconnect" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -161,72 +145,59 @@
             </Border>
 
             <!-- Step 3: Graph Connection -->
-            <Border Classes="card" Margin="0,0,0,16">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+            <Border Classes="card">
+                <Grid ColumnDefinitions="Auto,*,Auto" Margin="8">
+                    <!-- Step Indicator -->
+                    <Panel Grid.Column="0" Width="32" Height="32" VerticalAlignment="Center" Margin="0,0,24,0">
+                        <Border CornerRadius="16" 
+                                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                BorderThickness="2"
+                                IsVisible="{Binding !GraphConnected}">
+                            <TextBlock Text="3" 
+                                     FontSize="18" 
+                                     FontWeight="Bold"
+                                     HorizontalAlignment="Center" 
+                                     VerticalAlignment="Center"/>
+                        </Border>
+                        <fi:SymbolIcon Symbol="CheckmarkCircle" 
+                                     FontSize="28"
+                                     HorizontalAlignment="Center"
+                                     VerticalAlignment="Center"
+                                     Foreground="{DynamicResource SystemFillColorSuccessBrush}"
+                                     IsVisible="{Binding GraphConnected}"/>
+                    </Panel>
                     
-                    <!-- Step Number -->
-                    <Border Width="48" Height="48" 
-                            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
-                            CornerRadius="24"
-                            VerticalAlignment="Center"
-                            Margin="0,0,16,0">
-                        <TextBlock Text="3" 
-                                 FontSize="24" 
-                                 FontWeight="Bold"
-                                 HorizontalAlignment="Center"
-                                 VerticalAlignment="Center"
-                                 Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                    </Border>
-                    
-                    <!-- Step Content -->
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <!-- Content -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
                         <TextBlock Text="Connect to Microsoft Graph"
                                  FontSize="18"
-                                 FontWeight="Bold"
-                                 Margin="0,0,0,8"/>
-                        <TextBlock Text="Establish a connection to Microsoft Graph for managing M365 groups and resources."
+                                 FontWeight="SemiBold"/>
+                        <TextBlock Text="Connect to Microsoft Graph to manage M365 groups and resources."
                                  FontSize="14"
-                                 TextWrapping="Wrap"
-                                 Opacity="0.87"/>
+                                 Opacity="0.7"
+                                 TextWrapping="Wrap"/>
                     </StackPanel>
                     
-                    <!-- Action Buttons -->
-                    <StackPanel Grid.Column="2" Orientation="Vertical">
-                        <Button Command="{Binding ConnectGraphCommand}"
+                    <!-- Action -->
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="24,0,0,0">
+                         <Button Command="{Binding ConnectGraphCommand}"
+                                IsVisible="{Binding !GraphConnected}"
                                 IsEnabled="{Binding CanConnectGraph}"
-                                
-                                
-                                FontWeight="Bold"
-                                MinWidth="200"
-                                
-                                Margin="0,0,0,8" Classes="IconTextLarge">
+                                Classes="IconText"
+                                MinWidth="160">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon 
-                                         Symbol="Cloud"
-                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                         />
-                                <TextBlock Text="Connect Graph" VerticalAlignment="Center"/>
+                                <fi:SymbolIcon Symbol="Cloud"/>
+                                <TextBlock Text="Connect" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                        
                         <Button Command="{Binding DisconnectGraphCommand}"
-                                IsEnabled="{Binding GraphConnected}"
-                                
-                                
-                                FontWeight="Bold"
-                                MinWidth="200"
-                                 Classes="IconTextLarge">
+                                IsVisible="{Binding GraphConnected}"
+                                Classes="IconText"
+                                Foreground="{DynamicResource SystemFillColorCriticalBrush}"
+                                MinWidth="160">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon 
-                                         Symbol="SignOut"
-                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                         />
-                                <TextBlock Text="Disconnect Graph" VerticalAlignment="Center"/>
+                                <fi:SymbolIcon Symbol="SignOut"/>
+                                <TextBlock Text="Disconnect" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -234,64 +205,47 @@
             </Border>
 
             <!-- Proceed Section -->
-            <Border Classes="card" Margin="0,24,0,0">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16">
-                        <fi:SymbolIcon FontSize="28"
-                                 Symbol="CheckmarkCircle"
-                                 Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                 />
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Ready to Continue"
+            <Border Classes="card" 
+                    Background="{DynamicResource SolidBackgroundFillColorTertiaryBrush}"
+                    BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                    Margin="0,16,0,0"
+                    IsVisible="{Binding CanProceed}">
+                <Grid ColumnDefinitions="*,Auto" Margin="8">
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="CheckmarkCircle" Foreground="{DynamicResource SystemFillColorSuccessBrush}" FontSize="24"/>
+                            <TextBlock Text="All Systems Ready"
                                      FontSize="18"
-                                     FontWeight="Bold"/>
-                            <TextBlock Text="All prerequisites completed"
-                                     FontSize="12"
-                                     Opacity="0.7"/>
+                                     FontWeight="SemiBold"/>
                         </StackPanel>
+                        <TextBlock Text="You have successfully connected to all required services."
+                                 FontSize="14"
+                                 Opacity="0.7"/>
                     </StackPanel>
                     
-                    <TextBlock Text="Once all connections are established, you can proceed to configure your phone system variables."
-                             FontSize="14"
-                             TextAlignment="Center"
-                             TextWrapping="Wrap"
-                             Opacity="0.87"
-                             Margin="0,0,0,24"/>
-                    
-                    <Button Command="{Binding NavigateToPageCommand}"
+                    <Button Grid.Column="1"
+                            Command="{Binding NavigateToPageCommand}"
                             CommandParameter="Variables"
-                            IsEnabled="{Binding CanProceed}"
-                            HorizontalAlignment="Center"
-                            
-                            
+                            Classes="Accent IconTextLarge"
                             FontWeight="Bold"
-                            MinWidth="200"
-                             Classes="IconTextLarge">
-                        <StackPanel Orientation="Horizontal">
-                            <fi:SymbolIcon 
-                                         Symbol="ArrowRight"
-                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                         />
-                                <TextBlock Text="Proceed to Variables" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                </StackPanel>
+                            MinWidth="200">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Text="Start Configuration" VerticalAlignment="Center"/>
+                            <fi:SymbolIcon Symbol="ArrowRight"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
             </Border>
 
-            <!-- Progress Indicator -->
-            <Border Classes="card" 
-                   Margin="0,24,0,0" 
-                   IsVisible="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <ProgressBar IsIndeterminate="True"
-                               Width="24"
-                               Height="24"
-                               Margin="0,0,16,0"/>
-                    <TextBlock Text="Processing..."
-                             
-                             VerticalAlignment="Center"/>
-                </StackPanel>
-            </Border>
+            <!-- Loading Indicator -->
+             <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Center" 
+                        Spacing="12"
+                        IsVisible="{Binding IsBusy}">
+                <ProgressBar IsIndeterminate="True" Width="20" Height="20"/>
+                <TextBlock Text="Processing..." Opacity="0.7"/>
+            </StackPanel>
+
         </StackPanel>
     </ScrollViewer>
 </UserControl>

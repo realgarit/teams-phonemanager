@@ -37,7 +37,7 @@
         <Border Grid.Row="0" Classes="header">
             <DockPanel LastChildFill="False">
                 <TextBlock Text="Teams Phone Manager" 
-                         
+                         FontSize="18"
                          FontWeight="SemiBold"
                          VerticalAlignment="Center"
                          Foreground="White"/>
