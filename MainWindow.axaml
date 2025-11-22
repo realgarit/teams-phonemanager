@@ -2,11 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:material="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-        xmlns:materialDialogs="clr-namespace:Material.Dialog;assembly=Material.Avalonia.Dialogs"
-        xmlns:materialDialogViews="clr-namespace:Material.Dialog.Views;assembly=Material.Avalonia.Dialogs"
-        xmlns:materialStyles="clr-namespace:Material.Styles;assembly=Material.Styles"
-        xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        xmlns:fi="using:FluentIcons.Avalonia"
+        xmlns:fic="using:FluentIcons.Common"
         xmlns:local="clr-namespace:teams_phonemanager"
         xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
         xmlns:converters="clr-namespace:teams_phonemanager.Converters"
@@ -16,14 +13,18 @@
         x:Class="teams_phonemanager.MainWindow"
         Title="Teams Phone Manager" 
         Height="720" 
-        Width="1280"
-        FontWeight="Medium"
-        FontSize="14">
+        Width="1280">
 
     <Window.DataContext>
         <viewmodels:MainWindowViewModel/>
     </Window.DataContext>
 
+    <Window.Styles>
+        <Style Selector="Border.header">
+            <Setter Property="Background" Value="{DynamicResource TeamsPrimaryBrush}"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+    </Window.Styles>
 
     <Grid x:Name="MainGrid">
         <Grid.RowDefinitions>
@@ -33,20 +34,27 @@
         </Grid.RowDefinitions>
 
         <!-- Top Bar -->
-        <material:ColorZone Mode="PrimaryMid" Grid.Row="0" Padding="16">
+        <Border Grid.Row="0" Classes="header">
             <DockPanel LastChildFill="False">
                 <TextBlock Text="Teams Phone Manager" 
-                         Classes="headline6" 
-                         VerticalAlignment="Center"/>
+                         FontSize="18"
+                         FontWeight="SemiBold"
+                         VerticalAlignment="Center"
+                         Foreground="White"/>
                 <Button x:Name="SettingsButton"
                         DockPanel.Dock="Right" 
-                        Classes="icon"
                         Command="{Binding ToggleSettingsCommand}"
-                        Foreground="White">
-                    <materialIcons:MaterialIcon Kind="Settings" Width="24" Height="24"/>
+                        Background="Transparent"
+                        Foreground="White"
+                        Width="40"
+                        Height="40"
+                        Classes="IconOnly">
+                    <fi:SymbolIcon 
+                              Symbol="Settings"
+                              Foreground="White"/>
                 </Button>
             </DockPanel>
-        </material:ColorZone>
+        </Border>
 
         <!-- Main Content -->
         <Grid Grid.Row="1">
@@ -56,103 +64,84 @@
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar -->
-            <material:Card Grid.Column="0" Margin="16" CornerRadius="8">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="0,8">
-                        <!-- Main Navigation Section -->
-                        <Button Classes="flat" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="Welcome"
-                               Height="48"
-                               Margin="0,4">
-                            <StackPanel Orientation="Horizontal">
-                                <materialIcons:MaterialIcon Kind="Home" Margin="0,0,12,0" Width="24" Height="24"/>
-                                <TextBlock Text="Welcome" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
+            <Grid Grid.Column="0" Margin="16,16,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <ListBox x:Name="NavigationListBox" Grid.Column="0" SelectionChanged="NavigationListBox_SelectionChanged">
+                    <ListBoxItem Tag="Welcome" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <fi:SymbolIcon 
+                                      Symbol="Home"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Welcome" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    
+                    <ListBoxItem Tag="GetStarted" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <fi:SymbolIcon 
+                                      Symbol="Rocket"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Get Started" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    
+                    <ListBoxItem Tag="Variables" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <fi:SymbolIcon 
+                                      Symbol="Code"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Variables" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    
+                    <ListBoxItem Tag="M365Groups" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <fi:SymbolIcon 
+                                      Symbol="PeopleTeam"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="M365 Groups" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    
+                    <ListBoxItem Tag="CallQueues" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <fi:SymbolIcon 
+                                      Symbol="CallInbound"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Call Queues" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    
+                    <ListBoxItem Tag="AutoAttendants" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <fi:SymbolIcon 
+                                      Symbol="Bot"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Auto Attendants" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
+                    
+                    <ListBoxItem Tag="Holidays" VerticalContentAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                            <fi:SymbolIcon 
+                                      Symbol="Calendar"
+                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <TextBlock Text="Holidays" FontSize="14" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </ListBoxItem>
 
-                        <Button Classes="flat" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="GetStarted"
-                               Height="48"
-                               Margin="0,4">
-                            <StackPanel Orientation="Horizontal">
-                                <materialIcons:MaterialIcon Kind="PlayCircle" Margin="0,0,12,0" Width="24" Height="24"/>
-                                <TextBlock Text="Get Started" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- Variables Section -->
-                        <Separator Margin="16,16,16,8"/>
-                        <TextBlock Text="VARIABLES" 
-                                 Margin="16,0,16,8" 
-                                 FontSize="12"
-                                 Opacity="0.7"/>
-
-                        <Button Classes="flat" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="Variables"
-                               Height="48"
-                               Margin="0,4">
-                            <StackPanel Orientation="Horizontal">
-                                <materialIcons:MaterialIcon Kind="Variable" Margin="0,0,12,0" Width="24" Height="24"/>
-                                <TextBlock Text="Variables" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <!-- Voice Configuration Section -->
-                        <Separator Margin="16,16,16,8"/>
-                        <TextBlock Text="VOICE CONFIGURATION" 
-                                 Margin="16,0,16,8" 
-                                 FontSize="12"
-                                 Opacity="0.7"/>
-
-                        <Button Classes="flat" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="M365Groups"
-                               Height="48"
-                               Margin="0,4">
-                            <StackPanel Orientation="Horizontal">
-                                <materialIcons:MaterialIcon Kind="AccountGroup" Margin="0,0,12,0" Width="24" Height="24"/>
-                                <TextBlock Text="M365 Groups" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button Classes="flat" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="CallQueues"
-                               Height="48"
-                               Margin="0,4">
-                            <StackPanel Orientation="Horizontal">
-                                <materialIcons:MaterialIcon Kind="Phone" Margin="0,0,12,0" Width="24" Height="24"/>
-                                <TextBlock Text="Call Queues" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button Classes="flat" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="AutoAttendants"
-                               Height="48"
-                               Margin="0,4">
-                            <StackPanel Orientation="Horizontal">
-                                <materialIcons:MaterialIcon Kind="PhoneInTalk" Margin="0,0,12,0" Width="24" Height="24"/>
-                                <TextBlock Text="Auto Attendants" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-
-                        <Button Classes="flat" 
-                               Command="{Binding NavigateToCommand}" 
-                               CommandParameter="Holidays"
-                               Height="48"
-                               Margin="0,4">
-                            <StackPanel Orientation="Horizontal">
-                                <materialIcons:MaterialIcon Kind="Calendar" Margin="0,0,12,0" Width="24" Height="24"/>
-                                <TextBlock Text="Holidays" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </ScrollViewer>
-            </material:Card>
+                </ListBox>
+                
+                <Border Grid.Column="1" 
+                        Background="Gray"
+                        Width="2"
+                        Margin="8,0,0,0"
+                        Opacity="0.6"/>
+            </Grid>
 
             <!-- Content Area -->
             <Grid Grid.Column="1" Margin="16">
@@ -201,7 +190,11 @@
         </Grid>
 
         <!-- Bottom Bar -->
-        <material:ColorZone Mode="Standard" Grid.Row="2" Padding="16">
+        <Border Grid.Row="2" 
+                Background="{DynamicResource ControlFillColorDefaultBrush}"
+                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="16">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -215,7 +208,7 @@
                 <!-- Latest Log Entry - Clickable Log Area -->
                 <Button Grid.Column="1" 
                         Command="{Binding ToggleLogDialogCommand}"
-                        Classes="flat"
+                        Background="Transparent"
                         Margin="16,0"
                         Padding="12,8"
                         HorizontalAlignment="Stretch"
@@ -227,42 +220,60 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         
-                        <materialIcons:MaterialIcon Grid.Column="0" 
-                                               Kind="Console" 
-                                               Width="20" 
-                                               Height="20"
-                                               Margin="0,0,8,0"
-                                               VerticalAlignment="Center"/>
+                        <fi:SymbolIcon Grid.Column="0" 
+                                  FontSize="16"
+                                  Symbol="Code"
+                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                  
+                                  VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="1" 
                                  Text="{Binding LatestLogEntry}" 
                                  TextTrimming="CharacterEllipsis" 
                                  VerticalAlignment="Center"
                                  FontFamily="Consolas"
                                  FontSize="12"/>
-                        <materialIcons:MaterialIcon Grid.Column="2" 
-                                               Kind="ChevronRight" 
-                                               Width="16" 
-                                               Height="16"
-                                               Margin="8,0,0,0"
-                                               Opacity="0.6"
-                                               VerticalAlignment="Center"/>
+                        <fi:SymbolIcon Grid.Column="2" 
+                                  FontSize="14"
+                                  Symbol="ChevronRight"
+                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                  Margin="8,0,0,0"
+                                  Opacity="0.6"
+                                  VerticalAlignment="Center"/>
                     </Grid>
                 </Button>
                 
                 <!-- Copyright -->
                 <TextBlock Grid.Column="2" Text="Realgar © 2025. MIT License." VerticalAlignment="Center"/>
             </Grid>
-        </material:ColorZone>
+        </Border>
 
-        <!-- Log Viewer Dialog -->
-        <Popup IsOpen="{Binding IsLogDialogOpen}"
-               Placement="Center"
-               PlacementTarget="#MainGrid"
-               HorizontalOffset="0"
-               VerticalOffset="0"
-               OverlayDismissEventPassThrough="True">
-            <Popup.Child>
-                <material:Card Padding="0" Margin="16" MaxWidth="1000" MaxHeight="600">
+        <!-- Log Viewer Dialog - Border overlay -->
+        <Border Grid.RowSpan="3"
+                IsVisible="{Binding IsLogDialogOpen}"
+                Background="#80000000"
+                ZIndex="1000"
+                PointerPressed="LogDialogBackdrop_PointerPressed">
+            <Border.Styles>
+                <Style Selector="Border">
+                    <Style.Animations>
+                        <Animation Duration="0:0:0.2">
+                            <KeyFrame Cue="0%">
+                                <Setter Property="Opacity" Value="0"/>
+                            </KeyFrame>
+                            <KeyFrame Cue="100%">
+                                <Setter Property="Opacity" Value="1"/>
+                            </KeyFrame>
+                        </Animation>
+                    </Style.Animations>
+                </Style>
+            </Border.Styles>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
+                  PointerPressed="LogDialogCard_PointerPressed">
+                <Border Background="{DynamicResource SolidBackgroundFillColorBase}"
+                        BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Margin="16" MaxWidth="1000" MaxHeight="600" Padding="0">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -271,20 +282,26 @@
                         </Grid.RowDefinitions>
                         
                         <!-- Dialog Header -->
-                        <material:ColorZone Mode="PrimaryMid" Grid.Row="0" Padding="16">
+                        <Border Grid.Row="0" Classes="header" Padding="16">
                             <DockPanel LastChildFill="False">
                                 <TextBlock Text="Log Viewer" 
-                                         Classes="headline6" 
+                                         
+                                         FontWeight="SemiBold"
                                          Foreground="White"
                                          VerticalAlignment="Center"/>
                                 <Button DockPanel.Dock="Right" 
-                                        Classes="icon"
+                                        Background="Transparent"
+                                        Foreground="White"
                                         Command="{Binding CloseLogDialogCommand}"
-                                        Foreground="White">
-                                    <materialIcons:MaterialIcon Kind="Close" Width="24" Height="24"/>
+                                        Width="40"
+                                        Height="40"
+                                        Classes="IconOnly">
+                                    <fi:SymbolIcon 
+                                             Symbol="Dismiss"
+                                             Foreground="White"/>
                                 </Button>
                             </DockPanel>
-                        </material:ColorZone>
+                        </Border>
                         
                         <!-- Log Content -->
                         <ScrollViewer x:Name="LogScrollViewer"
@@ -301,6 +318,7 @@
                                    AcceptsReturn="True"
                                    AcceptsTab="True"
                                    Padding="8"
+                                   VerticalContentAlignment="Top"
                                    TextChanged="LogView_TextChanged">
                                 <TextBox.ContextMenu>
                                     <ContextMenu>
@@ -315,24 +333,33 @@
                         <StackPanel Grid.Row="2" 
                                    Orientation="Horizontal" 
                                    HorizontalAlignment="Right"
-                                   Margin="16,8,16,16">
-                            <Button Classes="flat"
-                                    Command="{Binding ClearLogCommand}"
-                                    Margin="0,0,8,0">
+                                   Margin="16,8,16,16"
+                                   Spacing="16">
+                            <Button Command="{Binding ClearLogCommand}"
+                                    Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="Delete" Margin="0,0,8,0" Width="16" Height="16"/>
-                                    <TextBlock Text="Clear Log"/>
+                                    <fi:SymbolIcon FontSize="16"
+                                             Symbol="Delete"
+                                             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                             />
+                                    <TextBlock Text="Clear Log" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
-                            <Button Classes="raised"
-                                    Command="{Binding CloseLogDialogCommand}">
-                                <TextBlock Text="Close"/>
+                            <Button Command="{Binding CloseLogDialogCommand}"
+                                    Classes="IconText">
+                                <StackPanel Orientation="Horizontal">
+                                    <fi:SymbolIcon FontSize="16"
+                                             Symbol="Dismiss"
+                                             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                             />
+                                    <TextBlock Text="Close" VerticalAlignment="Center"/>
+                                </StackPanel>
                             </Button>
                         </StackPanel>
                     </Grid>
-                </material:Card>
-            </Popup.Child>
-        </Popup>
+                </Border>
+            </Grid>
+        </Border>
 
         <!-- Settings Side Panel -->
         <!-- Overlay backdrop -->
@@ -359,57 +386,63 @@
         
         <!-- Side panel -->
         <Border Grid.RowSpan="3"
-                Background="{DynamicResource MaterialDesignPaper}"
+                Background="{DynamicResource SolidBackgroundFillColorBase}"
                 Width="360"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Stretch"
                 IsVisible="{Binding IsSettingsOpen}"
                 ZIndex="1001"
-                ClipToBounds="True">
-            <material:Card Padding="0" Margin="0" CornerRadius="0">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    
-                    <!-- Header -->
-                    <material:ColorZone Mode="PrimaryMid" Grid.Row="0" Padding="24">
-                        <DockPanel LastChildFill="False">
-                            <TextBlock Text="Settings" 
-                                     Classes="headline6" 
-                                     Foreground="White"
-                                     VerticalAlignment="Center"/>
-                            <Button DockPanel.Dock="Right" 
-                                    Classes="icon"
-                                    Foreground="White"
-                                    Command="{Binding CloseSettingsCommand}">
-                                <materialIcons:MaterialIcon Kind="Close" Width="24" Height="24"/>
-                            </Button>
-                        </DockPanel>
-                    </material:ColorZone>
-                    
-                    <!-- Content -->
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                        <StackPanel Margin="24" Spacing="24">
-                            <StackPanel Spacing="8">
-                                <TextBlock Text="Appearance" 
-                                         Classes="subtitle1"
-                                         Margin="0,0,0,8"/>
-                                
-                                <DockPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Dark Theme" 
-                                             VerticalAlignment="Center"
-                                             Margin="0,0,16,0"/>
-                                    <ToggleSwitch DockPanel.Dock="Right" 
-                                                IsChecked="{Binding IsDarkTheme}"/>
-                                </DockPanel>
-                            </StackPanel>
+                ClipToBounds="True"
+                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1,0,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Header -->
+                <Border Grid.Row="0" Classes="header" Padding="24">
+                    <DockPanel LastChildFill="False">
+                        <TextBlock Text="Settings" 
+                                 
+                                 FontWeight="SemiBold"
+                                 Foreground="White"
+                                 VerticalAlignment="Center"/>
+                        <Button DockPanel.Dock="Right" 
+                                Background="Transparent"
+                                Foreground="White"
+                                Command="{Binding CloseSettingsCommand}"
+                                Width="40"
+                                Height="40"
+                                Classes="IconOnly">
+                            <fi:SymbolIcon 
+                                     Symbol="Dismiss"
+                                     Foreground="White"/>
+                        </Button>
+                    </DockPanel>
+                </Border>
+                
+                <!-- Content -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="24" Spacing="24">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Appearance" 
+                                     FontSize="18"
+                                     FontWeight="SemiBold"
+                                     Margin="0,0,0,8"/>
+                            
+                            <DockPanel VerticalAlignment="Center">
+                                <TextBlock Text="Dark Theme" 
+                                         VerticalAlignment="Center"
+                                         Margin="0,0,16,0"/>
+                                <ToggleSwitch DockPanel.Dock="Right" 
+                                            IsChecked="{Binding IsDarkTheme}"/>
+                            </DockPanel>
                         </StackPanel>
-                    </ScrollViewer>
-                </Grid>
-            </material:Card>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
         </Border>
     </Grid>
 </Window>
-

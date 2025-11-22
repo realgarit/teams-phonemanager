@@ -3,8 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:material="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:fi="using:FluentIcons.Avalonia"
+             xmlns:fic="using:FluentIcons.Common"
              xmlns:local="clr-namespace:teams_phonemanager.Views"
              xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
              xmlns:converters="clr-namespace:teams_phonemanager.Converters"
@@ -19,8 +19,12 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </UserControl.Resources>
 
+    <UserControl.Styles>
+        <!-- Local styles removed, using App.axaml styles -->
+    </UserControl.Styles>
+
     <Grid>
-    <material:Card Margin="32" CornerRadius="8">
+    <Border Classes="card" Margin="24">
         <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -37,7 +41,7 @@
                     <!-- Status Message -->
                     <StackPanel Grid.Row="0" Margin="0,0,0,16">
                     <TextBlock Text="{Binding StatusMessage}"
-                             Classes="body1"
+                             FontSize="14"
                              TextWrapping="Wrap"/>
                     </StackPanel>
 
@@ -45,76 +49,77 @@
                     <ScrollViewer Grid.Row="1" Margin="16">
                         <StackPanel>
                             <TextBlock Text="Follow these steps in order to create a holiday for your auto attendant:"
-                                     Classes="subtitle1"
+                                     FontSize="18"
+                                 FontWeight="SemiBold"
                                      Margin="0,0,0,24"/>
 
                             <!-- Step 1: Create Holiday -->
-                            <material:Card Margin="0,0,0,16" Padding="16">
+                            <Border Classes="card" Margin="0,0,0,16">
                                 <StackPanel>
                                     <TextBlock Text="Step 1: Create Holiday"
-                                             Classes="subtitle1"
+                                             FontSize="18"
                                              FontWeight="Bold"
                                              Margin="0,0,0,8"/>
                                     <TextBlock Text="Create a holiday schedule that will be used for the auto attendant. This defines when the holiday call flow should be active."
-                                             Classes="body2"
+                                             FontSize="14"
                                              TextWrapping="Wrap"
                                              Margin="0,0,0,16"/>
-                                    <Button Classes="raised"
+                                    <Button
                                             Command="{Binding OpenCreateHolidayDialogCommand}"
-                                            HorizontalAlignment="Left">
+                                            HorizontalAlignment="Left" Classes="IconText">
                                         <StackPanel Orientation="Horizontal">
-                                            <materialIcons:MaterialIcon Kind="CalendarPlus" Margin="0,0,8,0"/>
-                                            <TextBlock Text="Create Holiday"/>
+                                            <fi:SymbolIcon  Symbol="CalendarAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                            <TextBlock Text="Create Holiday" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
-                            </material:Card>
+                            </Border>
 
                             <!-- Step 2: Check Auto Attendant -->
-                            <material:Card Margin="0,0,0,16" Padding="16">
+                            <Border Classes="card" Margin="0,0,0,16">
                                 <StackPanel>
                                     <TextBlock Text="Step 2: Check Auto Attendant"
-                                             Classes="subtitle1"
+                                             FontSize="18"
                                              FontWeight="Bold"
                                              Margin="0,0,0,8"/>
                                     <TextBlock Text="Verify the auto attendant exists and is ready to receive the holiday configuration. You can modify the auto attendant name if needed."
-                                             Classes="body2"
+                                             FontSize="14"
                                              TextWrapping="Wrap"
                                              Margin="0,0,0,16"/>
-                                    <Button Classes="raised"
+                                    <Button
                                             Command="{Binding OpenCheckAutoAttendantDialogCommand}"
-                                            HorizontalAlignment="Left">
+                                            HorizontalAlignment="Left" Classes="IconText">
                                         <StackPanel Orientation="Horizontal">
-                                            <materialIcons:MaterialIcon Kind="PhoneCheck" Margin="0,0,8,0"/>
-                                            <TextBlock Text="Check Auto Attendant"/>
+                                            <fi:SymbolIcon  Symbol="CallCheckmark" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                            <TextBlock Text="Check Auto Attendant" VerticalAlignment="Center"/>
                                         </StackPanel>
                                     </Button>
                                 </StackPanel>
-                            </material:Card>
+                            </Border>
 
                             <!-- Step 3: Attach Holiday to Auto Attendant -->
-                            <material:Card Margin="0,0,0,16" Padding="16">
+                            <Border Classes="card" Margin="0,0,0,16">
                                 <StackPanel>
                                     <TextBlock Text="Step 3: Attach Holiday to Auto Attendant"
-                                             Classes="subtitle1"
+                                             FontSize="18"
                                              FontWeight="Bold"
                                              Margin="0,0,0,8"/>
                                     <TextBlock Text="Attach the created holiday to the auto attendant. This will create a holiday call flow with disconnect action and associate it with the holiday schedule."
-                                             Classes="body2"
+                                             FontSize="14"
                                              TextWrapping="Wrap"
                                              Margin="0,0,0,16"/>
                                     <StackPanel Orientation="Horizontal">
-                                        <Button Classes="raised"
+                                        <Button
                                                 Command="{Binding OpenAttachHolidayDialogCommand}"
-                                                Margin="0,0,16,0">
+                                                Margin="0,0,16,0" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <materialIcons:MaterialIcon Kind="Link" Margin="0,0,8,0"/>
-                                                <TextBlock Text="Attach to Auto Attendant"/>
+                                                <fi:SymbolIcon  Symbol="Link" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <TextBlock Text="Attach to Auto Attendant" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
                                 </StackPanel>
-                            </material:Card>
+                            </Border>
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>
@@ -126,7 +131,7 @@
                              Height="4"
                              Margin="32,0,32,16"/>
             </Grid>
-        </material:Card>
+        </Border>
 
         <!-- Create Holiday Dialog - Border overlay -->
         <Border IsVisible="{Binding ShowCreateHolidayDialog}"
@@ -149,37 +154,42 @@
             </Border.Styles>
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                   PointerPressed="CreateHolidayCard_PointerPressed">
-                <material:Card Padding="16" MinWidth="400" Margin="16">
+                <Border Classes="dialog" MinWidth="400" Margin="16">
                     <StackPanel>
                         <TextBlock Text="Create Holiday"
-                                 Classes="headline6"
+                                 
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Holiday Configuration:"
-                                 Classes="subtitle2"
+                                 FontSize="16"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBlock Text="Holidays will be created based on your configured holiday series in the Variables page. Each holiday will use the specified date, time, and greeting prompt."
-                                 Classes="body2"
+                                 FontSize="14"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
-                                  HorizontalAlignment="Right">
-                            <Button Classes="flat"
-                                    Command="{Binding CloseCreateHolidayDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
-                            </Button>
-                            <Button Classes="raised"
-                                    Command="{Binding CreateHolidayCommand}">
+                                  HorizontalAlignment="Right"
+                                  Spacing="16">
+                            <Button Command="{Binding CloseCreateHolidayDialogCommand}"
+                                    Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="CalendarPlus" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Create Holiday"/>
+                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button
+                                    Command="{Binding CreateHolidayCommand}" Classes="IconText">
+                                <StackPanel Orientation="Horizontal">
+                                    <fi:SymbolIcon  Symbol="CalendarAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Create Holiday" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                </material:Card>
+                </Border>
             </Grid>
         </Border>
 
@@ -204,42 +214,46 @@
             </Border.Styles>
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                   PointerPressed="CheckAutoAttendantCard_PointerPressed">
-                <material:Card Padding="16" MinWidth="400" Margin="16">
+                <Border Classes="dialog" MinWidth="400" Margin="16">
                     <StackPanel>
                         <TextBlock Text="Check Auto Attendant"
-                                 Classes="headline6"
+                                 
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Auto Attendant Name:"
-                                 Classes="subtitle2"
+                                 FontSize="16"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding AutoAttendantName}"
-                                 Classes="outlined"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="This will verify that the auto attendant exists and is ready to receive holiday configuration. The value is auto-generated from your variables, but you can modify it if needed."
-                                 Classes="caption"
+                                 FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
-                                  HorizontalAlignment="Right">
-                            <Button Classes="flat"
-                                    Command="{Binding CloseCheckAutoAttendantDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
-                            </Button>
-                            <Button Classes="raised"
-                                    Command="{Binding VerifyAutoAttendantCommand}">
+                                  HorizontalAlignment="Right"
+                                  Spacing="16">
+                            <Button Command="{Binding CloseCheckAutoAttendantDialogCommand}"
+                                    Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="Check" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Verify &amp; Confirm"/>
+                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button
+                                    Command="{Binding VerifyAutoAttendantCommand}" Classes="IconText">
+                                <StackPanel Orientation="Horizontal">
+                                    <fi:SymbolIcon  Symbol="Checkmark" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Verify &amp; Confirm" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                </material:Card>
+                </Border>
             </Grid>
         </Border>
 
@@ -264,49 +278,53 @@
             </Border.Styles>
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                   PointerPressed="AttachHolidayCard_PointerPressed">
-                <material:Card Padding="16" MinWidth="400" Margin="16">
+                <Border Classes="dialog" MinWidth="400" Margin="16">
                     <StackPanel>
                         <TextBlock Text="Attach Holiday to Auto Attendant"
-                                 Classes="headline6"
+                                 
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Holiday Name:"
-                                 Classes="subtitle2"
+                                 FontSize="16"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding HolidayName}"
-                                 Classes="outlined"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="Auto Attendant Name:"
-                                 Classes="subtitle2"
+                                 FontSize="16"
+                                 FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding AutoAttendantName}"
-                                 Classes="outlined"
                                  Margin="0,0,0,16"/>
                         
                         <TextBlock Text="This will attach the created holiday to the auto attendant, creating a holiday call flow with disconnect action and associating it with the holiday schedule."
-                                 Classes="caption"
+                                 FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
                         
                         <StackPanel Orientation="Horizontal" 
-                                  HorizontalAlignment="Right">
-                            <Button Classes="flat"
-                                    Command="{Binding CloseAttachHolidayDialogCommand}"
-                                    Margin="0,0,8,0">
-                                <TextBlock Text="Cancel"/>
-                            </Button>
-                            <Button Classes="raised"
-                                    Command="{Binding AttachHolidayToAutoAttendantCommand}">
+                                  HorizontalAlignment="Right"
+                                  Spacing="16">
+                            <Button Command="{Binding CloseAttachHolidayDialogCommand}"
+                                    Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <materialIcons:MaterialIcon Kind="Link" Margin="0,0,8,0"/>
-                                    <TextBlock Text="Attach Holiday"/>
+                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Cancel" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button
+                                    Command="{Binding AttachHolidayToAutoAttendantCommand}" Classes="IconText">
+                                <StackPanel Orientation="Horizontal">
+                                    <fi:SymbolIcon  Symbol="Link" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <TextBlock Text="Attach Holiday" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>
                     </StackPanel>
-                </material:Card>
+                </Border>
             </Grid>
         </Border>
 
@@ -314,16 +332,16 @@
         <Grid 
               Opacity="0.8"
               IsVisible="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <ProgressBar Classes="circular"
+                <ProgressBar
                        Value="0"
                        IsIndeterminate="True"
                        Width="50"
-                       Height="50"
+                       
                        Margin="0,16,0,0"/>
             
             <!-- Waiting Message -->
             <TextBlock Text="{Binding WaitingMessage, TargetNullValue=''}"
-                       Classes="body2"
+                       FontSize="14"
                        TextWrapping="Wrap"
                        Margin="0,8,0,0"
                        TextAlignment="Center"/>

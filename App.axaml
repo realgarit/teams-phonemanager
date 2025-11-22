@@ -1,20 +1,103 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:teams_phonemanager"
-             xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
-             xmlns:material="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:converters="clr-namespace:teams_phonemanager.Converters"
+             xmlns:fa="using:FluentAvalonia.Styling"
+             xmlns:fi="using:FluentIcons.Avalonia"
              x:Class="teams_phonemanager.App"
              RequestedThemeVariant="Dark">
     <Application.Styles>
-        <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Indigo" SecondaryColor="Indigo" />
-        <materialIcons:MaterialIconStyles />
+        <fa:FluentAvaloniaTheme />
+        
+        <!-- Global Control Styles -->
+        <Style Selector="TextBox">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="ComboBox">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="CalendarDatePicker">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="NumericUpDown">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{DynamicResource CardBackgroundFillColorDefaultBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+        
+        <Style Selector="Border.dialog">
+            <Setter Property="Background" Value="{DynamicResource SolidBackgroundFillColorBase}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+        
+        <!-- Reusable Button Styles for Icon+Text patterns -->
+        <Style Selector="Button.IconText">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="12,0"/>
+        </Style>
+        
+        <Style Selector="Button.IconTextLarge">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="16,0"/>
+        </Style>
+        
+        <!-- Centered Icon+Text Button (for Welcome page) -->
+        <Style Selector="Button.IconTextCentered">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="16,0"/>
+        </Style>
+        
+        <!-- Icon Only Button (for Settings, etc.) -->
+        <Style Selector="Button.IconOnly">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        
+        <!-- Icon styles - different margins for different contexts -->
+        
+        <!-- Default: Apply right margin for spacing (Buttons, Cards, etc.) -->
+        <Style Selector="fi|SymbolIcon">
+            <Setter Property="Margin" Value="0,-4,8,0"/>
+            <Setter Property="FontSize" Value="20"/>
+        </Style>
+        
+        <!-- NavBar override: No right margin (uses StackPanel Spacing) -->
+        <Style Selector="ListBoxItem fi|SymbolIcon">
+            <Setter Property="Margin" Value="0,-4,0,0"/>
+        </Style>
+        
+        <!-- IconOnly override: No margin (centered in button) -->
+        <Style Selector="Button.IconOnly fi|SymbolIcon">
+            <Setter Property="Margin" Value="0"/>
+        </Style>
     </Application.Styles>
     
     <Application.Resources>
         <!-- Value Converters -->
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        
+        <!-- Note: Icon geometries removed - now using FluentIcons.Avalonia SymbolIcon -->
+
+        <!-- Teams Violet Color Palette -->
+        <SolidColorBrush x:Key="TeamsPrimaryBrush" Color="#6264A7"/>
+        <SolidColorBrush x:Key="TeamsPrimaryLightBrush" Color="#8B8FC7"/>
+        <SolidColorBrush x:Key="TeamsPrimaryDarkBrush" Color="#464775"/>
     </Application.Resources>
 </Application>

@@ -54,11 +54,44 @@ namespace teams_phonemanager.Models
         [ObservableProperty]
         private string _phoneNumberType = string.Empty;
 
+        // Auto Attendant Configuration Properties
+        // Default Call Flow
         [ObservableProperty]
-        private string _defaultCallFlowGreetingPromptDE = string.Empty;
+        private string? _aaDefaultGreetingType; // "None", "AudioFile", "TextToSpeech"
 
         [ObservableProperty]
-        private string _afterHoursCallFlowGreetingPromptDE = string.Empty;
+        private string? _aaDefaultGreetingAudioFileId;
+
+        [ObservableProperty]
+        private string? _aaDefaultGreetingTextToSpeechPrompt;
+
+        [ObservableProperty]
+        private string? _aaDefaultAction; // "Disconnect", "TransferToTarget", "TransferToVoicemail"
+
+        [ObservableProperty]
+        private string? _aaDefaultActionTarget;
+
+        [ObservableProperty]
+        private string? _aaDefaultDisconnectAction; // "None", "AudioFile", "TextToSpeech" - for UI only
+
+        // After Hours Call Flow
+        [ObservableProperty]
+        private string? _aaAfterHoursGreetingType; // "None", "AudioFile", "TextToSpeech"
+
+        [ObservableProperty]
+        private string? _aaAfterHoursGreetingAudioFileId;
+
+        [ObservableProperty]
+        private string? _aaAfterHoursGreetingTextToSpeechPrompt;
+
+        [ObservableProperty]
+        private string? _aaAfterHoursAction; // "Disconnect", "TransferToTarget", "TransferToVoicemail"
+
+        [ObservableProperty]
+        private string? _aaAfterHoursActionTarget;
+
+        [ObservableProperty]
+        private string? _aaAfterHoursDisconnectAction; // "None", "AudioFile", "TextToSpeech" - for UI only
 
         [ObservableProperty]
         private TimeSpan _openingHours1Start = new TimeSpan(0, 0, 0);
@@ -89,6 +122,85 @@ namespace teams_phonemanager.Models
 
         [ObservableProperty]
         private ObservableCollection<HolidayEntry> _holidaySeries = new ObservableCollection<HolidayEntry>();
+
+        // Call Queue Configuration Properties
+        [ObservableProperty]
+        private string? _cqGreetingType; // "None", "AudioFile", "TextToSpeech"
+
+        [ObservableProperty]
+        private string? _cqGreetingAudioFileId;
+
+        [ObservableProperty]
+        private string? _cqGreetingTextToSpeechPrompt;
+
+        [ObservableProperty]
+        private string? _cqMusicOnHoldType; // "Default", "AudioFile"
+
+        [ObservableProperty]
+        private string? _cqMusicOnHoldAudioFileId;
+
+        [ObservableProperty]
+        private int? _cqOverflowThreshold;
+
+        [ObservableProperty]
+        private string? _cqOverflowAction; // "Disconnect", "TransferToTarget", "TransferToVoicemail"
+
+        [ObservableProperty]
+        private string? _cqOverflowActionTarget;
+
+        [ObservableProperty]
+        private string? _cqOverflowVoicemailGreetingType; // "AudioFile", "TextToSpeech" - for UI only
+
+        [ObservableProperty]
+        private string? _cqOverflowActionAudioFileId;
+
+        [ObservableProperty]
+        private string? _cqOverflowActionTextToSpeechPrompt;
+
+        [ObservableProperty]
+        private string? _cqOverflowDisconnectAction; // "None", "AudioFile", "TextToSpeech" - for UI only, determines what to show
+
+        [ObservableProperty]
+        private int? _cqTimeoutThreshold;
+
+        [ObservableProperty]
+        private string? _cqTimeoutAction; // "Disconnect", "TransferToTarget", "TransferToVoicemail"
+
+        [ObservableProperty]
+        private string? _cqTimeoutActionTarget;
+
+        [ObservableProperty]
+        private string? _cqTimeoutVoicemailGreetingType; // "AudioFile", "TextToSpeech" - for UI only
+
+        [ObservableProperty]
+        private string? _cqTimeoutActionAudioFileId;
+
+        [ObservableProperty]
+        private string? _cqTimeoutActionTextToSpeechPrompt;
+
+        [ObservableProperty]
+        private string? _cqTimeoutDisconnectAction; // "None", "AudioFile", "TextToSpeech" - for UI only, determines what to show
+
+        [ObservableProperty]
+        private string? _cqNoAgentAction; // "QueueCall", "Disconnect", "TransferToTarget", "TransferToVoicemail"
+
+        [ObservableProperty]
+        private string? _cqNoAgentActionTarget;
+
+        [ObservableProperty]
+        private string? _cqNoAgentVoicemailGreetingType; // "AudioFile", "TextToSpeech" - for UI only
+
+        [ObservableProperty]
+        private string? _cqNoAgentActionAudioFileId;
+
+        [ObservableProperty]
+        private string? _cqNoAgentActionTextToSpeechPrompt;
+
+        [ObservableProperty]
+        private string? _cqNoAgentDisconnectAction; // "None", "AudioFile", "TextToSpeech" - for UI only, determines what to show
+
+        [ObservableProperty]
+        private bool _cqNoAgentApplyToNewCallsOnly;
 
         public string M365Group => $"ttgrp-{Customer}-{CustomerGroupName}";
         public string RacqUPN => $"racq-{Customer}-{CustomerGroupName}{MsFallbackDomain}";
@@ -183,6 +295,23 @@ namespace teams_phonemanager.Models
         partial void OnOpeningHours2EndChanged(TimeSpan value)
         {
             OnPropertyChanged();
+        }
+
+        partial void OnM365GroupIdChanged(string value)
+        {
+            // Prefill target fields if they are empty
+            if (string.IsNullOrWhiteSpace(CqOverflowActionTarget) && !string.IsNullOrWhiteSpace(value))
+            {
+                CqOverflowActionTarget = value;
+            }
+            if (string.IsNullOrWhiteSpace(CqTimeoutActionTarget) && !string.IsNullOrWhiteSpace(value))
+            {
+                CqTimeoutActionTarget = value;
+            }
+            if (string.IsNullOrWhiteSpace(CqNoAgentActionTarget) && !string.IsNullOrWhiteSpace(value))
+            {
+                CqNoAgentActionTarget = value;
+            }
         }
     }
 } 

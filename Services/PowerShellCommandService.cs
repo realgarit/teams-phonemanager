@@ -169,7 +169,7 @@ if ($existingGroup)
 
 try {{
     $newGroup = New-MgGroup -DisplayName ""{groupName}"" `
-        -MailEnabled:$False `
+        -MailEnabled:$True `
         -MailNickName ""{groupName}"" `
         -SecurityEnabled `
         -GroupTypes @(""Unified"")
@@ -185,6 +185,8 @@ catch {{
 
         public string GetCreateCallQueueCommand(PhoneManagerVariables variables)
         {
+            var callQueueParams = BuildCallQueueParameters(variables);
+            
             return $@"
 New-CsOnlineApplicationInstance -UserPrincipalName {variables.RacqUPN} -ApplicationId {variables.CsAppCqId} -DisplayName {variables.RacqDisplayName}
 
@@ -203,11 +205,7 @@ New-CsCallQueue `
 -AgentAlertTime " + ConstantsService.CallQueue.AgentAlertTime + @" `
 -LanguageId {variables.LanguageId} `
 -DistributionLists $global:m365groupId `
--OverflowThreshold " + ConstantsService.CallQueue.OverflowThreshold + @" `
--OverflowAction Disconnect `
--TimeoutThreshold " + ConstantsService.CallQueue.TimeoutThreshold + @" `
--TimeoutAction Disconnect `
--UseDefaultMusicOnHold $true `
+{callQueueParams}
 -PresenceBasedRouting $false
 
 Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
@@ -218,8 +216,173 @@ $cqautoAttendantId = (Get-CsCallQueue -NameFilter {variables.CqDisplayName}).Ide
 New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceId) -ConfigurationId $cqautoAttendantId -ConfigurationType CallQueue";
         }
 
+        private string BuildCallQueueParameters(PhoneManagerVariables variables)
+        {
+            var parameters = new System.Text.StringBuilder();
+
+            // Greeting
+            if (variables.CqGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqGreetingAudioFileId))
+            {
+                parameters.AppendLine($"-WelcomeMusicAudioFileId \"{variables.CqGreetingAudioFileId}\" `");
+            }
+            else if (variables.CqGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqGreetingTextToSpeechPrompt))
+            {
+                parameters.AppendLine($"-WelcomeTextToSpeechPrompt \"{variables.CqGreetingTextToSpeechPrompt}\" `");
+            }
+
+            // Music on Hold
+            if (variables.CqMusicOnHoldType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqMusicOnHoldAudioFileId))
+            {
+                parameters.AppendLine($"-MusicOnHoldAudioFileId \"{variables.CqMusicOnHoldAudioFileId}\" `");
+                parameters.AppendLine($"-UseDefaultMusicOnHold $false `");
+            }
+            else
+            {
+                // Explicitly set UseDefaultMusicOnHold to true when "Default" is selected
+                parameters.AppendLine($"-UseDefaultMusicOnHold $true `");
+            }
+
+            // Overflow
+            var overflowThreshold = variables.CqOverflowThreshold ?? ConstantsService.CallQueue.OverflowThreshold;
+            parameters.AppendLine($"-OverflowThreshold {overflowThreshold} `");
+            
+            if (!string.IsNullOrWhiteSpace(variables.CqOverflowAction))
+            {
+                if (variables.CqOverflowAction == "Disconnect")
+                {
+                    parameters.AppendLine($"-OverflowAction DisconnectWithBusy `");
+                }
+                else if (variables.CqOverflowAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTarget))
+                {
+                    parameters.AppendLine($"-OverflowAction Forward `");
+                    parameters.AppendLine($"-OverflowActionTarget \"{variables.CqOverflowActionTarget}\" `");
+                }
+                else if (variables.CqOverflowAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTarget))
+                {
+                    if (System.Guid.TryParse(variables.CqOverflowActionTarget, out _))
+                    {
+                        parameters.AppendLine($"-OverflowAction SharedVoicemail `");
+                        parameters.AppendLine($"-OverflowActionTarget \"{variables.CqOverflowActionTarget}\" `");
+                        if (variables.CqOverflowVoicemailGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTextToSpeechPrompt))
+                        {
+                            parameters.AppendLine($"-OverflowSharedVoicemailTextToSpeechPrompt \"{variables.CqOverflowActionTextToSpeechPrompt}\" `");
+                        }
+                        else if (variables.CqOverflowVoicemailGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionAudioFileId))
+                        {
+                            parameters.AppendLine($"-OverflowSharedVoicemailAudioFilePrompt \"{variables.CqOverflowActionAudioFileId}\" `");
+                        }
+                    }
+                    else
+                    {
+                        parameters.AppendLine($"-OverflowAction Voicemail `");
+                        parameters.AppendLine($"-OverflowActionTarget \"{variables.CqOverflowActionTarget}\" `");
+                    }
+                }
+            }
+            else
+            {
+                parameters.AppendLine($"-OverflowAction DisconnectWithBusy `");
+            }
+
+            // Timeout
+            var timeoutThreshold = variables.CqTimeoutThreshold ?? ConstantsService.CallQueue.TimeoutThreshold;
+            if (timeoutThreshold < ConstantsService.CallQueue.MinTimeoutThreshold)
+            {
+                timeoutThreshold = ConstantsService.CallQueue.MinTimeoutThreshold;
+            }
+            parameters.AppendLine($"-TimeoutThreshold {timeoutThreshold} `");
+            
+            if (!string.IsNullOrWhiteSpace(variables.CqTimeoutAction))
+            {
+                if (variables.CqTimeoutAction == "Disconnect")
+                {
+                    parameters.AppendLine($"-TimeoutAction Disconnect `");
+                }
+                else if (variables.CqTimeoutAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTarget))
+                {
+                    parameters.AppendLine($"-TimeoutAction Forward `");
+                    parameters.AppendLine($"-TimeoutActionTarget \"{variables.CqTimeoutActionTarget}\" `");
+                }
+                else if (variables.CqTimeoutAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTarget))
+                {
+                    if (System.Guid.TryParse(variables.CqTimeoutActionTarget, out _))
+                    {
+                        parameters.AppendLine($"-TimeoutAction SharedVoicemail `");
+                        parameters.AppendLine($"-TimeoutActionTarget \"{variables.CqTimeoutActionTarget}\" `");
+                        if (variables.CqTimeoutVoicemailGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTextToSpeechPrompt))
+                        {
+                            parameters.AppendLine($"-TimeoutSharedVoicemailTextToSpeechPrompt \"{variables.CqTimeoutActionTextToSpeechPrompt}\" `");
+                        }
+                        else if (variables.CqTimeoutVoicemailGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionAudioFileId))
+                        {
+                            parameters.AppendLine($"-TimeoutSharedVoicemailAudioFilePrompt \"{variables.CqTimeoutActionAudioFileId}\" `");
+                        }
+                    }
+                    else
+                    {
+                        parameters.AppendLine($"-TimeoutAction Voicemail `");
+                        parameters.AppendLine($"-TimeoutActionTarget \"{variables.CqTimeoutActionTarget}\" `");
+                    }
+                }
+            }
+            else
+            {
+                parameters.AppendLine($"-TimeoutAction Disconnect `");
+            }
+
+            // No Agent
+            if (!string.IsNullOrWhiteSpace(variables.CqNoAgentAction) && variables.CqNoAgentAction != "QueueCall")
+            {
+                if (variables.CqNoAgentAction == "Disconnect")
+                {
+                    parameters.AppendLine($"-NoAgentAction Disconnect `");
+                }
+                else if (variables.CqNoAgentAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTarget))
+                {
+                    parameters.AppendLine($"-NoAgentAction Forward `");
+                    parameters.AppendLine($"-NoAgentActionTarget \"{variables.CqNoAgentActionTarget}\" `");
+                }
+                else if (variables.CqNoAgentAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTarget))
+                {
+                    if (System.Guid.TryParse(variables.CqNoAgentActionTarget, out _))
+                    {
+                        parameters.AppendLine($"-NoAgentAction SharedVoicemail `");
+                        parameters.AppendLine($"-NoAgentActionTarget \"{variables.CqNoAgentActionTarget}\" `");
+                        if (variables.CqNoAgentVoicemailGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTextToSpeechPrompt))
+                        {
+                            parameters.AppendLine($"-NoAgentSharedVoicemailTextToSpeechPrompt \"{variables.CqNoAgentActionTextToSpeechPrompt}\" `");
+                        }
+                        else if (variables.CqNoAgentVoicemailGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionAudioFileId))
+                        {
+                            parameters.AppendLine($"-NoAgentSharedVoicemailAudioFilePrompt \"{variables.CqNoAgentActionAudioFileId}\" `");
+                        }
+                    }
+                    else
+                    {
+                        parameters.AppendLine($"-NoAgentAction Voicemail `");
+                        parameters.AppendLine($"-NoAgentActionTarget \"{variables.CqNoAgentActionTarget}\" `");
+                    }
+                }
+
+                if (variables.CqNoAgentApplyToNewCallsOnly)
+                {
+                    parameters.AppendLine($"-NoAgentApplyTo NewCalls `");
+                }
+                else
+                {
+                    parameters.AppendLine($"-NoAgentApplyTo AllCalls `");
+                }
+            }
+
+            return parameters.ToString().TrimEnd();
+        }
+
+
         public string GetCreateAutoAttendantCommand(PhoneManagerVariables variables)
         {
+            var defaultCallFlow = BuildCallFlow(variables, "Default", variables.AaDefaultGreetingType, variables.AaDefaultGreetingTextToSpeechPrompt, variables.AaDefaultGreetingAudioFileId, variables.AaDefaultAction, variables.AaDefaultActionTarget);
+            var afterHoursCallFlow = BuildCallFlow(variables, "After Hours", variables.AaAfterHoursGreetingType, variables.AaAfterHoursGreetingTextToSpeechPrompt, variables.AaAfterHoursGreetingAudioFileId, variables.AaAfterHoursAction, variables.AaAfterHoursActionTarget);
+
             return $@"
 New-CsOnlineApplicationInstance -UserPrincipalName ""{variables.RaaaUPN}"" -ApplicationId ""{variables.CsAppAaId}"" -DisplayName ""{variables.RaaaDisplayName}""
 
@@ -230,21 +393,13 @@ Set-MgUserLicense -UserId ""{variables.RaaaUPN}"" -AddLicenses @{{SkuId = $SkuId
 
 Set-CsPhoneNumberAssignment -Identity ""{variables.RaaaUPN}"" -PhoneNumber ""{variables.RaaAnr}"" -PhoneNumberType ""{variables.PhoneNumberType}""
 
-$racqUser = Get-CsOnlineUser ""{variables.RacqUPN}""
-if (-not $racqUser) {{
-    throw ""Resource account {variables.RacqUPN} not found. Please ensure it was created successfully.""
-}}
-$racqid = $racqUser.Identity
-$aacalltarget = New-CsAutoAttendantCallableEntity -Identity $racqid -Type ApplicationEndpoint
-$aamenuOptionDisconnect = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -CallTarget $aacalltarget -DtmfResponse Automatic
-$aadefaultMenu = New-CsAutoAttendantMenu -Name ""Default menu"" -MenuOptions $aamenuOptionDisconnect
-$aadefaultCallFlow = New-CsAutoAttendantCallFlow -Name ""Default call flow"" -Greetings @(""{variables.DefaultCallFlowGreetingPromptDE}"") -Menu $aadefaultMenu
+{defaultCallFlow}
 
-$aaafterHoursMenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic
-$aaafterHoursMenu = New-CsAutoAttendantMenu -Name ""After Hours menu"" -MenuOptions @($aaafterHoursMenuOption)
-$aaafterHoursCallFlow = New-CsAutoAttendantCallFlow -Name ""After Hours call flow"" -Greetings @(""{variables.AfterHoursCallFlowGreetingPromptDE}"") -Menu $aaafterHoursMenu
+{afterHoursCallFlow}
+
 $aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -TuesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -WednesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -ThursdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -FridayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -Complement
 $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
+
 New-CsAutoAttendant `
 -Name ""{variables.AaDisplayName}"" `
 -DefaultCallFlow $aadefaultCallFlow `
@@ -256,6 +411,61 @@ New-CsAutoAttendant `
 $aaapplicationInstanceId = (Get-CsOnlineUser ""{variables.RaaaUPN}"").Identity
 $aaautoAttendantId = (Get-CsAutoAttendant -NameFilter ""{variables.AaDisplayName}"").Identity
 New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceId) -ConfigurationId $aaautoAttendantId -ConfigurationType AutoAttendant";
+        }
+
+        private string BuildCallFlow(PhoneManagerVariables variables, string flowName, string? greetingType, string? ttsPrompt, string? audioFileId, string? action, string? actionTarget)
+        {
+            var sb = new System.Text.StringBuilder();
+            var prefix = flowName.Replace(" ", "").ToLower();
+            
+            // Greeting
+            string greetingVar = "$null";
+            if (greetingType == "AudioFile" && !string.IsNullOrWhiteSpace(audioFileId))
+            {
+                sb.AppendLine($"${prefix}Greeting = New-CsAutoAttendantPrompt -AudioFilePrompt \"{audioFileId}\"");
+                greetingVar = $"@(${prefix}Greeting)";
+            }
+            else if (greetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(ttsPrompt))
+            {
+                sb.AppendLine($"${prefix}Greeting = New-CsAutoAttendantPrompt -TextToSpeechPrompt \"{ttsPrompt}\"");
+                greetingVar = $"@(${prefix}Greeting)";
+            }
+            // If None, greetingVar remains $null (or empty array for cmdlet)
+            
+            // Action
+            sb.AppendLine($"${prefix}MenuOption = $null");
+            if (action == "TransferToTarget" && !string.IsNullOrWhiteSpace(actionTarget))
+            {
+                // Check if target is a resource account to get Identity
+                sb.AppendLine($"$targetUser = Get-CsOnlineUser \"{actionTarget}\" -ErrorAction SilentlyContinue");
+                sb.AppendLine($"if ($targetUser) {{ $targetId = $targetUser.Identity }} else {{ $targetId = \"{actionTarget}\" }}"); // Fallback if not found or is object ID
+                sb.AppendLine($"${prefix}CallTarget = New-CsAutoAttendantCallableEntity -Identity $targetId -Type ApplicationEndpoint");
+                sb.AppendLine($"${prefix}MenuOption = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -CallTarget ${prefix}CallTarget -DtmfResponse Automatic");
+            }
+            else if (action == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(actionTarget))
+            {
+                 // Shared Voicemail (M365 Group)
+                sb.AppendLine($"${prefix}CallTarget = New-CsAutoAttendantCallableEntity -Identity \"{actionTarget}\" -Type SharedVoicemail");
+                sb.AppendLine($"${prefix}MenuOption = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -CallTarget ${prefix}CallTarget -DtmfResponse Automatic");
+            }
+            else
+            {
+                // Default to Disconnect
+                sb.AppendLine($"${prefix}MenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic");
+            }
+
+            sb.AppendLine($"${prefix}Menu = New-CsAutoAttendantMenu -Name \"{flowName} menu\" -MenuOptions @(${prefix}MenuOption)");
+            
+            if (greetingVar != "$null")
+            {
+                sb.AppendLine($"$aa{prefix}CallFlow = New-CsAutoAttendantCallFlow -Name \"{flowName} call flow\" -Greetings {greetingVar} -Menu ${prefix}Menu");
+            }
+            else
+            {
+                 sb.AppendLine($"$aa{prefix}CallFlow = New-CsAutoAttendantCallFlow -Name \"{flowName} call flow\" -Menu ${prefix}Menu");
+            }
+
+            return sb.ToString();
         }
 
         public string GetCreateHolidayCommand(string holidayName, DateTime holidayDate)
@@ -431,29 +641,73 @@ catch {{
 }}";
         }
 
-        public string GetCreateCallQueueCommand(string name, string languageId, string m365GroupId)
+        public string GetCreateCallQueueCommand(string name, string languageId, string m365GroupId, PhoneManagerVariables? variables = null)
         {
+            var callQueueParams = variables != null ? BuildCallQueueParameters(variables) : BuildDefaultCallQueueParameters();
+            
             return $@"
 try {{
+    # Create Call Queue in one step
     New-CsCallQueue `
-    -Name {name} `
+    -Name ""{name}"" `
     -RoutingMethod Attendant `
     -AllowOptOut $true `
     -ConferenceMode $true `
     -AgentAlertTime 30 `
-    -LanguageId {languageId} `
-    -DistributionLists {m365GroupId} `
-    -OverflowThreshold 15 `
-    -OverflowAction Disconnect `
-    -TimeoutThreshold 30 `
-    -TimeoutAction Disconnect `
-    -UseDefaultMusicOnHold $true `
+    -LanguageId ""{languageId}"" `
+    -DistributionLists @(""{m365GroupId}"") `
+    {callQueueParams}
     -PresenceBasedRouting $false
     
     Write-Host ""SUCCESS: Call queue {name} created successfully""
 }}
 catch {{
     Write-Host ""ERROR: Failed to create call queue {name}: $_""
+}}";
+        }
+
+        private string BuildDefaultCallQueueParameters()
+        {
+            return $@"-OverflowThreshold " + ConstantsService.CallQueue.OverflowThreshold + @" `
+-OverflowAction DisconnectWithBusy `
+-TimeoutThreshold " + ConstantsService.CallQueue.TimeoutThreshold + @" `
+-TimeoutAction Disconnect `
+-UseDefaultMusicOnHold $true `";
+        }
+
+        public string GetImportAudioFileCommand(string filePath)
+        {
+            // Escape single quotes for PowerShell (use single quotes to avoid issues with spaces and special chars)
+            var escapedPath = filePath.Replace("'", "''");
+            // Extract just the filename from the path
+            var fileName = System.IO.Path.GetFileName(filePath).Replace("'", "''");
+            
+            return $@"
+try {{
+    # Read the audio file content as bytes (compatible with both PowerShell 5.x and 6+)
+    $fileContent = $null
+    if ($PSVersionTable.PSVersion.Major -ge 6) {{
+        $fileContent = Get-Content -Path '{escapedPath}' -AsByteStream -ReadCount 0
+    }} else {{
+        $fileContent = Get-Content -Path '{escapedPath}' -Encoding Byte -ReadCount 0
+    }}
+    
+    if (-not $fileContent) {{
+        Write-Host ""ERROR: Failed to read audio file content""
+        exit
+    }}
+    
+    # Import the audio file (using HuntGroup ApplicationId for Call Queues)
+    $audioFile = Import-CsOnlineAudioFile -ApplicationId HuntGroup -FileName '{fileName}' -Content $fileContent
+    if ($audioFile) {{
+        Write-Host ""SUCCESS: Audio file imported successfully""
+        Write-Host ""AUDIOFILEID: $($audioFile.Id)""
+    }} else {{
+        Write-Host ""ERROR: Failed to import audio file - no result returned""
+    }}
+}}
+catch {{
+    Write-Host ""ERROR: Failed to import audio file: $_""
 }}";
         }
 
@@ -619,13 +873,12 @@ catch {{
 }}";
         }
 
-        public string GetCreateDefaultCallFlowCommand(string greetingText)
+        public string GetCreateDefaultCallFlowCommand(PhoneManagerVariables variables)
         {
+            var callFlowScript = BuildCallFlow(variables, "Default", variables.AaDefaultGreetingType, variables.AaDefaultGreetingTextToSpeechPrompt, variables.AaDefaultGreetingAudioFileId, variables.AaDefaultAction, variables.AaDefaultActionTarget);
             return $@"
 try {{
-    $aamenuOptionDisconnect = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -CallTarget $aacalltarget -DtmfResponse Automatic
-    $aadefaultMenu = New-CsAutoAttendantMenu -Name ""Default menu"" -MenuOptions $aamenuOptionDisconnect
-    $aadefaultCallFlow = New-CsAutoAttendantCallFlow -Name ""Default call flow"" -Greetings @(""{greetingText}"") -Menu $aadefaultMenu
+{callFlowScript}
     Write-Host ""SUCCESS: Created default call flow""
 }}
 catch {{
@@ -633,13 +886,12 @@ catch {{
 }}";
         }
 
-        public string GetCreateAfterHoursCallFlowCommand(string greetingText)
+        public string GetCreateAfterHoursCallFlowCommand(PhoneManagerVariables variables)
         {
+            var callFlowScript = BuildCallFlow(variables, "After Hours", variables.AaAfterHoursGreetingType, variables.AaAfterHoursGreetingTextToSpeechPrompt, variables.AaAfterHoursGreetingAudioFileId, variables.AaAfterHoursAction, variables.AaAfterHoursActionTarget);
             return $@"
 try {{
-    $aaafterHoursMenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic
-    $aaafterHoursMenu = New-CsAutoAttendantMenu -Name ""After Hours menu"" -MenuOptions @($aaafterHoursMenuOption)
-    $aaafterHoursCallFlow = New-CsAutoAttendantCallFlow -Name ""After Hours call flow"" -Greetings @(""{greetingText}"") -Menu $aaafterHoursMenu
+{callFlowScript}
     Write-Host ""SUCCESS: Created after hours call flow""
 }}
 catch {{
@@ -652,7 +904,12 @@ catch {{
             return $@"
 try {{
     $aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -TuesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -WednesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -ThursdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -FridayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -Complement
-    Write-Host ""SUCCESS: Created after hours schedule""
+    
+    if ($aaafterHoursSchedule) {{
+        Write-Host ""SUCCESS: Created after hours schedule with ID: $($aaafterHoursSchedule.Id)""
+    }} else {{
+        Write-Host ""ERROR: Failed to retrieve ID after creating schedule""
+    }}
 }}
 catch {{
     Write-Host ""ERROR: Failed to create after hours schedule: $_""
@@ -663,8 +920,12 @@ catch {{
         {
             return $@"
 try {{
-    $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
-    Write-Host ""SUCCESS: Created call handling association""
+    if ($aaafterHoursSchedule.Id) {{
+        $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
+        Write-Host ""SUCCESS: Created call handling association""
+    }} else {{
+        Write-Host ""ERROR: Failed to create call handling association: ScheduleId is empty""
+    }}
 }}
 catch {{
     Write-Host ""ERROR: Failed to create call handling association: $_""

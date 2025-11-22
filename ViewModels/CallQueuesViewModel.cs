@@ -469,7 +469,7 @@ namespace teams_phonemanager.ViewModels
 
                 _loggingService.Log($"Creating call queue: {CallQueueName}", LogLevel.Info);
 
-                var command = _powerShellCommandService.GetCreateCallQueueCommand(CallQueueName, variables.LanguageId, variables.M365GroupId);
+                var command = _powerShellCommandService.GetCreateCallQueueCommand(CallQueueName, variables.LanguageId, variables.M365GroupId, variables);
                 var result = await ExecutePowerShellCommandAsync(command, "CreateCallQueue");
                 
                 if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))

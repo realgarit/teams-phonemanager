@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 
 using teams_phonemanager.Services;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using teams_phonemanager.Models;
 using System.IO;
@@ -38,6 +39,7 @@ namespace teams_phonemanager.ViewModels
         private bool _showHolidaySeriesManager = false;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DialogHolidayDate))]
         private HolidayEntry? _editingHoliday;
 
         [ObservableProperty]
@@ -48,6 +50,7 @@ namespace teams_phonemanager.ViewModels
 
         // Simple properties for Add/Edit dialogs
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DialogHolidayDate))]
         private DateTime _newHolidayDate = DateTime.Now;
 
         [ObservableProperty]
@@ -57,15 +60,18 @@ namespace teams_phonemanager.ViewModels
         private TimeSpan _editHolidayTime = new TimeSpan(0, 0, 0);
 
         // Computed properties for the dialog
-        public DateTime DialogHolidayDate
+        public DateTime? DialogHolidayDate
         {
             get => EditingHoliday?.Date ?? NewHolidayDate;
             set
             {
-                if (EditingHoliday != null)
-                    EditingHoliday.Date = value;
-                else
-                    NewHolidayDate = value;
+                if (value.HasValue)
+                {
+                    if (EditingHoliday != null)
+                        EditingHoliday.Date = value.Value;
+                    else
+                        NewHolidayDate = value.Value;
+                }
             }
         }
 
@@ -78,6 +84,52 @@ namespace teams_phonemanager.ViewModels
                 : null;
 
             _loggingService.Log("Variables page loaded", LogLevel.Info);
+            
+            // Subscribe to variable changes for Call Queue configuration visibility
+            if (_mainWindowViewModel?.Variables != null)
+            {
+                _mainWindowViewModel.Variables.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName?.StartsWith("Cq") == true)
+                    {
+                        UpdateCallQueueVisibility();
+                    }
+                    else if (e.PropertyName == nameof(PhoneManagerVariables.M365GroupId))
+                    {
+                        PrefillCallQueueTargets();
+                    }
+                    else if (e.PropertyName?.StartsWith("Aa") == true)
+                    {
+                        UpdateAutoAttendantVisibility();
+                    }
+                };
+                
+                // Prefill target fields if M365GroupId is already set
+                PrefillCallQueueTargets();
+            }
+        }
+
+        private void PrefillCallQueueTargets()
+        {
+            var variables = Variables;
+            if (variables == null) return;
+
+            var groupId = variables.M365GroupId;
+            if (string.IsNullOrWhiteSpace(groupId)) return;
+
+            // Prefill target fields if they are empty
+            if (string.IsNullOrWhiteSpace(variables.CqOverflowActionTarget))
+            {
+                variables.CqOverflowActionTarget = groupId;
+            }
+            if (string.IsNullOrWhiteSpace(variables.CqTimeoutActionTarget))
+            {
+                variables.CqTimeoutActionTarget = groupId;
+            }
+            if (string.IsNullOrWhiteSpace(variables.CqNoAgentActionTarget))
+            {
+                variables.CqNoAgentActionTarget = groupId;
+            }
         }
 
         public PhoneManagerVariables Variables
@@ -89,6 +141,28 @@ namespace teams_phonemanager.ViewModels
                 {
                     _mainWindowViewModel.Variables = value;
                     OnPropertyChanged();
+                    // Subscribe to changes on the new Variables instance
+                    if (value != null)
+                    {
+                        value.PropertyChanged += (s, e) =>
+                        {
+                            if (e.PropertyName?.StartsWith("Cq") == true)
+                            {
+                                UpdateCallQueueVisibility();
+                            }
+                            else if (e.PropertyName == nameof(PhoneManagerVariables.M365GroupId))
+                            {
+                                PrefillCallQueueTargets();
+                            }
+                            else if (e.PropertyName?.StartsWith("Aa") == true)
+                            {
+                                UpdateAutoAttendantVisibility();
+                            }
+                        };
+                        
+                        // Prefill target fields if M365GroupId is already set
+                        PrefillCallQueueTargets();
+                    }
                 }
             }
         }
@@ -549,6 +623,325 @@ namespace teams_phonemanager.ViewModels
                 _loggingService.Log($"Saved holiday series with {variables.HolidaySeries.Count} holidays", LogLevel.Info);
                 ShowHolidaySeriesManager = false;
             }
+        }
+
+        // Call Queue Configuration Properties
+        public ObservableCollection<string> GreetingTypeOptions { get; } = new ObservableCollection<string>
+        {
+            "None",
+            "AudioFile",
+            "TextToSpeech"
+        };
+
+        public ObservableCollection<string> MusicOnHoldTypeOptions { get; } = new ObservableCollection<string>
+        {
+            "Default",
+            "AudioFile"
+        };
+
+        public ObservableCollection<string> OverflowActionOptions { get; } = new ObservableCollection<string>
+        {
+            "Disconnect",
+            "TransferToTarget",
+            "TransferToVoicemail"
+        };
+
+        public ObservableCollection<string> TimeoutActionOptions { get; } = new ObservableCollection<string>
+        {
+            "Disconnect",
+            "TransferToTarget",
+            "TransferToVoicemail"
+        };
+
+        public ObservableCollection<string> NoAgentActionOptions { get; } = new ObservableCollection<string>
+        {
+            "QueueCall",
+            "Disconnect",
+            "TransferToTarget",
+            "TransferToVoicemail"
+        };
+
+        public ObservableCollection<string> VoicemailGreetingTypeOptions { get; } = new ObservableCollection<string>
+        {
+            "AudioFile",
+            "TextToSpeech"
+        };
+
+        public ObservableCollection<string> AaGreetingTypeOptions { get; } = new ObservableCollection<string>
+        {
+            "None",
+            "AudioFile",
+            "TextToSpeech"
+        };
+
+        public ObservableCollection<string> AaActionOptions { get; } = new ObservableCollection<string>
+        {
+            "Disconnect",
+            "TransferToTarget",
+            "TransferToVoicemail"
+        };
+
+        // Conditional visibility properties
+        public bool ShowGreetingAudioFile => Variables.CqGreetingType == "AudioFile";
+        public bool ShowGreetingTextToSpeech => Variables.CqGreetingType == "TextToSpeech";
+        public bool ShowMusicOnHoldAudioFile => Variables.CqMusicOnHoldType == "AudioFile";
+        public bool ShowOverflowTarget => Variables.CqOverflowAction == "TransferToTarget" || Variables.CqOverflowAction == "TransferToVoicemail";
+        public bool ShowTimeoutTarget => Variables.CqTimeoutAction == "TransferToTarget" || Variables.CqTimeoutAction == "TransferToVoicemail";
+        public bool ShowNoAgentTarget => Variables.CqNoAgentAction == "TransferToTarget" || Variables.CqNoAgentAction == "TransferToVoicemail";
+        
+        // Voicemail greeting visibility (only show when TransferToVoicemail is selected AND target is a GUID)
+        public bool ShowOverflowVoicemailGreeting => Variables.CqOverflowAction == "TransferToVoicemail" && 
+            !string.IsNullOrWhiteSpace(Variables.CqOverflowActionTarget) && 
+            System.Guid.TryParse(Variables.CqOverflowActionTarget, out _);
+        public bool ShowTimeoutVoicemailGreeting => Variables.CqTimeoutAction == "TransferToVoicemail" && 
+            !string.IsNullOrWhiteSpace(Variables.CqTimeoutActionTarget) && 
+            System.Guid.TryParse(Variables.CqTimeoutActionTarget, out _);
+        public bool ShowNoAgentVoicemailGreeting => Variables.CqNoAgentAction == "TransferToVoicemail" && 
+            !string.IsNullOrWhiteSpace(Variables.CqNoAgentActionTarget) && 
+            System.Guid.TryParse(Variables.CqNoAgentActionTarget, out _);
+        
+        // Voicemail greeting type visibility
+        public bool ShowOverflowVoicemailAudioFile => Variables.CqOverflowVoicemailGreetingType == "AudioFile";
+        public bool ShowOverflowVoicemailTextToSpeech => Variables.CqOverflowVoicemailGreetingType == "TextToSpeech";
+        public bool ShowTimeoutVoicemailAudioFile => Variables.CqTimeoutVoicemailGreetingType == "AudioFile";
+        public bool ShowTimeoutVoicemailTextToSpeech => Variables.CqTimeoutVoicemailGreetingType == "TextToSpeech";
+        public bool ShowNoAgentVoicemailAudioFile => Variables.CqNoAgentVoicemailGreetingType == "AudioFile";
+        public bool ShowNoAgentVoicemailTextToSpeech => Variables.CqNoAgentVoicemailGreetingType == "TextToSpeech";
+
+        // AA Conditional visibility properties
+        public bool ShowAaDefaultGreetingAudioFile => Variables.AaDefaultGreetingType == "AudioFile";
+        public bool ShowAaDefaultGreetingTextToSpeech => Variables.AaDefaultGreetingType == "TextToSpeech";
+        public bool ShowAaDefaultTarget => Variables.AaDefaultAction == "TransferToTarget" || Variables.AaDefaultAction == "TransferToVoicemail";
+
+        public bool ShowAaAfterHoursGreetingAudioFile => Variables.AaAfterHoursGreetingType == "AudioFile";
+        public bool ShowAaAfterHoursGreetingTextToSpeech => Variables.AaAfterHoursGreetingType == "TextToSpeech";
+        public bool ShowAaAfterHoursTarget => Variables.AaAfterHoursAction == "TransferToTarget" || Variables.AaAfterHoursAction == "TransferToVoicemail";
+
+
+        private void UpdateCallQueueVisibility()
+        {
+            OnPropertyChanged(nameof(ShowGreetingAudioFile));
+            OnPropertyChanged(nameof(ShowGreetingTextToSpeech));
+            OnPropertyChanged(nameof(ShowMusicOnHoldAudioFile));
+            OnPropertyChanged(nameof(ShowOverflowTarget));
+            OnPropertyChanged(nameof(ShowTimeoutTarget));
+            OnPropertyChanged(nameof(ShowNoAgentTarget));
+            OnPropertyChanged(nameof(ShowOverflowVoicemailGreeting));
+            OnPropertyChanged(nameof(ShowTimeoutVoicemailGreeting));
+            OnPropertyChanged(nameof(ShowNoAgentVoicemailGreeting));
+            OnPropertyChanged(nameof(ShowOverflowVoicemailAudioFile));
+            OnPropertyChanged(nameof(ShowOverflowVoicemailTextToSpeech));
+            OnPropertyChanged(nameof(ShowTimeoutVoicemailAudioFile));
+            OnPropertyChanged(nameof(ShowTimeoutVoicemailTextToSpeech));
+            OnPropertyChanged(nameof(ShowNoAgentVoicemailAudioFile));
+            OnPropertyChanged(nameof(ShowNoAgentVoicemailTextToSpeech));
+        }
+
+        private void UpdateAutoAttendantVisibility()
+        {
+            OnPropertyChanged(nameof(ShowAaDefaultGreetingAudioFile));
+            OnPropertyChanged(nameof(ShowAaDefaultGreetingTextToSpeech));
+            OnPropertyChanged(nameof(ShowAaDefaultTarget));
+            OnPropertyChanged(nameof(ShowAaAfterHoursGreetingAudioFile));
+            OnPropertyChanged(nameof(ShowAaAfterHoursGreetingTextToSpeech));
+            OnPropertyChanged(nameof(ShowAaAfterHoursTarget));
+        }
+
+
+
+        // Call Queue Configuration Dialog
+        [ObservableProperty]
+        private bool _showCallQueueConfigurationDialog = false;
+
+        [RelayCommand]
+        private void OpenCallQueueConfigurationDialog()
+        {
+            ShowCallQueueConfigurationDialog = true;
+        }
+
+        [RelayCommand]
+        private void CancelCallQueueConfiguration()
+        {
+            ShowCallQueueConfigurationDialog = false;
+        }
+
+        [RelayCommand]
+        private void SaveCallQueueConfiguration()
+        {
+            _loggingService.Log("Call Queue configuration saved", LogLevel.Info);
+            ShowCallQueueConfigurationDialog = false;
+        }
+
+        [RelayCommand]
+        private async Task SelectGreetingAudioFile()
+        {
+            await SelectAndImportAudioFile(
+                audioFileId => Variables.CqGreetingAudioFileId = audioFileId,
+                "Greeting");
+        }
+
+        [RelayCommand]
+        private async Task SelectMusicOnHoldAudioFile()
+        {
+            await SelectAndImportAudioFile(
+                audioFileId => Variables.CqMusicOnHoldAudioFileId = audioFileId,
+                "Music on Hold");
+        }
+
+        [RelayCommand]
+        private async Task SelectOverflowVoicemailAudioFile()
+        {
+            await SelectAndImportAudioFile(
+                audioFileId => Variables.CqOverflowActionAudioFileId = audioFileId,
+                "Overflow Voicemail Greeting");
+        }
+
+        [RelayCommand]
+        private async Task SelectTimeoutVoicemailAudioFile()
+        {
+            await SelectAndImportAudioFile(
+                audioFileId => Variables.CqTimeoutActionAudioFileId = audioFileId,
+                "Timeout Voicemail Greeting");
+        }
+
+        [RelayCommand]
+        private async Task SelectNoAgentVoicemailAudioFile()
+        {
+            await SelectAndImportAudioFile(
+                audioFileId => Variables.CqNoAgentActionAudioFileId = audioFileId,
+                "No Agent Voicemail Greeting");
+        }
+
+        // Auto Attendant Configuration Dialog
+        [ObservableProperty]
+        private bool _showAutoAttendantConfigurationDialog = false;
+
+        [RelayCommand]
+        private void OpenAutoAttendantConfigurationDialog()
+        {
+            ShowAutoAttendantConfigurationDialog = true;
+        }
+
+        [RelayCommand]
+        private void CancelAutoAttendantConfiguration()
+        {
+            ShowAutoAttendantConfigurationDialog = false;
+        }
+
+        [RelayCommand]
+        private void SaveAutoAttendantConfiguration()
+        {
+            _loggingService.Log("Auto Attendant configuration saved", LogLevel.Info);
+            ShowAutoAttendantConfigurationDialog = false;
+        }
+
+        [RelayCommand]
+        private async Task SelectAaDefaultGreetingAudioFile()
+        {
+            await SelectAndImportAudioFile(
+                audioFileId => Variables.AaDefaultGreetingAudioFileId = audioFileId,
+                "AA Default Greeting");
+        }
+
+        [RelayCommand]
+        private async Task SelectAaAfterHoursGreetingAudioFile()
+        {
+            await SelectAndImportAudioFile(
+                audioFileId => Variables.AaAfterHoursGreetingAudioFileId = audioFileId,
+                "AA After Hours Greeting");
+        }
+
+
+        private async Task SelectAndImportAudioFile(Action<string> setAudioFileId, string context)
+        {
+            try
+            {
+                var window = Avalonia.Application.Current?.ApplicationLifetime as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime;
+                if (window?.MainWindow != null)
+                {
+                    var storageProvider = window.MainWindow.StorageProvider;
+                    
+                    var file = await storageProvider.OpenFilePickerAsync(new Avalonia.Platform.Storage.FilePickerOpenOptions
+                    {
+                        Title = $"Select Audio File for {context}",
+                        FileTypeFilter = new[]
+                        {
+                            new Avalonia.Platform.Storage.FilePickerFileType("WAV files") { Patterns = new[] { "*.wav" } },
+                            new Avalonia.Platform.Storage.FilePickerFileType("All files") { Patterns = new[] { "*" } }
+                        }
+                    });
+
+                    if (file != null && file.Count > 0)
+                    {
+                        var filePath = file[0].Path.LocalPath;
+                        var fileInfo = new FileInfo(filePath);
+                        
+                        // Validate file size (max 5MB)
+                        if (fileInfo.Length > 5 * 1024 * 1024)
+                        {
+                            await _errorHandlingService.HandleGenericError("Audio file must be 5MB or smaller.", "File Size Error");
+                            return;
+                        }
+
+                        // Validate file extension
+                        if (!filePath.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))
+                        {
+                            await _errorHandlingService.HandleGenericError("Only WAV files are supported.", "File Type Error");
+                            return;
+                        }
+
+                        _loggingService.Log($"Importing audio file: {filePath}", LogLevel.Info);
+                        
+                        // Import the audio file via PowerShell
+                        var command = _powerShellCommandService.GetImportAudioFileCommand(filePath);
+                        var result = await ExecutePowerShellCommandAsync(command, "ImportAudioFile");
+                        
+                        if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                        {
+                            // Parse the audio file ID from the result
+                            var audioFileId = ParseAudioFileIdFromResult(result);
+                            if (!string.IsNullOrEmpty(audioFileId))
+                            {
+                                var fileName = fileInfo.Name;
+                                setAudioFileId(audioFileId);
+                                _loggingService.Log($"Audio file imported successfully. ID: {audioFileId}, File: {fileName}", LogLevel.Info);
+                                await _errorHandlingService.ShowSuccess($"Audio file imported successfully.\nFile: {fileName}\nID: {audioFileId}", "Import Successful");
+                            }
+                            else
+                            {
+                                await _errorHandlingService.HandleGenericError("Failed to parse audio file ID from result.", "Import Error");
+                            }
+                        }
+                        else
+                        {
+                            await _errorHandlingService.HandleGenericError($"Failed to import audio file:\n{result}", "Import Error");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Error importing audio file: {ex.Message}", LogLevel.Error);
+                await _errorHandlingService.HandleGenericError($"Error importing audio file:\n{ex.Message}", "Import Error");
+            }
+        }
+
+        private string? ParseAudioFileIdFromResult(string result)
+        {
+            // Look for pattern like "AUDIOFILEID: {guid}" in the result
+            var lines = result.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines)
+            {
+                if (line.Contains("AUDIOFILEID:") && line.Length > 13)
+                {
+                    var id = line.Substring(13).Trim();
+                    if (Guid.TryParse(id, out _))
+                    {
+                        return id;
+                    }
+                }
+            }
+            return null;
         }
     }
 } 

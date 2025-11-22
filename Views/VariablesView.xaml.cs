@@ -77,5 +77,31 @@ namespace teams_phonemanager.Views
         {
             e.Handled = true;
         }
+
+        private void CallQueueConfigurationBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (DataContext is ViewModels.VariablesViewModel viewModel)
+            {
+                viewModel.CancelCallQueueConfigurationCommand.Execute(null);
+            }
+        }
+
+        private void CallQueueConfigurationCard_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void AutoAttendantConfigurationBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            if (DataContext is ViewModels.VariablesViewModel viewModel)
+            {
+                viewModel.CancelAutoAttendantConfigurationCommand.Execute(null);
+            }
+        }
+
+        private void AutoAttendantConfigurationCard_PointerPressed(object? sender, PointerPressedEventArgs e)
+        {
+            e.Handled = true;
+        }
     }
 } 

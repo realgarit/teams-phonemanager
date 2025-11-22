@@ -347,7 +347,7 @@ namespace teams_phonemanager.ViewModels
                 IsBusy = true;
                 ShowCreateDefaultCallFlowDialog = false;
 
-                var command = _powerShellCommandService.GetCreateDefaultCallFlowCommand(variables.DefaultCallFlowGreetingPromptDE);
+                var command = _powerShellCommandService.GetCreateDefaultCallFlowCommand(variables);
                 var result = await ExecutePowerShellCommandAsync(command, "CreateDefaultCallFlow");
                 
                 if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
@@ -387,7 +387,7 @@ namespace teams_phonemanager.ViewModels
                 IsBusy = true;
                 ShowCreateAfterHoursCallFlowDialog = false;
 
-                var command = _powerShellCommandService.GetCreateAfterHoursCallFlowCommand(variables.AfterHoursCallFlowGreetingPromptDE);
+                var command = _powerShellCommandService.GetCreateAfterHoursCallFlowCommand(variables);
                 var result = await ExecutePowerShellCommandAsync(command, "CreateAfterHoursCallFlow");
                 
                 if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))

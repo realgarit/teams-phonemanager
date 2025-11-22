@@ -19,7 +19,7 @@ namespace teams_phonemanager.Services
 
         public static class Application
         {
-            public const string Version = "Version 3.0.0";
+            public const string Version = "Version 3.4.0";
             public const string Copyright = "Realgar © 2025. MIT License.";
         }
 
@@ -34,6 +34,7 @@ namespace teams_phonemanager.Services
             public const int AgentAlertTime = 30;
             public const int OverflowThreshold = 15;
             public const int TimeoutThreshold = 30;
+            public const int MinTimeoutThreshold = 30;
         }
 
         public static class Naming
