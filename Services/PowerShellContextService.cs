@@ -36,19 +36,21 @@ namespace teams_phonemanager.Services
         {
             try
             {
-                _powerShell.Commands.Clear();
-                _powerShell.AddCommand("Set-ExecutionPolicy")
-                    .AddParameter("ExecutionPolicy", "Bypass")
-                    .AddParameter("Scope", "Process")
-                    .AddParameter("Force", true)
-                    .Invoke();
+                // Note: When using System.Management.Automation in-process, execution policy
+                // doesn't apply the same way as when invoking PowerShell.exe. The in-process host
+                // doesn't enforce execution policy, so we don't need to bypass it.
+                // This reduces security tool false positives while maintaining functionality.
                 
                 _powerShell.Commands.Clear();
-                _powerShell.AddScript("$InformationPreference = 'Continue'").Invoke();
+                // Set InformationPreference using command-based approach instead of script
+                _powerShell.AddCommand("Set-Variable")
+                    .AddParameter("Name", "InformationPreference")
+                    .AddParameter("Value", "Continue")
+                    .Invoke();
             }
             catch (Exception ex)
             {
-                LoggingService.Instance.Log($"Error setting execution policy: {ex.Message}", LogLevel.Warning);
+                LoggingService.Instance.Log($"Error initializing PowerShell preferences: {ex.Message}", LogLevel.Warning);
             }
         }
 
@@ -114,10 +116,14 @@ $ErrorActionPreference = 'Continue'
                 switch (service.ToLower())
                 {
                     case "teams":
-                        _powerShell.AddScript("Get-CsTenant -ErrorAction SilentlyContinue");
+                        // Use command-based execution instead of script for better security tool compatibility
+                        _powerShell.AddCommand("Get-CsTenant")
+                            .AddParameter("ErrorAction", "SilentlyContinue");
                         break;
                     case "graph":
-                        _powerShell.AddScript("Get-MgContext -ErrorAction SilentlyContinue");
+                        // Use command-based execution instead of script for better security tool compatibility
+                        _powerShell.AddCommand("Get-MgContext")
+                            .AddParameter("ErrorAction", "SilentlyContinue");
                         break;
                     default:
                         return false;

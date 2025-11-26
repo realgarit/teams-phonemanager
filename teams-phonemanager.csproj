@@ -6,9 +6,9 @@
     <RootNamespace>teams_phonemanager</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>3.4.0</Version>
-    <AssemblyVersion>3.4.0</AssemblyVersion>
-    <FileVersion>3.4.0</FileVersion>
+    <Version>3.4.1</Version>
+    <AssemblyVersion>3.4.1</AssemblyVersion>
+    <FileVersion>3.4.1</FileVersion>
     
     <!-- Publish Settings for Framework-Dependent Deployment -->
     <PublishSingleFile>false</PublishSingleFile>
@@ -23,6 +23,9 @@
     <Company>Realgar</Company>
     <Product>Teams Phone Manager</Product>
     <Copyright>Copyright © 2025</Copyright>
+    
+    <!-- Application Manifest for Windows security and compatibility -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>

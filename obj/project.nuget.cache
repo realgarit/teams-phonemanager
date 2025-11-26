@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "FvKFDV16VKk=",
+  "dgSpecHash": "uqza9wA1TT0=",
   "success": true,
   "projectFilePath": "/Users/realgar/Git/teams-phonemanager/teams-phonemanager.csproj",
   "expectedPackageFiles": [
@@ -129,8 +129,7 @@
     "/Users/realgar/.nuget/packages/system.threading.accesscontrol/8.0.0/system.threading.accesscontrol.8.0.0.nupkg.sha512",
     "/Users/realgar/.nuget/packages/system.web.services.description/4.10.3/system.web.services.description.4.10.3.nupkg.sha512",
     "/Users/realgar/.nuget/packages/system.windows.extensions/8.0.0/system.windows.extensions.8.0.0.nupkg.sha512",
-    "/Users/realgar/.nuget/packages/tmds.dbus.protocol/0.20.0/tmds.dbus.protocol.0.20.0.nupkg.sha512",
-    "/Users/realgar/.nuget/packages/microsoft.netcore.app.host.win-x64/8.0.21/microsoft.netcore.app.host.win-x64.8.0.21.nupkg.sha512"
+    "/Users/realgar/.nuget/packages/tmds.dbus.protocol/0.20.0/tmds.dbus.protocol.0.20.0.nupkg.sha512"
   ],
   "logs": []
 }
