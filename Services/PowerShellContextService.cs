@@ -36,10 +36,12 @@ namespace teams_phonemanager.Services
         {
             try
             {
-                // Note: When using System.Management.Automation in-process, execution policy
-                // doesn't apply the same way as when invoking PowerShell.exe. The in-process host
-                // doesn't enforce execution policy, so we don't need to bypass it.
-                // This reduces security tool false positives while maintaining functionality.
+                _powerShell.Commands.Clear();
+                _powerShell.AddCommand("Set-ExecutionPolicy")
+                    .AddParameter("ExecutionPolicy", "RemoteSigned")
+                    .AddParameter("Scope", "Process")
+                    .AddParameter("Force", true)
+                    .Invoke();
                 
                 _powerShell.Commands.Clear();
                 // Set InformationPreference using command-based approach instead of script
