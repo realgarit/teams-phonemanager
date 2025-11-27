@@ -1,0 +1,103 @@
+param(
+    [Parameter(Mandatory=$true)]
+    [ValidateSet('major', 'minor', 'patch')]
+    [string]$BumpType,
+    
+    [string]$CommitMessage = "",
+    [switch]$Push = $false,
+    [string]$Branch = "dev"
+)
+
+$ErrorActionPreference = "Stop"
+
+# Get the repo root
+$repoRoot = (Split-Path $PSScriptRoot -Parent)
+Set-Location $repoRoot
+
+# Read current version from csproj
+$csprojPath = Join-Path $repoRoot "teams-phonemanager.csproj"
+$csprojContent = Get-Content $csprojPath -Raw
+
+# Extract current version
+if ($csprojContent -match '<Version>([\d.]+)</Version>') {
+    $currentVersion = $matches[1]
+    Write-Host "Current version: $currentVersion" -ForegroundColor Cyan
+} else {
+    Write-Host "Error: Could not find version in csproj file" -ForegroundColor Red
+    exit 1
+}
+
+# Parse version
+$versionParts = $currentVersion.Split('.')
+$major = [int]$versionParts[0]
+$minor = [int]$versionParts[1]
+$patch = [int]$versionParts[2]
+
+# Bump version
+switch ($BumpType) {
+    'major' {
+        $major++
+        $minor = 0
+        $patch = 0
+    }
+    'minor' {
+        $minor++
+        $patch = 0
+    }
+    'patch' {
+        $patch++
+    }
+}
+
+$newVersion = "$major.$minor.$patch"
+Write-Host "New version: $newVersion" -ForegroundColor Green
+
+# Update csproj file
+$csprojContent = $csprojContent -replace '<Version>[\d.]+</Version>', "<Version>$newVersion</Version>"
+$csprojContent = $csprojContent -replace '<AssemblyVersion>[\d.]+</AssemblyVersion>', "<AssemblyVersion>$newVersion</AssemblyVersion>"
+$csprojContent = $csprojContent -replace '<FileVersion>[\d.]+</FileVersion>', "<FileVersion>$newVersion</FileVersion>"
+Set-Content -Path $csprojPath -Value $csprojContent -NoNewline
+Write-Host "✓ Updated teams-phonemanager.csproj" -ForegroundColor Green
+
+# Update app.manifest
+$manifestPath = Join-Path $repoRoot "app.manifest"
+$manifestContent = Get-Content $manifestPath -Raw
+$manifestContent = $manifestContent -replace 'version="[\d.]+"', "version=`"$newVersion`""
+Set-Content -Path $manifestPath -Value $manifestContent -NoNewline
+Write-Host "✓ Updated app.manifest" -ForegroundColor Green
+
+# Update ConstantsService.cs
+$constantsPath = Join-Path $repoRoot "Services\ConstantsService.cs"
+$constantsContent = Get-Content $constantsPath -Raw
+$constantsContent = $constantsContent -replace 'public const string Version = "Version [\d.]+";', "public const string Version = `"Version $newVersion`";"
+Set-Content -Path $constantsPath -Value $constantsContent -NoNewline
+Write-Host "✓ Updated ConstantsService.cs" -ForegroundColor Green
+
+# Stage changes
+git add teams-phonemanager.csproj app.manifest Services/ConstantsService.cs
+
+# Create commit message if not provided
+if ([string]::IsNullOrWhiteSpace($CommitMessage)) {
+    $CommitMessage = "Bump version to $newVersion ($BumpType)"
+}
+
+# Commit
+git commit -m $CommitMessage
+Write-Host "✓ Committed version bump" -ForegroundColor Green
+
+# Push if requested
+if ($Push) {
+    git push origin $Branch
+    Write-Host "✓ Pushed to origin/$Branch" -ForegroundColor Green
+}
+
+Write-Host ""
+Write-Host "Version bumped from $currentVersion to $newVersion" -ForegroundColor Green
+Write-Host "Next steps:" -ForegroundColor Yellow
+Write-Host "  1. Review your changes" -ForegroundColor White
+if (-not $Push) {
+    Write-Host "  2. Push to dev: git push origin $Branch" -ForegroundColor White
+}
+Write-Host "  3. Create PR from dev to main on GitHub" -ForegroundColor White
+Write-Host "  4. After merge, release will be created automatically" -ForegroundColor White
+
