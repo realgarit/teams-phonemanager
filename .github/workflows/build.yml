@@ -5,14 +5,63 @@ on:
     branches: [ main, master ]
     tags:
       - 'v*'
-  pull_request:
-    branches: [ main, master ]
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
+  create-tag:
+    name: Create Tag from Version
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    permissions:
+      contents: write
+    outputs:
+      tag_name: ${{ steps.get-version.outputs.tag }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Extract version from csproj
+      id: get-version
+      run: |
+        VERSION=$(grep '<Version>' teams-phonemanager.csproj | sed -n 's/.*<Version>\([0-9.]*\)<\/Version>.*/\1/p' | head -1)
+        TAG="v$VERSION"
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "tag=$TAG" >> $GITHUB_OUTPUT
+        echo "Extracted version: $VERSION"
+        echo "Tag will be: $TAG"
+    
+    - name: Check if tag exists
+      id: check-tag
+      run: |
+        TAG="${{ steps.get-version.outputs.tag }}"
+        if git rev-parse "$TAG" >/dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "Tag $TAG already exists, skipping tag creation"
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "Tag $TAG does not exist, will create it"
+        fi
+    
+    - name: Create and push tag
+      if: steps.check-tag.outputs.exists == 'false'
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+      run: |
+        TAG="${{ steps.get-version.outputs.tag }}"
+        git config user.name "${{ github.actor }}"
+        git config user.email "${{ github.actor }}@users.noreply.github.com"
+        git remote set-url origin https://${{ github.actor }}:${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        git tag -a "$TAG" -m "Release $TAG"
+        git push origin "$TAG"
+        echo "Created and pushed tag: $TAG"
+
   build:
     name: Build on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    if: startsWith(github.ref, 'refs/tags/v')
     strategy:
       fail-fast: false
       matrix:
@@ -55,10 +104,19 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+    
+    - name: Get tag name
+      id: tag
+      run: |
+        TAG_NAME=${GITHUB_REF#refs/tags/}
+        echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+        echo "Creating release for tag: $TAG_NAME"
     
     - name: Download Windows artifacts
       uses: actions/download-artifact@v4
@@ -72,13 +130,48 @@ jobs:
         name: teams-phonemanager-osx-x64
         path: ./artifacts/osx-x64
     
+    - name: List downloaded artifacts
+      run: |
+        echo "Windows artifacts:"
+        ls -la artifacts/win-x64/ || echo "No Windows artifacts found"
+        echo ""
+        echo "macOS artifacts:"
+        ls -la artifacts/osx-x64/ || echo "No macOS artifacts found"
+    
+    - name: Create zip archives
+      run: |
+        if [ -d "artifacts/win-x64" ] && [ "$(ls -A artifacts/win-x64)" ]; then
+          cd artifacts/win-x64
+          zip -r ../teams-phonemanager-win-x64.zip .
+          cd ../..
+          echo "Created Windows zip archive"
+        else
+          echo "Windows artifacts directory is empty or missing"
+        fi
+        
+        if [ -d "artifacts/osx-x64" ] && [ "$(ls -A artifacts/osx-x64)" ]; then
+          cd artifacts/osx-x64
+          zip -r ../teams-phonemanager-osx-x64.zip .
+          cd ../..
+          echo "Created macOS zip archive"
+        else
+          echo "macOS artifacts directory is empty or missing"
+        fi
+        
+        echo "Zip files created:"
+        ls -lh artifacts/*.zip 2>/dev/null || echo "No zip files found"
+    
     - name: Create Release
       uses: softprops/action-gh-release@v1
       with:
+        tag_name: ${{ steps.tag.outputs.tag_name }}
+        name: Release ${{ steps.tag.outputs.tag_name }}
         files: |
-          artifacts/win-x64/**
-          artifacts/osx-x64/**
+          artifacts/teams-phonemanager-win-x64.zip
+          artifacts/teams-phonemanager-osx-x64.zip
+        fail_on_unmatched_files: false
         draft: false
         prerelease: false
+        generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
