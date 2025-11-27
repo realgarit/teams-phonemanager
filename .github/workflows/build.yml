@@ -157,6 +157,12 @@ jobs:
         fi
         
         if [ -d "artifacts/osx-x64" ] && [ "$(ls -A artifacts/osx-x64)" ]; then
+          # Ensure executable has proper permissions before zipping
+          if [ -f "artifacts/osx-x64/teams-phonemanager" ]; then
+            chmod +x artifacts/osx-x64/teams-phonemanager
+            echo "Set executable permissions for teams-phonemanager"
+            ls -la artifacts/osx-x64/teams-phonemanager
+          fi
           cd artifacts/osx-x64
           zip -r ../teams-phonemanager-osx-x64.zip .
           cd ../..
