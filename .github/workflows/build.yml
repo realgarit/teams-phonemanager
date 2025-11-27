@@ -39,13 +39,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     
     - name: Publish
-      run: |
-        dotnet publish \
-          --configuration Release \
-          --runtime ${{ matrix.runtime }} \
-          --self-contained false \
-          --output ./publish/${{ matrix.runtime }} \
-          /p:OutputType=${{ matrix.output-type }}
+      run: dotnet publish --configuration Release --runtime ${{ matrix.runtime }} --self-contained false --output ./publish/${{ matrix.runtime }} /p:OutputType=${{ matrix.output-type }}
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
