@@ -38,17 +38,21 @@ namespace teams_phonemanager.Services
             {
                 _powerShell.Commands.Clear();
                 _powerShell.AddCommand("Set-ExecutionPolicy")
-                    .AddParameter("ExecutionPolicy", "Bypass")
+                    .AddParameter("ExecutionPolicy", "RemoteSigned")
                     .AddParameter("Scope", "Process")
                     .AddParameter("Force", true)
                     .Invoke();
                 
                 _powerShell.Commands.Clear();
-                _powerShell.AddScript("$InformationPreference = 'Continue'").Invoke();
+                // Set InformationPreference using command-based approach instead of script
+                _powerShell.AddCommand("Set-Variable")
+                    .AddParameter("Name", "InformationPreference")
+                    .AddParameter("Value", "Continue")
+                    .Invoke();
             }
             catch (Exception ex)
             {
-                LoggingService.Instance.Log($"Error setting execution policy: {ex.Message}", LogLevel.Warning);
+                LoggingService.Instance.Log($"Error initializing PowerShell preferences: {ex.Message}", LogLevel.Warning);
             }
         }
 
@@ -114,10 +118,14 @@ $ErrorActionPreference = 'Continue'
                 switch (service.ToLower())
                 {
                     case "teams":
-                        _powerShell.AddScript("Get-CsTenant -ErrorAction SilentlyContinue");
+                        // Use command-based execution instead of script for better security tool compatibility
+                        _powerShell.AddCommand("Get-CsTenant")
+                            .AddParameter("ErrorAction", "SilentlyContinue");
                         break;
                     case "graph":
-                        _powerShell.AddScript("Get-MgContext -ErrorAction SilentlyContinue");
+                        // Use command-based execution instead of script for better security tool compatibility
+                        _powerShell.AddCommand("Get-MgContext")
+                            .AddParameter("ErrorAction", "SilentlyContinue");
                         break;
                     default:
                         return false;
