@@ -178,7 +178,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ steps.tag.outputs.tag_name }}
-        name: Release ${{ steps.tag.outputs.tag_name }}
+        name: ${{ steps.tag.outputs.tag_name }}
         files: |
           artifacts/teams-phonemanager-win-x64.zip
           artifacts/teams-phonemanager-osx-x64.zip
