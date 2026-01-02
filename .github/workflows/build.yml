@@ -59,7 +59,7 @@ jobs:
         echo "Created and pushed tag: $TAG"
 
   build:
-    name: Build on ${{ matrix.os }}
+    name: Build ${{ matrix.runtime }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     needs: create-tag
     if: |
@@ -68,7 +68,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest]
         include:
           - os: windows-latest
             runtime: win-x64
@@ -130,18 +129,21 @@ jobs:
     
     - name: Download Windows artifacts
       uses: actions/download-artifact@v4
+      continue-on-error: true
       with:
         name: teams-phonemanager-win-x64
         path: ./artifacts/win-x64
     
     - name: Download macOS Intel artifacts
       uses: actions/download-artifact@v4
+      continue-on-error: true
       with:
         name: teams-phonemanager-osx-x64
         path: ./artifacts/osx-x64
     
     - name: Download macOS Apple Silicon artifacts
       uses: actions/download-artifact@v4
+      continue-on-error: true
       with:
         name: teams-phonemanager-osx-arm64
         path: ./artifacts/osx-arm64
