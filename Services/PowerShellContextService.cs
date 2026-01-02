@@ -32,7 +32,7 @@ namespace teams_phonemanager.Services
             {
                 _powerShell.Commands.Clear();
                 _powerShell.AddCommand("Set-ExecutionPolicy")
-                    .AddParameter("ExecutionPolicy", "RemoteSigned")
+                    .AddParameter("ExecutionPolicy", ConstantsService.PowerShell.ExecutionPolicy)
                     .AddParameter("Scope", "Process")
                     .AddParameter("Force", true)
                     .Invoke();
