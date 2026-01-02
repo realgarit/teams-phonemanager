@@ -36,12 +36,23 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="FluentAvaloniaUI" Version="2.4.0" />
     <PackageReference Include="FluentIcons.Avalonia" Version="1.1.223" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.4.1" />
     <PackageReference Include="System.Management.Automation" Version="7.4.1" />
   </ItemGroup>
 
   <ItemGroup>
     <AvaloniaResource Include="Resources\AargauHolidaysReference.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Exclude archived test files from build -->
+    <Compile Remove="Archive\**\*.cs" />
+    <Compile Remove="Archive\**\*.axaml.cs" />
+    <None Include="Archive\**\*.axaml">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+    <AvaloniaXaml Remove="Archive\**\*.axaml" />
   </ItemGroup>
 
   <ItemGroup>

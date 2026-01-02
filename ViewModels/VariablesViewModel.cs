@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
+using teams_phonemanager.Services.Interfaces;
 using teams_phonemanager.Services;
 using System;
 using System.Linq;
@@ -77,14 +77,23 @@ namespace teams_phonemanager.ViewModels
 
         // Removed DialogHolidayTime - now using SelectedEditHolidayTime with ComboBoxItem approach
 
-        public VariablesViewModel()
+        public VariablesViewModel(
+            IPowerShellContextService powerShellContextService,
+            IPowerShellCommandService powerShellCommandService,
+            ILoggingService loggingService,
+            ISessionManager sessionManager,
+            INavigationService navigationService,
+            IErrorHandlingService errorHandlingService,
+            IValidationService validationService)
+            : base(powerShellContextService, powerShellCommandService, loggingService,
+                  sessionManager, navigationService, errorHandlingService, validationService)
         {
             _mainWindowViewModel = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
                 ? desktop.MainWindow?.DataContext as MainWindowViewModel
                 : null;
 
             _loggingService.Log("Variables page loaded", LogLevel.Info);
-            
+
             // Subscribe to variable changes for Call Queue configuration visibility
             if (_mainWindowViewModel?.Variables != null)
             {
@@ -103,7 +112,7 @@ namespace teams_phonemanager.ViewModels
                         UpdateAutoAttendantVisibility();
                     }
                 };
-                
+
                 // Prefill target fields if M365GroupId is already set
                 PrefillCallQueueTargets();
             }

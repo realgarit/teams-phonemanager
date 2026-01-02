@@ -76,6 +76,9 @@ jobs:
           - os: macos-latest
             runtime: osx-x64
             output-type: Exe
+          - os: macos-latest
+            runtime: osx-arm64
+            output-type: Exe
     
     steps:
     - name: Checkout code
@@ -131,19 +134,28 @@ jobs:
         name: teams-phonemanager-win-x64
         path: ./artifacts/win-x64
     
-    - name: Download macOS artifacts
+    - name: Download macOS Intel artifacts
       uses: actions/download-artifact@v4
       with:
         name: teams-phonemanager-osx-x64
         path: ./artifacts/osx-x64
+    
+    - name: Download macOS Apple Silicon artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: teams-phonemanager-osx-arm64
+        path: ./artifacts/osx-arm64
     
     - name: List downloaded artifacts
       run: |
         echo "Windows artifacts:"
         ls -la artifacts/win-x64/ || echo "No Windows artifacts found"
         echo ""
-        echo "macOS artifacts:"
-        ls -la artifacts/osx-x64/ || echo "No macOS artifacts found"
+        echo "macOS Intel artifacts:"
+        ls -la artifacts/osx-x64/ || echo "No macOS Intel artifacts found"
+        echo ""
+        echo "macOS Apple Silicon artifacts:"
+        ls -la artifacts/osx-arm64/ || echo "No macOS Apple Silicon artifacts found"
     
     - name: Create zip archives
       run: |
@@ -166,9 +178,24 @@ jobs:
           cd artifacts/osx-x64
           zip -r ../teams-phonemanager-osx-x64.zip .
           cd ../..
-          echo "Created macOS zip archive"
+          echo "Created macOS Intel zip archive"
         else
-          echo "macOS artifacts directory is empty or missing"
+          echo "macOS Intel artifacts directory is empty or missing"
+        fi
+        
+        if [ -d "artifacts/osx-arm64" ] && [ "$(ls -A artifacts/osx-arm64)" ]; then
+          # Ensure executable has proper permissions before zipping
+          if [ -f "artifacts/osx-arm64/teams-phonemanager" ]; then
+            chmod +x artifacts/osx-arm64/teams-phonemanager
+            echo "Set executable permissions for teams-phonemanager (Apple Silicon)"
+            ls -la artifacts/osx-arm64/teams-phonemanager
+          fi
+          cd artifacts/osx-arm64
+          zip -r ../teams-phonemanager-osx-arm64.zip .
+          cd ../..
+          echo "Created macOS Apple Silicon zip archive"
+        else
+          echo "macOS Apple Silicon artifacts directory is empty or missing"
         fi
         
         echo "Zip files created:"
@@ -182,9 +209,10 @@ jobs:
         files: |
           artifacts/teams-phonemanager-win-x64.zip
           artifacts/teams-phonemanager-osx-x64.zip
+          artifacts/teams-phonemanager-osx-arm64.zip
         fail_on_unmatched_files: false
         draft: false
         prerelease: false
         generate_release_notes: true
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}

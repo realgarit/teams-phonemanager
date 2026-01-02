@@ -1,40 +1,32 @@
 using System;
-using System.Threading.Tasks;
+using teams_phonemanager.Services.Interfaces;
 
 namespace teams_phonemanager.Services
 {
-    public class SessionManager
+    public class SessionManager : ISessionManager
     {
-        private static SessionManager? _instance;
-        
-        private SessionManager()
+        private readonly ILoggingService _loggingService;
+
+        public SessionManager(ILoggingService loggingService)
         {
-            LoggingService.Instance.Log("Session manager initialized", LogLevel.Info);
-        }
-        
-        public static SessionManager Instance
-        {
-            get
-            {
-                _instance ??= new SessionManager();
-                return _instance;
-            }
+            _loggingService = loggingService;
+            _loggingService.Log("Session manager initialized", LogLevel.Info);
         }
         
         public bool ModulesChecked { get; set; }
-        
+
         public bool TeamsConnected { get; set; }
         public bool GraphConnected { get; set; }
-        
+
         public string? TeamsAccount { get; set; }
         public string? GraphAccount { get; set; }
-        
-        public string? TeamsTenantId { get; set; }
-        public string? TeamsTenantName { get; set; }
-        
+
+        public string? TenantId { get; set; }
+        public string? TenantName { get; set; }
+
         public DateTime LastTeamsConnection { get; set; }
         public DateTime LastGraphConnection { get; set; }
-        
+
         public bool IsSessionValid => TeamsConnected && GraphConnected;
         
         public TimeSpan TeamsSessionDuration => DateTime.Now - LastTeamsConnection;
@@ -50,59 +42,59 @@ namespace teams_phonemanager.Services
         {
             TeamsConnected = connected;
             TeamsAccount = account;
-            
+
             if (connected)
             {
                 LastTeamsConnection = DateTime.Now;
-                LoggingService.Instance.Log($"Teams connection updated: Connected as {account}", LogLevel.Info);
+                _loggingService.Log($"Teams connection updated: Connected as {account}", LogLevel.Info);
             }
             else
             {
-                LoggingService.Instance.Log("Teams connection updated: Disconnected", LogLevel.Info);
+                _loggingService.Log("Teams connection updated: Disconnected", LogLevel.Info);
             }
         }
-        
+
         public void UpdateGraphConnection(bool connected, string? account = null)
         {
             GraphConnected = connected;
             GraphAccount = account;
-            
+
             if (connected)
             {
                 LastGraphConnection = DateTime.Now;
-                LoggingService.Instance.Log($"Graph connection updated: Connected as {account}", LogLevel.Info);
+                _loggingService.Log($"Graph connection updated: Connected as {account}", LogLevel.Info);
             }
             else
             {
-                LoggingService.Instance.Log("Graph connection updated: Disconnected", LogLevel.Info);
+                _loggingService.Log("Graph connection updated: Disconnected", LogLevel.Info);
             }
         }
-        
+
         public void UpdateModulesChecked(bool modulesChecked)
         {
             ModulesChecked = modulesChecked;
-            LoggingService.Instance.Log($"Modules checked state updated: {modulesChecked}", LogLevel.Info);
+            _loggingService.Log($"Modules checked state updated: {modulesChecked}", LogLevel.Info);
         }
-        
-        public void UpdateTeamsTenantInfo(string tenantId, string tenantName)
+
+        public void UpdateTenantInfo(string tenantId, string tenantName)
         {
-            TeamsTenantId = tenantId;
-            TeamsTenantName = tenantName;
-            LoggingService.Instance.Log($"Teams tenant info updated: {tenantName} ({tenantId})", LogLevel.Info);
+            TenantId = tenantId;
+            TenantName = tenantName;
+            _loggingService.Log($"Teams tenant info updated: {tenantName} ({tenantId})", LogLevel.Info);
         }
-        
+
         public void ResetSession()
         {
             TeamsConnected = false;
             GraphConnected = false;
             TeamsAccount = null;
             GraphAccount = null;
-            TeamsTenantId = null;
-            TeamsTenantName = null;
+            TenantId = null;
+            TenantName = null;
             LastTeamsConnection = DateTime.MinValue;
             LastGraphConnection = DateTime.MinValue;
-            
-            LoggingService.Instance.Log("Session reset", LogLevel.Info);
+
+            _loggingService.Log("Session reset", LogLevel.Info);
         }
     }
 } 

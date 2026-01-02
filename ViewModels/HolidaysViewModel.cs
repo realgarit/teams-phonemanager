@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
+using teams_phonemanager.Services.Interfaces;
 using teams_phonemanager.Services;
 using teams_phonemanager.Models;
 using System;
@@ -41,7 +41,16 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private bool _isHolidayCreated = false;
 
-        public HolidaysViewModel()
+        public HolidaysViewModel(
+            IPowerShellContextService powerShellContextService,
+            IPowerShellCommandService powerShellCommandService,
+            ILoggingService loggingService,
+            ISessionManager sessionManager,
+            INavigationService navigationService,
+            IErrorHandlingService errorHandlingService,
+            IValidationService validationService)
+            : base(powerShellContextService, powerShellCommandService, loggingService,
+                  sessionManager, navigationService, errorHandlingService, validationService)
         {
             _mainWindowViewModel = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
                 ? desktop.MainWindow?.DataContext as MainWindowViewModel

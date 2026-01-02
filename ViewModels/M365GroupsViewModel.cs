@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
+using teams_phonemanager.Services.Interfaces;
 using teams_phonemanager.Services;
 using teams_phonemanager.Models;
 using System;
@@ -54,14 +54,23 @@ namespace teams_phonemanager.ViewModels
             Groups.Where(FilterGroup)
         );
 
-        public M365GroupsViewModel()
+        public M365GroupsViewModel(
+            IPowerShellContextService powerShellContextService,
+            IPowerShellCommandService powerShellCommandService,
+            ILoggingService loggingService,
+            ISessionManager sessionManager,
+            INavigationService navigationService,
+            IErrorHandlingService errorHandlingService,
+            IValidationService validationService)
+            : base(powerShellContextService, powerShellCommandService, loggingService,
+                  sessionManager, navigationService, errorHandlingService, validationService)
         {
             _mainWindowViewModel = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
                 ? desktop.MainWindow?.DataContext as MainWindowViewModel
                 : null;
 
             _loggingService.Log("M365 Groups page loaded", LogLevel.Info);
-            
+
             // Initialize with auto-generated group name if variables are available
             UpdateNewGroupName();
 

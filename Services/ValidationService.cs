@@ -1,38 +1,36 @@
+using System.Text.RegularExpressions;
 using teams_phonemanager.Models;
+using teams_phonemanager.Services.Interfaces;
 
 namespace teams_phonemanager.Services
 {
-    public class ValidationService
+    public partial class ValidationService : IValidationService
     {
-        private static ValidationService? _instance;
+        private readonly ISessionManager _sessionManager;
 
-        private ValidationService() { }
+        [GeneratedRegex(@"^\+[1-9]\d{6,14}$", RegexOptions.Compiled)]
+        private static partial Regex E164PhonePattern();
 
-        public static ValidationService Instance
+        public ValidationService(ISessionManager sessionManager)
         {
-            get
-            {
-                _instance ??= new ValidationService();
-                return _instance;
-            }
+            _sessionManager = sessionManager;
         }
 
         public ValidationResult ValidatePrerequisites()
         {
-            var sessionManager = SessionManager.Instance;
             var result = new ValidationResult();
 
-            if (!sessionManager.ModulesChecked)
+            if (!_sessionManager.ModulesChecked)
             {
                 result.AddError("PowerShell modules have not been checked. Please check modules first.");
             }
 
-            if (!sessionManager.TeamsConnected)
+            if (!_sessionManager.TeamsConnected)
             {
                 result.AddError("Not connected to Microsoft Teams. Please connect to Teams first.");
             }
 
-            if (!sessionManager.GraphConnected)
+            if (!_sessionManager.GraphConnected)
             {
                 result.AddError("Not connected to Microsoft Graph. Please connect to Graph first.");
             }
@@ -136,10 +134,38 @@ namespace teams_phonemanager.Services
 
         public bool IsValidEmail(string email)
         {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
             try
             {
                 var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == email;
+
+                // Additional validation checks
+                if (addr.Address != email)
+                    return false;
+
+                // Check for double dots
+                if (email.Contains(".."))
+                    return false;
+
+                // Check for leading or trailing dots
+                if (email.StartsWith(".") || email.EndsWith("."))
+                    return false;
+
+                // Check domain has valid TLD
+                var parts = email.Split('@');
+                if (parts.Length != 2)
+                    return false;
+
+                if (!parts[1].Contains('.'))
+                    return false;
+
+                // Check local part doesn't start or end with dot
+                if (parts[0].StartsWith(".") || parts[0].EndsWith("."))
+                    return false;
+
+                return true;
             }
             catch
             {
@@ -149,9 +175,19 @@ namespace teams_phonemanager.Services
 
         public bool IsValidPhoneNumber(string phoneNumber)
         {
-            return !string.IsNullOrWhiteSpace(phoneNumber) && 
-                   phoneNumber.Length >= 10 && 
-                   phoneNumber.StartsWith("+");
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+                return false;
+
+            // E.164 format validation: +[country code][subscriber number]
+            // Total length: 8-16 characters (including +)
+            if (!E164PhonePattern().IsMatch(phoneNumber))
+                return false;
+
+            // Additional length check
+            if (phoneNumber.Length < 8 || phoneNumber.Length > 16)
+                return false;
+
+            return true;
         }
     }
 

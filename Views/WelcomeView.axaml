@@ -10,9 +10,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1000">
     
-    <UserControl.DataContext>
-        <viewmodels:WelcomeViewModel/>
-    </UserControl.DataContext>
+    <!-- DataContext is set via data binding from MainWindow -->
 
     <UserControl.Styles>
         <!-- Local styles removed, using App.axaml styles -->

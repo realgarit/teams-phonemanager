@@ -1,20 +1,15 @@
 using teams_phonemanager.Models;
+using teams_phonemanager.Services.Interfaces;
 
 namespace teams_phonemanager.Services
 {
-    public class PowerShellCommandService
+    public class PowerShellCommandService : IPowerShellCommandService
     {
-        private static PowerShellCommandService? _instance;
+        private readonly IPowerShellSanitizationService _sanitizer;
 
-        private PowerShellCommandService() { }
-
-        public static PowerShellCommandService Instance
+        public PowerShellCommandService(IPowerShellSanitizationService sanitizer)
         {
-            get
-            {
-                _instance ??= new PowerShellCommandService();
-                return _instance;
-            }
+            _sanitizer = sanitizer;
         }
 
         public string GetCheckModulesCommand()
@@ -157,28 +152,30 @@ catch {
 
         public string GetCreateM365GroupCommand(string groupName)
         {
+            var sanitizedGroupName = _sanitizer.SanitizeString(groupName);
+
             return $@"
-$existingGroup = Get-MgGroup -Filter ""displayName eq '{groupName}'"" -ErrorAction SilentlyContinue
-if ($existingGroup) 
+$existingGroup = Get-MgGroup -Filter ""displayName eq '{sanitizedGroupName}'"" -ErrorAction SilentlyContinue
+if ($existingGroup)
 {{
-    Write-Host ""{groupName} already exists. Please check, otherwise SFO will be salty!""
+    Write-Host ""{sanitizedGroupName} already exists. Please check, otherwise SFO will be salty!""
     $global:m365groupId = $existingGroup.Id
-    Write-Host ""{groupName} was found successfully with ID: $global:m365groupId""
+    Write-Host ""{sanitizedGroupName} was found successfully with ID: $global:m365groupId""
     return
-}} 
+}}
 
 try {{
-    $newGroup = New-MgGroup -DisplayName ""{groupName}"" `
+    $newGroup = New-MgGroup -DisplayName ""{sanitizedGroupName}"" `
         -MailEnabled:$True `
-        -MailNickName ""{groupName}"" `
+        -MailNickName ""{sanitizedGroupName}"" `
         -SecurityEnabled `
         -GroupTypes @(""Unified"")
 
     $global:m365groupId = $newGroup.Id
-    Write-Host ""{groupName} created successfully with ID: $global:m365groupId""
+    Write-Host ""{sanitizedGroupName} created successfully with ID: $global:m365groupId""
 }}
 catch {{
-    Write-Host ""{groupName} failed to create: $_""
+    Write-Host ""{sanitizedGroupName} failed to create: $_""
     exit
 }}";
         }
@@ -186,24 +183,29 @@ catch {{
         public string GetCreateCallQueueCommand(PhoneManagerVariables variables)
         {
             var callQueueParams = BuildCallQueueParameters(variables);
-            
+            var sanitizedRacqUPN = _sanitizer.SanitizeIdentifier(variables.RacqUPN);
+            var sanitizedRacqDisplayName = _sanitizer.SanitizeString(variables.RacqDisplayName);
+            var sanitizedCqDisplayName = _sanitizer.SanitizeString(variables.CqDisplayName);
+            var sanitizedUsageLocation = _sanitizer.SanitizeString(variables.UsageLocation);
+            var sanitizedLanguageId = _sanitizer.SanitizeString(variables.LanguageId);
+
             return $@"
-New-CsOnlineApplicationInstance -UserPrincipalName {variables.RacqUPN} -ApplicationId {variables.CsAppCqId} -DisplayName {variables.RacqDisplayName}
+New-CsOnlineApplicationInstance -UserPrincipalName {sanitizedRacqUPN} -ApplicationId {variables.CsAppCqId} -DisplayName {sanitizedRacqDisplayName}
 
 Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
 Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
 
-$global:racqid = (Get-CsOnlineUser {variables.RacqUPN}).Identity
+$global:racqid = (Get-CsOnlineUser {sanitizedRacqUPN}).Identity
 
-Update-MgUser -UserId {variables.RacqUPN} -UsageLocation {variables.UsageLocation}
+Update-MgUser -UserId {sanitizedRacqUPN} -UsageLocation {sanitizedUsageLocation}
 
 New-CsCallQueue `
--Name {variables.CqDisplayName} `
+-Name {sanitizedCqDisplayName} `
 -RoutingMethod Attendant `
 -AllowOptOut $true `
 -ConferenceMode $true `
 -AgentAlertTime " + ConstantsService.CallQueue.AgentAlertTime + @" `
--LanguageId {variables.LanguageId} `
+-LanguageId {sanitizedLanguageId} `
 -DistributionLists $global:m365groupId `
 {callQueueParams}
 -PresenceBasedRouting $false
@@ -211,8 +213,8 @@ New-CsCallQueue `
 Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
 Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
 
-$cqapplicationInstanceId = (Get-CsOnlineUser {variables.RacqUPN}).Identity
-$cqautoAttendantId = (Get-CsCallQueue -NameFilter {variables.CqDisplayName}).Identity
+$cqapplicationInstanceId = (Get-CsOnlineUser {sanitizedRacqUPN}).Identity
+$cqautoAttendantId = (Get-CsCallQueue -NameFilter {sanitizedCqDisplayName}).Identity
 New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceId) -ConfigurationId $cqautoAttendantId -ConfigurationType CallQueue";
         }
 
@@ -223,17 +225,20 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceI
             // Greeting
             if (variables.CqGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqGreetingAudioFileId))
             {
-                parameters.AppendLine($"-WelcomeMusicAudioFileId \"{variables.CqGreetingAudioFileId}\" `");
+                var sanitizedAudioFileId = _sanitizer.SanitizeString(variables.CqGreetingAudioFileId);
+                parameters.AppendLine($"-WelcomeMusicAudioFileId \"{sanitizedAudioFileId}\" `");
             }
             else if (variables.CqGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqGreetingTextToSpeechPrompt))
             {
-                parameters.AppendLine($"-WelcomeTextToSpeechPrompt \"{variables.CqGreetingTextToSpeechPrompt}\" `");
+                var sanitizedPrompt = _sanitizer.SanitizeString(variables.CqGreetingTextToSpeechPrompt);
+                parameters.AppendLine($"-WelcomeTextToSpeechPrompt \"{sanitizedPrompt}\" `");
             }
 
             // Music on Hold
             if (variables.CqMusicOnHoldType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqMusicOnHoldAudioFileId))
             {
-                parameters.AppendLine($"-MusicOnHoldAudioFileId \"{variables.CqMusicOnHoldAudioFileId}\" `");
+                var sanitizedAudioFileId = _sanitizer.SanitizeString(variables.CqMusicOnHoldAudioFileId);
+                parameters.AppendLine($"-MusicOnHoldAudioFileId \"{sanitizedAudioFileId}\" `");
                 parameters.AppendLine($"-UseDefaultMusicOnHold $false `");
             }
             else
@@ -245,7 +250,7 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceI
             // Overflow
             var overflowThreshold = variables.CqOverflowThreshold ?? ConstantsService.CallQueue.OverflowThreshold;
             parameters.AppendLine($"-OverflowThreshold {overflowThreshold} `");
-            
+
             if (!string.IsNullOrWhiteSpace(variables.CqOverflowAction))
             {
                 if (variables.CqOverflowAction == "Disconnect")
@@ -254,28 +259,32 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceI
                 }
                 else if (variables.CqOverflowAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTarget))
                 {
+                    var sanitizedTarget = _sanitizer.SanitizeString(variables.CqOverflowActionTarget);
                     parameters.AppendLine($"-OverflowAction Forward `");
-                    parameters.AppendLine($"-OverflowActionTarget \"{variables.CqOverflowActionTarget}\" `");
+                    parameters.AppendLine($"-OverflowActionTarget \"{sanitizedTarget}\" `");
                 }
                 else if (variables.CqOverflowAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTarget))
                 {
+                    var sanitizedTarget = _sanitizer.SanitizeString(variables.CqOverflowActionTarget);
                     if (System.Guid.TryParse(variables.CqOverflowActionTarget, out _))
                     {
                         parameters.AppendLine($"-OverflowAction SharedVoicemail `");
-                        parameters.AppendLine($"-OverflowActionTarget \"{variables.CqOverflowActionTarget}\" `");
+                        parameters.AppendLine($"-OverflowActionTarget \"{sanitizedTarget}\" `");
                         if (variables.CqOverflowVoicemailGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTextToSpeechPrompt))
                         {
-                            parameters.AppendLine($"-OverflowSharedVoicemailTextToSpeechPrompt \"{variables.CqOverflowActionTextToSpeechPrompt}\" `");
+                            var sanitizedPrompt = _sanitizer.SanitizeString(variables.CqOverflowActionTextToSpeechPrompt);
+                            parameters.AppendLine($"-OverflowSharedVoicemailTextToSpeechPrompt \"{sanitizedPrompt}\" `");
                         }
                         else if (variables.CqOverflowVoicemailGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionAudioFileId))
                         {
-                            parameters.AppendLine($"-OverflowSharedVoicemailAudioFilePrompt \"{variables.CqOverflowActionAudioFileId}\" `");
+                            var sanitizedFileId = _sanitizer.SanitizeString(variables.CqOverflowActionAudioFileId);
+                            parameters.AppendLine($"-OverflowSharedVoicemailAudioFilePrompt \"{sanitizedFileId}\" `");
                         }
                     }
                     else
                     {
                         parameters.AppendLine($"-OverflowAction Voicemail `");
-                        parameters.AppendLine($"-OverflowActionTarget \"{variables.CqOverflowActionTarget}\" `");
+                        parameters.AppendLine($"-OverflowActionTarget \"{sanitizedTarget}\" `");
                     }
                 }
             }
@@ -291,7 +300,7 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceI
                 timeoutThreshold = ConstantsService.CallQueue.MinTimeoutThreshold;
             }
             parameters.AppendLine($"-TimeoutThreshold {timeoutThreshold} `");
-            
+
             if (!string.IsNullOrWhiteSpace(variables.CqTimeoutAction))
             {
                 if (variables.CqTimeoutAction == "Disconnect")
@@ -300,28 +309,32 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceI
                 }
                 else if (variables.CqTimeoutAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTarget))
                 {
+                    var sanitizedTarget = _sanitizer.SanitizeString(variables.CqTimeoutActionTarget);
                     parameters.AppendLine($"-TimeoutAction Forward `");
-                    parameters.AppendLine($"-TimeoutActionTarget \"{variables.CqTimeoutActionTarget}\" `");
+                    parameters.AppendLine($"-TimeoutActionTarget \"{sanitizedTarget}\" `");
                 }
                 else if (variables.CqTimeoutAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTarget))
                 {
+                    var sanitizedTarget = _sanitizer.SanitizeString(variables.CqTimeoutActionTarget);
                     if (System.Guid.TryParse(variables.CqTimeoutActionTarget, out _))
                     {
                         parameters.AppendLine($"-TimeoutAction SharedVoicemail `");
-                        parameters.AppendLine($"-TimeoutActionTarget \"{variables.CqTimeoutActionTarget}\" `");
+                        parameters.AppendLine($"-TimeoutActionTarget \"{sanitizedTarget}\" `");
                         if (variables.CqTimeoutVoicemailGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTextToSpeechPrompt))
                         {
-                            parameters.AppendLine($"-TimeoutSharedVoicemailTextToSpeechPrompt \"{variables.CqTimeoutActionTextToSpeechPrompt}\" `");
+                            var sanitizedPrompt = _sanitizer.SanitizeString(variables.CqTimeoutActionTextToSpeechPrompt);
+                            parameters.AppendLine($"-TimeoutSharedVoicemailTextToSpeechPrompt \"{sanitizedPrompt}\" `");
                         }
                         else if (variables.CqTimeoutVoicemailGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionAudioFileId))
                         {
-                            parameters.AppendLine($"-TimeoutSharedVoicemailAudioFilePrompt \"{variables.CqTimeoutActionAudioFileId}\" `");
+                            var sanitizedFileId = _sanitizer.SanitizeString(variables.CqTimeoutActionAudioFileId);
+                            parameters.AppendLine($"-TimeoutSharedVoicemailAudioFilePrompt \"{sanitizedFileId}\" `");
                         }
                     }
                     else
                     {
                         parameters.AppendLine($"-TimeoutAction Voicemail `");
-                        parameters.AppendLine($"-TimeoutActionTarget \"{variables.CqTimeoutActionTarget}\" `");
+                        parameters.AppendLine($"-TimeoutActionTarget \"{sanitizedTarget}\" `");
                     }
                 }
             }
@@ -339,28 +352,32 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceI
                 }
                 else if (variables.CqNoAgentAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTarget))
                 {
+                    var sanitizedTarget = _sanitizer.SanitizeString(variables.CqNoAgentActionTarget);
                     parameters.AppendLine($"-NoAgentAction Forward `");
-                    parameters.AppendLine($"-NoAgentActionTarget \"{variables.CqNoAgentActionTarget}\" `");
+                    parameters.AppendLine($"-NoAgentActionTarget \"{sanitizedTarget}\" `");
                 }
                 else if (variables.CqNoAgentAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTarget))
                 {
+                    var sanitizedTarget = _sanitizer.SanitizeString(variables.CqNoAgentActionTarget);
                     if (System.Guid.TryParse(variables.CqNoAgentActionTarget, out _))
                     {
                         parameters.AppendLine($"-NoAgentAction SharedVoicemail `");
-                        parameters.AppendLine($"-NoAgentActionTarget \"{variables.CqNoAgentActionTarget}\" `");
+                        parameters.AppendLine($"-NoAgentActionTarget \"{sanitizedTarget}\" `");
                         if (variables.CqNoAgentVoicemailGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTextToSpeechPrompt))
                         {
-                            parameters.AppendLine($"-NoAgentSharedVoicemailTextToSpeechPrompt \"{variables.CqNoAgentActionTextToSpeechPrompt}\" `");
+                            var sanitizedPrompt = _sanitizer.SanitizeString(variables.CqNoAgentActionTextToSpeechPrompt);
+                            parameters.AppendLine($"-NoAgentSharedVoicemailTextToSpeechPrompt \"{sanitizedPrompt}\" `");
                         }
                         else if (variables.CqNoAgentVoicemailGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionAudioFileId))
                         {
-                            parameters.AppendLine($"-NoAgentSharedVoicemailAudioFilePrompt \"{variables.CqNoAgentActionAudioFileId}\" `");
+                            var sanitizedFileId = _sanitizer.SanitizeString(variables.CqNoAgentActionAudioFileId);
+                            parameters.AppendLine($"-NoAgentSharedVoicemailAudioFilePrompt \"{sanitizedFileId}\" `");
                         }
                     }
                     else
                     {
                         parameters.AppendLine($"-NoAgentAction Voicemail `");
-                        parameters.AppendLine($"-NoAgentActionTarget \"{variables.CqNoAgentActionTarget}\" `");
+                        parameters.AppendLine($"-NoAgentActionTarget \"{sanitizedTarget}\" `");
                     }
                 }
 
@@ -383,15 +400,25 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceI
             var defaultCallFlow = BuildCallFlow(variables, "Default", variables.AaDefaultGreetingType, variables.AaDefaultGreetingTextToSpeechPrompt, variables.AaDefaultGreetingAudioFileId, variables.AaDefaultAction, variables.AaDefaultActionTarget);
             var afterHoursCallFlow = BuildCallFlow(variables, "After Hours", variables.AaAfterHoursGreetingType, variables.AaAfterHoursGreetingTextToSpeechPrompt, variables.AaAfterHoursGreetingAudioFileId, variables.AaAfterHoursAction, variables.AaAfterHoursActionTarget);
 
+            var sanitizedRaaaUPN = _sanitizer.SanitizeIdentifier(variables.RaaaUPN);
+            var sanitizedRaaaDisplayName = _sanitizer.SanitizeString(variables.RaaaDisplayName);
+            var sanitizedUsageLocation = _sanitizer.SanitizeString(variables.UsageLocation);
+            var sanitizedSkuId = _sanitizer.SanitizeString(variables.SkuId);
+            var sanitizedPhoneNumber = _sanitizer.SanitizeString(variables.RaaAnr);
+            var sanitizedPhoneNumberType = _sanitizer.SanitizeString(variables.PhoneNumberType);
+            var sanitizedAaDisplayName = _sanitizer.SanitizeString(variables.AaDisplayName);
+            var sanitizedLanguageId = _sanitizer.SanitizeString(variables.LanguageId);
+            var sanitizedTimeZoneId = _sanitizer.SanitizeString(variables.TimeZoneId);
+
             return $@"
-New-CsOnlineApplicationInstance -UserPrincipalName ""{variables.RaaaUPN}"" -ApplicationId ""{variables.CsAppAaId}"" -DisplayName ""{variables.RaaaDisplayName}""
+New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedRaaaUPN}"" -ApplicationId ""{variables.CsAppAaId}"" -DisplayName ""{sanitizedRaaaDisplayName}""
 
-Update-MgUser -UserId ""{variables.RaaaUPN}"" -UsageLocation ""{variables.UsageLocation}""
+Update-MgUser -UserId ""{sanitizedRaaaUPN}"" -UsageLocation ""{sanitizedUsageLocation}""
 
-$SkuId = ""{variables.SkuId}""
-Set-MgUserLicense -UserId ""{variables.RaaaUPN}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
+$SkuId = ""{sanitizedSkuId}""
+Set-MgUserLicense -UserId ""{sanitizedRaaaUPN}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
 
-Set-CsPhoneNumberAssignment -Identity ""{variables.RaaaUPN}"" -PhoneNumber ""{variables.RaaAnr}"" -PhoneNumberType ""{variables.PhoneNumberType}""
+Set-CsPhoneNumberAssignment -Identity ""{sanitizedRaaaUPN}"" -PhoneNumber ""{sanitizedPhoneNumber}"" -PhoneNumberType ""{sanitizedPhoneNumberType}""
 
 {defaultCallFlow}
 
@@ -401,15 +428,15 @@ $aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -Wee
 $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
 
 New-CsAutoAttendant `
--Name ""{variables.AaDisplayName}"" `
+-Name ""{sanitizedAaDisplayName}"" `
 -DefaultCallFlow $aadefaultCallFlow `
 -CallFlows @($aaafterHoursCallFlow) `
 -CallHandlingAssociations @($aaafterHoursCallHandlingAssociation) `
--LanguageId ""{variables.LanguageId}"" `
--TimeZoneId ""{variables.TimeZoneId}""
+-LanguageId ""{sanitizedLanguageId}"" `
+-TimeZoneId ""{sanitizedTimeZoneId}""
 
-$aaapplicationInstanceId = (Get-CsOnlineUser ""{variables.RaaaUPN}"").Identity
-$aaautoAttendantId = (Get-CsAutoAttendant -NameFilter ""{variables.AaDisplayName}"").Identity
+$aaapplicationInstanceId = (Get-CsOnlineUser ""{sanitizedRaaaUPN}"").Identity
+$aaautoAttendantId = (Get-CsAutoAttendant -NameFilter ""{sanitizedAaDisplayName}"").Identity
 New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceId) -ConfigurationId $aaautoAttendantId -ConfigurationType AutoAttendant";
         }
 
@@ -417,35 +444,40 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceI
         {
             var sb = new System.Text.StringBuilder();
             var prefix = flowName.Replace(" ", "").ToLower();
-            
+            var sanitizedFlowName = _sanitizer.SanitizeString(flowName);
+
             // Greeting
             string greetingVar = "$null";
             if (greetingType == "AudioFile" && !string.IsNullOrWhiteSpace(audioFileId))
             {
-                sb.AppendLine($"${prefix}Greeting = New-CsAutoAttendantPrompt -AudioFilePrompt \"{audioFileId}\"");
+                var sanitizedAudioFileId = _sanitizer.SanitizeString(audioFileId);
+                sb.AppendLine($"${prefix}Greeting = New-CsAutoAttendantPrompt -AudioFilePrompt \"{sanitizedAudioFileId}\"");
                 greetingVar = $"@(${prefix}Greeting)";
             }
             else if (greetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(ttsPrompt))
             {
-                sb.AppendLine($"${prefix}Greeting = New-CsAutoAttendantPrompt -TextToSpeechPrompt \"{ttsPrompt}\"");
+                var sanitizedTtsPrompt = _sanitizer.SanitizeString(ttsPrompt);
+                sb.AppendLine($"${prefix}Greeting = New-CsAutoAttendantPrompt -TextToSpeechPrompt \"{sanitizedTtsPrompt}\"");
                 greetingVar = $"@(${prefix}Greeting)";
             }
             // If None, greetingVar remains $null (or empty array for cmdlet)
-            
+
             // Action
             sb.AppendLine($"${prefix}MenuOption = $null");
             if (action == "TransferToTarget" && !string.IsNullOrWhiteSpace(actionTarget))
             {
+                var sanitizedActionTarget = _sanitizer.SanitizeString(actionTarget);
                 // Check if target is a resource account to get Identity
-                sb.AppendLine($"$targetUser = Get-CsOnlineUser \"{actionTarget}\" -ErrorAction SilentlyContinue");
-                sb.AppendLine($"if ($targetUser) {{ $targetId = $targetUser.Identity }} else {{ $targetId = \"{actionTarget}\" }}"); // Fallback if not found or is object ID
+                sb.AppendLine($"$targetUser = Get-CsOnlineUser \"{sanitizedActionTarget}\" -ErrorAction SilentlyContinue");
+                sb.AppendLine($"if ($targetUser) {{ $targetId = $targetUser.Identity }} else {{ $targetId = \"{sanitizedActionTarget}\" }}"); // Fallback if not found or is object ID
                 sb.AppendLine($"${prefix}CallTarget = New-CsAutoAttendantCallableEntity -Identity $targetId -Type ApplicationEndpoint");
                 sb.AppendLine($"${prefix}MenuOption = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -CallTarget ${prefix}CallTarget -DtmfResponse Automatic");
             }
             else if (action == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(actionTarget))
             {
-                 // Shared Voicemail (M365 Group)
-                sb.AppendLine($"${prefix}CallTarget = New-CsAutoAttendantCallableEntity -Identity \"{actionTarget}\" -Type SharedVoicemail");
+                var sanitizedActionTarget = _sanitizer.SanitizeString(actionTarget);
+                // Shared Voicemail (M365 Group)
+                sb.AppendLine($"${prefix}CallTarget = New-CsAutoAttendantCallableEntity -Identity \"{sanitizedActionTarget}\" -Type SharedVoicemail");
                 sb.AppendLine($"${prefix}MenuOption = New-CsAutoAttendantMenuOption -Action TransferCallToTarget -CallTarget ${prefix}CallTarget -DtmfResponse Automatic");
             }
             else
@@ -454,15 +486,15 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceI
                 sb.AppendLine($"${prefix}MenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic");
             }
 
-            sb.AppendLine($"${prefix}Menu = New-CsAutoAttendantMenu -Name \"{flowName} menu\" -MenuOptions @(${prefix}MenuOption)");
-            
+            sb.AppendLine($"${prefix}Menu = New-CsAutoAttendantMenu -Name \"{sanitizedFlowName} menu\" -MenuOptions @(${prefix}MenuOption)");
+
             if (greetingVar != "$null")
             {
-                sb.AppendLine($"$aa{prefix}CallFlow = New-CsAutoAttendantCallFlow -Name \"{flowName} call flow\" -Greetings {greetingVar} -Menu ${prefix}Menu");
+                sb.AppendLine($"$aa{prefix}CallFlow = New-CsAutoAttendantCallFlow -Name \"{sanitizedFlowName} call flow\" -Greetings {greetingVar} -Menu ${prefix}Menu");
             }
             else
             {
-                 sb.AppendLine($"$aa{prefix}CallFlow = New-CsAutoAttendantCallFlow -Name \"{flowName} call flow\" -Menu ${prefix}Menu");
+                sb.AppendLine($"$aa{prefix}CallFlow = New-CsAutoAttendantCallFlow -Name \"{sanitizedFlowName} call flow\" -Menu ${prefix}Menu");
             }
 
             return sb.ToString();
@@ -470,26 +502,30 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceI
 
         public string GetCreateHolidayCommand(string holidayName, DateTime holidayDate)
         {
+            var sanitizedHolidayName = _sanitizer.SanitizeString(holidayName);
+
             // Format date explicitly to ensure slashes are used instead of dots
             var formattedDate = holidayDate.ToString("d/M/yyyy H:mm", System.Globalization.CultureInfo.InvariantCulture);
             var formattedDateShort = holidayDate.ToString("d/M/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-            
+
             return $@"
 try {{
     $HolidayDateRange = New-CsOnlineDateTimeRange -Start ""{formattedDate}""
-    New-CsOnlineSchedule -Name ""{holidayName}"" -FixedSchedule -DateTimeRanges @($HolidayDateRange)
-    Write-Host ""SUCCESS: Holiday {holidayName} created successfully for {formattedDateShort}""
+    New-CsOnlineSchedule -Name ""{sanitizedHolidayName}"" -FixedSchedule -DateTimeRanges @($HolidayDateRange)
+    Write-Host ""SUCCESS: Holiday {sanitizedHolidayName} created successfully for {formattedDateShort}""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to create holiday {holidayName}: $_""
+    Write-Host ""ERROR: Failed to create holiday {sanitizedHolidayName}: $_""
 }}";
         }
 
         public string GetCreateHolidaySeriesCommand(string holidayName, List<DateTime> holidayDates)
         {
+            var sanitizedHolidayName = _sanitizer.SanitizeString(holidayName);
+
             var formattedDateTimes = new List<string>();
             var formattedDates = new List<string>();
-            
+
             foreach (var date in holidayDates)
             {
                 var formattedDateTime = date.ToString("d/M/yyyy H:mm", System.Globalization.CultureInfo.InvariantCulture);
@@ -498,21 +534,21 @@ catch {{
                 formattedDateTimes.Add($"'{formattedDateTime}'");
                 formattedDates.Add(formattedDateShort);
             }
-            
+
             var datesArray = string.Join(", ", formattedDateTimes);
             var datesList = string.Join(", ", formattedDates);
-            
+
             return $@"
 try {{
     $dates = @({datesArray})
     $HolidayDateRange = foreach ($d in $dates) {{
         New-CsOnlineDateTimeRange -Start $d
     }}
-    New-CsOnlineSchedule -Name ""{holidayName}"" -FixedSchedule -DateTimeRanges @($HolidayDateRange)
-    Write-Host ""SUCCESS: Holiday series {holidayName} created successfully for dates: {datesList}""
+    New-CsOnlineSchedule -Name ""{sanitizedHolidayName}"" -FixedSchedule -DateTimeRanges @($HolidayDateRange)
+    Write-Host ""SUCCESS: Holiday series {sanitizedHolidayName} created successfully for dates: {datesList}""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to create holiday series {holidayName}: $_""
+    Write-Host ""ERROR: Failed to create holiday series {sanitizedHolidayName}: $_""
 }}";
         }
 
@@ -536,32 +572,36 @@ catch {{
 
         public string GetAttachHolidayToAutoAttendantCommand(string holidayName, string aaDisplayName, string holidayGreetingPrompt)
         {
+            var sanitizedHolidayName = _sanitizer.SanitizeString(holidayName);
+            var sanitizedAaDisplayName = _sanitizer.SanitizeString(aaDisplayName);
+            var sanitizedGreetingPrompt = _sanitizer.SanitizeString(holidayGreetingPrompt);
+
             return $@"
 try {{
-    $HolidaySchedule = Get-CsOnlineSchedule | Where-Object {{$_.Name -eq ""{holidayName}""}}
+    $HolidaySchedule = Get-CsOnlineSchedule | Where-Object {{$_.Name -eq ""{sanitizedHolidayName}""}}
     if (-not $HolidaySchedule) {{
-        throw ""Holiday schedule '{holidayName}' not found. Please create the holiday first.""
+        throw ""Holiday schedule '{sanitizedHolidayName}' not found. Please create the holiday first.""
     }}
-    
+
     $HolidayScheduleName = $HolidaySchedule.Name
     $HolidayMenuOption = New-CsAutoAttendantMenuOption -Action DisconnectCall -DtmfResponse Automatic
     $HolidayMenu = New-CsAutoAttendantMenu -Name $HolidayScheduleName -MenuOptions @($HolidayMenuOption)
-    $HolidayGreetingPromptDE = New-CsAutoAttendantPrompt -TextToSpeechPrompt ""{holidayGreetingPrompt}""
+    $HolidayGreetingPromptDE = New-CsAutoAttendantPrompt -TextToSpeechPrompt ""{sanitizedGreetingPrompt}""
     $HolidayCallFlow = New-CsAutoAttendantCallFlow -Name $HolidayScheduleName -Menu $HolidayMenu -Greetings @($HolidayGreetingPromptDE)
     $HolidayCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type Holiday -ScheduleId $HolidaySchedule.Id -CallFlowId $HolidayCallFlow.Id
-    
-    $HolidayAutoAttendant = Get-CsAutoAttendant -NameFilter ""{aaDisplayName}"" | Where-Object {{$_.Name -eq ""{aaDisplayName}""}} | Select-Object -First 1
+
+    $HolidayAutoAttendant = Get-CsAutoAttendant -NameFilter ""{sanitizedAaDisplayName}"" | Where-Object {{$_.Name -eq ""{sanitizedAaDisplayName}""}} | Select-Object -First 1
     if (-not $HolidayAutoAttendant) {{
-        throw ""Auto Attendant '{aaDisplayName}' not found. Please ensure it exists.""
+        throw ""Auto Attendant '{sanitizedAaDisplayName}' not found. Please ensure it exists.""
     }}
-    
+
     $HolidayAutoAttendant.CallFlows += @($HolidayCallFlow)
     $HolidayAutoAttendant.CallHandlingAssociations += @($HolidayCallHandlingAssociation)
     Set-CsAutoAttendant -Instance $HolidayAutoAttendant
-    Write-Host ""SUCCESS: Holiday {holidayName} attached to auto attendant {aaDisplayName} successfully""
+    Write-Host ""SUCCESS: Holiday {sanitizedHolidayName} attached to auto attendant {sanitizedAaDisplayName} successfully""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to attach holiday {holidayName} to auto attendant {aaDisplayName}: $_""
+    Write-Host ""ERROR: Failed to attach holiday {sanitizedHolidayName} to auto attendant {sanitizedAaDisplayName}: $_""
 }}";
         }
 

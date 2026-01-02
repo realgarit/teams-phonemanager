@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
+using teams_phonemanager.Services.Interfaces;
 using teams_phonemanager.Services;
 using teams_phonemanager.Models;
 using System;
@@ -83,7 +83,16 @@ namespace teams_phonemanager.ViewModels
             AutoAttendants.Where(FilterAutoAttendant)
         );
 
-        public AutoAttendantsViewModel()
+        public AutoAttendantsViewModel(
+            IPowerShellContextService powerShellContextService,
+            IPowerShellCommandService powerShellCommandService,
+            ILoggingService loggingService,
+            ISessionManager sessionManager,
+            INavigationService navigationService,
+            IErrorHandlingService errorHandlingService,
+            IValidationService validationService)
+            : base(powerShellContextService, powerShellCommandService, loggingService,
+                  sessionManager, navigationService, errorHandlingService, validationService)
         {
             _mainWindowViewModel = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
                 ? desktop.MainWindow?.DataContext as MainWindowViewModel
@@ -292,263 +301,269 @@ namespace teams_phonemanager.ViewModels
             ShowCreateCallHandlingAssociationDialog = false;
         }
 
-        [RelayCommand]
-        private async Task CreateCallTargetAsync()
-        {
-            var variables = _mainWindowViewModel?.Variables;
-            if (variables == null)
-            {
-                StatusMessage = "Error: Variables not found";
-                return;
-            }
+        // Unused wizard method - commented out during DI refactoring
+        //[RelayCommand]
+        //private async Task CreateCallTargetAsync()
+        //{
+        //    var variables = _mainWindowViewModel?.Variables;
+        //    if (variables == null)
+        //    {
+        //        StatusMessage = "Error: Variables not found";
+        //        return;
+        //    }
 
-            try
-            {
-                IsBusy = true;
-                ShowCreateCallTargetDialog = false;
+        //    try
+        //    {
+        //        IsBusy = true;
+        //        ShowCreateCallTargetDialog = false;
 
-                var command = _powerShellCommandService.GetCreateCallTargetCommand(variables.RacqUPN);
-                var result = await ExecutePowerShellCommandAsync(command, "CreateCallTarget");
-                
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
-                {
-                    StatusMessage = "Call target created successfully";
-                    _loggingService.Log("Call target created successfully", LogLevel.Info);
-                }
-                else
-                {
-                    StatusMessage = $"Error creating call target: {result}";
-                    _loggingService.Log($"Error creating call target: {result}", LogLevel.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error: {ex.Message}";
-                _loggingService.Log($"Exception in CreateCallTargetAsync: {ex}", LogLevel.Error);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+        //        var command = _powerShellCommandService.GetCreateCallTargetCommand(variables.RacqUPN);
+        //        var result = await ExecutePowerShellCommandAsync(command, "CreateCallTarget");
+        //
+        //        if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+        //        {
+        //            StatusMessage = "Call target created successfully";
+        //            _loggingService.Log("Call target created successfully", LogLevel.Info);
+        //        }
+        //        else
+        //        {
+        //            StatusMessage = $"Error creating call target: {result}";
+        //            _loggingService.Log($"Error creating call target: {result}", LogLevel.Error);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        StatusMessage = $"Error: {ex.Message}";
+        //        _loggingService.Log($"Exception in CreateCallTargetAsync: {ex}", LogLevel.Error);
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //    }
+        //}
 
-        [RelayCommand]
-        private async Task CreateDefaultCallFlowAsync()
-        {
-            var variables = _mainWindowViewModel?.Variables;
-            if (variables == null)
-            {
-                StatusMessage = "Error: Variables not found";
-                return;
-            }
+        // Unused wizard method - commented out during DI refactoring
+        //[RelayCommand]
+        //private async Task CreateDefaultCallFlowAsync()
+        //{
+        //    var variables = _mainWindowViewModel?.Variables;
+        //    if (variables == null)
+        //    {
+        //        StatusMessage = "Error: Variables not found";
+        //        return;
+        //    }
 
-            try
-            {
-                IsBusy = true;
-                ShowCreateDefaultCallFlowDialog = false;
+        //    try
+        //    {
+        //        IsBusy = true;
+        //        ShowCreateDefaultCallFlowDialog = false;
 
-                var command = _powerShellCommandService.GetCreateDefaultCallFlowCommand(variables);
-                var result = await ExecutePowerShellCommandAsync(command, "CreateDefaultCallFlow");
-                
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
-                {
-                    StatusMessage = "Default call flow created successfully";
-                    _loggingService.Log("Default call flow created successfully", LogLevel.Info);
-                }
-                else
-                {
-                    StatusMessage = $"Error creating default call flow: {result}";
-                    _loggingService.Log($"Error creating default call flow: {result}", LogLevel.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error: {ex.Message}";
-                _loggingService.Log($"Exception in CreateDefaultCallFlowAsync: {ex}", LogLevel.Error);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+        //        var command = _powerShellCommandService.GetCreateDefaultCallFlowCommand(variables);
+        //        var result = await ExecutePowerShellCommandAsync(command, "CreateDefaultCallFlow");
+        //
+        //        if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+        //        {
+        //            StatusMessage = "Default call flow created successfully";
+        //            _loggingService.Log("Default call flow created successfully", LogLevel.Info);
+        //        }
+        //        else
+        //        {
+        //            StatusMessage = $"Error creating default call flow: {result}";
+        //            _loggingService.Log($"Error creating default call flow: {result}", LogLevel.Error);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        StatusMessage = $"Error: {ex.Message}";
+        //        _loggingService.Log($"Exception in CreateDefaultCallFlowAsync: {ex}", LogLevel.Error);
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //    }
+        //}
 
-        [RelayCommand]
-        private async Task CreateAfterHoursCallFlowAsync()
-        {
-            var variables = _mainWindowViewModel?.Variables;
-            if (variables == null)
-            {
-                StatusMessage = "Error: Variables not found";
-                return;
-            }
+        // Unused wizard method - commented out during DI refactoring
+        //[RelayCommand]
+        //private async Task CreateAfterHoursCallFlowAsync()
+        //{
+        //    var variables = _mainWindowViewModel?.Variables;
+        //    if (variables == null)
+        //    {
+        //        StatusMessage = "Error: Variables not found";
+        //        return;
+        //    }
 
-            try
-            {
-                IsBusy = true;
-                ShowCreateAfterHoursCallFlowDialog = false;
+        //    try
+        //    {
+        //        IsBusy = true;
+        //        ShowCreateAfterHoursCallFlowDialog = false;
 
-                var command = _powerShellCommandService.GetCreateAfterHoursCallFlowCommand(variables);
-                var result = await ExecutePowerShellCommandAsync(command, "CreateAfterHoursCallFlow");
-                
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
-                {
-                    StatusMessage = "After hours call flow created successfully";
-                    _loggingService.Log("After hours call flow created successfully", LogLevel.Info);
-                }
-                else
-                {
-                    StatusMessage = $"Error creating after hours call flow: {result}";
-                    _loggingService.Log($"Error creating after hours call flow: {result}", LogLevel.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error: {ex.Message}";
-                _loggingService.Log($"Exception in CreateAfterHoursCallFlowAsync: {ex}", LogLevel.Error);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+        //        var command = _powerShellCommandService.GetCreateAfterHoursCallFlowCommand(variables);
+        //        var result = await ExecutePowerShellCommandAsync(command, "CreateAfterHoursCallFlow");
+        //
+        //        if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+        //        {
+        //            StatusMessage = "After hours call flow created successfully";
+        //            _loggingService.Log("After hours call flow created successfully", LogLevel.Info);
+        //        }
+        //        else
+        //        {
+        //            StatusMessage = $"Error creating after hours call flow: {result}";
+        //            _loggingService.Log($"Error creating after hours call flow: {result}", LogLevel.Error);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        StatusMessage = $"Error: {ex.Message}";
+        //        _loggingService.Log($"Exception in CreateAfterHoursCallFlowAsync: {ex}", LogLevel.Error);
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //    }
+        //}
 
-        [RelayCommand]
-        private async Task CreateAfterHoursScheduleAsync()
-        {
-            var variables = _mainWindowViewModel?.Variables;
-            if (variables == null)
-            {
-                StatusMessage = "Error: Variables not found";
-                return;
-            }
+        // Unused wizard method - commented out during DI refactoring
+        //[RelayCommand]
+        //private async Task CreateAfterHoursScheduleAsync()
+        //{
+        //    var variables = _mainWindowViewModel?.Variables;
+        //    if (variables == null)
+        //    {
+        //        StatusMessage = "Error: Variables not found";
+        //        return;
+        //    }
 
-            try
-            {
-                IsBusy = true;
-                ShowCreateAfterHoursScheduleDialog = false;
+        //    try
+        //    {
+        //        IsBusy = true;
+        //        ShowCreateAfterHoursScheduleDialog = false;
 
-                var command = _powerShellCommandService.GetCreateAfterHoursScheduleCommand(variables);
-                var result = await ExecutePowerShellCommandAsync(command, "CreateAfterHoursSchedule");
-                
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
-                {
-                    StatusMessage = "After hours schedule created successfully";
-                    _loggingService.Log("After hours schedule created successfully", LogLevel.Info);
-                }
-                else
-                {
-                    StatusMessage = $"Error creating after hours schedule: {result}";
-                    _loggingService.Log($"Error creating after hours schedule: {result}", LogLevel.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error: {ex.Message}";
-                _loggingService.Log($"Exception in CreateAfterHoursScheduleAsync: {ex}", LogLevel.Error);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+        //        var command = _powerShellCommandService.GetCreateAfterHoursScheduleCommand(variables);
+        //        var result = await ExecutePowerShellCommandAsync(command, "CreateAfterHoursSchedule");
+        //
+        //        if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+        //        {
+        //            StatusMessage = "After hours schedule created successfully";
+        //            _loggingService.Log("After hours schedule created successfully", LogLevel.Info);
+        //        }
+        //        else
+        //        {
+        //            StatusMessage = $"Error creating after hours schedule: {result}";
+        //            _loggingService.Log($"Error creating after hours schedule: {result}", LogLevel.Error);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        StatusMessage = $"Error: {ex.Message}";
+        //        _loggingService.Log($"Exception in CreateAfterHoursScheduleAsync: {ex}", LogLevel.Error);
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //    }
+        //}
 
-        [RelayCommand]
-        private async Task CreateCallHandlingAssociationAsync()
-        {
-            try
-            {
-                IsBusy = true;
-                ShowCreateCallHandlingAssociationDialog = false;
+        // Unused wizard method - commented out during DI refactoring
+        //[RelayCommand]
+        //private async Task CreateCallHandlingAssociationAsync()
+        //{
+        //    try
+        //    {
+        //        IsBusy = true;
+        //        ShowCreateCallHandlingAssociationDialog = false;
 
-                var command = _powerShellCommandService.GetCreateCallHandlingAssociationCommand();
-                var result = await ExecutePowerShellCommandAsync(command, "CreateCallHandlingAssociation");
-                
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
-                {
-                    StatusMessage = "Call handling association created successfully";
-                    _loggingService.Log("Call handling association created successfully", LogLevel.Info);
-                }
-                else
-                {
-                    StatusMessage = $"Error creating call handling association: {result}";
-                    _loggingService.Log($"Error creating call handling association: {result}", LogLevel.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error: {ex.Message}";
-                _loggingService.Log($"Exception in CreateCallHandlingAssociationAsync: {ex}", LogLevel.Error);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+        //        var command = _powerShellCommandService.GetCreateCallHandlingAssociationCommand();
+        //        var result = await ExecutePowerShellCommandAsync(command, "CreateCallHandlingAssociation");
+        //
+        //        if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+        //        {
+        //            StatusMessage = "Call handling association created successfully";
+        //            _loggingService.Log("Call handling association created successfully", LogLevel.Info);
+        //        }
+        //        else
+        //        {
+        //            StatusMessage = $"Error creating call handling association: {result}";
+        //            _loggingService.Log($"Error creating call handling association: {result}", LogLevel.Error);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        StatusMessage = $"Error: {ex.Message}";
+        //        _loggingService.Log($"Exception in CreateCallHandlingAssociationAsync: {ex}", LogLevel.Error);
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //    }
+        //}
 
-        [RelayCommand]
-        private async Task CreateResourceAccountAsync()
-        {
-            if (string.IsNullOrWhiteSpace(ResourceAccountUpn) || string.IsNullOrWhiteSpace(ResourceAccountDisplayName))
-            {
-                StatusMessage = "Error: Resource account UPN and display name cannot be empty";
-                return;
-            }
+        // Unused wizard method - commented out during DI refactoring
+        //[RelayCommand]
+        //private async Task CreateResourceAccountAsync()
+        //{
+        //    if (string.IsNullOrWhiteSpace(ResourceAccountUpn) || string.IsNullOrWhiteSpace(ResourceAccountDisplayName))
+        //    {
+        //        StatusMessage = "Error: Resource account UPN and display name cannot be empty";
+        //        return;
+        //    }
 
-            try
-            {
-                IsBusy = true;
-                ShowCreateResourceAccountDialog = false;
+        //    try
+        //    {
+        //        IsBusy = true;
+        //        ShowCreateResourceAccountDialog = false;
 
-                var variables = _mainWindowViewModel?.Variables;
-                if (variables == null)
-                {
-                    StatusMessage = "Error: Variables not found";
-                    return;
-                }
+        //        var variables = _mainWindowViewModel?.Variables;
+        //        if (variables == null)
+        //        {
+        //            StatusMessage = "Error: Variables not found";
+        //            return;
+        //        }
 
-                if (string.IsNullOrWhiteSpace(variables.CsAppAaId))
-                {
-                    StatusMessage = "Error: Auto Attendant Application ID not found in variables";
-                    return;
-                }
+        //        if (string.IsNullOrWhiteSpace(variables.CsAppAaId))
+        //        {
+        //            StatusMessage = "Error: Auto Attendant Application ID not found in variables";
+        //            return;
+        //        }
 
-                // Validate that the UPN includes a domain
-                if (string.IsNullOrWhiteSpace(variables.MsFallbackDomain) || !variables.MsFallbackDomain.StartsWith("@"))
-                {
-                    StatusMessage = "Error: MS Fallback Domain is not set or invalid. Please set a valid domain (e.g., @yourdomain.com) in Variables.";
-                    return;
-                }
+        //        // Validate that the UPN includes a domain
+        //        if (string.IsNullOrWhiteSpace(variables.MsFallbackDomain) || !variables.MsFallbackDomain.StartsWith("@"))
+        //        {
+        //            StatusMessage = "Error: MS Fallback Domain is not set or invalid. Please set a valid domain (e.g., @yourdomain.com) in Variables.";
+        //            return;
+        //        }
 
-                if (!variables.RaaaUPN.Contains("@"))
-                {
-                    StatusMessage = "Error: Resource Account UPN must include a domain name. Please check your MS Fallback Domain setting.";
-                    return;
-                }
+        //        if (!variables.RaaaUPN.Contains("@"))
+        //        {
+        //            StatusMessage = "Error: Resource Account UPN must include a domain name. Please check your MS Fallback Domain setting.";
+        //            return;
+        //        }
 
-                var command = _powerShellCommandService.GetCreateAutoAttendantResourceAccountCommand(variables);
-                var result = await ExecutePowerShellCommandAsync(command, "CreateAutoAttendantResourceAccount");
-                
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
-                {
-                    StatusMessage = $"Resource account '{ResourceAccountUpn}' created successfully";
-                    _loggingService.Log($"Resource account {ResourceAccountUpn} created successfully", LogLevel.Info);
-                }
-                else
-                {
-                    StatusMessage = $"Error creating resource account: {result}";
-                    _loggingService.Log($"Error creating resource account {ResourceAccountUpn}: {result}", LogLevel.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error: {ex.Message}";
-                _loggingService.Log($"Exception in CreateResourceAccountAsync: {ex}", LogLevel.Error);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+        //        var command = _powerShellCommandService.GetCreateAutoAttendantResourceAccountCommand(variables);
+        //        var result = await ExecutePowerShellCommandAsync(command, "CreateAutoAttendantResourceAccount");
+        //
+        //        if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+        //        {
+        //            StatusMessage = $"Resource account '{ResourceAccountUpn}' created successfully";
+        //            _loggingService.Log($"Resource account {ResourceAccountUpn} created successfully", LogLevel.Info);
+        //        }
+        //        else
+        //        {
+        //            StatusMessage = $"Error creating resource account: {result}";
+        //            _loggingService.Log($"Error creating resource account {ResourceAccountUpn}: {result}", LogLevel.Error);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        StatusMessage = $"Error: {ex.Message}";
+        //        _loggingService.Log($"Exception in CreateResourceAccountAsync: {ex}", LogLevel.Error);
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //    }
+        //}
 
         [RelayCommand]
         private void OpenUpdateUsageLocationDialog()
@@ -565,145 +580,148 @@ namespace teams_phonemanager.ViewModels
             ShowUpdateUsageLocationDialog = true;
         }
 
-        [RelayCommand]
-        private async Task UpdateUsageLocationAsync()
-        {
-            if (string.IsNullOrWhiteSpace(ResourceAccountUpn))
-            {
-                StatusMessage = "Error: Resource account UPN cannot be empty";
-                return;
-            }
+        // Unused wizard method - commented out during DI refactoring
+        //[RelayCommand]
+        //private async Task UpdateUsageLocationAsync()
+        //{
+        //    if (string.IsNullOrWhiteSpace(ResourceAccountUpn))
+        //    {
+        //        StatusMessage = "Error: Resource account UPN cannot be empty";
+        //        return;
+        //    }
 
-            try
-            {
-                IsBusy = true;
-                ShowUpdateUsageLocationDialog = false;
+        //    try
+        //    {
+        //        IsBusy = true;
+        //        ShowUpdateUsageLocationDialog = false;
 
-                var variables = _mainWindowViewModel?.Variables;
-                if (variables == null)
-                {
-                    StatusMessage = "Error: Variables not found";
-                    return;
-                }
+        //        var variables = _mainWindowViewModel?.Variables;
+        //        if (variables == null)
+        //        {
+        //            StatusMessage = "Error: Variables not found";
+        //            return;
+        //        }
 
-                _loggingService.Log($"Updating usage location for: {ResourceAccountUpn}", LogLevel.Info);
+        //        _loggingService.Log($"Updating usage location for: {ResourceAccountUpn}", LogLevel.Info);
 
-                var command = _powerShellCommandService.GetUpdateAutoAttendantResourceAccountUsageLocationCommand(ResourceAccountUpn, variables.UsageLocation);
-                var result = await ExecutePowerShellCommandAsync(command, "UpdateUsageLocation");
-                
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
-                {
-                    StatusMessage = $"Usage location updated for '{ResourceAccountUpn}' to '{variables.UsageLocation}'";
-                    _loggingService.Log($"Usage location updated for {ResourceAccountUpn}", LogLevel.Info);
-                }
-                else
-                {
-                    StatusMessage = $"Error updating usage location: {result}";
-                    _loggingService.Log($"Error updating usage location for {ResourceAccountUpn}: {result}", LogLevel.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error: {ex.Message}";
-                _loggingService.Log($"Exception in UpdateUsageLocationAsync: {ex}", LogLevel.Error);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+        //        var command = _powerShellCommandService.GetUpdateAutoAttendantResourceAccountUsageLocationCommand(ResourceAccountUpn, variables.UsageLocation);
+        //        var result = await ExecutePowerShellCommandAsync(command, "UpdateUsageLocation");
+        //
+        //        if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+        //        {
+        //            StatusMessage = $"Usage location updated for '{ResourceAccountUpn}' to '{variables.UsageLocation}'";
+        //            _loggingService.Log($"Usage location updated for {ResourceAccountUpn}", LogLevel.Info);
+        //        }
+        //        else
+        //        {
+        //            StatusMessage = $"Error updating usage location: {result}";
+        //            _loggingService.Log($"Error updating usage location for {ResourceAccountUpn}: {result}", LogLevel.Error);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        StatusMessage = $"Error: {ex.Message}";
+        //        _loggingService.Log($"Exception in UpdateUsageLocationAsync: {ex}", LogLevel.Error);
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //    }
+        //}
 
-        [RelayCommand]
-        private async Task AssignLicenseAsync()
-        {
-            var variables = _mainWindowViewModel?.Variables;
-            if (variables == null)
-            {
-                StatusMessage = "Error: Variables not found";
-                return;
-            }
+        // Unused wizard method - commented out during DI refactoring
+        //[RelayCommand]
+        //private async Task AssignLicenseAsync()
+        //{
+        //    var variables = _mainWindowViewModel?.Variables;
+        //    if (variables == null)
+        //    {
+        //        StatusMessage = "Error: Variables not found";
+        //        return;
+        //    }
 
-            if (string.IsNullOrWhiteSpace(variables.RaaaUPN))
-            {
-                StatusMessage = "Error: Resource Account UPN is not set. Please set variables first.";
-                return;
-            }
+        //    if (string.IsNullOrWhiteSpace(variables.RaaaUPN))
+        //    {
+        //        StatusMessage = "Error: Resource Account UPN is not set. Please set variables first.";
+        //        return;
+        //    }
 
-            if (string.IsNullOrWhiteSpace(variables.SkuId))
-            {
-                StatusMessage = "Error: SKU ID is not set. Please set the SKU ID variable first.";
-                return;
-            }
+        //    if (string.IsNullOrWhiteSpace(variables.SkuId))
+        //    {
+        //        StatusMessage = "Error: SKU ID is not set. Please set the SKU ID variable first.";
+        //        return;
+        //    }
 
-            try
-            {
-                IsBusy = true;
-                StatusMessage = "Assigning license to resource account...";
+        //    try
+        //    {
+        //        IsBusy = true;
+        //        StatusMessage = "Assigning license to resource account...";
 
-                var command = _powerShellCommandService.GetAssignAutoAttendantLicenseCommand(variables.RaaaUPN, variables.SkuId);
-                var result = await ExecutePowerShellCommandAsync(command, "AssignLicense");
-                
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
-                {
-                    StatusMessage = $"License assigned to resource account '{variables.RaaaUPN}' successfully";
-                    _loggingService.Log($"License assigned to resource account {variables.RaaaUPN}", LogLevel.Info);
-                }
-                else
-                {
-                    StatusMessage = $"Error assigning license: {result}";
-                    _loggingService.Log($"Error assigning license to {variables.RaaaUPN}: {result}", LogLevel.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error: {ex.Message}";
-                _loggingService.Log($"Exception in AssignLicenseAsync: {ex}", LogLevel.Error);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+        //        var command = _powerShellCommandService.GetAssignAutoAttendantLicenseCommand(variables.RaaaUPN, variables.SkuId);
+        //        var result = await ExecutePowerShellCommandAsync(command, "AssignLicense");
+        //
+        //        if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+        //        {
+        //            StatusMessage = $"License assigned to resource account '{variables.RaaaUPN}' successfully";
+        //            _loggingService.Log($"License assigned to resource account {variables.RaaaUPN}", LogLevel.Info);
+        //        }
+        //        else
+        //        {
+        //            StatusMessage = $"Error assigning license: {result}";
+        //            _loggingService.Log($"Error assigning license to {variables.RaaaUPN}: {result}", LogLevel.Error);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        StatusMessage = $"Error: {ex.Message}";
+        //        _loggingService.Log($"Exception in AssignLicenseAsync: {ex}", LogLevel.Error);
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //    }
+        //}
 
-        [RelayCommand]
-        private async Task ValidateCallQueueResourceAccountAsync()
-        {
-            if (string.IsNullOrWhiteSpace(CallQueueUpn))
-            {
-                StatusMessage = "Error: Call Queue resource account UPN cannot be empty";
-                return;
-            }
+        // Unused wizard method - commented out during DI refactoring
+        //[RelayCommand]
+        //private async Task ValidateCallQueueResourceAccountAsync()
+        //{
+        //    if (string.IsNullOrWhiteSpace(CallQueueUpn))
+        //    {
+        //        StatusMessage = "Error: Call Queue resource account UPN cannot be empty";
+        //        return;
+        //    }
 
-            try
-            {
-                IsBusy = true;
-                ShowValidateCallQueueDialog = false;
-                StatusMessage = "Validating Call Queue resource account...";
+        //    try
+        //    {
+        //        IsBusy = true;
+        //        ShowValidateCallQueueDialog = false;
+        //        StatusMessage = "Validating Call Queue resource account...";
 
-                var command = _powerShellCommandService.GetValidateCallQueueResourceAccountCommand(CallQueueUpn);
-                var result = await ExecutePowerShellCommandAsync(command, "ValidateCallQueueResourceAccount");
-                
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
-                {
-                    StatusMessage = $"Call Queue resource account '{CallQueueUpn}' validated successfully and ready to be used as call target";
-                    _loggingService.Log($"Call Queue resource account {CallQueueUpn} validated successfully", LogLevel.Info);
-                }
-                else
-                {
-                    StatusMessage = $"Error validating Call Queue resource account: {result}";
-                    _loggingService.Log($"Error validating Call Queue resource account {CallQueueUpn}: {result}", LogLevel.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error: {ex.Message}";
-                _loggingService.Log($"Exception in ValidateCallQueueResourceAccountAsync: {ex}", LogLevel.Error);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+        //        var command = _powerShellCommandService.GetValidateCallQueueResourceAccountCommand(CallQueueUpn);
+        //        var result = await ExecutePowerShellCommandAsync(command, "ValidateCallQueueResourceAccount");
+        //
+        //        if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+        //        {
+        //            StatusMessage = $"Call Queue resource account '{CallQueueUpn}' validated successfully and ready to be used as call target";
+        //            _loggingService.Log($"Call Queue resource account {CallQueueUpn} validated successfully", LogLevel.Info);
+        //        }
+        //        else
+        //        {
+        //            StatusMessage = $"Error validating Call Queue resource account: {result}";
+        //            _loggingService.Log($"Error validating Call Queue resource account {CallQueueUpn}: {result}", LogLevel.Error);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        StatusMessage = $"Error: {ex.Message}";
+        //        _loggingService.Log($"Exception in ValidateCallQueueResourceAccountAsync: {ex}", LogLevel.Error);
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //    }
+        //}
 
         [RelayCommand]
         private void OpenCreateAutoAttendantDialog()
@@ -720,53 +738,54 @@ namespace teams_phonemanager.ViewModels
             ShowCreateAutoAttendantDialog = true;
         }
 
-        [RelayCommand]
-        private async Task CreateAutoAttendantAsync()
-        {
-            if (string.IsNullOrWhiteSpace(AutoAttendantName))
-            {
-                StatusMessage = "Error: Auto attendant name cannot be empty";
-                return;
-            }
+        // Unused wizard method - commented out during DI refactoring
+        //[RelayCommand]
+        //private async Task CreateAutoAttendantAsync()
+        //{
+        //    if (string.IsNullOrWhiteSpace(AutoAttendantName))
+        //    {
+        //        StatusMessage = "Error: Auto attendant name cannot be empty";
+        //        return;
+        //    }
 
-            try
-            {
-                IsBusy = true;
-                ShowCreateAutoAttendantDialog = false;
+        //    try
+        //    {
+        //        IsBusy = true;
+        //        ShowCreateAutoAttendantDialog = false;
 
-                var variables = _mainWindowViewModel?.Variables;
-                if (variables == null)
-                {
-                    StatusMessage = "Error: Variables not found";
-                    return;
-                }
+        //        var variables = _mainWindowViewModel?.Variables;
+        //        if (variables == null)
+        //        {
+        //            StatusMessage = "Error: Variables not found";
+        //            return;
+        //        }
 
-                _loggingService.Log($"Creating auto attendant: {AutoAttendantName}", LogLevel.Info);
+        //        _loggingService.Log($"Creating auto attendant: {AutoAttendantName}", LogLevel.Info);
 
-                var command = _powerShellCommandService.GetCreateSimpleAutoAttendantCommand(variables);
-                var result = await ExecutePowerShellCommandAsync(command, "CreateAutoAttendant");
-                
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
-                {
-                    StatusMessage = $"Auto attendant '{AutoAttendantName}' created successfully";
-                    _loggingService.Log($"Auto attendant {AutoAttendantName} created successfully", LogLevel.Info);
-                }
-                else
-                {
-                    StatusMessage = $"Error creating auto attendant: {result}";
-                    _loggingService.Log($"Error creating auto attendant {AutoAttendantName}: {result}", LogLevel.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error: {ex.Message}";
-                _loggingService.Log($"Exception in CreateAutoAttendantAsync: {ex}", LogLevel.Error);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+        //        var command = _powerShellCommandService.GetCreateSimpleAutoAttendantCommand(variables);
+        //        var result = await ExecutePowerShellCommandAsync(command, "CreateAutoAttendant");
+        //
+        //        if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+        //        {
+        //            StatusMessage = $"Auto attendant '{AutoAttendantName}' created successfully";
+        //            _loggingService.Log($"Auto attendant {AutoAttendantName} created successfully", LogLevel.Info);
+        //        }
+        //        else
+        //        {
+        //            StatusMessage = $"Error creating auto attendant: {result}";
+        //            _loggingService.Log($"Error creating auto attendant {AutoAttendantName}: {result}", LogLevel.Error);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        StatusMessage = $"Error: {ex.Message}";
+        //        _loggingService.Log($"Exception in CreateAutoAttendantAsync: {ex}", LogLevel.Error);
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //    }
+        //}
 
         [RelayCommand]
         private void OpenAssociateDialog()
@@ -785,46 +804,47 @@ namespace teams_phonemanager.ViewModels
             ShowAssociateDialog = true;
         }
 
-        [RelayCommand]
-        private async Task AssociateResourceAccountWithAutoAttendantAsync()
-        {
-            if (string.IsNullOrWhiteSpace(ResourceAccountUpn) || string.IsNullOrWhiteSpace(AutoAttendantName))
-            {
-                StatusMessage = "Error: Resource account UPN and auto attendant name cannot be empty";
-                return;
-            }
+        // Unused wizard method - commented out during DI refactoring
+        //[RelayCommand]
+        //private async Task AssociateResourceAccountWithAutoAttendantAsync()
+        //{
+        //    if (string.IsNullOrWhiteSpace(ResourceAccountUpn) || string.IsNullOrWhiteSpace(AutoAttendantName))
+        //    {
+        //        StatusMessage = "Error: Resource account UPN and auto attendant name cannot be empty";
+        //        return;
+        //    }
 
-            try
-            {
-                IsBusy = true;
-                ShowAssociateDialog = false;
+        //    try
+        //    {
+        //        IsBusy = true;
+        //        ShowAssociateDialog = false;
 
-                _loggingService.Log($"Associating resource account {ResourceAccountUpn} with auto attendant {AutoAttendantName}", LogLevel.Info);
+        //        _loggingService.Log($"Associating resource account {ResourceAccountUpn} with auto attendant {AutoAttendantName}", LogLevel.Info);
 
-                var command = _powerShellCommandService.GetAssociateResourceAccountWithAutoAttendantCommand(ResourceAccountUpn, AutoAttendantName);
-                var result = await ExecutePowerShellCommandAsync(command, "AssociateResourceAccountWithAutoAttendant");
-                
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
-                {
-                    StatusMessage = $"Successfully associated resource account '{ResourceAccountUpn}' with auto attendant '{AutoAttendantName}'";
-                    _loggingService.Log($"Successfully associated resource account {ResourceAccountUpn} with auto attendant {AutoAttendantName}", LogLevel.Info);
-                }
-                else
-                {
-                    StatusMessage = $"Error associating resource account with auto attendant: {result}";
-                    _loggingService.Log($"Error associating resource account {ResourceAccountUpn} with auto attendant {AutoAttendantName}: {result}", LogLevel.Error);
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusMessage = $"Error: {ex.Message}";
-                _loggingService.Log($"Exception in AssociateResourceAccountWithAutoAttendantAsync: {ex}", LogLevel.Error);
-            }
-            finally
-            {
-                IsBusy = false;
-            }
-        }
+        //        var command = _powerShellCommandService.GetAssociateResourceAccountWithAutoAttendantCommand(ResourceAccountUpn, AutoAttendantName);
+        //        var result = await ExecutePowerShellCommandAsync(command, "AssociateResourceAccountWithAutoAttendant");
+        //
+        //        if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+        //        {
+        //            StatusMessage = $"Successfully associated resource account '{ResourceAccountUpn}' with auto attendant '{AutoAttendantName}'";
+        //            _loggingService.Log($"Successfully associated resource account {ResourceAccountUpn} with auto attendant {AutoAttendantName}", LogLevel.Info);
+        //        }
+        //        else
+        //        {
+        //            StatusMessage = $"Error associating resource account with auto attendant: {result}";
+        //            _loggingService.Log($"Error associating resource account {ResourceAccountUpn} with auto attendant {AutoAttendantName}: {result}", LogLevel.Error);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        StatusMessage = $"Error: {ex.Message}";
+        //        _loggingService.Log($"Exception in AssociateResourceAccountWithAutoAttendantAsync: {ex}", LogLevel.Error);
+        //    }
+        //    finally
+        //    {
+        //        IsBusy = false;
+        //    }
+        //}
 
         private void ParseResourceAccountsFromResult(string result)
         {

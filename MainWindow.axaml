@@ -15,9 +15,7 @@
         Height="720" 
         Width="1280">
 
-    <Window.DataContext>
-        <viewmodels:MainWindowViewModel/>
-    </Window.DataContext>
+    <!-- DataContext is set via DI in App.xaml.cs -->
 
     <Window.Styles>
         <Style Selector="Border.header">

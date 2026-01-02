@@ -1,21 +1,16 @@
 using Avalonia.Controls;
 using FluentAvalonia.UI.Controls;
+using teams_phonemanager.Services.Interfaces;
 
 namespace teams_phonemanager.Services
 {
-    public class ErrorHandlingService
+    public class ErrorHandlingService : IErrorHandlingService
     {
-        private static ErrorHandlingService? _instance;
+        private readonly ILoggingService _loggingService;
 
-        private ErrorHandlingService() { }
-
-        public static ErrorHandlingService Instance
+        public ErrorHandlingService(ILoggingService loggingService)
         {
-            get
-            {
-                _instance ??= new ErrorHandlingService();
-                return _instance;
-            }
+            _loggingService = loggingService;
         }
 
         private Window? GetMainWindow()
@@ -25,7 +20,7 @@ namespace teams_phonemanager.Services
                 : null;
         }
 
-        private async Task ShowContentDialogAsync(string title, string message, ContentDialogButton defaultButton = ContentDialogButton.Primary)
+        public async Task ShowContentDialogAsync(string title, string message, ContentDialogButton defaultButton = ContentDialogButton.Primary)
         {
             var window = GetMainWindow();
             if (window != null)
@@ -64,7 +59,7 @@ namespace teams_phonemanager.Services
         {
             var cleanCommand = command?.Replace("\r", "").Replace("\n", " ") ?? "";
             var message = $"PowerShell Error in {context}:\nCommand: {cleanCommand}\nError: {error}";
-            LoggingService.Instance.Log(message, LogLevel.Error);
+            _loggingService.Log(message, LogLevel.Error);
             
             await ShowContentDialogAsync(
                 ConstantsService.ErrorDialogTitles.PowerShellError,
@@ -75,7 +70,7 @@ namespace teams_phonemanager.Services
         public async Task HandleValidationError(string message, string context = "")
         {
             var fullMessage = $"Validation Error in {context}: {message}";
-            LoggingService.Instance.Log(fullMessage, LogLevel.Warning);
+            _loggingService.Log(fullMessage, LogLevel.Warning);
             
             await ShowContentDialogAsync(
                 ConstantsService.ErrorDialogTitles.ValidationError,
@@ -86,7 +81,7 @@ namespace teams_phonemanager.Services
         public async Task HandleConnectionError(string service, string error)
         {
             var message = $"Failed to connect to {service}: {error}";
-            LoggingService.Instance.Log(message, LogLevel.Error);
+            _loggingService.Log(message, LogLevel.Error);
             
             await ShowContentDialogAsync(
                 ConstantsService.ErrorDialogTitles.ConnectionError,
@@ -97,7 +92,7 @@ namespace teams_phonemanager.Services
         public async Task HandleGenericError(string message, string context = "")
         {
             var fullMessage = $"Error in {context}: {message}";
-            LoggingService.Instance.Log(fullMessage, LogLevel.Error);
+            _loggingService.Log(fullMessage, LogLevel.Error);
             
             await ShowContentDialogAsync(
                 ConstantsService.ErrorDialogTitles.Error,
@@ -107,19 +102,19 @@ namespace teams_phonemanager.Services
 
         public async Task<bool> HandleConfirmation(string message, string title = ConstantsService.ErrorDialogTitles.Confirmation)
         {
-            LoggingService.Instance.Log($"User confirmation requested: {title} - {message}", LogLevel.Info);
+            _loggingService.Log($"User confirmation requested: {title} - {message}", LogLevel.Info);
             return await ShowConfirmationDialogAsync(title, message);
         }
 
         public async Task ShowSuccess(string message, string title = ConstantsService.ErrorDialogTitles.Success)
         {
-            LoggingService.Instance.Log($"Success: {title} - {message}", LogLevel.Success);
+            _loggingService.Log($"Success: {title} - {message}", LogLevel.Success);
             await ShowContentDialogAsync(title, message);
         }
 
         public async Task ShowInfo(string message, string title = ConstantsService.ErrorDialogTitles.Information)
         {
-            LoggingService.Instance.Log($"Info: {title} - {message}", LogLevel.Info);
+            _loggingService.Log($"Info: {title} - {message}", LogLevel.Info);
             await ShowContentDialogAsync(title, message);
         }
     }

@@ -10,9 +10,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="1000">
     
-    <UserControl.DataContext>
-        <viewmodels:GetStartedViewModel/>
-    </UserControl.DataContext>
+    <!-- DataContext is set via data binding from MainWindow -->
 
     <UserControl.Resources>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>

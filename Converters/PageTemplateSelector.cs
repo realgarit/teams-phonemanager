@@ -6,11 +6,9 @@ namespace teams_phonemanager.Converters
 {
     public class PageTemplateSelector : IDataTemplate
     {
-        private readonly LoggingService _loggingService;
-
         public PageTemplateSelector()
         {
-            _loggingService = LoggingService.Instance;
+            // PageTemplateSelector is created by XAML, so we cannot use constructor injection here
         }
 
         public required IDataTemplate WelcomeTemplate { get; set; }
@@ -46,11 +44,9 @@ namespace teams_phonemanager.Converters
                     _ => WelcomeTemplate
                 };
 
-                _loggingService.Log($"Selected template for page '{pageName}' (normalized: '{normalizedPageName}')", LogLevel.Info);
                 return template;
             }
 
-            _loggingService.Log("Item was not a string, defaulting to WelcomeTemplate", LogLevel.Warning);
             return WelcomeTemplate;
         }
 

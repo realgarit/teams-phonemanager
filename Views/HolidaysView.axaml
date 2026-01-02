@@ -11,9 +11,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     
-    <UserControl.DataContext>
-        <viewmodels:HolidaysViewModel/>
-    </UserControl.DataContext>
+    <!-- DataContext is set via data binding from MainWindow -->
 
     <UserControl.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>

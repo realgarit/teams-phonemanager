@@ -1,18 +1,18 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel;
-using teams_phonemanager.Services;
+using teams_phonemanager.Services.Interfaces;
 
 namespace teams_phonemanager.ViewModels
 {
     public partial class ViewModelBase : ObservableObject
     {
-        protected readonly PowerShellContextService _powerShellContextService;
-        protected readonly PowerShellCommandService _powerShellCommandService;
-        protected readonly LoggingService _loggingService;
-        protected readonly SessionManager _sessionManager;
-        protected readonly NavigationService _navigationService;
-        protected readonly ErrorHandlingService _errorHandlingService;
-        protected readonly ValidationService _validationService;
+        protected readonly IPowerShellContextService _powerShellContextService;
+        protected readonly IPowerShellCommandService _powerShellCommandService;
+        protected readonly ILoggingService _loggingService;
+        protected readonly ISessionManager _sessionManager;
+        protected readonly INavigationService _navigationService;
+        protected readonly IErrorHandlingService _errorHandlingService;
+        protected readonly IValidationService _validationService;
 
         [ObservableProperty]
         private bool _isBusy;
@@ -23,15 +23,22 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private string _logMessage = string.Empty;
 
-        protected ViewModelBase()
+        protected ViewModelBase(
+            IPowerShellContextService powerShellContextService,
+            IPowerShellCommandService powerShellCommandService,
+            ILoggingService loggingService,
+            ISessionManager sessionManager,
+            INavigationService navigationService,
+            IErrorHandlingService errorHandlingService,
+            IValidationService validationService)
         {
-            _powerShellContextService = PowerShellContextService.Instance;
-            _powerShellCommandService = PowerShellCommandService.Instance;
-            _loggingService = LoggingService.Instance;
-            _sessionManager = SessionManager.Instance;
-            _navigationService = NavigationService.Instance;
-            _errorHandlingService = ErrorHandlingService.Instance;
-            _validationService = ValidationService.Instance;
+            _powerShellContextService = powerShellContextService;
+            _powerShellCommandService = powerShellCommandService;
+            _loggingService = loggingService;
+            _sessionManager = sessionManager;
+            _navigationService = navigationService;
+            _errorHandlingService = errorHandlingService;
+            _validationService = validationService;
         }
 
         protected void UpdateStatus(string message)
@@ -90,37 +97,37 @@ namespace teams_phonemanager.ViewModels
 
         protected void NavigateToVariables()
         {
-            NavigateTo(ConstantsService.Pages.Variables);
+            NavigateTo(Services.ConstantsService.Pages.Variables);
         }
 
         protected void NavigateToM365Groups()
         {
-            NavigateTo(ConstantsService.Pages.M365Groups);
+            NavigateTo(Services.ConstantsService.Pages.M365Groups);
         }
 
         protected void NavigateToCallQueues()
         {
-            NavigateTo(ConstantsService.Pages.CallQueues);
+            NavigateTo(Services.ConstantsService.Pages.CallQueues);
         }
 
         protected void NavigateToAutoAttendants()
         {
-            NavigateTo(ConstantsService.Pages.AutoAttendants);
+            NavigateTo(Services.ConstantsService.Pages.AutoAttendants);
         }
 
         protected void NavigateToHolidays()
         {
-            NavigateTo(ConstantsService.Pages.Holidays);
+            NavigateTo(Services.ConstantsService.Pages.Holidays);
         }
 
         protected void NavigateToGetStarted()
         {
-            NavigateTo(ConstantsService.Pages.GetStarted);
+            NavigateTo(Services.ConstantsService.Pages.GetStarted);
         }
 
         protected void NavigateToWelcome()
         {
-            NavigateTo(ConstantsService.Pages.Welcome);
+            NavigateTo(Services.ConstantsService.Pages.Welcome);
         }
     }
 }

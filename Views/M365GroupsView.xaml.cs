@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Microsoft.Extensions.DependencyInjection;
+using teams_phonemanager.ViewModels;
 
 namespace teams_phonemanager.Views
 {
@@ -8,6 +10,7 @@ namespace teams_phonemanager.Views
         public M365GroupsView()
         {
             InitializeComponent();
+            DataContext = Program.Services?.GetService<M365GroupsViewModel>();
         }
 
         private void ConfirmVariablesBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)

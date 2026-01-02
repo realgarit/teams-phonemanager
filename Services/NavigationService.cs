@@ -1,25 +1,17 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using teams_phonemanager.ViewModels;
+using teams_phonemanager.Services.Interfaces;
 
 namespace teams_phonemanager.Services
 {
-    public class NavigationService : ObservableObject
+    public class NavigationService : ObservableObject, INavigationService
     {
-        private static NavigationService? _instance;
+        private readonly ILoggingService _loggingService;
         private string _currentPage = ConstantsService.Pages.Welcome;
 
-        private NavigationService()
+        public NavigationService(ILoggingService loggingService)
         {
-            LoggingService.Instance.Log("Navigation service initialized", LogLevel.Info);
-        }
-
-        public static NavigationService Instance
-        {
-            get
-            {
-                _instance ??= new NavigationService();
-                return _instance;
-            }
+            _loggingService = loggingService;
+            _loggingService.Log("Navigation service initialized", LogLevel.Info);
         }
 
         public string CurrentPage
@@ -31,7 +23,7 @@ namespace teams_phonemanager.Services
                 {
                     _currentPage = value;
                     OnPropertyChanged();
-                    LoggingService.Instance.Log($"Navigated to {value} page", LogLevel.Info);
+                    _loggingService.Log($"Navigated to {value} page", LogLevel.Info);
                 }
             }
         }

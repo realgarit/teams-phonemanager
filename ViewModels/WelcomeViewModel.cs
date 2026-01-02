@@ -2,12 +2,22 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Diagnostics;
 using teams_phonemanager.Services;
+using teams_phonemanager.Services.Interfaces;
 
 namespace teams_phonemanager.ViewModels
 {
     public partial class WelcomeViewModel : ViewModelBase
     {
-        public WelcomeViewModel()
+        public WelcomeViewModel(
+            IPowerShellContextService powerShellContextService,
+            IPowerShellCommandService powerShellCommandService,
+            ILoggingService loggingService,
+            ISessionManager sessionManager,
+            INavigationService navigationService,
+            IErrorHandlingService errorHandlingService,
+            IValidationService validationService)
+            : base(powerShellContextService, powerShellCommandService, loggingService,
+                  sessionManager, navigationService, errorHandlingService, validationService)
         {
             _loggingService.Log("Welcome page loaded", LogLevel.Info);
         }

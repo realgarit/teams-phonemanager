@@ -116,6 +116,8 @@ public partial class MainWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
-        PowerShellContextService.Instance.Dispose();
+        // PowerShell context is now managed by DI container and will be disposed automatically
+        var psContext = Program.Services?.GetService(typeof(Services.Interfaces.IPowerShellContextService)) as IDisposable;
+        psContext?.Dispose();
     }
 }

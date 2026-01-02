@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Microsoft.Extensions.DependencyInjection;
+using teams_phonemanager.ViewModels;
 
 namespace teams_phonemanager.Views
 {
@@ -8,6 +10,7 @@ namespace teams_phonemanager.Views
         public HolidaysView()
         {
             InitializeComponent();
+            DataContext = Program.Services?.GetService<HolidaysViewModel>();
         }
 
         private void CreateHolidayBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)

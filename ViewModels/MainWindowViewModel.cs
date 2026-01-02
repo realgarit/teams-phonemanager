@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using teams_phonemanager.Services;
+using teams_phonemanager.Services.Interfaces;
 using System.Collections.ObjectModel;
 using System.Collections;
 using System.Text;
@@ -8,11 +9,22 @@ using System.Linq;
 using System;
 using teams_phonemanager.Models;
 using FluentAvalonia.Styling;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace teams_phonemanager.ViewModels
 {
-    public partial class MainWindowViewModel : ViewModelBase
+    public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
+        private const int MaxLogEntries = 1000;
+        private bool _disposed = false;
+        private string? _allLogEntriesTextCache;
+        private bool _logCacheDirty = true;
+
+        private PropertyChangedEventHandler? _loggingPropertyHandler;
+        private NotifyCollectionChangedEventHandler? _logEntriesHandler;
+        private PropertyChangedEventHandler? _navigationPropertyHandler;
+
         public ObservableCollection<string> LogEntries => _loggingService.LogEntries;
         public string LatestLogEntry => _loggingService.LatestLogEntry;
 
@@ -20,7 +32,17 @@ namespace teams_phonemanager.ViewModels
         {
             get
             {
-                return string.Join(Environment.NewLine, LogEntries);
+                if (_logCacheDirty || _allLogEntriesTextCache == null)
+                {
+                    var sb = new StringBuilder();
+                    foreach (var entry in LogEntries)
+                    {
+                        sb.AppendLine(entry);
+                    }
+                    _allLogEntriesTextCache = sb.ToString();
+                    _logCacheDirty = false;
+                }
+                return _allLogEntriesTextCache;
             }
         }
 
@@ -28,7 +50,7 @@ namespace teams_phonemanager.ViewModels
         private bool _isDarkTheme = true;
 
         [ObservableProperty]
-        private string _currentPage = ConstantsService.Pages.Welcome;
+        private string _currentPage = Services.ConstantsService.Pages.Welcome;
 
         [ObservableProperty]
         private bool _isSettingsOpen;
@@ -37,35 +59,55 @@ namespace teams_phonemanager.ViewModels
         private bool _isLogDialogOpen;
 
         [ObservableProperty]
-        private string _version = ConstantsService.Application.Version;
-        
+        private string _version = Services.ConstantsService.Application.Version;
+
         [ObservableProperty]
         private PhoneManagerVariables _variables = new();
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(
+            IPowerShellContextService powerShellContextService,
+            IPowerShellCommandService powerShellCommandService,
+            ILoggingService loggingService,
+            ISessionManager sessionManager,
+            INavigationService navigationService,
+            IErrorHandlingService errorHandlingService,
+            IValidationService validationService)
+            : base(powerShellContextService, powerShellCommandService, loggingService,
+                  sessionManager, navigationService, errorHandlingService, validationService)
         {
             _loggingService.Log("Application started", LogLevel.Info);
 
-            _loggingService.PropertyChanged += (s, e) =>
+            _loggingPropertyHandler = (s, e) =>
             {
-                if (e.PropertyName == nameof(LoggingService.LatestLogEntry))
+                if (e.PropertyName == nameof(ILoggingService.LatestLogEntry))
                 {
                     OnPropertyChanged(nameof(LatestLogEntry));
                 }
             };
+            _loggingService.PropertyChanged += _loggingPropertyHandler;
 
-            LogEntries.CollectionChanged += (s, e) =>
+            _logEntriesHandler = (s, e) =>
             {
+                _logCacheDirty = true;
+
+                // Limit log size
+                while (LogEntries.Count > MaxLogEntries)
+                {
+                    LogEntries.RemoveAt(0);
+                }
+
                 OnPropertyChanged(nameof(AllLogEntriesText));
             };
+            LogEntries.CollectionChanged += _logEntriesHandler;
 
-            _navigationService.PropertyChanged += (s, e) =>
+            _navigationPropertyHandler = (s, e) =>
             {
-                if (e.PropertyName == nameof(NavigationService.CurrentPage))
+                if (e.PropertyName == nameof(INavigationService.CurrentPage))
                 {
                     CurrentPage = _navigationService.CurrentPage;
                 }
             };
+            _navigationService.PropertyChanged += _navigationPropertyHandler;
         }
 
         partial void OnIsDarkThemeChanged(bool value)
@@ -119,6 +161,23 @@ namespace teams_phonemanager.ViewModels
         {
             IsLogDialogOpen = false;
             _loggingService.Log("Log viewer closed", LogLevel.Info);
+        }
+
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                if (_loggingPropertyHandler != null)
+                    _loggingService.PropertyChanged -= _loggingPropertyHandler;
+
+                if (_logEntriesHandler != null)
+                    LogEntries.CollectionChanged -= _logEntriesHandler;
+
+                if (_navigationPropertyHandler != null)
+                    _navigationService.PropertyChanged -= _navigationPropertyHandler;
+
+                _disposed = true;
+            }
         }
     }
 } 

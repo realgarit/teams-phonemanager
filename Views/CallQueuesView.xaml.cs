@@ -1,5 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Microsoft.Extensions.DependencyInjection;
+using teams_phonemanager.ViewModels;
 
 namespace teams_phonemanager.Views
 {
@@ -8,7 +10,7 @@ namespace teams_phonemanager.Views
         public CallQueuesView()
         {
             InitializeComponent();
-            DataContext = new ViewModels.CallQueuesViewModel();
+            DataContext = Program.Services?.GetService<CallQueuesViewModel>();
         }
 
         private void CreateResourceAccountBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)

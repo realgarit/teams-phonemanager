@@ -1,35 +1,29 @@
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Text;
+using teams_phonemanager.Services.Interfaces;
 
 namespace teams_phonemanager.Services
 {
-    public class PowerShellContextService : IDisposable
+    public class PowerShellContextService : IPowerShellContextService
     {
-        private static PowerShellContextService? _instance;
+        private readonly ILoggingService _loggingService;
         private readonly Runspace _runspace;
         private readonly PowerShell _powerShell;
         private bool _disposed = false;
 
-        private PowerShellContextService()
+        public PowerShellContextService(ILoggingService loggingService)
         {
+            _loggingService = loggingService;
+
             _runspace = RunspaceFactory.CreateRunspace();
             _runspace.Open();
-            
+
             _powerShell = PowerShell.Create();
             _powerShell.Runspace = _runspace;
-            
-            InitializeExecutionPolicy();
-            LoggingService.Instance.Log("PowerShell context service initialized with persistent runspace", LogLevel.Info);
-        }
 
-        public static PowerShellContextService Instance
-        {
-            get
-            {
-                _instance ??= new PowerShellContextService();
-                return _instance;
-            }
+            InitializeExecutionPolicy();
+            _loggingService.Log("PowerShell context service initialized with persistent runspace", LogLevel.Info);
         }
 
         private void InitializeExecutionPolicy()
@@ -52,11 +46,11 @@ namespace teams_phonemanager.Services
             }
             catch (Exception ex)
             {
-                LoggingService.Instance.Log($"Error initializing PowerShell preferences: {ex.Message}", LogLevel.Warning);
+                _loggingService.Log($"Error initializing PowerShell preferences: {ex.Message}", LogLevel.Warning);
             }
         }
 
-        public async Task<string> ExecuteCommandAsync(string command)
+        public async Task<string> ExecuteCommandAsync(string command, CancellationToken cancellationToken = default)
         {
             if (_disposed)
                 throw new ObjectDisposedException(nameof(PowerShellContextService));
@@ -76,7 +70,11 @@ $ErrorActionPreference = 'Continue'
                 
                 _powerShell.AddScript(fullCommand);
                 
-                var result = await Task.Run(() => _powerShell.Invoke());
+                var result = await Task.Run(() =>
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    return _powerShell.Invoke();
+                }, cancellationToken);
                 
                 var output = new StringBuilder();
                 
@@ -94,7 +92,7 @@ $ErrorActionPreference = 'Continue'
                 {
                     foreach (var error in _powerShell.Streams.Error)
                     {
-                        LoggingService.Instance.Log($"PowerShell error: {error}", LogLevel.Error);
+                        _loggingService.Log($"PowerShell error: {error}", LogLevel.Error);
                         output.AppendLine($"ERROR: {error}");
                     }
                 }
@@ -103,7 +101,7 @@ $ErrorActionPreference = 'Continue'
             }
             catch (Exception ex)
             {
-                LoggingService.Instance.Log($"Error executing PowerShell command: {ex.Message}", LogLevel.Error);
+                _loggingService.Log($"Error executing PowerShell command: {ex.Message}", LogLevel.Error);
                 return $"ERROR: {ex.Message}";
             }
         }
@@ -140,13 +138,13 @@ $ErrorActionPreference = 'Continue'
             }
         }
 
-        public async Task<string> GetConnectionStatusAsync()
+        public async Task<string> GetConnectionStatusAsync(CancellationToken cancellationToken = default)
         {
             try
             {
                 _powerShell.Commands.Clear();
                 _powerShell.Streams.ClearStreams();
-                
+
                 var statusCommand = @"
 $status = @()
 try {
@@ -173,9 +171,13 @@ try {
 
 $status -join ""`n""
 ";
-                
+
                 _powerShell.AddScript(statusCommand);
-                var result = await Task.Run(() => _powerShell.Invoke());
+                var result = await Task.Run(() =>
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    return _powerShell.Invoke();
+                }, cancellationToken);
                 
                 var output = new StringBuilder();
                 foreach (var item in result)
@@ -198,7 +200,7 @@ $status -join ""`n""
                 _powerShell?.Dispose();
                 _runspace?.Dispose();
                 _disposed = true;
-                LoggingService.Instance.Log("PowerShell context service disposed", LogLevel.Info);
+                _loggingService.Log("PowerShell context service disposed", LogLevel.Info);
             }
         }
     }

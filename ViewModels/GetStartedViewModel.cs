@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using teams_phonemanager.Services;
+using teams_phonemanager.Services.Interfaces;
 using System.Threading.Tasks;
 using System;
 
@@ -23,13 +24,22 @@ namespace teams_phonemanager.ViewModels
         public bool CanConnectTeams => ModulesChecked && !TeamsConnected;
         public bool CanConnectGraph => ModulesChecked && !GraphConnected;
 
-        public GetStartedViewModel()
+        public GetStartedViewModel(
+            IPowerShellContextService powerShellContextService,
+            IPowerShellCommandService powerShellCommandService,
+            ILoggingService loggingService,
+            ISessionManager sessionManager,
+            INavigationService navigationService,
+            IErrorHandlingService errorHandlingService,
+            IValidationService validationService)
+            : base(powerShellContextService, powerShellCommandService, loggingService,
+                  sessionManager, navigationService, errorHandlingService, validationService)
         {
             _modulesChecked = _sessionManager.ModulesChecked;
             _teamsConnected = _sessionManager.TeamsConnected;
             _graphConnected = _sessionManager.GraphConnected;
             UpdateCanProceed();
-            
+
             _loggingService.Log("Get Started page loaded", LogLevel.Info);
         }
 
@@ -150,7 +160,7 @@ namespace teams_phonemanager.ViewModels
                 _sessionManager.UpdateTeamsConnection(TeamsConnected);
                 if (tenantId != null && tenantName != null)
                 {
-                    _sessionManager.UpdateTeamsTenantInfo(tenantId, tenantName);
+                    _sessionManager.UpdateTenantInfo(tenantId, tenantName);
                 }
                 
                 UpdateCanProceed();
