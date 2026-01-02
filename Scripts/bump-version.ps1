@@ -27,11 +27,12 @@ if ($csprojContent -match '<Version>([\d.]+)</Version>') {
     exit 1
 }
 
-# Parse version
+# Parse version (support both 3-part and 4-part versions)
 $versionParts = $currentVersion.Split('.')
 $major = [int]$versionParts[0]
 $minor = [int]$versionParts[1]
 $patch = [int]$versionParts[2]
+$revision = if ($versionParts.Length -gt 3) { [int]$versionParts[3] } else { 0 }
 
 # Bump version
 switch ($BumpType) {
@@ -39,17 +40,20 @@ switch ($BumpType) {
         $major++
         $minor = 0
         $patch = 0
+        $revision = 0
     }
     'minor' {
         $minor++
         $patch = 0
+        $revision = 0
     }
     'patch' {
         $patch++
+        $revision = 0
     }
 }
 
-$newVersion = "$major.$minor.$patch"
+$newVersion = "$major.$minor.$patch.$revision"
 Write-Host "New version: $newVersion" -ForegroundColor Green
 
 # Update csproj file
@@ -66,10 +70,12 @@ $manifestContent = $manifestContent -replace 'version="[\d.]+"', "version=`"$new
 Set-Content -Path $manifestPath -Value $manifestContent -NoNewline
 Write-Host "✓ Updated app.manifest" -ForegroundColor Green
 
-# Update ConstantsService.cs
+# Update ConstantsService.cs (use 3-part version for display)
 $constantsPath = Join-Path $repoRoot "Services\ConstantsService.cs"
 $constantsContent = Get-Content $constantsPath -Raw
-$constantsContent = $constantsContent -replace 'public const string Version = "Version [\d.]+";', "public const string Version = `"Version $newVersion`";"
+# Use 3-part version for display (major.minor.patch)
+$displayVersion = "$major.$minor.$patch"
+$constantsContent = $constantsContent -replace 'public const string Version = "Version [\d.]+";', "public const string Version = `"Version $displayVersion`";"
 Set-Content -Path $constantsPath -Value $constantsContent -NoNewline
 Write-Host "✓ Updated ConstantsService.cs" -ForegroundColor Green
 
