@@ -111,6 +111,10 @@ catch {
         {
             return @"
 try {
+    # Fix for 'window handle must be configured' error
+    # This forces MSAL to use the system browser instead of WAM (Web Account Manager)
+    $env:MSAL_DISABLE_WAM = 'true'
+
     # Import Microsoft.Graph modules
     Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphAuthentication + @" -Force
     Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphUsers + @" -Force
