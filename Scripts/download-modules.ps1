@@ -38,7 +38,6 @@ try {
 # This is more efficient than downloading Microsoft.Graph which includes everything
 $coreGraphModules = @(
     "Microsoft.Graph.Authentication",
-    "Microsoft.Graph.Core",
     "Microsoft.Graph.Users",
     "Microsoft.Graph.Users.Actions",
     "Microsoft.Graph.Groups",

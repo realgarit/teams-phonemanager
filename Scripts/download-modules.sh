@@ -34,7 +34,6 @@ echo "MicrosoftTeams extracted successfully"
 # This is more efficient than downloading Microsoft.Graph which includes everything
 CORE_GRAPH_MODULES=(
     "Microsoft.Graph.Authentication"
-    "Microsoft.Graph.Core"
     "Microsoft.Graph.Users"
     "Microsoft.Graph.Users.Actions"
     "Microsoft.Graph.Groups"
