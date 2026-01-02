@@ -23,12 +23,22 @@ $output = @()
 $output += 'TLS 1.2 security protocol enabled'
 
 # Add bundled modules to PSModulePath
-$appDir = Get-Location
+# Get the application's base directory (where the executable is located)
+$appDir = [System.IO.Path]::GetDirectoryName([System.Reflection.Assembly]::GetExecutingAssembly().Location)
+if (-not $appDir) {
+    $appDir = [System.AppDomain]::CurrentDomain.BaseDirectory
+}
 $possiblePaths = @(
     (Join-Path $appDir 'Modules'),
     (Join-Path $appDir 'win-x64\Modules'),
+    (Join-Path $appDir 'osx-x64\Modules'),
+    (Join-Path $appDir 'osx-arm64\Modules'),
+    (Join-Path $appDir 'linux-x64\Modules'),
     (Join-Path $appDir '..\Modules'),
-    (Join-Path $appDir '..\win-x64\Modules')
+    (Join-Path $appDir '..\win-x64\Modules'),
+    (Join-Path $appDir '..\osx-x64\Modules'),
+    (Join-Path $appDir '..\osx-arm64\Modules'),
+    (Join-Path $appDir '..\linux-x64\Modules')
 )
 
 $bundledModulesPath = $null

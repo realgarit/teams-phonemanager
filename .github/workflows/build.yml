@@ -90,6 +90,18 @@ jobs:
       with:
         dotnet-version: '8.0.x'
     
+    - name: Download PowerShell modules (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: ./Scripts/download-modules.ps1
+    
+    - name: Download PowerShell modules (macOS/Linux)
+      if: matrix.os != 'windows-latest'
+      shell: bash
+      run: |
+        chmod +x Scripts/download-modules.sh
+        ./Scripts/download-modules.sh
+    
     - name: Restore dependencies
       run: dotnet restore
     
