@@ -60,8 +60,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
       run: |
         TAG="${{ steps.get-version.outputs.tag }}"
-        git config user.name "${{ github.actor }}"
-        git config user.email "${{ github.actor }}@users.noreply.github.com"
         git remote set-url origin https://${{ github.actor }}:${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
         git tag -s "$TAG" -m "Release $TAG"
         git push origin "$TAG"
