@@ -83,7 +83,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        ref: ${{ needs.create-tag.outputs.tag_name }}
+        ref: ${{ github.sha }}
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
