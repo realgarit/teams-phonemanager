@@ -18,6 +18,10 @@ namespace teams_phonemanager.Services
 $ErrorActionPreference = 'Stop'
 $output = @()
 
+# Force MSAL and Azure.Identity to use system browser instead of WAM
+$env:MSAL_DISABLE_WAM = 'true'
+$env:AZURE_IDENTITY_DISABLE_WAM = 'true'
+
 # Enable TLS 1.2 for secure communication
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $output += 'TLS 1.2 security protocol enabled'
@@ -94,6 +98,8 @@ $output | ForEach-Object { Write-Host $_ }
         {
             return @"
 try {
+    $env:MSAL_DISABLE_WAM = 'true'
+    $env:AZURE_IDENTITY_DISABLE_WAM = 'true'
     Connect-MicrosoftTeams -ErrorAction Stop
     $connection = Get-CsTenant -ErrorAction Stop
     if ($connection) {
@@ -114,6 +120,7 @@ try {
     # Fix for 'window handle must be configured' error
     # This forces MSAL to use the system browser instead of WAM (Web Account Manager)
     $env:MSAL_DISABLE_WAM = 'true'
+    $env:AZURE_IDENTITY_DISABLE_WAM = 'true'
 
     # Import Microsoft.Graph modules
     Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphAuthentication + @" -Force

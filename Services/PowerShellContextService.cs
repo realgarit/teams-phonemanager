@@ -43,6 +43,10 @@ namespace teams_phonemanager.Services
                     .AddParameter("Name", "InformationPreference")
                     .AddParameter("Value", "Continue")
                     .Invoke();
+
+                _powerShell.Commands.Clear();
+                _powerShell.AddScript("$env:MSAL_DISABLE_WAM = 'true'; $env:AZURE_IDENTITY_DISABLE_WAM = 'true'");
+                _powerShell.Invoke();
             }
             catch (Exception ex)
             {

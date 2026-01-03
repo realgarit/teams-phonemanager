@@ -19,6 +19,12 @@ class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        // Fix for 'window handle must be configured' error in Microsoft Graph PowerShell SDK
+        // This forces MSAL and Azure.Identity to use the system browser instead of WAM (Web Account Manager)
+        // These must be set at the process level before any authentication modules are loaded.
+        Environment.SetEnvironmentVariable("MSAL_DISABLE_WAM", "true", EnvironmentVariableTarget.Process);
+        Environment.SetEnvironmentVariable("AZURE_IDENTITY_DISABLE_WAM", "true", EnvironmentVariableTarget.Process);
+
         var services = new ServiceCollection();
         ConfigureServices(services);
         Services = services.BuildServiceProvider();
