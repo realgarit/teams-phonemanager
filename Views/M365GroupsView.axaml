@@ -81,12 +81,15 @@
 
                     <TextBox Grid.Column="2"
                              Text="{Binding SearchText}"
-                             Watermark="Search groups..."/>
+                             Watermark="Search groups..."
+                             ToolTip.Tip="Search groups"
+                             AutomationProperties.Name="Search groups"/>
                 </Grid>
 
                 <!-- Groups List -->
                 <DataGrid Grid.Row="2" 
-                          Margin="0,16" 
+                          Margin="0,16"
+                          AutomationProperties.Name="M365 Groups List"
                           ItemsSource="{Binding GroupsView}"
                           AutoGenerateColumns="False"
                           HeadersVisibility="Column"

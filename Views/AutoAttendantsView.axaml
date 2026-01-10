@@ -85,11 +85,14 @@
 
                                 <TextBox Grid.Column="2"
                                          Text="{Binding SearchResourceAccountsText}"
-                                         Watermark="Search resource accounts..."/>
+                                         Watermark="Search resource accounts..."
+                                         ToolTip.Tip="Search resource accounts"
+                                         AutomationProperties.Name="Search resource accounts"/>
                             </Grid>
 
                             <!-- Resource Accounts List -->
                             <DataGrid Grid.Row="2"
+                                      AutomationProperties.Name="Resource Accounts List"
                                       ItemsSource="{Binding ResourceAccountsView}"
                                       AutoGenerateColumns="False"
                                       HeadersVisibility="Column"
@@ -151,11 +154,14 @@
 
                                 <TextBox Grid.Column="2"
                                          Text="{Binding SearchAutoAttendantsText}"
-                                         Watermark="Search auto attendants..."/>
+                                         Watermark="Search auto attendants..."
+                                         ToolTip.Tip="Search auto attendants"
+                                         AutomationProperties.Name="Search auto attendants"/>
                             </Grid>
 
                             <!-- Auto Attendants List -->
                             <DataGrid Grid.Row="2"
+                                      AutomationProperties.Name="Auto Attendants List"
                                       ItemsSource="{Binding AutoAttendantsView}"
                                       AutoGenerateColumns="False"
                                       HeadersVisibility="Column"
