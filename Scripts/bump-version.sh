@@ -97,7 +97,7 @@ echo -e "\033[32m✓ Updated teams-phonemanager.csproj\033[0m"
 
 # Update app.manifest
 MANIFEST_PATH="$REPO_ROOT/app.manifest"
-sed -i.bak "s/version=\"[0-9.]*\"/version=\"$NEW_VERSION\"/g" "$MANIFEST_PATH"
+sed -i.bak "s/    version=\"[0-9.]*\"/    version=\"$NEW_VERSION\"/g" "$MANIFEST_PATH"
 rm -f "$MANIFEST_PATH.bak"
 echo -e "\033[32m✓ Updated app.manifest\033[0m"
 

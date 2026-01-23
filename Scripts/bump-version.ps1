@@ -62,7 +62,7 @@ Write-Host "✓ Updated teams-phonemanager.csproj" -ForegroundColor Green
 # Update app.manifest
 $manifestPath = Join-Path $repoRoot "app.manifest"
 $manifestContent = Get-Content $manifestPath -Raw
-$manifestContent = $manifestContent -replace 'version="[\d.]+"', "version=`"$newVersion`""
+$manifestContent = $manifestContent -replace '    version="[\d.]+"', "    version=`"$newVersion`""
 Set-Content -Path $manifestPath -Value $manifestContent -NoNewline
 Write-Host "✓ Updated app.manifest" -ForegroundColor Green
 
