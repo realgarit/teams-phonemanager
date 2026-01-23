@@ -24,6 +24,8 @@ namespace teams_phonemanager.ViewModels
         public bool CanConnectTeams => ModulesChecked && !TeamsConnected;
         public bool CanConnectGraph => ModulesChecked && !GraphConnected;
 
+        private readonly IMsalGraphAuthenticationService _msalAuthService;
+
         public GetStartedViewModel(
             IPowerShellContextService powerShellContextService,
             IPowerShellCommandService powerShellCommandService,
@@ -31,10 +33,12 @@ namespace teams_phonemanager.ViewModels
             ISessionManager sessionManager,
             INavigationService navigationService,
             IErrorHandlingService errorHandlingService,
-            IValidationService validationService)
+            IValidationService validationService,
+            IMsalGraphAuthenticationService msalAuthService)
             : base(powerShellContextService, powerShellCommandService, loggingService,
                   sessionManager, navigationService, errorHandlingService, validationService)
         {
+            _msalAuthService = msalAuthService;
             _modulesChecked = _sessionManager.ModulesChecked;
             _teamsConnected = _sessionManager.TeamsConnected;
             _graphConnected = _sessionManager.GraphConnected;
@@ -190,25 +194,32 @@ namespace teams_phonemanager.ViewModels
                 }
 
                 IsBusy = true;
-                _loggingService.Log("Connecting to Microsoft Graph...", LogLevel.Info);
+                _loggingService.Log("Authenticating to Microsoft Graph...", LogLevel.Info);
 
-                var command = _powerShellCommandService.GetConnectGraphCommand();
+                // Step 1: Authenticate using MSAL (opens browser popup)
+                var authResult = await _msalAuthService.AuthenticateAsync();
+                
+                if (!authResult.Success || string.IsNullOrEmpty(authResult.AccessToken))
+                {
+                    _loggingService.Log($"Authentication failed: {authResult.ErrorMessage}", LogLevel.Error);
+                    GraphConnected = false;
+                    _sessionManager.UpdateGraphConnection(false);
+                    UpdateCanProceed();
+                    return;
+                }
+
+                _loggingService.Log("Authentication successful, connecting PowerShell to Microsoft Graph...", LogLevel.Info);
+
+                // Step 2: Pass the token to PowerShell's Connect-MgGraph
+                var command = _powerShellCommandService.GetConnectGraphWithTokenCommand(authResult.AccessToken);
                 var result = await ExecutePowerShellCommandAsync(command, "ConnectGraph");
                 GraphConnected = result.Contains("SUCCESS:");
                 
-                string? account = null;
+                string? account = authResult.Account;
                 
                 if (GraphConnected)
                 {
-                    _loggingService.Log($"Connected to Microsoft Graph successfully\n{result}", LogLevel.Success);
-                    
-                    foreach (var line in result.Split('\n'))
-                    {
-                        if (line.Contains("Connected as:"))
-                        {
-                            account = line.Split(':')[1].Trim();
-                        }
-                    }
+                    _loggingService.Log($"Connected to Microsoft Graph successfully as {account}", LogLevel.Success);
                 }
                 else
                 {
@@ -263,6 +274,9 @@ namespace teams_phonemanager.ViewModels
             {
                 IsBusy = true;
                 _loggingService.Log("Disconnecting from Microsoft Graph...", LogLevel.Info);
+
+                // Sign out from MSAL to clear cached tokens
+                await _msalAuthService.SignOutAsync();
 
                 var command = _powerShellCommandService.GetDisconnectGraphCommand();
                 var result = await ExecutePowerShellCommandAsync(command, "DisconnectGraph");

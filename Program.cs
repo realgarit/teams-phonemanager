@@ -39,6 +39,7 @@ class Program
         services.AddSingleton<ISessionManager, SessionManager>();
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IPowerShellContextService, PowerShellContextService>();
+        services.AddSingleton<IMsalGraphAuthenticationService, MsalGraphAuthenticationService>();
 
         // Transient services (new instance per request)
         services.AddTransient<IPowerShellCommandService, PowerShellCommandService>();

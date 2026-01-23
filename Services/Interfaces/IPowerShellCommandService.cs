@@ -10,6 +10,7 @@ public interface IPowerShellCommandService
     string GetCheckModulesCommand();
     string GetConnectTeamsCommand();
     string GetConnectGraphCommand();
+    string GetConnectGraphWithTokenCommand(string accessToken);
     string GetDisconnectTeamsCommand();
     string GetDisconnectGraphCommand();
     string GetCreateM365GroupCommand(string groupName);

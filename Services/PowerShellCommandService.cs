@@ -115,13 +115,21 @@ catch {
 
         public string GetConnectGraphCommand()
         {
+            // This method is kept for backwards compatibility but should not be called directly.
+            // Use GetConnectGraphWithTokenCommand instead.
+            return GetConnectGraphWithTokenCommand("");
+        }
+
+        /// <summary>
+        /// Connects to Microsoft Graph using a pre-obtained access token from MSAL.
+        /// This bypasses WAM issues on Windows by handling authentication in C#.
+        /// </summary>
+        public string GetConnectGraphWithTokenCommand(string accessToken)
+        {
+            // The access token is passed as a SecureString in PowerShell
+            // We need to convert it properly
             return @"
 try {
-    # Fix for 'window handle must be configured' error
-    # This forces MSAL to use the system browser instead of WAM (Web Account Manager)
-    $env:MSAL_DISABLE_WAM = 'true'
-    $env:AZURE_IDENTITY_DISABLE_WAM = 'true'
-
     # Import Microsoft.Graph modules
     Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphAuthentication + @" -Force
     Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphUsers + @" -Force
@@ -129,7 +137,10 @@ try {
     Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphGroups + @" -Force
     Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphIdentityDirectoryManagement + @" -Force
     
-    Connect-MgGraph -Scopes User.ReadWrite.All, Organization.Read.All, Group.ReadWrite.All, Directory.ReadWrite.All -ErrorAction Stop -NoWelcome
+    # Convert the access token to SecureString as required by Connect-MgGraph
+    $tokenSecure = ConvertTo-SecureString -String '" + accessToken + @"' -AsPlainText -Force
+    
+    Connect-MgGraph -AccessToken $tokenSecure -ErrorAction Stop -NoWelcome
     $context = Get-MgContext -ErrorAction Stop
     if ($context) {
         Write-Host 'SUCCESS: Connected to Microsoft Graph'

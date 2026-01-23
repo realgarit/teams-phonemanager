@@ -1,11 +1,7 @@
 param(
     [Parameter(Mandatory=$true)]
     [ValidateSet('major', 'minor', 'patch')]
-    [string]$BumpType,
-    
-    [string]$CommitMessage = "",
-    [switch]$Push = $false,
-    [string]$Branch = "dev"
+    [string]$BumpType
 )
 
 $ErrorActionPreference = "Stop"
@@ -79,31 +75,9 @@ $constantsContent = $constantsContent -replace 'public const string Version = "V
 Set-Content -Path $constantsPath -Value $constantsContent -NoNewline
 Write-Host "✓ Updated ConstantsService.cs" -ForegroundColor Green
 
-# Stage changes
-git add teams-phonemanager.csproj app.manifest Services/ConstantsService.cs
-
-# Create commit message if not provided
-if ([string]::IsNullOrWhiteSpace($CommitMessage)) {
-    $CommitMessage = "Bump version to $newVersion ($BumpType)"
-}
-
-# Commit
-git commit -m $CommitMessage
-Write-Host "✓ Committed version bump" -ForegroundColor Green
-
-# Push if requested
-if ($Push) {
-    git push origin $Branch
-    Write-Host "✓ Pushed to origin/$Branch" -ForegroundColor Green
-}
-
 Write-Host ""
 Write-Host "Version bumped from $currentVersion to $newVersion" -ForegroundColor Green
 Write-Host "Next steps:" -ForegroundColor Yellow
 Write-Host "  1. Review your changes" -ForegroundColor White
-if (-not $Push) {
-    Write-Host "  2. Push to dev: git push origin $Branch" -ForegroundColor White
-}
-Write-Host "  3. Create PR from dev to main on GitHub" -ForegroundColor White
-Write-Host "  4. After merge, release will be created automatically" -ForegroundColor White
+Write-Host "  2. Commit and push manually" -ForegroundColor White
 

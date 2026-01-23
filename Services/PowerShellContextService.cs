@@ -87,6 +87,13 @@ $ErrorActionPreference = 'Continue'
                     output.AppendLine(item.ToString());
                 }
                 
+                // Capture Warning stream (device code from Connect-MgGraph -UseDeviceCode is output here)
+                foreach (var item in _powerShell.Streams.Warning)
+                {
+                    _loggingService.Log($"{item}", LogLevel.Warning);
+                    output.AppendLine($"WARNING: {item}");
+                }
+                
                 foreach (var item in result)
                 {
                     output.AppendLine(item.ToString());

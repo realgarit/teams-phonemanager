@@ -6,9 +6,7 @@ set -e
 
 # Default values
 BUMP_TYPE=""
-COMMIT_MESSAGE=""
-PUSH=false
-BRANCH="dev"
+
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -17,31 +15,18 @@ while [[ $# -gt 0 ]]; do
             BUMP_TYPE="$1"
             shift
             ;;
-        --push)
-            PUSH=true
-            shift
-            ;;
-        --branch=*)
-            BRANCH="${1#*=}"
-            shift
-            ;;
         --help|-h)
-            echo "Usage: $0 [major|minor|patch] [commit-message] [--push] [--branch=dev]"
+            echo "Usage: $0 [major|minor|patch]"
             echo ""
             echo "Examples:"
-            echo "  $0 patch 'Fix bug in validation'"
-            echo "  $0 minor --push"
-            echo "  $0 major --push --branch=main"
+            echo "  $0 patch"
+            echo "  $0 minor"
+            echo "  $0 major"
             exit 0
             ;;
         *)
-            if [ -z "$COMMIT_MESSAGE" ]; then
-                COMMIT_MESSAGE="$1"
-            else
-                echo "Unknown option: $1"
-                exit 1
-            fi
-            shift
+            echo "Unknown option: $1"
+            exit 1
             ;;
     esac
 done
@@ -49,7 +34,7 @@ done
 # Validate bump type
 if [ -z "$BUMP_TYPE" ]; then
     echo "Error: Bump type (major|minor|patch) is required"
-    echo "Usage: $0 [major|minor|patch] [commit-message] [--push]"
+    echo "Usage: $0 [major|minor|patch]"
     exit 1
 fi
 
@@ -112,7 +97,7 @@ echo -e "\033[32m✓ Updated teams-phonemanager.csproj\033[0m"
 
 # Update app.manifest
 MANIFEST_PATH="$REPO_ROOT/app.manifest"
-sed -i.bak "s/version=\"$CURRENT_VERSION\"/version=\"$NEW_VERSION\"/g" "$MANIFEST_PATH"
+sed -i.bak "s/version=\"[0-9.]*\"/version=\"$NEW_VERSION\"/g" "$MANIFEST_PATH"
 rm -f "$MANIFEST_PATH.bak"
 echo -e "\033[32m✓ Updated app.manifest\033[0m"
 
@@ -124,31 +109,8 @@ sed -i.bak "s/public const string Version = \"Version [0-9.]*\";/public const st
 rm -f "$CONSTANTS_PATH.bak"
 echo -e "\033[32m✓ Updated ConstantsService.cs\033[0m"
 
-# Stage changes
-git add teams-phonemanager.csproj app.manifest Services/ConstantsService.cs
-
-# Create commit message if not provided
-if [ -z "$COMMIT_MESSAGE" ]; then
-    COMMIT_MESSAGE="Bump version to $NEW_VERSION ($BUMP_TYPE)"
-fi
-
-# Commit
-git commit -m "$COMMIT_MESSAGE"
-echo -e "\033[32m✓ Committed version bump\033[0m"
-
-# Push if requested
-if [ "$PUSH" = true ]; then
-    git push origin "$BRANCH"
-    echo -e "\033[32m✓ Pushed to origin/$BRANCH\033[0m"
-fi
-
 echo ""
 echo -e "\033[32mVersion bumped from $CURRENT_VERSION to $NEW_VERSION\033[0m"
 echo -e "\033[33mNext steps:\033[0m"
 echo -e "\033[37m  1. Review your changes\033[0m"
-if [ "$PUSH" = false ]; then
-    echo -e "\033[37m  2. Push to dev: git push origin $BRANCH\033[0m"
-fi
-echo -e "\033[37m  3. Create PR from dev to main on GitHub\033[0m"
-echo -e "\033[37m  4. After merge, release will be created automatically\033[0m"
-
+echo -e "\033[37m  2. Commit and push manually\033[0m"
