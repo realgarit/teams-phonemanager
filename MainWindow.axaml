@@ -241,7 +241,7 @@
                 </Button>
                 
                 <!-- Copyright -->
-                <TextBlock Grid.Column="2" Text="Realgar © 2025. MIT License." VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="Realgar © 2026." VerticalAlignment="Center"/>
             </Grid>
         </Border>
 

@@ -94,12 +94,62 @@ $output | ForEach-Object { Write-Host $_ }
 ";
         }
 
-        public string GetConnectTeamsCommand()
+        private string GetCommonSetupScript()
         {
             return @"
+# Common Setup
+$ErrorActionPreference = 'Stop'
+
+# Force MSAL and Azure.Identity to use system browser instead of WAM (Legacy/Compat)
+$env:MSAL_DISABLE_WAM = 'true'
+$env:AZURE_IDENTITY_DISABLE_WAM = 'true'
+
+# Enable TLS 1.2
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+# Add bundled modules to PSModulePath
+$appDir = [System.IO.Path]::GetDirectoryName([System.Reflection.Assembly]::GetExecutingAssembly().Location)
+if (-not $appDir) {
+    $appDir = [System.AppDomain]::CurrentDomain.BaseDirectory
+}
+$possiblePaths = @(
+    (Join-Path $appDir 'Modules'),
+    (Join-Path $appDir 'win-x64\Modules'),
+    (Join-Path $appDir 'osx-x64\Modules'),
+    (Join-Path $appDir 'osx-arm64\Modules'),
+    (Join-Path $appDir 'linux-x64\Modules'),
+    (Join-Path $appDir '..\Modules'),
+    (Join-Path $appDir '..\win-x64\Modules'),
+    (Join-Path $appDir '..\osx-x64\Modules'),
+    (Join-Path $appDir '..\osx-arm64\Modules'),
+    (Join-Path $appDir '..\linux-x64\Modules')
+)
+
+$bundledModulesPath = $null
+foreach ($path in $possiblePaths) {
+    if (Test-Path $path) {
+        $bundledModulesPath = $path
+        break
+    }
+}
+
+if ($bundledModulesPath) {
+    $pathSeparator = [System.IO.Path]::PathSeparator
+    $currentPaths = $env:PSModulePath -split $pathSeparator
+    if ($bundledModulesPath -notin $currentPaths) {
+        $env:PSModulePath = $bundledModulesPath + $pathSeparator + $env:PSModulePath
+    }
+}
+";
+        }
+
+        public string GetConnectTeamsCommand()
+        {
+            return GetCommonSetupScript() + @"
 try {
-    $env:MSAL_DISABLE_WAM = 'true'
-    $env:AZURE_IDENTITY_DISABLE_WAM = 'true'
+    # Explicitly import MicrosoftTeams to ensure cmdlets are available
+    Import-Module " + ConstantsService.PowerShellModules.MicrosoftTeams + @" -Force -ErrorAction Stop
+
     Connect-MicrosoftTeams -ErrorAction Stop
     $connection = Get-CsTenant -ErrorAction Stop
     if ($connection) {
@@ -128,7 +178,7 @@ catch {
         {
             // The access token is passed as a SecureString in PowerShell
             // We need to convert it properly
-            return @"
+            return GetCommonSetupScript() + @"
 try {
     # Import Microsoft.Graph modules
     Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphAuthentication + @" -Force

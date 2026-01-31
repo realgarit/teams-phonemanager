@@ -6,9 +6,9 @@
     <RootNamespace>teams_phonemanager</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>3.6.0.0</Version>
-    <AssemblyVersion>3.6.0.0</AssemblyVersion>
-    <FileVersion>3.6.0.0</FileVersion>
+    <Version>3.6.1</Version>
+    <AssemblyVersion>3.6.1</AssemblyVersion>
+    <FileVersion>3.6.1</FileVersion>
     
     <!-- Publish Settings for Framework-Dependent Deployment -->
     <PublishSingleFile>false</PublishSingleFile>
@@ -37,9 +37,9 @@
     <PackageReference Include="FluentAvaloniaUI" Version="2.4.0" />
     <PackageReference Include="FluentIcons.Avalonia" Version="1.1.223" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.81.0" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.4.1" />
     <PackageReference Include="System.Management.Automation" Version="7.4.1" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.65.0" />
   </ItemGroup>
 
   <ItemGroup>

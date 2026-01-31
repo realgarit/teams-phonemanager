@@ -86,16 +86,17 @@ case $BUMP_TYPE in
 esac
 
 NEW_VERSION="$MAJOR.$MINOR.$PATCH.$REVISION"
-echo -e "\033[32mNew version: $NEW_VERSION\033[0m"
+NEW_VERSION_SHORT="$MAJOR.$MINOR.$PATCH"
+echo -e "\033[32mNew version: $NEW_VERSION_SHORT (Win: $NEW_VERSION)\033[0m"
 
 # Update csproj file
-sed -i.bak "s/<Version>$CURRENT_VERSION<\/Version>/<Version>$NEW_VERSION<\/Version>/g" "$CSPROJ_PATH"
-sed -i.bak "s/<AssemblyVersion>$CURRENT_VERSION<\/AssemblyVersion>/<AssemblyVersion>$NEW_VERSION<\/AssemblyVersion>/g" "$CSPROJ_PATH"
-sed -i.bak "s/<FileVersion>$CURRENT_VERSION<\/FileVersion>/<FileVersion>$NEW_VERSION<\/FileVersion>/g" "$CSPROJ_PATH"
+sed -i.bak "s/<Version>$CURRENT_VERSION<\/Version>/<Version>$NEW_VERSION_SHORT<\/Version>/g" "$CSPROJ_PATH"
+sed -i.bak "s/<AssemblyVersion>$CURRENT_VERSION<\/AssemblyVersion>/<AssemblyVersion>$NEW_VERSION_SHORT<\/AssemblyVersion>/g" "$CSPROJ_PATH"
+sed -i.bak "s/<FileVersion>$CURRENT_VERSION<\/FileVersion>/<FileVersion>$NEW_VERSION_SHORT<\/FileVersion>/g" "$CSPROJ_PATH"
 rm -f "$CSPROJ_PATH.bak"
 echo -e "\033[32m✓ Updated teams-phonemanager.csproj\033[0m"
 
-# Update app.manifest
+# Update app.manifest (Windows requires 4-part version)
 MANIFEST_PATH="$REPO_ROOT/app.manifest"
 sed -i.bak "s/    version=\"[0-9.]*\"/    version=\"$NEW_VERSION\"/g" "$MANIFEST_PATH"
 rm -f "$MANIFEST_PATH.bak"
@@ -103,9 +104,7 @@ echo -e "\033[32m✓ Updated app.manifest\033[0m"
 
 # Update ConstantsService.cs (use 3-part version for display)
 CONSTANTS_PATH="$REPO_ROOT/Services/ConstantsService.cs"
-# Extract 3-part version for display (major.minor.patch)
-DISPLAY_VERSION="$MAJOR.$MINOR.$PATCH"
-sed -i.bak "s/public const string Version = \"Version [0-9.]*\";/public const string Version = \"Version $DISPLAY_VERSION\";/g" "$CONSTANTS_PATH"
+sed -i.bak "s/public const string Version = \"Version [0-9.]*\";/public const string Version = \"Version $NEW_VERSION_SHORT\";/g" "$CONSTANTS_PATH"
 rm -f "$CONSTANTS_PATH.bak"
 echo -e "\033[32m✓ Updated ConstantsService.cs\033[0m"
 
