@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>teams_phonemanager</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -54,6 +54,11 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <AvaloniaXaml Remove="Archive\**\*.axaml" />
+
+    <!-- Exclude test project from build -->
+    <Compile Remove="teams-phonemanager.Tests\**\*.cs" />
+    <None Remove="teams-phonemanager.Tests\**" />
+    <EmbeddedResource Remove="teams-phonemanager.Tests\**" />
   </ItemGroup>
 
   <ItemGroup>

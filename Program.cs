@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using teams_phonemanager.Services;
 using teams_phonemanager.Services.Interfaces;
+using teams_phonemanager.Services.ScriptBuilders;
 using teams_phonemanager.ViewModels;
 
 namespace teams_phonemanager;
@@ -46,6 +47,13 @@ class Program
         services.AddTransient<IValidationService, ValidationService>();
         services.AddTransient<IErrorHandlingService, ErrorHandlingService>();
         services.AddTransient<IPowerShellSanitizationService, PowerShellSanitizationService>();
+
+        // Script Builders
+        services.AddTransient<CommonScriptBuilder>();
+        services.AddTransient<CallQueueScriptBuilder>();
+        services.AddTransient<AutoAttendantScriptBuilder>();
+        services.AddTransient<HolidayScriptBuilder>();
+        services.AddTransient<ResourceAccountScriptBuilder>();
 
         // ViewModels (transient - new instance per navigation)
         services.AddTransient<MainWindowViewModel>();

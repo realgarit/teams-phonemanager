@@ -1,6 +1,7 @@
 using System.Management.Automation;
 using System.Management.Automation.Runspaces;
 using System.Text;
+using System.Threading;
 using teams_phonemanager.Services.Interfaces;
 
 namespace teams_phonemanager.Services
@@ -10,6 +11,7 @@ namespace teams_phonemanager.Services
         private readonly ILoggingService _loggingService;
         private readonly Runspace _runspace;
         private readonly PowerShell _powerShell;
+        private readonly SemaphoreSlim _semaphore = new(1, 1);
         private bool _disposed = false;
 
         public PowerShellContextService(ILoggingService loggingService)
@@ -36,7 +38,7 @@ namespace teams_phonemanager.Services
                     .AddParameter("Scope", "Process")
                     .AddParameter("Force", true)
                     .Invoke();
-                
+
                 _powerShell.Commands.Clear();
                 // Set InformationPreference using command-based approach instead of script
                 _powerShell.AddCommand("Set-Variable")
@@ -59,46 +61,45 @@ namespace teams_phonemanager.Services
             if (_disposed)
                 throw new ObjectDisposedException(nameof(PowerShellContextService));
 
-            // Keep logs meaningful; avoid noisy debug spam
-            
+            await _semaphore.WaitAsync(cancellationToken);
             try
             {
                 _powerShell.Commands.Clear();
                 _powerShell.Streams.ClearStreams();
-                
+
                 var fullCommand = $@"
 # Ensure we're in the right context
 $ErrorActionPreference = 'Continue'
 {command}
 ";
-                
+
                 _powerShell.AddScript(fullCommand);
-                
+
                 var result = await Task.Run(() =>
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     return _powerShell.Invoke();
                 }, cancellationToken);
-                
+
                 var output = new StringBuilder();
-                
+
                 foreach (var item in _powerShell.Streams.Information)
                 {
                     output.AppendLine(item.ToString());
                 }
-                
+
                 // Capture Warning stream (device code from Connect-MgGraph -UseDeviceCode is output here)
                 foreach (var item in _powerShell.Streams.Warning)
                 {
                     _loggingService.Log($"{item}", LogLevel.Warning);
                     output.AppendLine($"WARNING: {item}");
                 }
-                
+
                 foreach (var item in result)
                 {
                     output.AppendLine(item.ToString());
                 }
-                
+
                 if (_powerShell.HadErrors)
                 {
                     foreach (var error in _powerShell.Streams.Error)
@@ -107,7 +108,7 @@ $ErrorActionPreference = 'Continue'
                         output.AppendLine($"ERROR: {error}");
                     }
                 }
-                
+
                 return output.ToString();
             }
             catch (Exception ex)
@@ -115,15 +116,20 @@ $ErrorActionPreference = 'Continue'
                 _loggingService.Log($"Error executing PowerShell command: {ex.Message}", LogLevel.Error);
                 return $"ERROR: {ex.Message}";
             }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
         public bool IsConnected(string service)
         {
+            _semaphore.Wait();
             try
             {
                 _powerShell.Commands.Clear();
                 _powerShell.Streams.ClearStreams();
-                
+
                 switch (service.ToLower())
                 {
                     case "teams":
@@ -139,7 +145,7 @@ $ErrorActionPreference = 'Continue'
                     default:
                         return false;
                 }
-                
+
                 var result = _powerShell.Invoke();
                 return result != null && result.Count > 0;
             }
@@ -147,10 +153,15 @@ $ErrorActionPreference = 'Continue'
             {
                 return false;
             }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
 
         public async Task<string> GetConnectionStatusAsync(CancellationToken cancellationToken = default)
         {
+            await _semaphore.WaitAsync(cancellationToken);
             try
             {
                 _powerShell.Commands.Clear();
@@ -189,18 +200,22 @@ $status -join ""`n""
                     cancellationToken.ThrowIfCancellationRequested();
                     return _powerShell.Invoke();
                 }, cancellationToken);
-                
+
                 var output = new StringBuilder();
                 foreach (var item in result)
                 {
                     output.AppendLine(item.ToString());
                 }
-                
+
                 return output.ToString();
             }
             catch (Exception ex)
             {
                 return $"Error checking connection status: {ex.Message}";
+            }
+            finally
+            {
+                _semaphore.Release();
             }
         }
 
@@ -208,6 +223,7 @@ $status -join ""`n""
         {
             if (!_disposed)
             {
+                _semaphore.Dispose();
                 _powerShell?.Dispose();
                 _runspace?.Dispose();
                 _disposed = true;
