@@ -85,6 +85,9 @@ jobs:
           - os: macos-latest
             runtime: osx-arm64
             output-type: Exe
+          - os: ubuntu-latest
+            runtime: linux-x64
+            output-type: Exe
     
     steps:
     - name: Checkout code
@@ -95,7 +98,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x'
+        dotnet-version: '10.0.x'
     
     - name: Download PowerShell modules (Windows)
       if: matrix.os == 'windows-latest'
@@ -166,6 +169,13 @@ jobs:
       with:
         name: teams-phonemanager-osx-arm64
         path: ./artifacts/osx-arm64
+
+    - name: Download Linux artifacts
+      uses: actions/download-artifact@v4
+      continue-on-error: true
+      with:
+        name: teams-phonemanager-linux-x64
+        path: ./artifacts/linux-x64
     
     - name: List downloaded artifacts
       run: |
@@ -177,6 +187,9 @@ jobs:
         echo ""
         echo "macOS Apple Silicon artifacts:"
         ls -la artifacts/osx-arm64/ || echo "No macOS Apple Silicon artifacts found"
+        echo ""
+        echo "Linux artifacts:"
+        ls -la artifacts/linux-x64/ || echo "No Linux artifacts found"
     
     - name: Create zip archives
       run: |
@@ -218,6 +231,21 @@ jobs:
         else
           echo "macOS Apple Silicon artifacts directory is empty or missing"
         fi
+
+        if [ -d "artifacts/linux-x64" ] && [ "$(ls -A artifacts/linux-x64)" ]; then
+          # Ensure executable has proper permissions before zipping
+          if [ -f "artifacts/linux-x64/teams-phonemanager" ]; then
+            chmod +x artifacts/linux-x64/teams-phonemanager
+            echo "Set executable permissions for teams-phonemanager (Linux)"
+            ls -la artifacts/linux-x64/teams-phonemanager
+          fi
+          cd artifacts/linux-x64
+          zip -r ../teams-phonemanager-linux-x64.zip .
+          cd ../..
+          echo "Created Linux zip archive"
+        else
+          echo "Linux artifacts directory is empty or missing"
+        fi
         
         echo "Zip files created:"
         ls -lh artifacts/*.zip 2>/dev/null || echo "No zip files found"
@@ -231,6 +259,7 @@ jobs:
           artifacts/teams-phonemanager-win-x64.zip
           artifacts/teams-phonemanager-osx-x64.zip
           artifacts/teams-phonemanager-osx-arm64.zip
+          artifacts/teams-phonemanager-linux-x64.zip
         fail_on_unmatched_files: false
         draft: false
         prerelease: false

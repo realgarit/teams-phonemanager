@@ -34,15 +34,15 @@ if (-not $appDir) {
 }
 $possiblePaths = @(
     (Join-Path $appDir 'Modules'),
-    (Join-Path $appDir 'win-x64\Modules'),
-    (Join-Path $appDir 'osx-x64\Modules'),
-    (Join-Path $appDir 'osx-arm64\Modules'),
-    (Join-Path $appDir 'linux-x64\Modules'),
-    (Join-Path $appDir '..\Modules'),
-    (Join-Path $appDir '..\win-x64\Modules'),
-    (Join-Path $appDir '..\osx-x64\Modules'),
-    (Join-Path $appDir '..\osx-arm64\Modules'),
-    (Join-Path $appDir '..\linux-x64\Modules')
+    (Join-Path $appDir 'win-x64/Modules'),
+    (Join-Path $appDir 'osx-x64/Modules'),
+    (Join-Path $appDir 'osx-arm64/Modules'),
+    (Join-Path $appDir 'linux-x64/Modules'),
+    (Join-Path $appDir '../Modules'),
+    (Join-Path $appDir '../win-x64/Modules'),
+    (Join-Path $appDir '../osx-x64/Modules'),
+    (Join-Path $appDir '../osx-arm64/Modules'),
+    (Join-Path $appDir '../linux-x64/Modules')
 )
 
 $bundledModulesPath = $null
@@ -114,15 +114,15 @@ if (-not $appDir) {
 }
 $possiblePaths = @(
     (Join-Path $appDir 'Modules'),
-    (Join-Path $appDir 'win-x64\Modules'),
-    (Join-Path $appDir 'osx-x64\Modules'),
-    (Join-Path $appDir 'osx-arm64\Modules'),
-    (Join-Path $appDir 'linux-x64\Modules'),
-    (Join-Path $appDir '..\Modules'),
-    (Join-Path $appDir '..\win-x64\Modules'),
-    (Join-Path $appDir '..\osx-x64\Modules'),
-    (Join-Path $appDir '..\osx-arm64\Modules'),
-    (Join-Path $appDir '..\linux-x64\Modules')
+    (Join-Path $appDir 'win-x64/Modules'),
+    (Join-Path $appDir 'osx-x64/Modules'),
+    (Join-Path $appDir 'osx-arm64/Modules'),
+    (Join-Path $appDir 'linux-x64/Modules'),
+    (Join-Path $appDir '../Modules'),
+    (Join-Path $appDir '../win-x64/Modules'),
+    (Join-Path $appDir '../osx-x64/Modules'),
+    (Join-Path $appDir '../osx-arm64/Modules'),
+    (Join-Path $appDir '../linux-x64/Modules')
 )
 
 $bundledModulesPath = $null
