@@ -1,6 +1,6 @@
 # Teams Phone Manager
 
-An Avalonia-based Microsoft Teams Phone Manager application built with .NET 8 to simplify Microsoft Teams Phone System administration tasks. Cross-platform support for Windows and macOS.
+An Avalonia-based Microsoft Teams Phone Manager application built with .NET 10 to simplify Microsoft Teams Phone System administration tasks. Cross-platform support for Windows and macOS.
 
 ## Features
 
@@ -14,15 +14,15 @@ An Avalonia-based Microsoft Teams Phone Manager application built with .NET 8 to
 ## Prerequisites
 
 - Windows 10/11, Windows Server 2019+, or macOS 10.15+
-- .NET 8 Runtime (Desktop) - [Download here](https://dotnet.microsoft.com/download/dotnet/8.0)
+- .NET 10 Runtime (Desktop) - [Download here](https://dotnet.microsoft.com/download/dotnet/10.0)
 - Microsoft Teams & Graph PowerShell Module (included with the app)
 - PowerShell 7.4+ (included with the app)
 
 ## Development Setup
 
-1. Install .NET 8 SDK:
+1. Install .NET 10 SDK:
    ```bash
-   # Download from: https://dotnet.microsoft.com/download/dotnet/8.0
+   # Download from: https://dotnet.microsoft.com/download/dotnet/10.0
    ```
 
 2. Restore dependencies:
@@ -49,7 +49,7 @@ An Avalonia-based Microsoft Teams Phone Manager application built with .NET 8 to
 
 ## Architecture
 
-- .NET 8 Avalonia (cross-platform UI framework)
+- .NET 10 Avalonia (cross-platform UI framework)
 - Material Design for Avalonia
 - MVVM Pattern
 - Microsoft.PowerShell.SDK
