@@ -626,6 +626,8 @@
                                                         Height="40"
                                                         Classes="IconOnly"
                                                         Padding="0"
+                                                        AutomationProperties.Name="Edit Holiday"
+                                                        ToolTip.Tip="Edit Holiday"
                                                         >
                                                     <fi:SymbolIcon  Symbol="Edit"
                                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
@@ -641,6 +643,8 @@
                                                         Height="40"
                                                         Classes="IconOnly"
                                                         Padding="0"
+                                                        AutomationProperties.Name="Remove Holiday"
+                                                        ToolTip.Tip="Remove Holiday"
                                                         >
                                                     <fi:SymbolIcon  Symbol="Delete"
                                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
@@ -829,6 +833,7 @@
                                     <Button Command="{Binding ShowAargauInfoCommand}"
                                             IsVisible="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             ToolTip.Tip="Aargau Holiday Reference Information"
+                                            AutomationProperties.Name="Aargau Holiday Reference Information"
                                             Background="Transparent"
                                             VerticalAlignment="Center"
                                             Classes="IconOnly"
@@ -955,7 +960,8 @@
                                 Margin="0,0,0,16">
                             <Image Source="avares://teams-phonemanager/Resources/AargauHolidaysReference.png"
                                    Stretch="Uniform"
-                                   MaxHeight="400"/>
+                                   MaxHeight="400"
+                                   AutomationProperties.Name="Aargau Holiday Reference Table"/>
                         </Border>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
