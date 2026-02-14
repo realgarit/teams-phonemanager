@@ -5,3 +5,7 @@
 ## 2026-02-13 - Accessible Names for Icon-Only Elements
 **Learning:** Icon-only buttons and informative images in this Avalonia project lacked programmatic names, making them inaccessible to screen readers. Relying only on visual icons or ToolTips (which are often not read by screen readers unless specifically configured) is insufficient for accessibility.
 **Action:** Always use `AutomationProperties.Name` for icon-only buttons and provide descriptive names for informative images to ensure they are properly announced by screen readers.
+
+## 2026-02-14 - Contextual Clarity with Watermarks
+**Learning:** Input fields that rely on external example text (like "Example: Acme Corp") rather than explicit labels are difficult for screen readers and confusing for users. Adding a `Watermark` provides immediate context and often serves as the fallback accessible name.
+**Action:** Use `Watermark` in `TextBox` controls to clearly identify the field's purpose, especially when layout constraints prevent adding standard labels.

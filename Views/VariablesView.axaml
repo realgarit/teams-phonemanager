@@ -73,49 +73,49 @@
                                 </Grid.RowDefinitions>
 
                                 <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,8,4,8">
-                                    <TextBox 
+                                    <TextBox Watermark="Customer Legal Name"
                                              Text="{Binding Variables.CustomerLegalName}"
                                              />
                                     <TextBlock Text="Example: Acme Corp" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
                                 
                                 <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,8,0,8">
-                                    <TextBox 
+                                    <TextBox Watermark="Microsoft Fallback Domain"
                                              Text="{Binding Variables.MsFallbackDomain}"
                                              />
                                     <TextBlock Text="Example: @acme.onmicrosoft.com" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
                                 
                                 <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,4,8">
-                                    <TextBox 
+                                    <TextBox Watermark="Customer Code (e.g., acm-luc)"
                                              Text="{Binding Variables.Customer}"
                                              />
                                     <TextBlock Text="Example: acm-luc" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
                                 
                                 <StackPanel Grid.Row="1" Grid.Column="1" Margin="4,0,0,8">
-                                    <TextBox 
+                                    <TextBox Watermark="Customer Group Name"
                                              Text="{Binding Variables.CustomerGroupName}"
                                              />
                                     <TextBlock Text="Example: immo" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
                                 
                                 <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,4,8">
-                                    <TextBox 
+                                    <TextBox Watermark="Language ID (e.g., de-DE)"
                                              Text="{Binding Variables.LanguageId}"
                                              />
                                     <TextBlock Text="Example: de-DE" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
                                 
                                 <StackPanel Grid.Row="2" Grid.Column="1" Margin="4,0,0,8">
-                                    <TextBox 
+                                    <TextBox Watermark="Time Zone ID"
                                              Text="{Binding Variables.TimeZoneId}"
                                              />
                                     <TextBlock Text="Example: W. Europe Standard Time" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
                                 
                                 <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,0,4,8">
-                                    <TextBox 
+                                    <TextBox Watermark="Usage Location (e.g., CH)"
                                              Text="{Binding Variables.UsageLocation}"
                                              />
                                     <TextBlock Text="Example: CH" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
@@ -207,21 +207,21 @@
                                 </StackPanel>
                                 
                                 <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,8,0,8">
-                                    <TextBox 
+                                    <TextBox Watermark="Phone Number Type"
                                              Text="{Binding Variables.PhoneNumberType}"
                                              />
                                     <TextBlock Text="Example: DirectRouting" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
-                                    <TextBox 
+                                    <TextBox Watermark="Resource Account Name Suffix"
                                              Text="{Binding Variables.RaaAnrName}"
                                              />
                                     <TextBlock Text="Example: hn for 'Hauptnummer'" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
-                                    <TextBox 
+                                    <TextBox Watermark="Main Phone Number"
                                              Text="{Binding Variables.RaaAnr}"
                                              />
                                     <TextBlock Text="Example: +41413290024" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>

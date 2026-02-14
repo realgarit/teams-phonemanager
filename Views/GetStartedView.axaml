@@ -40,7 +40,9 @@
                         <Border CornerRadius="16" 
                                 BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                 BorderThickness="2"
-                                IsVisible="{Binding !ModulesChecked}">
+                                IsVisible="{Binding !ModulesChecked}"
+                                AutomationProperties.Name="Step 1: Pending"
+                                ToolTip.Tip="Step 1: Pending">
                             <TextBlock Text="1" 
                                      FontSize="18" 
                                      FontWeight="Bold"
@@ -53,7 +55,9 @@
                                      HorizontalAlignment="Center"
                                      VerticalAlignment="Center"
                                      Foreground="{DynamicResource SystemFillColorSuccessBrush}"
-                                     IsVisible="{Binding ModulesChecked}"/>
+                                     IsVisible="{Binding ModulesChecked}"
+                                     AutomationProperties.Name="Step 1: Completed"
+                                     ToolTip.Tip="Step 1: Completed"/>
                     </Panel>
                     
                     <!-- Content -->
@@ -90,7 +94,9 @@
                         <Border CornerRadius="16" 
                                 BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                 BorderThickness="2"
-                                IsVisible="{Binding !TeamsConnected}">
+                                IsVisible="{Binding !TeamsConnected}"
+                                AutomationProperties.Name="Step 2: Pending"
+                                ToolTip.Tip="Step 2: Pending">
                             <TextBlock Text="2" 
                                      FontSize="18" 
                                      FontWeight="Bold"
@@ -102,7 +108,9 @@
                                      HorizontalAlignment="Center"
                                      VerticalAlignment="Center"
                                      Foreground="{DynamicResource SystemFillColorSuccessBrush}"
-                                     IsVisible="{Binding TeamsConnected}"/>
+                                     IsVisible="{Binding TeamsConnected}"
+                                     AutomationProperties.Name="Step 2: Completed"
+                                     ToolTip.Tip="Step 2: Completed"/>
                     </Panel>
                     
                     <!-- Content -->
@@ -150,7 +158,9 @@
                         <Border CornerRadius="16" 
                                 BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                 BorderThickness="2"
-                                IsVisible="{Binding !GraphConnected}">
+                                IsVisible="{Binding !GraphConnected}"
+                                AutomationProperties.Name="Step 3: Pending"
+                                ToolTip.Tip="Step 3: Pending">
                             <TextBlock Text="3" 
                                      FontSize="18" 
                                      FontWeight="Bold"
@@ -162,7 +172,9 @@
                                      HorizontalAlignment="Center"
                                      VerticalAlignment="Center"
                                      Foreground="{DynamicResource SystemFillColorSuccessBrush}"
-                                     IsVisible="{Binding GraphConnected}"/>
+                                     IsVisible="{Binding GraphConnected}"
+                                     AutomationProperties.Name="Step 3: Completed"
+                                     ToolTip.Tip="Step 3: Completed"/>
                     </Panel>
                     
                     <!-- Content -->
