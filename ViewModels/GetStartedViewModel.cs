@@ -24,6 +24,10 @@ namespace teams_phonemanager.ViewModels
         public bool CanConnectTeams => ModulesChecked && !TeamsConnected;
         public bool CanConnectGraph => ModulesChecked && !GraphConnected;
 
+        public string ModulesStatusText => $"Step 1: Check PowerShell Modules. Status: {(ModulesChecked ? "Completed" : "Pending")}.";
+        public string TeamsStatusText => $"Step 2: Connect to Microsoft Teams. Status: {(TeamsConnected ? "Completed" : "Pending")}.";
+        public string GraphStatusText => $"Step 3: Connect to Microsoft Graph. Status: {(GraphConnected ? "Completed" : "Pending")}.";
+
         private readonly IMsalGraphAuthenticationService _msalAuthService;
 
         public GetStartedViewModel(
@@ -69,26 +73,26 @@ namespace teams_phonemanager.ViewModels
 
                 var command = _powerShellCommandService.GetCheckModulesCommand();
                 var result = await ExecutePowerShellCommandAsync(command, "CheckModules");
-                
+
                 // Check for Teams module
                 bool teamsAvailable = result.Contains("MicrosoftTeams module is available") || result.Contains("MicrosoftTeams module installed successfully");
-                
+
                 // Check for all required Graph modules
                 bool graphAuthAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphAuthentication + " module is available");
                 bool graphUsersAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphUsers + " module is available");
                 bool graphUsersActionsAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphUsersActions + " module is available");
                 bool graphGroupsAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphGroups + " module is available");
                 bool graphIdentityAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphIdentityDirectoryManagement + " module is available");
-                
-                ModulesChecked = teamsAvailable && 
-                                graphAuthAvailable && 
-                                graphUsersAvailable && 
-                                graphUsersActionsAvailable && 
-                                graphGroupsAvailable && 
+
+                ModulesChecked = teamsAvailable &&
+                                graphAuthAvailable &&
+                                graphUsersAvailable &&
+                                graphUsersActionsAvailable &&
+                                graphGroupsAvailable &&
                                 graphIdentityAvailable;
-                
+
                 _sessionManager.UpdateModulesChecked(ModulesChecked);
-                
+
                 if (ModulesChecked)
                 {
                     _loggingService.Log("PowerShell modules are available", LogLevel.Success);
@@ -135,14 +139,14 @@ namespace teams_phonemanager.ViewModels
                 var command = _powerShellCommandService.GetConnectTeamsCommand();
                 var result = await ExecutePowerShellCommandAsync(command, "ConnectTeams");
                 TeamsConnected = result.Contains("SUCCESS:");
-                
+
                 string? tenantId = null;
                 string? tenantName = null;
-                
+
                 if (TeamsConnected)
                 {
                     _loggingService.Log("Connected to Microsoft Teams successfully", LogLevel.Success);
-                    
+
                     foreach (var line in result.Split('\n'))
                     {
                         if (line.Contains("Connected to tenant:"))
@@ -160,13 +164,13 @@ namespace teams_phonemanager.ViewModels
                 {
                     _loggingService.Log($"Error connecting to Microsoft Teams: {result}", LogLevel.Error);
                 }
-                
+
                 _sessionManager.UpdateTeamsConnection(TeamsConnected);
                 if (tenantId != null && tenantName != null)
                 {
                     _sessionManager.UpdateTenantInfo(tenantId, tenantName);
                 }
-                
+
                 UpdateCanProceed();
             }
             catch (Exception ex)
@@ -198,7 +202,7 @@ namespace teams_phonemanager.ViewModels
 
                 // Step 1: Authenticate using MSAL (opens browser popup)
                 var authResult = await _msalAuthService.AuthenticateAsync();
-                
+
                 if (!authResult.Success || string.IsNullOrEmpty(authResult.AccessToken))
                 {
                     _loggingService.Log($"Authentication failed: {authResult.ErrorMessage}", LogLevel.Error);
@@ -214,9 +218,9 @@ namespace teams_phonemanager.ViewModels
                 var command = _powerShellCommandService.GetConnectGraphWithTokenCommand(authResult.AccessToken);
                 var result = await ExecutePowerShellCommandAsync(command, "ConnectGraph");
                 GraphConnected = result.Contains("SUCCESS:");
-                
+
                 string? account = authResult.Account;
-                
+
                 if (GraphConnected)
                 {
                     _loggingService.Log($"Connected to Microsoft Graph successfully as {account}", LogLevel.Success);
@@ -225,7 +229,7 @@ namespace teams_phonemanager.ViewModels
                 {
                     _loggingService.Log($"Error connecting to Microsoft Graph: {result}", LogLevel.Error);
                 }
-                
+
                 _sessionManager.UpdateGraphConnection(GraphConnected, account);
                 UpdateCanProceed();
             }
@@ -300,23 +304,26 @@ namespace teams_phonemanager.ViewModels
             CanProceed = ModulesChecked && TeamsConnected && GraphConnected;
         }
 
-        partial void OnModulesCheckedChanged(bool value) 
-        { 
+        partial void OnModulesCheckedChanged(bool value)
+        {
             UpdateCanProceed();
             OnPropertyChanged(nameof(CanConnectTeams));
             OnPropertyChanged(nameof(CanConnectGraph));
+            OnPropertyChanged(nameof(ModulesStatusText));
         }
-        
-        partial void OnTeamsConnectedChanged(bool value) 
-        { 
+
+        partial void OnTeamsConnectedChanged(bool value)
+        {
             UpdateCanProceed();
             OnPropertyChanged(nameof(CanConnectTeams));
+            OnPropertyChanged(nameof(TeamsStatusText));
         }
-        
-        partial void OnGraphConnectedChanged(bool value) 
-        { 
+
+        partial void OnGraphConnectedChanged(bool value)
+        {
             UpdateCanProceed();
             OnPropertyChanged(nameof(CanConnectGraph));
+            OnPropertyChanged(nameof(GraphStatusText));
         }
     }
-} 
+}

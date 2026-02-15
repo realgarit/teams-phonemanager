@@ -5,3 +5,7 @@
 ## 2026-02-13 - Accessible Names for Icon-Only Elements
 **Learning:** Icon-only buttons and informative images in this Avalonia project lacked programmatic names, making them inaccessible to screen readers. Relying only on visual icons or ToolTips (which are often not read by screen readers unless specifically configured) is insufficient for accessibility.
 **Action:** Always use `AutomationProperties.Name` for icon-only buttons and provide descriptive names for informative images to ensure they are properly announced by screen readers.
+
+## 2026-02-13 - Dynamic Status Announcements
+**Learning:** For setup/process-driven views like GetStartedView, visual icons alone are insufficient for screen readers. Using `AutomationProperties.LiveSetting="Polite"` combined with descriptive status properties in the ViewModel allows asynchronous updates (like command completion) to be automatically announced.
+**Action:** When implementing multi-step processes or long-running checks, bind `AutomationProperties.Name` to a descriptive status string and set `LiveSetting="Polite"` on the status indicator container.

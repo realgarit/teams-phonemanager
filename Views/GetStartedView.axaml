@@ -32,10 +32,13 @@
             </StackPanel>
 
             <!-- Step 1: PowerShell Modules -->
-            <Border Classes="card">
+            <Border Classes="card" AutomationProperties.Name="{Binding ModulesStatusText}">
                 <Grid ColumnDefinitions="Auto,*,Auto" Margin="8">
                     <!-- Step Indicator -->
-                    <Panel Grid.Column="0" Width="32" Height="32" VerticalAlignment="Center" Margin="0,0,24,0">
+                    <Panel Grid.Column="0" Width="32" Height="32" VerticalAlignment="Center" Margin="0,0,24,0"
+                           AutomationProperties.Name="{Binding ModulesStatusText}"
+                           AutomationProperties.LiveSetting="Polite"
+                           ToolTip.Tip="{Binding ModulesStatusText}">
                         <!-- Pending State: Ring with Number -->
                         <Border CornerRadius="16" 
                                 BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
@@ -83,10 +86,13 @@
             </Border>
 
             <!-- Step 2: Teams Connection -->
-            <Border Classes="card">
+            <Border Classes="card" AutomationProperties.Name="{Binding TeamsStatusText}">
                 <Grid ColumnDefinitions="Auto,*,Auto" Margin="8">
                     <!-- Step Indicator -->
-                    <Panel Grid.Column="0" Width="32" Height="32" VerticalAlignment="Center" Margin="0,0,24,0">
+                    <Panel Grid.Column="0" Width="32" Height="32" VerticalAlignment="Center" Margin="0,0,24,0"
+                           AutomationProperties.Name="{Binding TeamsStatusText}"
+                           AutomationProperties.LiveSetting="Polite"
+                           ToolTip.Tip="{Binding TeamsStatusText}">
                         <Border CornerRadius="16" 
                                 BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                 BorderThickness="2"
@@ -143,10 +149,13 @@
             </Border>
 
             <!-- Step 3: Graph Connection -->
-            <Border Classes="card">
+            <Border Classes="card" AutomationProperties.Name="{Binding GraphStatusText}">
                 <Grid ColumnDefinitions="Auto,*,Auto" Margin="8">
                     <!-- Step Indicator -->
-                    <Panel Grid.Column="0" Width="32" Height="32" VerticalAlignment="Center" Margin="0,0,24,0">
+                    <Panel Grid.Column="0" Width="32" Height="32" VerticalAlignment="Center" Margin="0,0,24,0"
+                           AutomationProperties.Name="{Binding GraphStatusText}"
+                           AutomationProperties.LiveSetting="Polite"
+                           ToolTip.Tip="{Binding GraphStatusText}">
                         <Border CornerRadius="16" 
                                 BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                 BorderThickness="2"
@@ -208,6 +217,20 @@
                     BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
                     Margin="0,16,0,0"
                     IsVisible="{Binding CanProceed}">
+                <Border.Styles>
+                    <Style Selector="Border">
+                        <Style.Animations>
+                            <Animation Duration="0:0:0.3">
+                                <KeyFrame Cue="0%">
+                                    <Setter Property="Opacity" Value="0"/>
+                                </KeyFrame>
+                                <KeyFrame Cue="100%">
+                                    <Setter Property="Opacity" Value="1"/>
+                                </KeyFrame>
+                            </Animation>
+                        </Style.Animations>
+                    </Style>
+                </Border.Styles>
                 <Grid ColumnDefinitions="*,Auto" Margin="8">
                     <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="4">
                         <StackPanel Orientation="Horizontal" Spacing="8">
