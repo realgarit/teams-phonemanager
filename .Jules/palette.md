@@ -9,3 +9,7 @@
 ## 2026-02-13 - Dynamic Status Announcements
 **Learning:** For setup/process-driven views like GetStartedView, visual icons alone are insufficient for screen readers. Using `AutomationProperties.LiveSetting="Polite"` combined with descriptive status properties in the ViewModel allows asynchronous updates (like command completion) to be automatically announced.
 **Action:** When implementing multi-step processes or long-running checks, bind `AutomationProperties.Name` to a descriptive status string and set `LiveSetting="Polite"` on the status indicator container.
+
+## 2026-02-14 - Contextual Clarity with Watermarks
+**Learning:** Input fields that rely on external example text (like "Example: Acme Corp") rather than explicit labels are difficult for screen readers and confusing for users. Adding a `Watermark` provides immediate context and often serves as the fallback accessible name.
+**Action:** Use `Watermark` in `TextBox` controls to clearly identify the field's purpose, especially when layout constraints prevent adding standard labels.
