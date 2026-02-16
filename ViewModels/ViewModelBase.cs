@@ -18,10 +18,21 @@ namespace teams_phonemanager.ViewModels
         private bool _isBusy;
 
         [ObservableProperty]
+        private string _waitingMessage = string.Empty;
+
+        [ObservableProperty]
         private string _statusMessage = string.Empty;
 
         [ObservableProperty]
         private string _logMessage = string.Empty;
+
+        partial void OnIsBusyChanged(bool value)
+        {
+            if (!value)
+            {
+                WaitingMessage = string.Empty;
+            }
+        }
 
         protected ViewModelBase(
             IPowerShellContextService powerShellContextService,
@@ -52,13 +63,13 @@ namespace teams_phonemanager.ViewModels
             try
             {
                 var result = await _powerShellContextService.ExecuteCommandAsync(command);
-                
+
                 // Only treat as error if result contains ERROR: and not SUCCESS
                 if (result.Contains("ERROR:") && !result.Contains("SUCCESS"))
                 {
                     await _errorHandlingService.HandlePowerShellError(command, result, context);
                 }
-                
+
                 return result;
             }
             catch (Exception ex)

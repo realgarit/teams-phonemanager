@@ -88,6 +88,7 @@ namespace teams_phonemanager.ViewModels
         {
             try
             {
+                WaitingMessage = ConstantsService.Messages.WaitingMessage;
                 IsBusy = true;
                 ResourceAccounts.Clear();
                 StatusMessage = "Retrieving resource accounts...";
@@ -125,6 +126,7 @@ namespace teams_phonemanager.ViewModels
         {
             try
             {
+                WaitingMessage = ConstantsService.Messages.WaitingMessage;
                 IsBusy = true;
                 CallQueues.Clear();
                 StatusMessage = "Retrieving call queues...";
@@ -222,6 +224,7 @@ namespace teams_phonemanager.ViewModels
 
             try
             {
+                WaitingMessage = ConstantsService.Messages.LicenseWaitingMessage;
                 IsBusy = true;
                 StatusMessage = "Assigning license to resource account...";
 
@@ -268,6 +271,7 @@ namespace teams_phonemanager.ViewModels
 
             try
             {
+                WaitingMessage = ConstantsService.Messages.WaitingMessage;
                 IsBusy = true;
                 StatusMessage = "Retrieving M365 Group ID...";
 
@@ -319,6 +323,7 @@ namespace teams_phonemanager.ViewModels
 
             try
             {
+                WaitingMessage = ConstantsService.Messages.WaitingMessage;
                 IsBusy = true;
                 ShowCreateResourceAccountDialog = false;
 
@@ -400,6 +405,7 @@ namespace teams_phonemanager.ViewModels
 
             try
             {
+                WaitingMessage = ConstantsService.Messages.WaitingMessage;
                 IsBusy = true;
                 ShowUpdateUsageLocationDialog = false;
 
@@ -466,6 +472,7 @@ namespace teams_phonemanager.ViewModels
 
             try
             {
+                WaitingMessage = ConstantsService.Messages.WaitingMessage;
                 IsBusy = true;
                 ShowCreateCallQueueDialog = false;
 
@@ -532,6 +539,7 @@ namespace teams_phonemanager.ViewModels
 
             try
             {
+                WaitingMessage = ConstantsService.Messages.WaitingMessage;
                 IsBusy = true;
                 ShowAssociateDialog = false;
 

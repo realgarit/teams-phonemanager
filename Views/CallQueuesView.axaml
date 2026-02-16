@@ -64,7 +64,8 @@
 
                                 <Button Grid.Column="0"
                                         Command="{Binding RetrieveResourceAccountsCommand}"
-                                        
+                                        ToolTip.Tip="Retrieve resource accounts from Microsoft Teams"
+                                        AutomationProperties.Name="Retrieve Resource Accounts"
                                         Margin="0,0,16,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
                                         <fi:SymbolIcon  Symbol="ArrowSync" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
@@ -74,7 +75,8 @@
 
                                 <Button Grid.Column="1"
                                         Command="{Binding OpenCreateResourceAccountDialogCommand}"
-                                        
+                                        ToolTip.Tip="Open dialog to create a new resource account"
+                                        AutomationProperties.Name="Create Resource Account"
                                         Margin="0,0,16,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
                                         <fi:SymbolIcon  Symbol="PersonAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
@@ -131,7 +133,8 @@
 
                                 <Button Grid.Column="0"
                                         Command="{Binding RetrieveCallQueuesCommand}"
-                                        
+                                        ToolTip.Tip="Retrieve call queues from Microsoft Teams"
+                                        AutomationProperties.Name="Retrieve Call Queues"
                                         Margin="0,0,16,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
                                         <fi:SymbolIcon  Symbol="ArrowSync" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
@@ -141,7 +144,8 @@
 
                                 <Button Grid.Column="1"
                                         Command="{Binding OpenCreateCallQueueDialogCommand}"
-                                        
+                                        ToolTip.Tip="Open dialog to create a new call queue"
+                                        AutomationProperties.Name="Create Call Queue"
                                         Margin="0,0,16,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
                                         <fi:SymbolIcon  Symbol="CallAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
@@ -605,22 +609,24 @@
             </Border>
 
             <!-- Progress Indicator -->
-            <Grid 
-                  Opacity="0.8"
+            <Grid Grid.RowSpan="2"
+                  ZIndex="2000"
+                  Background="#40000000"
                   IsVisible="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <ProgressBar
-                           Value="0"
-                           IsIndeterminate="True"
-                           Width="50"
-                           
-                           Margin="0,16,0,0"/>
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <ProgressBar
+                               AutomationProperties.Name="Operation Progress"
+                               Value="0"
+                               IsIndeterminate="True"
+                               Width="50"
+                               Margin="0,0,0,16"/>
                 
-                <!-- Waiting Message -->
-                <TextBlock Text="{Binding WaitingMessage, TargetNullValue=''}"
-                           FontSize="14"
-                           TextWrapping="Wrap"
-                           Margin="0,8,0,0"
-                           TextAlignment="Center"/>
+                    <!-- Waiting Message -->
+                    <TextBlock Text="{Binding WaitingMessage, TargetNullValue=''}"
+                               FontSize="14"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"/>
+                </StackPanel>
             </Grid>
         </Grid>
     </Border>
