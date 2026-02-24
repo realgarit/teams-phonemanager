@@ -180,13 +180,26 @@ $ErrorActionPreference = 'Continue'
 
         public bool IsConnected(string service)
         {
-            _semaphore.Wait();
+            // Synchronous wrapper for backward compatibility
+            // Deprecated: Use IsConnectedAsync instead
+            return IsConnectedAsync(service).GetAwaiter().GetResult();
+        }
+
+        public async Task<bool> IsConnectedAsync(string service, CancellationToken cancellationToken = default)
+        {
+            // Use timeout to prevent indefinite blocking
+            if (!await _semaphore.WaitAsync(TimeSpan.FromSeconds(30), cancellationToken))
+            {
+                _loggingService.Log("IsConnectedAsync timed out waiting for semaphore", LogLevel.Warning);
+                return false;
+            }
+            
             try
             {
                 _powerShell.Commands.Clear();
                 _powerShell.Streams.ClearStreams();
 
-                switch (service.ToLower())
+                switch (service.ToLowerInvariant())
                 {
                     case "teams":
                         // Use command-based execution instead of script for better security tool compatibility
@@ -202,11 +215,16 @@ $ErrorActionPreference = 'Continue'
                         return false;
                 }
 
-                var result = _powerShell.Invoke();
+                var result = await Task.Run(() => _powerShell.Invoke(), cancellationToken);
                 return result != null && result.Count > 0;
             }
-            catch
+            catch (OperationCanceledException)
             {
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Error checking {service} connection: {ex.Message}", LogLevel.Warning);
                 return false;
             }
             finally

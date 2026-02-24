@@ -17,6 +17,7 @@ namespace teams_phonemanager.ViewModels
     public partial class VariablesViewModel : ViewModelBase
     {
         private readonly MainWindowViewModel? _mainWindowViewModel;
+        private PhoneManagerVariables? _subscribedVariables;
 
         [ObservableProperty]
         private string _welcomeMessage = "Welcome to the Variables page. Here you can set the variables that will be used throughout the application.";
@@ -97,24 +98,38 @@ namespace teams_phonemanager.ViewModels
             // Subscribe to variable changes for Call Queue configuration visibility
             if (_mainWindowViewModel?.Variables != null)
             {
-                _mainWindowViewModel.Variables.PropertyChanged += (s, e) =>
-                {
-                    if (e.PropertyName?.StartsWith("Cq") == true)
-                    {
-                        UpdateCallQueueVisibility();
-                    }
-                    else if (e.PropertyName == nameof(PhoneManagerVariables.M365GroupId))
-                    {
-                        PrefillCallQueueTargets();
-                    }
-                    else if (e.PropertyName?.StartsWith("Aa") == true)
-                    {
-                        UpdateAutoAttendantVisibility();
-                    }
-                };
+                SubscribeToVariablesChanges(_mainWindowViewModel.Variables);
 
                 // Prefill target fields if M365GroupId is already set
                 PrefillCallQueueTargets();
+            }
+        }
+
+        private void SubscribeToVariablesChanges(PhoneManagerVariables variables)
+        {
+            // Unsubscribe from previous instance if any
+            if (_subscribedVariables != null)
+            {
+                _subscribedVariables.PropertyChanged -= OnVariablesPropertyChanged;
+            }
+
+            _subscribedVariables = variables;
+            variables.PropertyChanged += OnVariablesPropertyChanged;
+        }
+
+        private void OnVariablesPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName?.StartsWith("Cq") == true)
+            {
+                UpdateCallQueueVisibility();
+            }
+            else if (e.PropertyName == nameof(PhoneManagerVariables.M365GroupId))
+            {
+                PrefillCallQueueTargets();
+            }
+            else if (e.PropertyName?.StartsWith("Aa") == true)
+            {
+                UpdateAutoAttendantVisibility();
             }
         }
 
@@ -150,24 +165,11 @@ namespace teams_phonemanager.ViewModels
                 {
                     _mainWindowViewModel.Variables = value;
                     OnPropertyChanged();
+                    
                     // Subscribe to changes on the new Variables instance
                     if (value != null)
                     {
-                        value.PropertyChanged += (s, e) =>
-                        {
-                            if (e.PropertyName?.StartsWith("Cq") == true)
-                            {
-                                UpdateCallQueueVisibility();
-                            }
-                            else if (e.PropertyName == nameof(PhoneManagerVariables.M365GroupId))
-                            {
-                                PrefillCallQueueTargets();
-                            }
-                            else if (e.PropertyName?.StartsWith("Aa") == true)
-                            {
-                                UpdateAutoAttendantVisibility();
-                            }
-                        };
+                        SubscribeToVariablesChanges(value);
                         
                         // Prefill target fields if M365GroupId is already set
                         PrefillCallQueueTargets();
