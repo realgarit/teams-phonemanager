@@ -231,7 +231,16 @@ namespace teams_phonemanager.ViewModels
                 if (!string.IsNullOrEmpty(result))
                 {
                     var output = result.Trim();
-                    GroupId = output.Split(':')[1].Trim();
+                    var parts = output.Split(':');
+                    if (parts.Length >= 2)
+                    {
+                        GroupId = parts[1].Trim();
+                    }
+                    else
+                    {
+                        GroupId = string.Empty;
+                        _loggingService.Log($"Could not parse group ID from output: {output}", LogLevel.Warning);
+                    }
                     GroupStatus = output.Contains("already exists") ? "Group already exists" : "Group created successfully";
                     IsGroupChecked = true;
                     _loggingService.Log($"M365 Group {m365group} check completed: {GroupStatus}", LogLevel.Info);
