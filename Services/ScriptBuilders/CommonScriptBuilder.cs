@@ -165,8 +165,9 @@ catch {
 
         public string GetConnectGraphWithTokenCommand(string accessToken)
         {
-            // The access token is passed as a SecureString in PowerShell
-            // We need to convert it properly
+            // SECURITY: Pass the access token via environment variable to avoid logging it in clear text.
+            // The environment variable is cleared immediately after use.
+            // Using a unique variable name to avoid conflicts.
             return GetCommonSetupScript() + @"
 try {
     # Import Microsoft.Graph modules
@@ -177,7 +178,12 @@ try {
     Import-Module " + ConstantsService.PowerShellModules.MicrosoftGraphIdentityDirectoryManagement + @" -Force
 
     # Convert the access token to SecureString as required by Connect-MgGraph
-    $tokenSecure = ConvertTo-SecureString -String '" + accessToken + @"' -AsPlainText -Force
+    # Token is passed via environment variable to avoid logging
+    $tokenSecure = ConvertTo-SecureString -String $env:TEAMS_PM_TOKEN -AsPlainText -Force
+    
+    # Clear the environment variable immediately for security
+    $env:TEAMS_PM_TOKEN = $null
+    [GC]::Collect()
 
     Connect-MgGraph -AccessToken $tokenSecure -ErrorAction Stop -NoWelcome
     $context = Get-MgContext -ErrorAction Stop
@@ -187,6 +193,8 @@ try {
     }
 }
 catch {
+    # Ensure token is cleared even on error
+    $env:TEAMS_PM_TOKEN = $null
     Write-Error ""Failed to connect to Microsoft Graph: $_""
     exit " + ConstantsService.PowerShell.ExitCodeError + @"
 }";
@@ -259,14 +267,18 @@ catch {{
 
         public string GetAssignLicenseCommand(string userId, string skuId)
         {
+            // SECURITY: Sanitize inputs
+            var sanitizedUserId = _sanitizer.SanitizeString(userId);
+            var sanitizedSkuId = _sanitizer.SanitizeString(skuId);
+            
             return $@"
 try {{
-    $SkuId = ""{skuId}""
-    Set-MgUserLicense -UserId ""{userId}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
-    Write-Host ""SUCCESS: License assigned to user {userId} successfully""
+    $SkuId = ""{sanitizedSkuId}""
+    Set-MgUserLicense -UserId ""{sanitizedUserId}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
+    Write-Host ""SUCCESS: License assigned successfully""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to assign license to user {userId}: $_""
+    Write-Host ""ERROR: Failed to assign license: $_""
 }}";
         }
 

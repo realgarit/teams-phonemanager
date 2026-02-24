@@ -34,20 +34,33 @@ catch {
 
         public string GetCreateResourceAccountCommand(PhoneManagerVariables variables)
         {
+            // SECURITY: Sanitize all user inputs and wrap in quotes to prevent command injection
+            var sanitizedUpn = _sanitizer.SanitizeString(variables.RacqUPN);
+            var sanitizedDisplayName = _sanitizer.SanitizeString(variables.RacqDisplayName);
+            
             return $@"
-New-CsOnlineApplicationInstance -UserPrincipalName {variables.RacqUPN} -ApplicationId {variables.CsAppCqId} -DisplayName {variables.RacqDisplayName}
-Write-Host ""SUCCESS: Resource account {variables.RacqUPN} created successfully""";
+try {{
+    New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedUpn}"" -ApplicationId ""{variables.CsAppCqId}"" -DisplayName ""{sanitizedDisplayName}""
+    Write-Host ""SUCCESS: Resource account created successfully""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create resource account: $_""
+}}";
         }
 
         public string GetUpdateResourceAccountUsageLocationCommand(string upn, string usageLocation)
         {
+            // SECURITY: Sanitize inputs
+            var sanitizedUpn = _sanitizer.SanitizeString(upn);
+            var sanitizedUsageLocation = _sanitizer.SanitizeString(usageLocation);
+            
             return $@"
 try {{
-    Update-MgUser -UserId ""{upn}"" -UsageLocation ""{usageLocation}""
-    Write-Host ""SUCCESS: Updated usage location for {upn} to {usageLocation}""
+    Update-MgUser -UserId ""{sanitizedUpn}"" -UsageLocation ""{sanitizedUsageLocation}""
+    Write-Host ""SUCCESS: Updated usage location for resource account""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to update usage location for {upn}: $_""
+    Write-Host ""ERROR: Failed to update usage location: $_""
 }}";
         }
 
@@ -72,33 +85,50 @@ catch {
 
         public string GetCreateAutoAttendantResourceAccountCommand(PhoneManagerVariables variables)
         {
+            // SECURITY: Sanitize all user inputs and wrap in quotes to prevent command injection
+            var sanitizedUpn = _sanitizer.SanitizeString(variables.RaaaUPN);
+            var sanitizedDisplayName = _sanitizer.SanitizeString(variables.RaaaDisplayName);
+            
             return $@"
-New-CsOnlineApplicationInstance -UserPrincipalName {variables.RaaaUPN} -ApplicationId {variables.CsAppAaId} -DisplayName {variables.RaaaDisplayName}
-Write-Host ""SUCCESS: Resource account {variables.RaaaUPN} created successfully""";
+try {{
+    New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedUpn}"" -ApplicationId ""{variables.CsAppAaId}"" -DisplayName ""{sanitizedDisplayName}""
+    Write-Host ""SUCCESS: Resource account created successfully""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create resource account: $_""
+}}";
         }
 
         public string GetUpdateAutoAttendantResourceAccountUsageLocationCommand(string upn, string usageLocation)
         {
+            // SECURITY: Sanitize inputs
+            var sanitizedUpn = _sanitizer.SanitizeString(upn);
+            var sanitizedUsageLocation = _sanitizer.SanitizeString(usageLocation);
+            
             return $@"
 try {{
-    Update-MgUser -UserId ""{upn}"" -UsageLocation ""{usageLocation}""
-    Write-Host ""SUCCESS: Updated usage location for {upn} to {usageLocation}""
+    Update-MgUser -UserId ""{sanitizedUpn}"" -UsageLocation ""{sanitizedUsageLocation}""
+    Write-Host ""SUCCESS: Updated usage location for resource account""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to update usage location for {upn}: $_""
+    Write-Host ""ERROR: Failed to update usage location: $_""
 }}";
         }
 
         public string GetAssignAutoAttendantLicenseCommand(string userId, string skuId)
         {
+            // SECURITY: Sanitize inputs
+            var sanitizedUserId = _sanitizer.SanitizeString(userId);
+            var sanitizedSkuId = _sanitizer.SanitizeString(skuId);
+            
             return $@"
 try {{
-    $SkuId = ""{skuId}""
-    Set-MgUserLicense -UserId ""{userId}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
-    Write-Host ""SUCCESS: License assigned to user {userId} successfully""
+    $SkuId = ""{sanitizedSkuId}""
+    Set-MgUserLicense -UserId ""{sanitizedUserId}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
+    Write-Host ""SUCCESS: License assigned to user successfully""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to assign license to user {userId}: $_""
+    Write-Host ""ERROR: Failed to assign license: $_""
 }}";
         }
     }

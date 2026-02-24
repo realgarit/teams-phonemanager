@@ -18,14 +18,32 @@ namespace teams_phonemanager.Services
         {
             _loggingService = loggingService;
 
-            _runspace = RunspaceFactory.CreateRunspace();
-            _runspace.Open();
+            // Use local variables during construction to ensure proper cleanup on failure
+            Runspace? localRunspace = null;
+            PowerShell? localPowerShell = null;
+            
+            try
+            {
+                localRunspace = RunspaceFactory.CreateRunspace();
+                localRunspace.Open();
 
-            _powerShell = PowerShell.Create();
-            _powerShell.Runspace = _runspace;
+                localPowerShell = PowerShell.Create();
+                localPowerShell.Runspace = localRunspace;
 
-            InitializeExecutionPolicy();
-            _loggingService.Log("PowerShell context service initialized with persistent runspace", LogLevel.Info);
+                // Assign to fields only after successful initialization
+                _runspace = localRunspace;
+                _powerShell = localPowerShell;
+
+                InitializeExecutionPolicy();
+                _loggingService.Log("PowerShell context service initialized with persistent runspace", LogLevel.Info);
+            }
+            catch
+            {
+                // Clean up locally created resources if initialization fails
+                localPowerShell?.Dispose();
+                localRunspace?.Dispose();
+                throw;
+            }
         }
 
         private void InitializeExecutionPolicy()
@@ -58,58 +76,96 @@ namespace teams_phonemanager.Services
 
         public async Task<string> ExecuteCommandAsync(string command, CancellationToken cancellationToken = default)
         {
+            return await ExecuteCommandAsync(command, null, cancellationToken);
+        }
+
+        public async Task<string> ExecuteCommandAsync(string command, Dictionary<string, string>? environmentVariables, CancellationToken cancellationToken = default)
+        {
             if (_disposed)
                 throw new ObjectDisposedException(nameof(PowerShellContextService));
 
             await _semaphore.WaitAsync(cancellationToken);
             try
             {
-                _powerShell.Commands.Clear();
-                _powerShell.Streams.ClearStreams();
+                // SECURITY: Set environment variables if provided (e.g., for secure token passing)
+                // These will be cleared after command execution
+                var varsToClear = new List<string>();
+                if (environmentVariables != null)
+                {
+                    foreach (var kvp in environmentVariables)
+                    {
+                        _runspace.SessionStateProxy.SetVariable(kvp.Key, kvp.Value);
+                        // Also set as environment variable for PowerShell scripts
+                        Environment.SetEnvironmentVariable(kvp.Key, kvp.Value);
+                        varsToClear.Add(kvp.Key);
+                    }
+                }
 
-                var fullCommand = $@"
+                try
+                {
+                    _powerShell.Commands.Clear();
+                    _powerShell.Streams.ClearStreams();
+
+                    var fullCommand = $@"
 # Ensure we're in the right context
 $ErrorActionPreference = 'Continue'
 {command}
 ";
 
-                _powerShell.AddScript(fullCommand);
+                    _powerShell.AddScript(fullCommand);
 
-                var result = await Task.Run(() =>
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    return _powerShell.Invoke();
-                }, cancellationToken);
-
-                var output = new StringBuilder();
-
-                foreach (var item in _powerShell.Streams.Information)
-                {
-                    output.AppendLine(item.ToString());
-                }
-
-                // Capture Warning stream (device code from Connect-MgGraph -UseDeviceCode is output here)
-                foreach (var item in _powerShell.Streams.Warning)
-                {
-                    _loggingService.Log($"{item}", LogLevel.Warning);
-                    output.AppendLine($"WARNING: {item}");
-                }
-
-                foreach (var item in result)
-                {
-                    output.AppendLine(item.ToString());
-                }
-
-                if (_powerShell.HadErrors)
-                {
-                    foreach (var error in _powerShell.Streams.Error)
+                    var result = await Task.Run(() =>
                     {
-                        _loggingService.Log($"PowerShell error: {error}", LogLevel.Error);
-                        output.AppendLine($"ERROR: {error}");
+                        cancellationToken.ThrowIfCancellationRequested();
+                        return _powerShell.Invoke();
+                    }, cancellationToken);
+
+                    var output = new StringBuilder();
+
+                    foreach (var item in _powerShell.Streams.Information)
+                    {
+                        output.AppendLine(item.ToString());
+                    }
+
+                    // Capture Warning stream (device code from Connect-MgGraph -UseDeviceCode is output here)
+                    foreach (var item in _powerShell.Streams.Warning)
+                    {
+                        _loggingService.Log($"{item}", LogLevel.Warning);
+                        output.AppendLine($"WARNING: {item}");
+                    }
+
+                    foreach (var item in result)
+                    {
+                        output.AppendLine(item.ToString());
+                    }
+
+                    if (_powerShell.HadErrors)
+                    {
+                        foreach (var error in _powerShell.Streams.Error)
+                        {
+                            _loggingService.Log($"PowerShell error: {error}", LogLevel.Error);
+                            output.AppendLine($"ERROR: {error}");
+                        }
+                    }
+
+                    return output.ToString();
+                }
+                finally
+                {
+                    // SECURITY: Clear sensitive environment variables immediately after execution
+                    foreach (var varName in varsToClear)
+                    {
+                        try
+                        {
+                            _runspace.SessionStateProxy.SetVariable(varName, null);
+                            Environment.SetEnvironmentVariable(varName, null);
+                        }
+                        catch
+                        {
+                            // Ignore errors when clearing variables
+                        }
                     }
                 }
-
-                return output.ToString();
             }
             catch (Exception ex)
             {

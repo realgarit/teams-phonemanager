@@ -214,9 +214,14 @@ namespace teams_phonemanager.ViewModels
 
                 _loggingService.Log("Authentication successful, connecting PowerShell to Microsoft Graph...", LogLevel.Info);
 
-                // Step 2: Pass the token to PowerShell's Connect-MgGraph
+                // Step 2: Pass the token securely via environment variable (not embedded in script)
+                // This prevents the token from appearing in logs or error messages
                 var command = _powerShellCommandService.GetConnectGraphWithTokenCommand(authResult.AccessToken);
-                var result = await ExecutePowerShellCommandAsync(command, "ConnectGraph");
+                var envVars = new Dictionary<string, string>
+                {
+                    { "TEAMS_PM_TOKEN", authResult.AccessToken }
+                };
+                var result = await ExecutePowerShellCommandAsync(command, envVars, "ConnectGraph");
                 GraphConnected = result.Contains("SUCCESS:");
 
                 string? account = authResult.Account;

@@ -193,13 +193,18 @@ catch {{
 
         public string GetAssignPhoneNumberToAutoAttendantCommand(string upn, string phoneNumber, string phoneNumberType)
         {
+            // SECURITY: Sanitize inputs
+            var sanitizedUpn = _sanitizer.SanitizeString(upn);
+            var sanitizedPhoneNumber = _sanitizer.SanitizeString(phoneNumber);
+            var sanitizedPhoneNumberType = _sanitizer.SanitizeString(phoneNumberType);
+            
             return $@"
 try {{
-    Set-CsPhoneNumberAssignment -Identity {upn} -PhoneNumber {phoneNumber} -PhoneNumberType {phoneNumberType}
-    Write-Host ""SUCCESS: Phone number {phoneNumber} assigned to {upn} successfully""
+    Set-CsPhoneNumberAssignment -Identity ""{sanitizedUpn}"" -PhoneNumber ""{sanitizedPhoneNumber}"" -PhoneNumberType ""{sanitizedPhoneNumberType}""
+    Write-Host ""SUCCESS: Phone number assigned successfully""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to assign phone number {phoneNumber} to {upn}: $_""
+    Write-Host ""ERROR: Failed to assign phone number: $_""
 }}";
         }
 
@@ -264,33 +269,42 @@ catch {{
 
         public string GetCreateSimpleAutoAttendantCommand(PhoneManagerVariables variables)
         {
+            // SECURITY: Sanitize inputs
+            var sanitizedAaDisplayName = _sanitizer.SanitizeString(variables.AaDisplayName);
+            var sanitizedLanguageId = _sanitizer.SanitizeString(variables.LanguageId);
+            var sanitizedTimeZoneId = _sanitizer.SanitizeString(variables.TimeZoneId);
+            
             return $@"
 try {{
     New-CsAutoAttendant `
-    -Name ""{variables.AaDisplayName}"" `
+    -Name ""{sanitizedAaDisplayName}"" `
     -DefaultCallFlow $aadefaultCallFlow `
     -CallFlows @($aaafterHoursCallFlow) `
     -CallHandlingAssociations @($aaafterHoursCallHandlingAssociation) `
-    -LanguageId ""{variables.LanguageId}"" `
-    -TimeZoneId ""{variables.TimeZoneId}""
-    Write-Host ""SUCCESS: Auto attendant {variables.AaDisplayName} created successfully""
+    -LanguageId ""{sanitizedLanguageId}"" `
+    -TimeZoneId ""{sanitizedTimeZoneId}""
+    Write-Host ""SUCCESS: Auto attendant created successfully""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to create auto attendant {variables.AaDisplayName}: $_""
+    Write-Host ""ERROR: Failed to create auto attendant: $_""
 }}";
         }
 
         public string GetAssociateResourceAccountWithAutoAttendantCommand(string resourceAccountUpn, string autoAttendantName)
         {
+            // SECURITY: Sanitize inputs
+            var sanitizedUpn = _sanitizer.SanitizeString(resourceAccountUpn);
+            var sanitizedAaName = _sanitizer.SanitizeString(autoAttendantName);
+            
             return $@"
 try {{
-    $aaapplicationInstanceId = (Get-CsOnlineUser {resourceAccountUpn}).Identity
-    $aaautoAttendantId = (Get-CsAutoAttendant -NameFilter {autoAttendantName}).Identity
+    $aaapplicationInstanceId = (Get-CsOnlineUser ""{sanitizedUpn}"").Identity
+    $aaautoAttendantId = (Get-CsAutoAttendant -NameFilter ""{sanitizedAaName}"").Identity
     New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceId) -ConfigurationId $aaautoAttendantId -ConfigurationType AutoAttendant
-    Write-Host ""SUCCESS: Associated resource account {resourceAccountUpn} with auto attendant {autoAttendantName}""
+    Write-Host ""SUCCESS: Associated resource account with auto attendant""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to associate resource account {resourceAccountUpn} with auto attendant {autoAttendantName}: $_""
+    Write-Host ""ERROR: Failed to associate resource account with auto attendant: $_""
 }}";
         }
     }

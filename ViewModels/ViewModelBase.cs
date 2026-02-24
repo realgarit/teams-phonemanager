@@ -60,9 +60,14 @@ namespace teams_phonemanager.ViewModels
 
         protected async Task<string> ExecutePowerShellCommandAsync(string command, string context = "")
         {
+            return await ExecutePowerShellCommandAsync(command, null, context);
+        }
+
+        protected async Task<string> ExecutePowerShellCommandAsync(string command, Dictionary<string, string>? environmentVariables, string context = "")
+        {
             try
             {
-                var result = await _powerShellContextService.ExecuteCommandAsync(command);
+                var result = await _powerShellContextService.ExecuteCommandAsync(command, environmentVariables);
 
                 // Only treat as error if result contains ERROR: and not SUCCESS
                 if (result.Contains("ERROR:") && !result.Contains("SUCCESS"))
