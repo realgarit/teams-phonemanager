@@ -333,18 +333,20 @@ catch {
 
         public string GetM365GroupIdCommand(string groupName)
         {
+            var sanitizedGroupName = _sanitizer.SanitizeString(groupName);
+            
             return $@"
 try {{
-    $group = Get-MgGroup -Filter ""DisplayName eq '{groupName}'""
+    $group = Get-MgGroup -Filter ""DisplayName eq '{sanitizedGroupName}'""
     if ($group) {{
         Write-Host ""SUCCESS: M365 Group ID retrieved successfully""
         Write-Host ""M365GROUPID: $($group.Id)""
     }} else {{
-        Write-Host ""ERROR: M365 Group '{groupName}' not found""
+        Write-Host ""ERROR: M365 Group not found""
     }}
 }}
 catch {{
-    Write-Host ""ERROR: Failed to retrieve M365 Group ID for '{groupName}': $_""
+    Write-Host ""ERROR: Failed to retrieve M365 Group ID: $_""
 }}";
         }
     }

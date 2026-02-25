@@ -82,24 +82,29 @@ catch {{
         {
             var callQueueParams = variables != null ? BuildCallQueueParameters(variables) : BuildDefaultCallQueueParameters();
 
+            // SECURITY: Sanitize all inputs
+            var sanitizedName = _sanitizer.SanitizeString(name);
+            var sanitizedLanguageId = _sanitizer.SanitizeString(languageId);
+            var sanitizedM365GroupId = _sanitizer.SanitizeString(m365GroupId);
+
             return $@"
 try {{
     # Create Call Queue in one step
     New-CsCallQueue `
-    -Name ""{name}"" `
+    -Name ""{sanitizedName}"" `
     -RoutingMethod Attendant `
     -AllowOptOut $true `
     -ConferenceMode $true `
     -AgentAlertTime 30 `
-    -LanguageId ""{languageId}"" `
-    -DistributionLists @(""{m365GroupId}"") `
+    -LanguageId ""{sanitizedLanguageId}"" `
+    -DistributionLists @(""{sanitizedM365GroupId}"") `
     {callQueueParams}
     -PresenceBasedRouting $false
 
-    Write-Host ""SUCCESS: Call queue {name} created successfully""
+    Write-Host ""SUCCESS: Call queue created successfully""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to create call queue {name}: $_""
+    Write-Host ""ERROR: Failed to create call queue: $_""
 }}";
         }
 

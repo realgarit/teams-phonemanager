@@ -140,19 +140,21 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceI
 
         public string GetVerifyAutoAttendantCommand(string aaDisplayName)
         {
+            var sanitizedAaDisplayName = _sanitizer.SanitizeString(aaDisplayName);
+            
             return $@"
 try {{
-    $AutoAttendant = Get-CsAutoAttendant -NameFilter ""{aaDisplayName}""
+    $AutoAttendant = Get-CsAutoAttendant -NameFilter ""{sanitizedAaDisplayName}""
     if ($AutoAttendant) {{
-        Write-Host ""SUCCESS: Auto attendant '{aaDisplayName}' found and is accessible""
+        Write-Host ""SUCCESS: Auto attendant found and is accessible""
         Write-Host ""Auto Attendant ID: $($AutoAttendant.Identity)""
         Write-Host ""Auto Attendant Name: $($AutoAttendant.Name)""
     }} else {{
-        Write-Host ""ERROR: Auto attendant '{aaDisplayName}' not found""
+        Write-Host ""ERROR: Auto attendant not found""
     }}
 }}
 catch {{
-    Write-Host ""ERROR: Failed to verify auto attendant '{aaDisplayName}': $_""
+    Write-Host ""ERROR: Failed to verify auto attendant: $_""
 }}";
         }
 
