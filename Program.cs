@@ -41,6 +41,9 @@ class Program
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IPowerShellContextService, PowerShellContextService>();
         services.AddSingleton<IMsalGraphAuthenticationService, MsalGraphAuthenticationService>();
+        
+        // UI Services (singleton - manages UI state)
+        services.AddSingleton<IDialogService, DialogService>();
 
         // Transient services (new instance per request)
         services.AddTransient<IPowerShellCommandService, PowerShellCommandService>();
