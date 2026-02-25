@@ -294,6 +294,7 @@ namespace teams_phonemanager.ViewModels
                         }
                     }
                     StatusMessage = "Error: Could not parse M365 Group ID from result";
+                    _loggingService.Log("Error: Could not parse M365 Group ID from result - no M365GROUPID line found", LogLevel.Error);
                 }
                 else
                 {

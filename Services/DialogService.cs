@@ -31,6 +31,11 @@ namespace teams_phonemanager.Services
                 };
                 await dialog.ShowAsync(window);
             }
+            else
+            {
+                // Log when window is not available
+                System.Diagnostics.Debug.WriteLine($"DialogService: Cannot show message dialog - window not available. Title: {title}");
+            }
         }
 
         public async Task<bool> ShowConfirmationAsync(string title, string message)

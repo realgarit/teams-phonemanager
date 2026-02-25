@@ -1,6 +1,7 @@
 using teams_phonemanager.Models;
 using teams_phonemanager.Services.Interfaces;
 using teams_phonemanager.Services;
+using System.Text;
 
 namespace teams_phonemanager.Services.ScriptBuilders
 {
@@ -119,7 +120,6 @@ catch {{
 
         public string GetAssociateResourceAccountWithCallQueueCommand(string resourceAccountUpn, string callQueueName)
         {
-            // SECURITY: Sanitize inputs
             var sanitizedUpn = _sanitizer.SanitizeString(resourceAccountUpn);
             var sanitizedQueueName = _sanitizer.SanitizeString(callQueueName);
             
@@ -137,7 +137,6 @@ catch {{
 
         public string GetValidateCallQueueResourceAccountCommand(string racqUpn)
         {
-            // SECURITY: Sanitize input
             var sanitizedUpn = _sanitizer.SanitizeString(racqUpn);
             
             return $@"
@@ -157,7 +156,6 @@ catch {{
 
         public string GetCreateCallTargetCommand(string racqUpn)
         {
-            // SECURITY: Sanitize input
             var sanitizedUpn = _sanitizer.SanitizeString(racqUpn);
             
             return $@"
@@ -177,178 +175,176 @@ catch {{
 
         private string BuildCallQueueParameters(PhoneManagerVariables variables)
         {
-            var parameters = new System.Text.StringBuilder();
+            var parameters = new StringBuilder();
 
-            // Greeting
+            AppendGreetingParameters(parameters, variables);
+            AppendMusicOnHoldParameters(parameters, variables);
+            AppendOverflowParameters(parameters, variables);
+            AppendTimeoutParameters(parameters, variables);
+            AppendNoAgentParameters(parameters, variables);
+
+            return parameters.ToString().TrimEnd();
+        }
+
+        private void AppendGreetingParameters(StringBuilder parameters, PhoneManagerVariables variables)
+        {
             if (variables.CqGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqGreetingAudioFileId))
             {
-                var sanitizedAudioFileId = _sanitizer.SanitizeString(variables.CqGreetingAudioFileId);
-                parameters.AppendLine($"-WelcomeMusicAudioFileId \"{sanitizedAudioFileId}\" `");
+                parameters.AppendLine($"-WelcomeMusicAudioFileId \"{_sanitizer.SanitizeString(variables.CqGreetingAudioFileId)}\" `");
             }
             else if (variables.CqGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqGreetingTextToSpeechPrompt))
             {
-                var sanitizedPrompt = _sanitizer.SanitizeString(variables.CqGreetingTextToSpeechPrompt);
-                parameters.AppendLine($"-WelcomeTextToSpeechPrompt \"{sanitizedPrompt}\" `");
+                parameters.AppendLine($"-WelcomeTextToSpeechPrompt \"{_sanitizer.SanitizeString(variables.CqGreetingTextToSpeechPrompt)}\" `");
             }
+        }
 
-            // Music on Hold
+        private void AppendMusicOnHoldParameters(StringBuilder parameters, PhoneManagerVariables variables)
+        {
             if (variables.CqMusicOnHoldType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqMusicOnHoldAudioFileId))
             {
-                var sanitizedAudioFileId = _sanitizer.SanitizeString(variables.CqMusicOnHoldAudioFileId);
-                parameters.AppendLine($"-MusicOnHoldAudioFileId \"{sanitizedAudioFileId}\" `");
+                parameters.AppendLine($"-MusicOnHoldAudioFileId \"{_sanitizer.SanitizeString(variables.CqMusicOnHoldAudioFileId)}\" `");
                 parameters.AppendLine($"-UseDefaultMusicOnHold $false `");
             }
             else
             {
-                // Explicitly set UseDefaultMusicOnHold to true when "Default" is selected
                 parameters.AppendLine($"-UseDefaultMusicOnHold $true `");
             }
+        }
 
-            // Overflow
-            var overflowThreshold = variables.CqOverflowThreshold ?? ConstantsService.CallQueue.OverflowThreshold;
-            parameters.AppendLine($"-OverflowThreshold {overflowThreshold} `");
+        private void AppendOverflowParameters(StringBuilder parameters, PhoneManagerVariables variables)
+        {
+            var threshold = variables.CqOverflowThreshold ?? ConstantsService.CallQueue.OverflowThreshold;
+            parameters.AppendLine($"-OverflowThreshold {threshold} `");
 
-            if (!string.IsNullOrWhiteSpace(variables.CqOverflowAction))
+            AppendActionParameters(parameters, 
+                actionType: variables.CqOverflowAction,
+                target: variables.CqOverflowActionTarget,
+                prefix: "Overflow",
+                voicemailGreetingType: variables.CqOverflowVoicemailGreetingType,
+                voicemailTtsPrompt: variables.CqOverflowActionTextToSpeechPrompt,
+                voicemailAudioFileId: variables.CqOverflowActionAudioFileId,
+                defaultAction: "DisconnectWithBusy");
+        }
+
+        private void AppendTimeoutParameters(StringBuilder parameters, PhoneManagerVariables variables)
+        {
+            var threshold = variables.CqTimeoutThreshold ?? ConstantsService.CallQueue.TimeoutThreshold;
+            if (threshold < ConstantsService.CallQueue.MinTimeoutThreshold)
             {
-                if (variables.CqOverflowAction == "Disconnect")
+                threshold = ConstantsService.CallQueue.MinTimeoutThreshold;
+            }
+            parameters.AppendLine($"-TimeoutThreshold {threshold} `");
+
+            AppendActionParameters(parameters, 
+                actionType: variables.CqTimeoutAction,
+                target: variables.CqTimeoutActionTarget,
+                prefix: "Timeout",
+                voicemailGreetingType: variables.CqTimeoutVoicemailGreetingType,
+                voicemailTtsPrompt: variables.CqTimeoutActionTextToSpeechPrompt,
+                voicemailAudioFileId: variables.CqTimeoutActionAudioFileId,
+                defaultAction: "Disconnect");
+        }
+
+        private void AppendNoAgentParameters(StringBuilder parameters, PhoneManagerVariables variables)
+        {
+            if (string.IsNullOrWhiteSpace(variables.CqNoAgentAction) || variables.CqNoAgentAction == "QueueCall")
+            {
+                return; // Default behavior - no parameters needed
+            }
+
+            AppendActionParameters(parameters, 
+                actionType: variables.CqNoAgentAction,
+                target: variables.CqNoAgentActionTarget,
+                prefix: "NoAgent",
+                voicemailGreetingType: variables.CqNoAgentVoicemailGreetingType,
+                voicemailTtsPrompt: variables.CqNoAgentActionTextToSpeechPrompt,
+                voicemailAudioFileId: variables.CqNoAgentActionAudioFileId,
+                defaultAction: null);
+
+            // ApplyTo setting for NoAgent
+            parameters.AppendLine(variables.CqNoAgentApplyToNewCallsOnly 
+                ? $"-NoAgentApplyTo NewCalls `" 
+                : $"-NoAgentApplyTo AllCalls `");
+        }
+
+        /// <summary>
+        /// Appends action parameters for overflow, timeout, or no-agent scenarios.
+        /// Consolidates common logic for Disconnect, TransferToTarget, and TransferToVoicemail actions.
+        /// </summary>
+        private void AppendActionParameters(
+            StringBuilder parameters,
+            string? actionType,
+            string? target,
+            string prefix,
+            string? voicemailGreetingType,
+            string? voicemailTtsPrompt,
+            string? voicemailAudioFileId,
+            string? defaultAction)
+        {
+            if (string.IsNullOrWhiteSpace(actionType))
+            {
+                if (defaultAction != null)
                 {
-                    parameters.AppendLine($"-OverflowAction DisconnectWithBusy `");
+                    parameters.AppendLine($"-{prefix}Action {defaultAction} `");
                 }
-                else if (variables.CqOverflowAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTarget))
-                {
-                    var sanitizedTarget = _sanitizer.SanitizeString(variables.CqOverflowActionTarget);
-                    parameters.AppendLine($"-OverflowAction Forward `");
-                    parameters.AppendLine($"-OverflowActionTarget \"{sanitizedTarget}\" `");
-                }
-                else if (variables.CqOverflowAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTarget))
-                {
-                    var sanitizedTarget = _sanitizer.SanitizeString(variables.CqOverflowActionTarget);
-                    if (System.Guid.TryParse(variables.CqOverflowActionTarget, out _))
+                return;
+            }
+
+            switch (actionType)
+            {
+                case "Disconnect":
+                    parameters.AppendLine($"-{prefix}Action {(prefix == "Overflow" ? "DisconnectWithBusy" : "Disconnect")} `");
+                    break;
+
+                case "TransferToTarget" when !string.IsNullOrWhiteSpace(target):
+                    parameters.AppendLine($"-{prefix}Action Forward `");
+                    parameters.AppendLine($"-{prefix}ActionTarget \"{_sanitizer.SanitizeString(target)}\" `");
+                    break;
+
+                case "TransferToVoicemail" when !string.IsNullOrWhiteSpace(target):
+                    var sanitizedTarget = _sanitizer.SanitizeString(target);
+                    var isGuid = Guid.TryParse(target, out _);
+                    
+                    if (isGuid)
                     {
-                        parameters.AppendLine($"-OverflowAction SharedVoicemail `");
-                        parameters.AppendLine($"-OverflowActionTarget \"{sanitizedTarget}\" `");
-                        if (variables.CqOverflowVoicemailGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionTextToSpeechPrompt))
-                        {
-                            var sanitizedPrompt = _sanitizer.SanitizeString(variables.CqOverflowActionTextToSpeechPrompt);
-                            parameters.AppendLine($"-OverflowSharedVoicemailTextToSpeechPrompt \"{sanitizedPrompt}\" `");
-                        }
-                        else if (variables.CqOverflowVoicemailGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqOverflowActionAudioFileId))
-                        {
-                            var sanitizedFileId = _sanitizer.SanitizeString(variables.CqOverflowActionAudioFileId);
-                            parameters.AppendLine($"-OverflowSharedVoicemailAudioFilePrompt \"{sanitizedFileId}\" `");
-                        }
+                        parameters.AppendLine($"-{prefix}Action SharedVoicemail `");
+                        parameters.AppendLine($"-{prefix}ActionTarget \"{sanitizedTarget}\" `");
+                        AppendVoicemailGreetingParameters(parameters, prefix, voicemailGreetingType, voicemailTtsPrompt, voicemailAudioFileId);
                     }
                     else
                     {
-                        parameters.AppendLine($"-OverflowAction Voicemail `");
-                        parameters.AppendLine($"-OverflowActionTarget \"{sanitizedTarget}\" `");
+                        parameters.AppendLine($"-{prefix}Action Voicemail `");
+                        parameters.AppendLine($"-{prefix}ActionTarget \"{sanitizedTarget}\" `");
                     }
-                }
-            }
-            else
-            {
-                parameters.AppendLine($"-OverflowAction DisconnectWithBusy `");
-            }
+                    break;
 
-            // Timeout
-            var timeoutThreshold = variables.CqTimeoutThreshold ?? ConstantsService.CallQueue.TimeoutThreshold;
-            if (timeoutThreshold < ConstantsService.CallQueue.MinTimeoutThreshold)
-            {
-                timeoutThreshold = ConstantsService.CallQueue.MinTimeoutThreshold;
-            }
-            parameters.AppendLine($"-TimeoutThreshold {timeoutThreshold} `");
-
-            if (!string.IsNullOrWhiteSpace(variables.CqTimeoutAction))
-            {
-                if (variables.CqTimeoutAction == "Disconnect")
-                {
-                    parameters.AppendLine($"-TimeoutAction Disconnect `");
-                }
-                else if (variables.CqTimeoutAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTarget))
-                {
-                    var sanitizedTarget = _sanitizer.SanitizeString(variables.CqTimeoutActionTarget);
-                    parameters.AppendLine($"-TimeoutAction Forward `");
-                    parameters.AppendLine($"-TimeoutActionTarget \"{sanitizedTarget}\" `");
-                }
-                else if (variables.CqTimeoutAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTarget))
-                {
-                    var sanitizedTarget = _sanitizer.SanitizeString(variables.CqTimeoutActionTarget);
-                    if (System.Guid.TryParse(variables.CqTimeoutActionTarget, out _))
+                default:
+                    if (defaultAction != null)
                     {
-                        parameters.AppendLine($"-TimeoutAction SharedVoicemail `");
-                        parameters.AppendLine($"-TimeoutActionTarget \"{sanitizedTarget}\" `");
-                        if (variables.CqTimeoutVoicemailGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionTextToSpeechPrompt))
-                        {
-                            var sanitizedPrompt = _sanitizer.SanitizeString(variables.CqTimeoutActionTextToSpeechPrompt);
-                            parameters.AppendLine($"-TimeoutSharedVoicemailTextToSpeechPrompt \"{sanitizedPrompt}\" `");
-                        }
-                        else if (variables.CqTimeoutVoicemailGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqTimeoutActionAudioFileId))
-                        {
-                            var sanitizedFileId = _sanitizer.SanitizeString(variables.CqTimeoutActionAudioFileId);
-                            parameters.AppendLine($"-TimeoutSharedVoicemailAudioFilePrompt \"{sanitizedFileId}\" `");
-                        }
+                        parameters.AppendLine($"-{prefix}Action {defaultAction} `");
                     }
-                    else
-                    {
-                        parameters.AppendLine($"-TimeoutAction Voicemail `");
-                        parameters.AppendLine($"-TimeoutActionTarget \"{sanitizedTarget}\" `");
-                    }
-                }
+                    break;
             }
-            else
+        }
+
+        /// <summary>
+        /// Appends voicemail greeting parameters for shared voicemail scenarios.
+        /// </summary>
+        private void AppendVoicemailGreetingParameters(
+            StringBuilder parameters,
+            string prefix,
+            string? greetingType,
+            string? ttsPrompt,
+            string? audioFileId)
+        {
+            if (greetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(ttsPrompt))
             {
-                parameters.AppendLine($"-TimeoutAction Disconnect `");
+                parameters.AppendLine($"-{prefix}SharedVoicemailTextToSpeechPrompt \"{_sanitizer.SanitizeString(ttsPrompt)}\" `");
             }
-
-            // No Agent
-            if (!string.IsNullOrWhiteSpace(variables.CqNoAgentAction) && variables.CqNoAgentAction != "QueueCall")
+            else if (greetingType == "AudioFile" && !string.IsNullOrWhiteSpace(audioFileId))
             {
-                if (variables.CqNoAgentAction == "Disconnect")
-                {
-                    parameters.AppendLine($"-NoAgentAction Disconnect `");
-                }
-                else if (variables.CqNoAgentAction == "TransferToTarget" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTarget))
-                {
-                    var sanitizedTarget = _sanitizer.SanitizeString(variables.CqNoAgentActionTarget);
-                    parameters.AppendLine($"-NoAgentAction Forward `");
-                    parameters.AppendLine($"-NoAgentActionTarget \"{sanitizedTarget}\" `");
-                }
-                else if (variables.CqNoAgentAction == "TransferToVoicemail" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTarget))
-                {
-                    var sanitizedTarget = _sanitizer.SanitizeString(variables.CqNoAgentActionTarget);
-                    if (System.Guid.TryParse(variables.CqNoAgentActionTarget, out _))
-                    {
-                        parameters.AppendLine($"-NoAgentAction SharedVoicemail `");
-                        parameters.AppendLine($"-NoAgentActionTarget \"{sanitizedTarget}\" `");
-                        if (variables.CqNoAgentVoicemailGreetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionTextToSpeechPrompt))
-                        {
-                            var sanitizedPrompt = _sanitizer.SanitizeString(variables.CqNoAgentActionTextToSpeechPrompt);
-                            parameters.AppendLine($"-NoAgentSharedVoicemailTextToSpeechPrompt \"{sanitizedPrompt}\" `");
-                        }
-                        else if (variables.CqNoAgentVoicemailGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqNoAgentActionAudioFileId))
-                        {
-                            var sanitizedFileId = _sanitizer.SanitizeString(variables.CqNoAgentActionAudioFileId);
-                            parameters.AppendLine($"-NoAgentSharedVoicemailAudioFilePrompt \"{sanitizedFileId}\" `");
-                        }
-                    }
-                    else
-                    {
-                        parameters.AppendLine($"-NoAgentAction Voicemail `");
-                        parameters.AppendLine($"-NoAgentActionTarget \"{sanitizedTarget}\" `");
-                    }
-                }
-
-                if (variables.CqNoAgentApplyToNewCallsOnly)
-                {
-                    parameters.AppendLine($"-NoAgentApplyTo NewCalls `");
-                }
-                else
-                {
-                    parameters.AppendLine($"-NoAgentApplyTo AllCalls `");
-                }
+                parameters.AppendLine($"-{prefix}SharedVoicemailAudioFilePrompt \"{_sanitizer.SanitizeString(audioFileId)}\" `");
             }
-
-            return parameters.ToString().TrimEnd();
         }
     }
 }
