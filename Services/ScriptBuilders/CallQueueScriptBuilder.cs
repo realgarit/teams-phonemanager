@@ -83,17 +83,22 @@ catch {{
         {
             var callQueueParams = variables != null ? BuildCallQueueParameters(variables) : BuildDefaultCallQueueParameters();
 
+            // SECURITY: Sanitize all inputs
+            var sanitizedName = _sanitizer.SanitizeString(name);
+            var sanitizedLanguageId = _sanitizer.SanitizeString(languageId);
+            var sanitizedM365GroupId = _sanitizer.SanitizeString(m365GroupId);
+
             return $@"
 try {{
     # Create Call Queue in one step
     New-CsCallQueue `
-    -Name ""{_sanitizer.SanitizeString(name)}"" `
+    -Name ""{sanitizedName}"" `
     -RoutingMethod Attendant `
     -AllowOptOut $true `
     -ConferenceMode $true `
     -AgentAlertTime 30 `
-    -LanguageId ""{_sanitizer.SanitizeString(languageId)}"" `
-    -DistributionLists @(""{_sanitizer.SanitizeString(m365GroupId)}"") `
+    -LanguageId ""{sanitizedLanguageId}"" `
+    -DistributionLists @(""{sanitizedM365GroupId}"") `
     {callQueueParams}
     -PresenceBasedRouting $false
 
