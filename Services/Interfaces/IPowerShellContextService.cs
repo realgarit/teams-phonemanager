@@ -6,6 +6,7 @@ namespace teams_phonemanager.Services.Interfaces;
 public interface IPowerShellContextService : IDisposable
 {
     Task<string> ExecuteCommandAsync(string command, CancellationToken cancellationToken = default);
+    Task<string> ExecuteCommandAsync(string command, Dictionary<string, string>? environmentVariables, CancellationToken cancellationToken = default);
     bool IsConnected(string service);
     Task<string> GetConnectionStatusAsync(CancellationToken cancellationToken = default);
 }

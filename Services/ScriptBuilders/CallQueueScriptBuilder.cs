@@ -35,63 +35,76 @@ catch {
         public string GetCreateCallQueueCommand(PhoneManagerVariables variables)
         {
             var callQueueParams = BuildCallQueueParameters(variables);
-            var sanitizedRacqUPN = _sanitizer.SanitizeIdentifier(variables.RacqUPN);
+            // SECURITY: Sanitize all user inputs and wrap in quotes
+            var sanitizedRacqUPN = _sanitizer.SanitizeString(variables.RacqUPN);
             var sanitizedRacqDisplayName = _sanitizer.SanitizeString(variables.RacqDisplayName);
             var sanitizedCqDisplayName = _sanitizer.SanitizeString(variables.CqDisplayName);
             var sanitizedUsageLocation = _sanitizer.SanitizeString(variables.UsageLocation);
             var sanitizedLanguageId = _sanitizer.SanitizeString(variables.LanguageId);
 
             return $@"
-New-CsOnlineApplicationInstance -UserPrincipalName {sanitizedRacqUPN} -ApplicationId {variables.CsAppCqId} -DisplayName {sanitizedRacqDisplayName}
+try {{
+    New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedRacqUPN}"" -ApplicationId ""{variables.CsAppCqId}"" -DisplayName ""{sanitizedRacqDisplayName}""
 
-Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
-Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
+    Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
+    Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
 
-$global:racqid = (Get-CsOnlineUser {sanitizedRacqUPN}).Identity
+    $global:racqid = (Get-CsOnlineUser ""{sanitizedRacqUPN}"").Identity
 
-Update-MgUser -UserId {sanitizedRacqUPN} -UsageLocation {sanitizedUsageLocation}
+    Update-MgUser -UserId ""{sanitizedRacqUPN}"" -UsageLocation ""{sanitizedUsageLocation}""
 
-New-CsCallQueue `
--Name {sanitizedCqDisplayName} `
--RoutingMethod Attendant `
--AllowOptOut $true `
--ConferenceMode $true `
--AgentAlertTime " + ConstantsService.CallQueue.AgentAlertTime + @" `
--LanguageId {sanitizedLanguageId} `
--DistributionLists $global:m365groupId `
-{callQueueParams}
--PresenceBasedRouting $false
+    New-CsCallQueue `
+    -Name ""{sanitizedCqDisplayName}"" `
+    -RoutingMethod Attendant `
+    -AllowOptOut $true `
+    -ConferenceMode $true `
+    -AgentAlertTime " + ConstantsService.CallQueue.AgentAlertTime + @" `
+    -LanguageId ""{sanitizedLanguageId}"" `
+    -DistributionLists $global:m365groupId `
+    {callQueueParams}
+    -PresenceBasedRouting $false
 
-Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
-Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
+    Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
+    Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
 
-$cqapplicationInstanceId = (Get-CsOnlineUser {sanitizedRacqUPN}).Identity
-$cqautoAttendantId = (Get-CsCallQueue -NameFilter {sanitizedCqDisplayName}).Identity
-New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceId) -ConfigurationId $cqautoAttendantId -ConfigurationType CallQueue";
+    $cqapplicationInstanceId = (Get-CsOnlineUser ""{sanitizedRacqUPN}"").Identity
+    $cqautoAttendantId = (Get-CsCallQueue -NameFilter ""{sanitizedCqDisplayName}"").Identity
+    New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceId) -ConfigurationId $cqautoAttendantId -ConfigurationType CallQueue
+    
+    Write-Host ""SUCCESS: Call queue created successfully""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create call queue: $_""
+}}";
         }
 
         public string GetCreateCallQueueCommand(string name, string languageId, string m365GroupId, PhoneManagerVariables? variables = null)
         {
             var callQueueParams = variables != null ? BuildCallQueueParameters(variables) : BuildDefaultCallQueueParameters();
 
+            // SECURITY: Sanitize all inputs
+            var sanitizedName = _sanitizer.SanitizeString(name);
+            var sanitizedLanguageId = _sanitizer.SanitizeString(languageId);
+            var sanitizedM365GroupId = _sanitizer.SanitizeString(m365GroupId);
+
             return $@"
 try {{
     # Create Call Queue in one step
     New-CsCallQueue `
-    -Name ""{name}"" `
+    -Name ""{sanitizedName}"" `
     -RoutingMethod Attendant `
     -AllowOptOut $true `
     -ConferenceMode $true `
     -AgentAlertTime 30 `
-    -LanguageId ""{languageId}"" `
-    -DistributionLists @(""{m365GroupId}"") `
+    -LanguageId ""{sanitizedLanguageId}"" `
+    -DistributionLists @(""{sanitizedM365GroupId}"") `
     {callQueueParams}
     -PresenceBasedRouting $false
 
-    Write-Host ""SUCCESS: Call queue {name} created successfully""
+    Write-Host ""SUCCESS: Call queue created successfully""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to create call queue {name}: $_""
+    Write-Host ""ERROR: Failed to create call queue: $_""
 }}";
         }
 
@@ -106,49 +119,59 @@ catch {{
 
         public string GetAssociateResourceAccountWithCallQueueCommand(string resourceAccountUpn, string callQueueName)
         {
+            // SECURITY: Sanitize inputs
+            var sanitizedUpn = _sanitizer.SanitizeString(resourceAccountUpn);
+            var sanitizedQueueName = _sanitizer.SanitizeString(callQueueName);
+            
             return $@"
 try {{
-    $cqapplicationInstanceId = (Get-CsOnlineUser {resourceAccountUpn}).Identity
-    $cqautoAttendantId = (Get-CsCallQueue -NameFilter {callQueueName}).Identity
+    $cqapplicationInstanceId = (Get-CsOnlineUser ""{sanitizedUpn}"").Identity
+    $cqautoAttendantId = (Get-CsCallQueue -NameFilter ""{sanitizedQueueName}"").Identity
     New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceId) -ConfigurationId $cqautoAttendantId -ConfigurationType CallQueue
-    Write-Host ""SUCCESS: Associated resource account {resourceAccountUpn} with call queue {callQueueName}""
+    Write-Host ""SUCCESS: Associated resource account with call queue""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to associate resource account {resourceAccountUpn} with call queue {callQueueName}: $_""
+    Write-Host ""ERROR: Failed to associate resource account with call queue: $_""
 }}";
         }
 
         public string GetValidateCallQueueResourceAccountCommand(string racqUpn)
         {
+            // SECURITY: Sanitize input
+            var sanitizedUpn = _sanitizer.SanitizeString(racqUpn);
+            
             return $@"
 try {{
-    $racqUser = Get-CsOnlineUser {racqUpn}
+    $racqUser = Get-CsOnlineUser ""{sanitizedUpn}""
     if ($racqUser) {{
-        Write-Host ""SUCCESS: Call Queue resource account {racqUpn} found and validated""
+        Write-Host ""SUCCESS: Call Queue resource account found and validated""
         Write-Host ""Account Details: $($racqUser.DisplayName) - $($racqUser.UserPrincipalName)""
     }} else {{
-        Write-Host ""ERROR: Call Queue resource account {racqUpn} not found. Please create it first.""
+        Write-Host ""ERROR: Call Queue resource account not found. Please create it first.""
     }}
 }}
 catch {{
-    Write-Host ""ERROR: Failed to validate Call Queue resource account {racqUpn}: $_""
+    Write-Host ""ERROR: Failed to validate Call Queue resource account: $_""
 }}";
         }
 
         public string GetCreateCallTargetCommand(string racqUpn)
         {
+            // SECURITY: Sanitize input
+            var sanitizedUpn = _sanitizer.SanitizeString(racqUpn);
+            
             return $@"
 try {{
-    $racqUser = Get-CsOnlineUser ""{racqUpn}""
+    $racqUser = Get-CsOnlineUser ""{sanitizedUpn}""
     if (-not $racqUser) {{
-        throw ""Resource account {racqUpn} not found. Please ensure it was created successfully.""
+        throw ""Resource account not found. Please ensure it was created successfully.""
     }}
     $racqid = $racqUser.Identity
     $aacalltarget = New-CsAutoAttendantCallableEntity -Identity $racqid -Type ApplicationEndpoint
-    Write-Host ""SUCCESS: Created call target for {racqUpn}""
+    Write-Host ""SUCCESS: Created call target""
 }}
 catch {{
-    Write-Host ""ERROR: Failed to create call target for {racqUpn}: $_""
+    Write-Host ""ERROR: Failed to create call target: $_""
 }}";
         }
 
