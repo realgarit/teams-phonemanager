@@ -31,6 +31,11 @@ namespace teams_phonemanager.Services
                 };
                 await dialog.ShowAsync(window);
             }
+            else
+            {
+                // Log when window is not available
+                System.Diagnostics.Debug.WriteLine($"DialogService: Cannot show message dialog - window not available. Title: {title}");
+            }
         }
 
         public async Task<bool> ShowConfirmationAsync(string title, string message)
@@ -49,6 +54,9 @@ namespace teams_phonemanager.Services
                 var result = await dialog.ShowAsync(window);
                 return result == ContentDialogResult.Primary;
             }
+            
+            // Log warning when window is not available and return false
+            System.Diagnostics.Debug.WriteLine($"DialogService: Cannot show confirmation dialog - window not available. Title: {title}");
             return false;
         }
     }
