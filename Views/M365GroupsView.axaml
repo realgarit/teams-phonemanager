@@ -21,7 +21,7 @@
         <!-- Local styles removed, using App.axaml styles -->
     </UserControl.Styles>
 
-    <Border Classes="card" Margin="24">
+    <Border Classes="card" Margin="0">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -29,7 +29,7 @@
             </Grid.RowDefinitions>
 
             <!-- Main Content -->
-            <Grid Grid.Row="0" Margin="32,32,32,0">
+            <Grid Grid.Row="0" Margin="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -132,15 +132,14 @@
                     <Border Classes="dialog" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Confirm Variables"
-                                 
-                                 FontWeight="SemiBold"
-                                 Margin="0,0,0,16"/>
+                                 Classes="dialog-title"/>
                         <TextBlock Text="Please confirm that you have set up all required variables in the Variables page before proceeding."
                                  FontSize="14"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
-                        <StackPanel Orientation="Horizontal" 
-                                  HorizontalAlignment="Right">
+                        <StackPanel Orientation="Horizontal"
+                                  HorizontalAlignment="Right"
+                                  Spacing="8">
                             <Button Command="{Binding NavigateToVariablesPageCommand}"
                                      Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
@@ -184,9 +183,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create New M365 Group"
-                                 
-                                 FontWeight="SemiBold"
-                                 Margin="0,0,0,16"/>
+                                 Classes="dialog-title"/>
                         
                         <TextBlock Text="Group Name:"
                                  FontSize="16"

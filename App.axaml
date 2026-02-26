@@ -97,6 +97,59 @@
         <Style Selector="Button.IconOnly fi|SymbolIcon">
             <Setter Property="Margin" Value="0"/>
         </Style>
+
+        <!-- ════════════════════════════════════════════════
+             Sidebar navigation ListBox / ListBoxItem styles
+             ════════════════════════════════════════════════ -->
+        <Style Selector="ListBox.nav">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0,4"/>
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem">
+            <Setter Property="Padding" Value="12,9"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BorderThickness" Value="2,0,0,0"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:selected">
+            <Setter Property="BorderBrush" Value="{DynamicResource TeamsPrimaryBrush}"/>
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}"/>
+        </Style>
+        <Style Selector="ListBox.nav ListBoxItem:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}"/>
+        </Style>
+
+        <!-- ════════════════════════════════════
+             Typography: page-title / section-title / hint
+             ════════════════════════════════════ -->
+        <!-- Large page title — use with TextBlock Classes="page-title" -->
+        <Style Selector="TextBlock.page-title">
+            <Setter Property="FontSize" Value="28"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+        <!-- Section sub-heading — use with TextBlock Classes="section-title" -->
+        <Style Selector="TextBlock.section-title">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+        <!-- Small helper / hint text — use with TextBlock Classes="hint" -->
+        <Style Selector="TextBlock.hint">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Opacity" Value="0.6"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+        </Style>
+        <!-- Dialog heading — use with TextBlock Classes="dialog-title" -->
+        <Style Selector="TextBlock.dialog-title">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,16"/>
+        </Style>
     </Application.Styles>
     
     <Application.Resources>

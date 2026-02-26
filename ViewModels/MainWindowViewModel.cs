@@ -61,6 +61,8 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private string _version = Services.ConstantsService.Application.Version;
 
+        public string Copyright => Services.ConstantsService.Application.Copyright;
+
         [ObservableProperty]
         private PhoneManagerVariables _variables = new();
 

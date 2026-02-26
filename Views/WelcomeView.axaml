@@ -26,16 +26,16 @@
                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                       Margin="0,0,16,0"/>
                         <TextBlock Text="Teams Phone Manager"
-                                 FontSize="42"
-                                 FontWeight="Bold"
+                                 FontSize="32"
+                                 FontWeight="SemiBold"
                                  VerticalAlignment="Center"/>
                     </StackPanel>
                     
                     <TextBlock Text="Your complete solution for Microsoft Teams Phone"
-                             FontSize="18"
+                             FontSize="16"
                              TextAlignment="Center"
                              TextWrapping="Wrap"
-                             Opacity="0.87"
+                             Opacity="0.7"
                              Margin="0,0,0,24"/>
                     
                     <!-- Action Buttons with Icons -->
@@ -103,7 +103,7 @@
                         </StackPanel>
                         <TextBlock TextWrapping="Wrap"
                                  FontSize="14"
-                                 Opacity="0.87">
+                                 Opacity="0.7">
                             Install PowerShell modules and connect to Teams and Graph services.
                         </TextBlock>
                     </StackPanel>
@@ -126,7 +126,7 @@
                         </StackPanel>
                         <TextBlock TextWrapping="Wrap"
                                  FontSize="14"
-                                 Opacity="0.87">
+                                 Opacity="0.7">
                             Set up customer details, domains, languages, and time zones.
                         </TextBlock>
                     </StackPanel>
@@ -149,7 +149,7 @@
                         </StackPanel>
                         <TextBlock TextWrapping="Wrap"
                                  FontSize="14"
-                                 Opacity="0.87">
+                                 Opacity="0.7">
                             Create and manage Microsoft 365 groups for your phone system.
                         </TextBlock>
                     </StackPanel>
@@ -172,7 +172,7 @@
                         </StackPanel>
                         <TextBlock TextWrapping="Wrap"
                                  FontSize="14"
-                                 Opacity="0.87">
+                                 Opacity="0.7">
                             Set up call queues with resource accounts and licensing. 
                             Manage routing methods and agent assignments.
                         </TextBlock>
@@ -196,7 +196,7 @@
                         </StackPanel>
                         <TextBlock TextWrapping="Wrap"
                                  FontSize="14"
-                                 Opacity="0.87">
+                                 Opacity="0.7">
                             Configure auto attendants with call flows and schedules. 
                             Set up business hours and after-hours routing.
                         </TextBlock>
@@ -220,7 +220,7 @@
                         </StackPanel>
                         <TextBlock TextWrapping="Wrap"
                                  FontSize="14"
-                                 Opacity="0.87">
+                                 Opacity="0.7">
                             Manage holiday schedules with Swiss holiday support.
                         </TextBlock>
                     </StackPanel>

@@ -22,7 +22,7 @@
     </UserControl.Styles>
 
     <Grid>
-    <Border Classes="card" Margin="32">
+    <Border Classes="card" Margin="0">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
@@ -30,7 +30,7 @@
             </Grid.RowDefinitions>
 
             <!-- Main Content -->
-            <Grid Grid.Row="0" Margin="32,32,32,0">
+            <Grid Grid.Row="0" Margin="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -473,9 +473,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Resource Account"
-                                 
-                                 FontWeight="SemiBold"
-                                 Margin="0,0,0,16"/>
+                                 Classes="dialog-title"/>
                         
                         <TextBlock Text="UPN:"
                                  FontSize="16"
@@ -543,9 +541,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Update Usage Location"
-                                 
-                                 FontWeight="SemiBold"
-                                 Margin="0,0,0,16"/>
+                                 Classes="dialog-title"/>
                         
                         <TextBlock Text="Resource Account UPN:"
                                  FontSize="16"
@@ -607,9 +603,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Auto Attendant"
-                                 
-                                 FontWeight="SemiBold"
-                                 Margin="0,0,0,16"/>
+                                 Classes="dialog-title"/>
                         
                         <TextBlock Text="Auto Attendant Name:"
                                  FontSize="16"
@@ -670,9 +664,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Associate Resource Account with Auto Attendant"
-                                 
-                                 FontWeight="SemiBold"
-                                 Margin="0,0,0,16"/>
+                                 Classes="dialog-title"/>
                         
                         <TextBlock Text="Resource Account UPN:"
                                  FontSize="16"
@@ -740,9 +732,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Validate Call Queue Resource Account"
-                                 
-                                 FontWeight="SemiBold"
-                                 Margin="0,0,0,16"/>
+                                 Classes="dialog-title"/>
                         
                         <TextBlock Text="Call Queue Resource Account UPN:"
                                  FontSize="16"
@@ -803,9 +793,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Call Target"
-                                 
-                                 FontWeight="SemiBold"
-                                 Margin="0,0,0,16"/>
+                                 Classes="dialog-title"/>
                         
                         <TextBlock Text="This will create the callable entity that will be used as the call target for the auto attendant."
                                  FontSize="12"
@@ -859,9 +847,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Default Call Flow"
-                                 
-                                 FontWeight="SemiBold"
-                                 Margin="0,0,0,16"/>
+                                 Classes="dialog-title"/>
                         
                         <TextBlock Text="This will create the default call flow with menu options for the auto attendant."
                                  FontSize="12"
@@ -915,9 +901,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create After Hours Call Flow"
-                                 
-                                 FontWeight="SemiBold"
-                                 Margin="0,0,0,16"/>
+                                 Classes="dialog-title"/>
                         
                         <TextBlock Text="This will create the after hours call flow with disconnect option."
                                  FontSize="12"
@@ -971,9 +955,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create After Hours Schedule"
-                                 
-                                 FontWeight="SemiBold"
-                                 Margin="0,0,0,16"/>
+                                 Classes="dialog-title"/>
                         
                         <TextBlock Text="This will create the schedule that defines when the after hours call flow should be active."
                                  FontSize="12"
@@ -1027,9 +1009,7 @@
                     <Border Classes="dialog" MinWidth="400" Margin="16">
                         <StackPanel>
                         <TextBlock Text="Create Call Handling Association"
-                                 
-                                 FontWeight="SemiBold"
-                                 Margin="0,0,0,16"/>
+                                 Classes="dialog-title"/>
                         
                         <TextBlock Text="This will associate the after hours schedule with the after hours call flow."
                                  FontSize="12"

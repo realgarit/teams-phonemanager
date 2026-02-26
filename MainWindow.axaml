@@ -11,9 +11,11 @@
         xmlns:services="clr-namespace:teams_phonemanager.Services"
         mc:Ignorable="d"
         x:Class="teams_phonemanager.MainWindow"
-        Title="Teams Phone Manager" 
-        Height="720" 
-        Width="1280">
+        Title="Teams Phone Manager"
+        Width="1280"
+        Height="720"
+        MinWidth="1024"
+        MinHeight="640">
 
     <!-- DataContext is set via DI in App.xaml.cs -->
 
@@ -70,77 +72,62 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 
-                <ListBox x:Name="NavigationListBox" Grid.Column="0" SelectionChanged="NavigationListBox_SelectionChanged">
-                    <ListBoxItem Tag="Welcome" VerticalContentAlignment="Center">
+                <ListBox x:Name="NavigationListBox" Grid.Column="0" Classes="nav"
+                         SelectionChanged="NavigationListBox_SelectionChanged">
+                    <ListBoxItem Tag="Welcome" Classes="nav">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <fi:SymbolIcon 
-                                      Symbol="Home"
-                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <fi:SymbolIcon Symbol="Home"/>
                             <TextBlock Text="Welcome" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
-                    
-                    <ListBoxItem Tag="GetStarted" VerticalContentAlignment="Center">
+
+                    <ListBoxItem Tag="GetStarted" Classes="nav">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <fi:SymbolIcon 
-                                      Symbol="Rocket"
-                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <fi:SymbolIcon Symbol="Rocket"/>
                             <TextBlock Text="Get Started" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
-                    
-                    <ListBoxItem Tag="Variables" VerticalContentAlignment="Center">
+
+                    <ListBoxItem Tag="Variables" Classes="nav">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <fi:SymbolIcon 
-                                      Symbol="Code"
-                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <fi:SymbolIcon Symbol="Code"/>
                             <TextBlock Text="Variables" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
-                    
-                    <ListBoxItem Tag="M365Groups" VerticalContentAlignment="Center">
+
+                    <ListBoxItem Tag="M365Groups" Classes="nav">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <fi:SymbolIcon 
-                                      Symbol="PeopleTeam"
-                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <fi:SymbolIcon Symbol="PeopleTeam"/>
                             <TextBlock Text="M365 Groups" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
-                    
-                    <ListBoxItem Tag="CallQueues" VerticalContentAlignment="Center">
+
+                    <ListBoxItem Tag="CallQueues" Classes="nav">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <fi:SymbolIcon 
-                                      Symbol="CallInbound"
-                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <fi:SymbolIcon Symbol="CallInbound"/>
                             <TextBlock Text="Call Queues" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
-                    
-                    <ListBoxItem Tag="AutoAttendants" VerticalContentAlignment="Center">
+
+                    <ListBoxItem Tag="AutoAttendants" Classes="nav">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <fi:SymbolIcon 
-                                      Symbol="Bot"
-                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <fi:SymbolIcon Symbol="Bot"/>
                             <TextBlock Text="Auto Attendants" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
-                    
-                    <ListBoxItem Tag="Holidays" VerticalContentAlignment="Center">
+
+                    <ListBoxItem Tag="Holidays" Classes="nav">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                            <fi:SymbolIcon 
-                                      Symbol="Calendar"
-                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <fi:SymbolIcon Symbol="Calendar"/>
                             <TextBlock Text="Holidays" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
-
                 </ListBox>
                 
-                <Border Grid.Column="1" 
-                        Background="Gray"
-                        Width="2"
-                        Margin="8,0,0,0"
-                        Opacity="0.6"/>
+                <Border Grid.Column="1"
+                        Background="{DynamicResource DividerStrokeColorDefaultBrush}"
+                        Width="1"
+                        Margin="4,8,0,8"/>
             </Grid>
 
             <!-- Content Area -->
@@ -244,7 +231,7 @@
                 </Button>
                 
                 <!-- Copyright -->
-                <TextBlock Grid.Column="2" Text="Realgar © 2026." VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{Binding Copyright}" VerticalAlignment="Center" Opacity="0.7"/>
             </Grid>
         </Border>
 
