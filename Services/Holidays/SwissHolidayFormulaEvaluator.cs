@@ -44,6 +44,28 @@ namespace teams_phonemanager.Services.Holidays
             return april1;
         }
 
+        // Obwalden-specific: Saint Nicholas of Flüe Day
+        public static DateTime BruderklausenFest(int year) => new DateTime(year, 9, 25);
+
+        // Appenzell Innerrhoden-specific (inner part only)
+        public static DateTime MauritiusTag(int year) => new DateTime(year, 9, 22);
+
+        // Vaud-specific: Monday after the third Sunday in September (Jeûne fédéral)
+        public static DateTime LundiDuJeune(int year)
+        {
+            var sept1 = new DateTime(year, 9, 1);
+            while (sept1.DayOfWeek != DayOfWeek.Sunday)
+                sept1 = sept1.AddDays(1);
+            var thirdSunday = sept1.AddDays(14);
+            return thirdSunday.AddDays(1); // Monday
+        }
+
+        // Neuchâtel-specific: Instauration de la République
+        public static DateTime RepublicDayNeuchatel(int year) => new DateTime(year, 3, 1);
+
+        // Jura-specific: Commémoration du plébiscite jurassien
+        public static DateTime JurassianIndependenceDay(int year) => new DateTime(year, 6, 23);
+
         // Computus - Meeus/Jones/Butcher algorithm for Gregorian Easter Sunday
         public static DateTime EasterSunday(int year)
         {

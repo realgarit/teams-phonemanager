@@ -62,7 +62,10 @@ Set-CsPhoneNumberAssignment -Identity ""{sanitizedRaaaUPN}"" -PhoneNumber ""{san
 
 {afterHoursCallFlow}
 
-$aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -TuesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -WednesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -ThursdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -FridayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -Complement
+$aatr1 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours1Start:hh\:mm}"" -End ""{variables.OpeningHours1End:hh\:mm}""
+$aatr2 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours2Start:hh\:mm}"" -End ""{variables.OpeningHours2End:hh\:mm}""
+$aaTimeRanges = if (""{variables.OpeningHours2Start:hh\:mm}"" -ne ""{variables.OpeningHours2End:hh\:mm}"") {{ @($aatr1, $aatr2) }} else {{ @($aatr1) }}
+$aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours $aaTimeRanges -TuesdayHours $aaTimeRanges -WednesdayHours $aaTimeRanges -ThursdayHours $aaTimeRanges -FridayHours $aaTimeRanges -Complement
 $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
 
 New-CsAutoAttendant `
@@ -89,7 +92,10 @@ New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceI
             if (greetingType == "AudioFile" && !string.IsNullOrWhiteSpace(audioFileId))
             {
                 var sanitizedAudioFileId = _sanitizer.SanitizeString(audioFileId);
-                sb.AppendLine($"${prefix}Greeting = New-CsAutoAttendantPrompt -AudioFilePrompt \"{sanitizedAudioFileId}\"");
+                // AudioFilePrompt requires an AudioFile object, not just an ID string.
+                // Retrieve the audio file object first using Get-CsOnlineAudioFile.
+                sb.AppendLine($"${prefix}AudioFile = Get-CsOnlineAudioFile -Identity \"{sanitizedAudioFileId}\" -ApplicationId OrgAutoAttendant");
+                sb.AppendLine($"${prefix}Greeting = New-CsAutoAttendantPrompt -AudioFilePrompt ${prefix}AudioFile");
                 greetingVar = $"@(${prefix}Greeting)";
             }
             else if (greetingType == "TextToSpeech" && !string.IsNullOrWhiteSpace(ttsPrompt))
@@ -240,7 +246,10 @@ catch {{
         {
             return $@"
 try {{
-    $aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -TuesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -WednesdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -ThursdayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -FridayHours @(@{{Start=""{variables.OpeningHours1Start:hh\:mm}""; End=""{variables.OpeningHours1End:hh\:mm}""}}, @{{Start=""{variables.OpeningHours2Start:hh\:mm}""; End=""{variables.OpeningHours2End:hh\:mm}""}}) -Complement
+    $aatr1 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours1Start:hh\:mm}"" -End ""{variables.OpeningHours1End:hh\:mm}""
+    $aatr2 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours2Start:hh\:mm}"" -End ""{variables.OpeningHours2End:hh\:mm}""
+    $aaTimeRanges = if (""{variables.OpeningHours2Start:hh\:mm}"" -ne ""{variables.OpeningHours2End:hh\:mm}"") {{ @($aatr1, $aatr2) }} else {{ @($aatr1) }}
+    $aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours $aaTimeRanges -TuesdayHours $aaTimeRanges -WednesdayHours $aaTimeRanges -ThursdayHours $aaTimeRanges -FridayHours $aaTimeRanges -Complement
 
     if ($aaafterHoursSchedule) {{
         Write-Host ""SUCCESS: Created after hours schedule with ID: $($aaafterHoursSchedule.Id)""
