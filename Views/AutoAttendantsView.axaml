@@ -30,21 +30,32 @@
             </Grid.RowDefinitions>
 
             <!-- Main Content -->
-            <Grid Grid.Row="0" Margin="0">
+            <Grid Grid.Row="0" Margin="24">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Status Message -->
+                <!-- Page Header -->
                 <StackPanel Grid.Row="0" Margin="0,0,0,16">
-                    <TextBlock Text="{Binding StatusMessage}"
-                             FontSize="14"
-                             TextWrapping="Wrap"/>
+                    <TextBlock Text="Auto Attendants" Classes="page-title"/>
+                    <TextBlock Text="Manage resource accounts, auto attendants, and step-by-step creation."
+                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                             TextWrapping="Wrap"
+                             Margin="0,4,0,0"/>
                 </StackPanel>
 
+                <!-- Status Message -->
+                <TextBlock Grid.Row="1" Text="{Binding StatusMessage}"
+                         FontSize="13"
+                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                         TextWrapping="Wrap"
+                         Margin="0,0,0,12"
+                         IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
                 <!-- Tab Control -->
-                <TabControl Grid.Row="1" >
+                <TabControl Grid.Row="2" >
                     
                     <!-- Resource Accounts Tab -->
                     <TabItem Header="Resource Accounts">
@@ -58,6 +69,7 @@
                             <!-- Resource Accounts Actions -->
                             <Grid Grid.Row="0" Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
@@ -76,14 +88,24 @@
                                 <Button Grid.Column="1"
                                         Command="{Binding OpenCreateResourceAccountDialogCommand}"
                                         
-                                        Margin="0,0,16,0" Classes="IconText">
+                                        Margin="0,0,8,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
                                         <fi:SymbolIcon  Symbol="PersonAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                                         <TextBlock Text="Create Account" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
 
-                                <TextBox Grid.Column="2"
+                                <Button Grid.Column="2"
+                                        Command="{Binding RemoveResourceAccountCommand}"
+                                        ToolTip.Tip="Remove the selected resource account"
+                                        Margin="0,0,16,0" Classes="IconText">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fi:SymbolIcon Symbol="PersonDelete" Foreground="OrangeRed"/>
+                                        <TextBlock Text="Remove Account" VerticalAlignment="Center" Foreground="OrangeRed"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <TextBox Grid.Column="3"
                                          Text="{Binding SearchResourceAccountsText}"
                                          Watermark="Search resource accounts..."
                                          ToolTip.Tip="Search resource accounts"
@@ -129,6 +151,7 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
@@ -145,14 +168,24 @@
                                 <Button Grid.Column="1"
                                         Command="{Binding OpenCreateAutoAttendantDialogCommand}"
                                         
-                                        Margin="0,0,16,0" Classes="IconText">
+                                        Margin="0,0,8,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
                                         <fi:SymbolIcon  Symbol="CallInbound" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                                         <TextBlock Text="Create Auto Attendant" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
 
-                                <TextBox Grid.Column="2"
+                                <Button Grid.Column="2"
+                                        Command="{Binding RemoveAutoAttendantCommand}"
+                                        ToolTip.Tip="Remove the selected auto attendant"
+                                        Margin="0,0,16,0" Classes="IconText">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fi:SymbolIcon Symbol="Delete" Foreground="OrangeRed"/>
+                                        <TextBlock Text="Remove AA" VerticalAlignment="Center" Foreground="OrangeRed"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <TextBox Grid.Column="3"
                                          Text="{Binding SearchAutoAttendantsText}"
                                          Watermark="Search auto attendants..."
                                          ToolTip.Tip="Search auto attendants"

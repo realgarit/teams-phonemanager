@@ -19,7 +19,7 @@ namespace teams_phonemanager.Services
 
         public static class Application
         {
-            public const string Version = "Version 3.10.0";
+            public const string Version = "Version 3.11.0";
             public const string Copyright = "Realgar © 2026. MIT License.";
         }
 
@@ -67,6 +67,9 @@ namespace teams_phonemanager.Services
             public const string CallQueues = "Call Queues";
             public const string AutoAttendants = "Auto Attendants";
             public const string Holidays = "Holidays";
+            public const string Documentation = "Documentation";
+            public const string Wizard = "Wizard";
+            public const string BulkOperations = "BulkOperations";
         }
 
         public static class ErrorDialogTitles

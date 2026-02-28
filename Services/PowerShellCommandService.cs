@@ -33,6 +33,7 @@ namespace teams_phonemanager.Services
         public string GetDisconnectTeamsCommand() => _commonBuilder.GetDisconnectTeamsCommand();
         public string GetDisconnectGraphCommand() => _commonBuilder.GetDisconnectGraphCommand();
         public string GetCreateM365GroupCommand(string groupName) => _commonBuilder.GetCreateM365GroupCommand(groupName);
+        public string GetRemoveM365GroupCommand(string groupId, string groupName) => _commonBuilder.GetRemoveM365GroupCommand(groupId, groupName);
         public string GetRetrieveM365GroupsCommand() => _commonBuilder.GetRetrieveM365GroupsCommand();
         public string GetM365GroupIdCommand(string groupName) => _commonBuilder.GetM365GroupIdCommand(groupName);
         public string GetImportAudioFileCommand(string filePath) => _commonBuilder.GetImportAudioFileCommand(filePath);
@@ -44,27 +45,35 @@ namespace teams_phonemanager.Services
         public string GetAssociateResourceAccountWithCallQueueCommand(string resourceAccountUpn, string callQueueName) => _callQueueBuilder.GetAssociateResourceAccountWithCallQueueCommand(resourceAccountUpn, callQueueName);
         public string GetValidateCallQueueResourceAccountCommand(string racqUpn) => _callQueueBuilder.GetValidateCallQueueResourceAccountCommand(racqUpn);
         public string GetCreateCallTargetCommand(string racqUpn) => _callQueueBuilder.GetCreateCallTargetCommand(racqUpn);
+        public string GetRemoveCallQueueCommand(string callQueueName) => _callQueueBuilder.GetRemoveCallQueueCommand(callQueueName);
+        public string GetRemoveResourceAccountCommand(string upn) => _callQueueBuilder.GetRemoveResourceAccountCommand(upn);
 
         public string GetRetrieveAutoAttendantsCommand() => _autoAttendantBuilder.GetRetrieveAutoAttendantsCommand();
         public string GetCreateAutoAttendantCommand(PhoneManagerVariables variables) => _autoAttendantBuilder.GetCreateAutoAttendantCommand(variables);
         public string GetVerifyAutoAttendantCommand(string aaDisplayName) => _autoAttendantBuilder.GetVerifyAutoAttendantCommand(aaDisplayName);
         public string GetAttachHolidayToAutoAttendantCommand(string holidayName, string aaDisplayName, string holidayGreetingPrompt) => _autoAttendantBuilder.GetAttachHolidayToAutoAttendantCommand(holidayName, aaDisplayName, holidayGreetingPrompt);
         public string GetCreateSimpleAutoAttendantCommand(PhoneManagerVariables variables) => _autoAttendantBuilder.GetCreateSimpleAutoAttendantCommand(variables);
+        public string GetCreateSimpleAutoAttendantCommand(string aaName, string languageId, string timeZoneId) => _autoAttendantBuilder.GetCreateSimpleAutoAttendantCommand(aaName, languageId, timeZoneId);
         public string GetAssociateResourceAccountWithAutoAttendantCommand(string resourceAccountUpn, string autoAttendantName) => _autoAttendantBuilder.GetAssociateResourceAccountWithAutoAttendantCommand(resourceAccountUpn, autoAttendantName);
         public string GetAssignPhoneNumberToAutoAttendantCommand(string upn, string phoneNumber, string phoneNumberType) => _autoAttendantBuilder.GetAssignPhoneNumberToAutoAttendantCommand(upn, phoneNumber, phoneNumberType);
         public string GetCreateDefaultCallFlowCommand(PhoneManagerVariables variables) => _autoAttendantBuilder.GetCreateDefaultCallFlowCommand(variables);
         public string GetCreateAfterHoursCallFlowCommand(PhoneManagerVariables variables) => _autoAttendantBuilder.GetCreateAfterHoursCallFlowCommand(variables);
         public string GetCreateAfterHoursScheduleCommand(PhoneManagerVariables variables) => _autoAttendantBuilder.GetCreateAfterHoursScheduleCommand(variables);
         public string GetCreateCallHandlingAssociationCommand() => _autoAttendantBuilder.GetCreateCallHandlingAssociationCommand();
+        public string GetRemoveAutoAttendantCommand(string autoAttendantName) => _autoAttendantBuilder.GetRemoveAutoAttendantCommand(autoAttendantName);
+        public string GetRemoveScheduleCommand(string scheduleName) => _autoAttendantBuilder.GetRemoveScheduleCommand(scheduleName);
 
         public string GetCreateHolidayCommand(string holidayName, DateTime holidayDate) => _holidayBuilder.GetCreateHolidayCommand(holidayName, holidayDate);
         public string GetCreateHolidaySeriesCommand(string holidayName, List<DateTime> holidayDates) => _holidayBuilder.GetCreateHolidaySeriesCommand(holidayName, holidayDates);
+        public string GetCreateHolidaySeriesFromEntriesCommand(string holidayName, List<HolidayEntry> holidayEntries) => _holidayBuilder.GetCreateHolidaySeriesFromEntriesCommand(holidayName, holidayEntries);
 
         public string GetRetrieveResourceAccountsCommand() => _resourceAccountBuilder.GetRetrieveResourceAccountsCommand();
         public string GetCreateResourceAccountCommand(PhoneManagerVariables variables) => _resourceAccountBuilder.GetCreateResourceAccountCommand(variables);
+        public string GetCreateResourceAccountCommand(string upn, string displayName, string appId) => _resourceAccountBuilder.GetCreateResourceAccountCommand(upn, displayName, appId);
         public string GetUpdateResourceAccountUsageLocationCommand(string upn, string usageLocation) => _resourceAccountBuilder.GetUpdateResourceAccountUsageLocationCommand(upn, usageLocation);
         public string GetRetrieveAutoAttendantResourceAccountsCommand() => _resourceAccountBuilder.GetRetrieveAutoAttendantResourceAccountsCommand();
         public string GetCreateAutoAttendantResourceAccountCommand(PhoneManagerVariables variables) => _resourceAccountBuilder.GetCreateAutoAttendantResourceAccountCommand(variables);
+        public string GetCreateAutoAttendantResourceAccountCommand(string upn, string displayName, string appId) => _resourceAccountBuilder.GetCreateAutoAttendantResourceAccountCommand(upn, displayName, appId);
         public string GetUpdateAutoAttendantResourceAccountUsageLocationCommand(string upn, string usageLocation) => _resourceAccountBuilder.GetUpdateAutoAttendantResourceAccountUsageLocationCommand(upn, usageLocation);
         public string GetAssignAutoAttendantLicenseCommand(string userId, string skuId) => _resourceAccountBuilder.GetAssignAutoAttendantLicenseCommand(userId, skuId);
     }

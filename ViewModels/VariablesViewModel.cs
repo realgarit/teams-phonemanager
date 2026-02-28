@@ -16,7 +16,6 @@ namespace teams_phonemanager.ViewModels
 {
     public partial class VariablesViewModel : ViewModelBase
     {
-        private readonly MainWindowViewModel? _mainWindowViewModel;
         private PhoneManagerVariables? _subscribedVariables;
 
         [ObservableProperty]
@@ -49,6 +48,15 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private TimeSpan? _selectedEditHolidayTime;
 
+        [ObservableProperty]
+        private bool _dialogHasEndDate;
+
+        [ObservableProperty]
+        private DateTime _dialogEndDate = DateTime.Now;
+
+        [ObservableProperty]
+        private TimeSpan? _selectedEditEndTime;
+
         // Simple properties for Add/Edit dialogs
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(DialogHolidayDate))]
@@ -78,6 +86,101 @@ namespace teams_phonemanager.ViewModels
 
         // Removed DialogHolidayTime - now using SelectedEditHolidayTime with ComboBoxItem approach
 
+        /// <summary>
+        /// Teams-supported language IDs for auto attendants and call queues.
+        /// </summary>
+        public static ObservableCollection<string> LanguageOptions { get; } = new ObservableCollection<string>
+        {
+            "de-DE", "de-AT", "de-CH",
+            "en-US", "en-GB", "en-AU", "en-CA",
+            "fr-FR", "fr-CH", "fr-CA",
+            "it-IT",
+            "es-ES", "es-MX",
+            "pt-BR", "pt-PT",
+            "nl-NL",
+            "ja-JP",
+            "zh-CN", "zh-TW",
+            "ko-KR",
+            "ru-RU",
+            "pl-PL",
+            "sv-SE",
+            "nb-NO",
+            "da-DK",
+            "fi-FI",
+            "cs-CZ",
+            "tr-TR",
+            "ar-SA",
+            "he-IL",
+            "th-TH",
+            "el-GR",
+            "hu-HU",
+            "ro-RO",
+            "sk-SK",
+            "uk-UA"
+        };
+
+        /// <summary>
+        /// Common Windows time zone IDs used with Teams.
+        /// </summary>
+        public static ObservableCollection<string> TimeZoneOptions { get; } = new ObservableCollection<string>
+        {
+            "W. Europe Standard Time",
+            "Central European Standard Time",
+            "Romance Standard Time",
+            "Central Europe Standard Time",
+            "GMT Standard Time",
+            "Eastern Standard Time",
+            "Central Standard Time",
+            "Mountain Standard Time",
+            "Pacific Standard Time",
+            "AUS Eastern Standard Time",
+            "Tokyo Standard Time",
+            "China Standard Time",
+            "India Standard Time",
+            "Singapore Standard Time",
+            "Arabian Standard Time",
+            "Russian Standard Time",
+            "New Zealand Standard Time",
+            "SA Pacific Standard Time",
+            "E. South America Standard Time",
+            "South Africa Standard Time",
+            "Israel Standard Time",
+            "Turkey Standard Time",
+            "Korea Standard Time",
+            "SE Asia Standard Time",
+            "FLE Standard Time",
+            "UTC"
+        };
+
+        /// <summary>
+        /// ISO 3166-1 alpha-2 country codes for usage location.
+        /// </summary>
+        public static ObservableCollection<string> UsageLocationOptions { get; } = new ObservableCollection<string>
+        {
+            "CH", "DE", "AT",
+            "FR", "IT", "NL", "BE", "LU",
+            "GB", "IE",
+            "US", "CA",
+            "AU", "NZ",
+            "JP", "SG", "IN", "CN",
+            "SE", "NO", "DK", "FI",
+            "ES", "PT", "GR",
+            "PL", "CZ", "SK", "HU", "RO",
+            "TR", "IL", "SA", "AE",
+            "BR", "MX", "ZA",
+            "KR", "TH", "UA", "RU"
+        };
+
+        /// <summary>
+        /// Phone number assignment types for Teams.
+        /// </summary>
+        public static ObservableCollection<string> PhoneNumberTypeOptions { get; } = new ObservableCollection<string>
+        {
+            "DirectRouting",
+            "CallingPlan",
+            "OperatorConnect"
+        };
+
         public VariablesViewModel(
             IPowerShellContextService powerShellContextService,
             IPowerShellCommandService powerShellCommandService,
@@ -85,20 +188,18 @@ namespace teams_phonemanager.ViewModels
             ISessionManager sessionManager,
             INavigationService navigationService,
             IErrorHandlingService errorHandlingService,
-            IValidationService validationService)
+            IValidationService validationService,
+            ISharedStateService sharedStateService,
+            IDialogService dialogService)
             : base(powerShellContextService, powerShellCommandService, loggingService,
-                  sessionManager, navigationService, errorHandlingService, validationService)
+                  sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
         {
-            _mainWindowViewModel = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
-                ? desktop.MainWindow?.DataContext as MainWindowViewModel
-                : null;
-
             _loggingService.Log("Variables page loaded", LogLevel.Info);
 
             // Subscribe to variable changes for Call Queue configuration visibility
-            if (_mainWindowViewModel?.Variables != null)
+            if (_sharedStateService?.Variables != null)
             {
-                SubscribeToVariablesChanges(_mainWindowViewModel.Variables);
+                SubscribeToVariablesChanges(_sharedStateService.Variables);
 
                 // Prefill target fields if M365GroupId is already set
                 PrefillCallQueueTargets();
@@ -158,12 +259,12 @@ namespace teams_phonemanager.ViewModels
 
         public PhoneManagerVariables Variables
         {
-            get => _mainWindowViewModel?.Variables ?? new PhoneManagerVariables();
+            get => _sharedStateService?.Variables ?? new PhoneManagerVariables();
             set
             {
-                if (_mainWindowViewModel != null)
+                if (_sharedStateService != null)
                 {
-                    _mainWindowViewModel.Variables = value;
+                    _sharedStateService.Variables = value;
                     OnPropertyChanged();
                     
                     // Subscribe to changes on the new Variables instance
@@ -298,7 +399,7 @@ namespace teams_phonemanager.ViewModels
         private void OpenHolidaySeriesManager()
         {
             // Save original state for cancel functionality
-            var variables = _mainWindowViewModel?.Variables;
+            var variables = _sharedStateService?.Variables;
             if (variables != null)
             {
                 OriginalHolidaySeries.Clear();
@@ -325,7 +426,7 @@ namespace teams_phonemanager.ViewModels
         private void CancelHolidaySeriesManager()
         {
             // Restore original state
-            var variables = _mainWindowViewModel?.Variables;
+            var variables = _sharedStateService?.Variables;
             if (variables != null)
             {
                 variables.HolidaySeries.Clear();
@@ -378,8 +479,10 @@ namespace teams_phonemanager.ViewModels
 
         [ObservableProperty]
         private ObservableCollection<string> _cantons = new ObservableCollection<string>(new[] { 
-            "Aargau", "Basel-Land", "Bern", "Fribourg", "Genf", "Glarus", "Luzern", 
-            "Schwyz", "Solothurn", "Tessin", "Thurgau", "Zug", "Zürich" 
+            "Aargau", "Appenzell-Ausserrhoden", "Appenzell-Innerrhoden", "Basel-Land", "Basel-Stadt",
+            "Bern", "Fribourg", "Genf", "Glarus", "Graubünden", "Jura", "Luzern", 
+            "Neuenburg", "Nidwalden", "Obwalden", "Schaffhausen", "Schwyz", "Solothurn",
+            "St. Gallen", "Tessin", "Thurgau", "Uri", "Waadt", "Wallis", "Zug", "Zürich" 
         });
 
         [ObservableProperty]
@@ -492,7 +595,7 @@ namespace teams_phonemanager.ViewModels
         {
             try
             {
-                var variables = _mainWindowViewModel?.Variables;
+                var variables = _sharedStateService?.Variables;
                 if (variables == null) return;
 
                 // Use Swiss provider for Switzerland; expand later for other countries
@@ -526,6 +629,19 @@ namespace teams_phonemanager.ViewModels
                     // Set the selected time, rounding to nearest 15-minute increment if needed
                     var roundedTime = new TimeSpan(holiday.Time.Hours, (holiday.Time.Minutes / 15) * 15, 0);
                     SelectedEditHolidayTime = roundedTime;
+
+                    // Set end date fields
+                    DialogHasEndDate = holiday.HasEndDate;
+                    DialogEndDate = holiday.EndDate ?? holiday.Date.AddDays(1);
+                    if (holiday.EndTime.HasValue)
+                    {
+                        var roundedEnd = new TimeSpan(holiday.EndTime.Value.Hours, (holiday.EndTime.Value.Minutes / 15) * 15, 0);
+                        SelectedEditEndTime = roundedEnd;
+                    }
+                    else
+                    {
+                        SelectedEditEndTime = null;
+                    }
                     
                     ShowEditHolidayDialog = true;
                     _loggingService.Log($"EditHoliday: Set ShowEditHolidayDialog to true", LogLevel.Info);
@@ -544,6 +660,8 @@ namespace teams_phonemanager.ViewModels
             ShowEditHolidayDialog = false;
             EditingHoliday = null;
             SelectedEditHolidayTime = null;
+            SelectedEditEndTime = null;
+            DialogHasEndDate = false;
         }
 
         [RelayCommand]
@@ -551,7 +669,7 @@ namespace teams_phonemanager.ViewModels
         {
             try
             {
-                var variables = _mainWindowViewModel?.Variables;
+                var variables = _sharedStateService?.Variables;
                 if (variables == null) return;
 
                 // Get the selected time from the ComboBox
@@ -561,6 +679,8 @@ namespace teams_phonemanager.ViewModels
                 {
                     // Editing existing holiday
                     EditingHoliday.Time = selectedTime;
+                    EditingHoliday.EndDate = DialogHasEndDate ? DialogEndDate : null;
+                    EditingHoliday.EndTime = DialogHasEndDate ? (SelectedEditEndTime ?? TimeSpan.Zero) : null;
                     _loggingService.Log($"Updated holiday: {EditingHoliday.DisplayText}", LogLevel.Info);
                 }
                 else
@@ -569,7 +689,9 @@ namespace teams_phonemanager.ViewModels
                     var newHoliday = new HolidayEntry
                     {
                         Date = NewHolidayDate,
-                        Time = selectedTime
+                        Time = selectedTime,
+                        EndDate = DialogHasEndDate ? DialogEndDate : null,
+                        EndTime = DialogHasEndDate ? (SelectedEditEndTime ?? TimeSpan.Zero) : null
                     };
                     variables.HolidaySeries.Add(newHoliday);
                     _loggingService.Log($"Added new holiday: {newHoliday.DisplayText}", LogLevel.Info);
@@ -578,6 +700,8 @@ namespace teams_phonemanager.ViewModels
                 ShowEditHolidayDialog = false;
                 EditingHoliday = null;
                 SelectedEditHolidayTime = null;
+                SelectedEditEndTime = null;
+                DialogHasEndDate = false;
             }
             catch (Exception ex)
             {
@@ -592,7 +716,7 @@ namespace teams_phonemanager.ViewModels
             {
                 if (holiday != null)
                 {
-                    var variables = _mainWindowViewModel?.Variables;
+                    var variables = _sharedStateService?.Variables;
                     if (variables != null)
                     {
                         variables.HolidaySeries.Remove(holiday);
@@ -611,7 +735,7 @@ namespace teams_phonemanager.ViewModels
         {
             try
             {
-                var variables = _mainWindowViewModel?.Variables;
+                var variables = _sharedStateService?.Variables;
                 if (variables != null && variables.HolidaySeries.Count > 0)
                 {
                     var count = variables.HolidaySeries.Count;
@@ -628,7 +752,7 @@ namespace teams_phonemanager.ViewModels
         [RelayCommand]
         private void SaveHolidaySeries()
         {
-            var variables = _mainWindowViewModel?.Variables;
+            var variables = _sharedStateService?.Variables;
             if (variables != null)
             {
                 _loggingService.Log($"Saved holiday series with {variables.HolidaySeries.Count} holidays", LogLevel.Info);

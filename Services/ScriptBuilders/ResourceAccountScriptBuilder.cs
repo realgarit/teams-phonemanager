@@ -33,14 +33,17 @@ catch {
         }
 
         public string GetCreateResourceAccountCommand(PhoneManagerVariables variables)
+            => GetCreateResourceAccountCommand(variables.RacqUPN, variables.RacqDisplayName, variables.CsAppCqId);
+
+        public string GetCreateResourceAccountCommand(string upn, string displayName, string appId)
         {
             // SECURITY: Sanitize all user inputs and wrap in quotes to prevent command injection
-            var sanitizedUpn = _sanitizer.SanitizeString(variables.RacqUPN);
-            var sanitizedDisplayName = _sanitizer.SanitizeString(variables.RacqDisplayName);
+            var sanitizedUpn = _sanitizer.SanitizeString(upn);
+            var sanitizedDisplayName = _sanitizer.SanitizeString(displayName);
             
             return $@"
 try {{
-    New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedUpn}"" -ApplicationId ""{variables.CsAppCqId}"" -DisplayName ""{sanitizedDisplayName}""
+    New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedUpn}"" -ApplicationId ""{appId}"" -DisplayName ""{sanitizedDisplayName}""
     Write-Host ""SUCCESS: Resource account created successfully""
 }}
 catch {{
@@ -84,14 +87,17 @@ catch {
         }
 
         public string GetCreateAutoAttendantResourceAccountCommand(PhoneManagerVariables variables)
+            => GetCreateAutoAttendantResourceAccountCommand(variables.RaaaUPN, variables.RaaaDisplayName, variables.CsAppAaId);
+
+        public string GetCreateAutoAttendantResourceAccountCommand(string upn, string displayName, string appId)
         {
             // SECURITY: Sanitize all user inputs and wrap in quotes to prevent command injection
-            var sanitizedUpn = _sanitizer.SanitizeString(variables.RaaaUPN);
-            var sanitizedDisplayName = _sanitizer.SanitizeString(variables.RaaaDisplayName);
+            var sanitizedUpn = _sanitizer.SanitizeString(upn);
+            var sanitizedDisplayName = _sanitizer.SanitizeString(displayName);
             
             return $@"
 try {{
-    New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedUpn}"" -ApplicationId ""{variables.CsAppAaId}"" -DisplayName ""{sanitizedDisplayName}""
+    New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedUpn}"" -ApplicationId ""{appId}"" -DisplayName ""{sanitizedDisplayName}""
     Write-Host ""SUCCESS: Resource account created successfully""
 }}
 catch {{

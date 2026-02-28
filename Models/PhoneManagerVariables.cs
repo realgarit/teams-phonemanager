@@ -105,6 +105,27 @@ namespace teams_phonemanager.Models
         [ObservableProperty]
         private TimeSpan _openingHours2End = new TimeSpan(0, 0, 0);
 
+        /// <summary>
+        /// When true, per-day business hours are used instead of uniform hours.
+        /// </summary>
+        [ObservableProperty]
+        private bool _usePerDaySchedule = false;
+
+        /// <summary>
+        /// Per-day business hours configuration. Each day can have its own schedule.
+        /// </summary>
+        [ObservableProperty]
+        private ObservableCollection<DaySchedule> _weeklySchedule = new ObservableCollection<DaySchedule>
+        {
+            new DaySchedule("Monday"),
+            new DaySchedule("Tuesday"),
+            new DaySchedule("Wednesday"),
+            new DaySchedule("Thursday"),
+            new DaySchedule("Friday"),
+            new DaySchedule("Saturday", isEnabled: false),
+            new DaySchedule("Sunday", isEnabled: false)
+        };
+
         [ObservableProperty]
         private string _holidayNameSuffix = string.Empty;
 

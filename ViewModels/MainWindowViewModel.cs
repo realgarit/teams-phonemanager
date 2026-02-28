@@ -35,7 +35,8 @@ namespace teams_phonemanager.ViewModels
                 if (_logCacheDirty || _allLogEntriesTextCache == null)
                 {
                     var sb = new StringBuilder();
-                    foreach (var entry in LogEntries)
+                    var entries = _loggingService.GetFilteredEntries();
+                    foreach (var entry in entries)
                     {
                         sb.AppendLine(entry);
                     }
@@ -48,6 +49,68 @@ namespace teams_phonemanager.ViewModels
 
         [ObservableProperty]
         private bool _isDarkTheme = true;
+
+        // Settings properties — these proxy through to ISharedStateService
+        public bool SkipScriptPreview
+        {
+            get => _sharedStateService?.SkipScriptPreview ?? false;
+            set
+            {
+                if (_sharedStateService != null)
+                {
+                    _sharedStateService.SkipScriptPreview = value;
+                    OnPropertyChanged();
+                    _loggingService.Log($"Skip script preview: {value}", LogLevel.Info);
+                }
+            }
+        }
+
+        public bool SkipDeleteConfirmation
+        {
+            get => _sharedStateService?.SkipDeleteConfirmation ?? false;
+            set
+            {
+                if (_sharedStateService != null)
+                {
+                    _sharedStateService.SkipDeleteConfirmation = value;
+                    OnPropertyChanged();
+                    _loggingService.Log($"Skip delete confirmation: {value}", LogLevel.Info);
+                }
+            }
+        }
+
+        public bool AutoRefreshAfterOperations
+        {
+            get => _sharedStateService?.AutoRefreshAfterOperations ?? true;
+            set
+            {
+                if (_sharedStateService != null)
+                {
+                    _sharedStateService.AutoRefreshAfterOperations = value;
+                    OnPropertyChanged();
+                    _loggingService.Log($"Auto-refresh after operations: {value}", LogLevel.Info);
+                }
+            }
+        }
+
+        public int SelectedLogLevelIndex
+        {
+            get => (int)(_sharedStateService?.MinimumLogLevel ?? LogLevel.Info);
+            set
+            {
+                var level = (LogLevel)value;
+                if (_sharedStateService != null)
+                {
+                    _sharedStateService.MinimumLogLevel = level;
+                    _loggingService.MinimumLogLevel = level;
+                    OnPropertyChanged();
+                    // Invalidate log cache so filtered view updates
+                    _logCacheDirty = true;
+                    OnPropertyChanged(nameof(AllLogEntriesText));
+                    _loggingService.Log($"Minimum log level: {level}", LogLevel.Info);
+                }
+            }
+        }
 
         [ObservableProperty]
         private string _currentPage = Services.ConstantsService.Pages.Welcome;
@@ -63,8 +126,18 @@ namespace teams_phonemanager.ViewModels
 
         public string Copyright => Services.ConstantsService.Application.Copyright;
 
-        [ObservableProperty]
-        private PhoneManagerVariables _variables = new();
+        public PhoneManagerVariables Variables
+        {
+            get => _sharedStateService?.Variables ?? new PhoneManagerVariables();
+            set
+            {
+                if (_sharedStateService != null)
+                {
+                    _sharedStateService.Variables = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public MainWindowViewModel(
             IPowerShellContextService powerShellContextService,
@@ -73,9 +146,11 @@ namespace teams_phonemanager.ViewModels
             ISessionManager sessionManager,
             INavigationService navigationService,
             IErrorHandlingService errorHandlingService,
-            IValidationService validationService)
+            IValidationService validationService,
+            ISharedStateService sharedStateService,
+            IDialogService dialogService)
             : base(powerShellContextService, powerShellCommandService, loggingService,
-                  sessionManager, navigationService, errorHandlingService, validationService)
+                  sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
         {
             _loggingService.Log("Application started", LogLevel.Info);
 

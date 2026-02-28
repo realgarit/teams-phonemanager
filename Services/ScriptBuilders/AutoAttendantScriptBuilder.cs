@@ -67,6 +67,7 @@ $aatr2 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours2Start:hh\:mm}"" 
 $aaTimeRanges = if (""{variables.OpeningHours2Start:hh\:mm}"" -ne ""{variables.OpeningHours2End:hh\:mm}"") {{ @($aatr1, $aatr2) }} else {{ @($aatr1) }}
 $aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours $aaTimeRanges -TuesdayHours $aaTimeRanges -WednesdayHours $aaTimeRanges -ThursdayHours $aaTimeRanges -FridayHours $aaTimeRanges -Complement
 $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
+$aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
 
 New-CsAutoAttendant `
 -Name ""{sanitizedAaDisplayName}"" `
@@ -244,6 +245,11 @@ catch {{
 
         public string GetCreateAfterHoursScheduleCommand(PhoneManagerVariables variables)
         {
+            if (variables.UsePerDaySchedule)
+            {
+                return BuildPerDayScheduleScript(variables);
+            }
+
             return $@"
 try {{
     $aatr1 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours1Start:hh\:mm}"" -End ""{variables.OpeningHours1End:hh\:mm}""
@@ -279,11 +285,14 @@ catch {{
         }
 
         public string GetCreateSimpleAutoAttendantCommand(PhoneManagerVariables variables)
+            => GetCreateSimpleAutoAttendantCommand(variables.AaDisplayName, variables.LanguageId, variables.TimeZoneId);
+
+        public string GetCreateSimpleAutoAttendantCommand(string aaName, string languageId, string timeZoneId)
         {
             // SECURITY: Sanitize inputs
-            var sanitizedAaDisplayName = _sanitizer.SanitizeString(variables.AaDisplayName);
-            var sanitizedLanguageId = _sanitizer.SanitizeString(variables.LanguageId);
-            var sanitizedTimeZoneId = _sanitizer.SanitizeString(variables.TimeZoneId);
+            var sanitizedAaDisplayName = _sanitizer.SanitizeString(aaName);
+            var sanitizedLanguageId = _sanitizer.SanitizeString(languageId);
+            var sanitizedTimeZoneId = _sanitizer.SanitizeString(timeZoneId);
             
             return $@"
 try {{
@@ -317,6 +326,104 @@ try {{
 catch {{
     Write-Host ""ERROR: Failed to associate resource account with auto attendant: $_""
 }}";
+        }
+
+        /// <summary>
+        /// Removes an auto attendant by name.
+        /// </summary>
+        public string GetRemoveAutoAttendantCommand(string autoAttendantName)
+        {
+            var sanitizedName = _sanitizer.SanitizeString(autoAttendantName);
+            
+            return $@"
+try {{
+    $aa = Get-CsAutoAttendant -NameFilter ""{sanitizedName}"" | Where-Object {{$_.Name -eq ""{sanitizedName}""}} | Select-Object -First 1
+    if (-not $aa) {{
+        Write-Host ""ERROR: Auto attendant '{sanitizedName}' not found""
+    }} else {{
+        Remove-CsAutoAttendant -Identity $aa.Identity
+        Write-Host ""SUCCESS: Auto attendant '{sanitizedName}' removed successfully""
+    }}
+}}
+catch {{
+    Write-Host ""ERROR: Failed to remove auto attendant '{sanitizedName}': $_""
+}}";
+        }
+
+        /// <summary>
+        /// Removes an online schedule by name.
+        /// </summary>
+        public string GetRemoveScheduleCommand(string scheduleName)
+        {
+            var sanitizedName = _sanitizer.SanitizeString(scheduleName);
+            
+            return $@"
+try {{
+    $schedule = Get-CsOnlineSchedule | Where-Object {{$_.Name -eq ""{sanitizedName}""}} | Select-Object -First 1
+    if (-not $schedule) {{
+        Write-Host ""ERROR: Schedule '{sanitizedName}' not found""
+    }} else {{
+        Remove-CsOnlineSchedule -Id $schedule.Id
+        Write-Host ""SUCCESS: Schedule '{sanitizedName}' removed successfully""
+    }}
+}}
+catch {{
+    Write-Host ""ERROR: Failed to remove schedule '{sanitizedName}': $_""
+}}";
+        }
+
+        private string BuildPerDayScheduleScript(PhoneManagerVariables variables)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(@"
+try {");
+            // Build time ranges for each day
+            var dayNames = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+            var psParamNames = new[] { "MondayHours", "TuesdayHours", "WednesdayHours", "ThursdayHours", "FridayHours", "SaturdayHours", "SundayHours" };
+
+            for (int i = 0; i < dayNames.Length; i++)
+            {
+                var day = variables.WeeklySchedule.FirstOrDefault(d => d.DayName == dayNames[i]);
+                if (day == null || !day.IsEnabled) continue;
+
+                var varPrefix = dayNames[i].ToLower();
+                sb.AppendLine($"    ${varPrefix}Tr1 = New-CsOnlineTimeRange -Start \"{day.Hours1Start:hh\\:mm}\" -End \"{day.Hours1End:hh\\:mm}\"");
+                if (day.HasSecondRange && day.Hours2Start != day.Hours2End)
+                {
+                    sb.AppendLine($"    ${varPrefix}Tr2 = New-CsOnlineTimeRange -Start \"{day.Hours2Start:hh\\:mm}\" -End \"{day.Hours2End:hh\\:mm}\"");
+                    sb.AppendLine($"    ${varPrefix}Hours = @(${varPrefix}Tr1, ${varPrefix}Tr2)");
+                }
+                else
+                {
+                    sb.AppendLine($"    ${varPrefix}Hours = @(${varPrefix}Tr1)");
+                }
+            }
+
+            // Build the schedule command with per-day parameters
+            sb.AppendLine("    $aaafterHoursSchedule = New-CsOnlineSchedule -Name \"After Hours Schedule\" -WeeklyRecurrentSchedule `");
+            
+            for (int i = 0; i < dayNames.Length; i++)
+            {
+                var day = variables.WeeklySchedule.FirstOrDefault(d => d.DayName == dayNames[i]);
+                if (day != null && day.IsEnabled)
+                {
+                    var varPrefix = dayNames[i].ToLower();
+                    sb.AppendLine($"        -{psParamNames[i]} ${varPrefix}Hours `");
+                }
+            }
+            sb.AppendLine("        -Complement");
+
+            sb.AppendLine(@"
+    if ($aaafterHoursSchedule) {
+        Write-Host ""SUCCESS: Created per-day after hours schedule with ID: $($aaafterHoursSchedule.Id)""
+    } else {
+        Write-Host ""ERROR: Failed to retrieve ID after creating schedule""
+    }
+}
+catch {
+    Write-Host ""ERROR: Failed to create after hours schedule: $_""
+}");
+            return sb.ToString();
         }
     }
 }

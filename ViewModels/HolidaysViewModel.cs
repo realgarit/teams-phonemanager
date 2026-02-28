@@ -14,7 +14,7 @@ namespace teams_phonemanager.ViewModels
 {
     public partial class HolidaysViewModel : ViewModelBase
     {
-        private readonly MainWindowViewModel? _mainWindowViewModel;
+        
 
         [ObservableProperty]
         private string _statusMessage = string.Empty;
@@ -48,13 +48,12 @@ namespace teams_phonemanager.ViewModels
             ISessionManager sessionManager,
             INavigationService navigationService,
             IErrorHandlingService errorHandlingService,
-            IValidationService validationService)
+            IValidationService validationService,
+            ISharedStateService sharedStateService,
+            IDialogService dialogService)
             : base(powerShellContextService, powerShellCommandService, loggingService,
-                  sessionManager, navigationService, errorHandlingService, validationService)
+                  sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
         {
-            _mainWindowViewModel = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
-                ? desktop.MainWindow?.DataContext as MainWindowViewModel
-                : null;
             _loggingService.Log("Holidays page loaded", LogLevel.Info);
         }
 
@@ -70,7 +69,7 @@ namespace teams_phonemanager.ViewModels
         [RelayCommand]
         private void OpenCreateHolidayDialog()
         {
-            var variables = _mainWindowViewModel?.Variables;
+            var variables = _sharedStateService?.Variables;
             if (variables != null && !string.IsNullOrEmpty(variables.Customer) && !string.IsNullOrEmpty(variables.CustomerGroupName))
             {
                 HolidayName = variables.HolidayName;
@@ -98,7 +97,7 @@ namespace teams_phonemanager.ViewModels
                 IsBusy = true;
                 ShowCreateHolidayDialog = false;
 
-                var variables = _mainWindowViewModel?.Variables;
+                var variables = _sharedStateService?.Variables;
                 if (variables == null)
                 {
                     StatusMessage = "Error: Variables not found";
@@ -111,18 +110,24 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
 
-                // Create a single holiday schedule with multiple date ranges
-                var holidayDates = variables.HolidaySeries.Select(h => h.DateTime).ToList();
+                // Create a single holiday schedule with multiple date ranges (supports end dates)
+                var holidayEntries = variables.HolidaySeries.ToList();
                 var holidayName = variables.HolidayName;
                 
-                _loggingService.Log($"Creating holiday series: {holidayName} with {holidayDates.Count} dates", LogLevel.Info);
+                _loggingService.Log($"Creating holiday series: {holidayName} with {holidayEntries.Count} dates", LogLevel.Info);
 
-                var command = _powerShellCommandService.GetCreateHolidaySeriesCommand(holidayName, holidayDates);
-                var result = await ExecutePowerShellCommandAsync(command, "CreateHolidaySeries");
+                var command = _powerShellCommandService.GetCreateHolidaySeriesFromEntriesCommand(holidayName, holidayEntries);
+                var result = await PreviewAndExecuteAsync(command, "Create Holiday Series");
+                
+                if (result == null)
+                {
+                    StatusMessage = "Operation cancelled by user";
+                    return;
+                }
                 
                 if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
                 {
-                    StatusMessage = $"Holiday series '{holidayName}' created successfully with {holidayDates.Count} dates!";
+                    StatusMessage = $"Holiday series '{holidayName}' created successfully with {holidayEntries.Count} dates!";
                     _loggingService.Log($"Holiday series {holidayName} created successfully", LogLevel.Info);
                     IsHolidayCreated = true;
                 }
@@ -148,7 +153,7 @@ namespace teams_phonemanager.ViewModels
         [RelayCommand]
         private void OpenCheckAutoAttendantDialog()
         {
-            var variables = _mainWindowViewModel?.Variables;
+            var variables = _sharedStateService?.Variables;
             if (variables != null && !string.IsNullOrEmpty(variables.Customer) && !string.IsNullOrEmpty(variables.CustomerGroupName))
             {
                 AutoAttendantName = variables.AaDisplayName;
@@ -210,7 +215,7 @@ namespace teams_phonemanager.ViewModels
         [RelayCommand]
         private void OpenAttachHolidayDialog()
         {
-            var variables = _mainWindowViewModel?.Variables;
+            var variables = _sharedStateService?.Variables;
             if (variables != null)
             {
                 AutoAttendantName = variables.AaDisplayName;
@@ -244,7 +249,7 @@ namespace teams_phonemanager.ViewModels
                 IsBusy = true;
                 ShowAttachHolidayDialog = false;
 
-                var variables = _mainWindowViewModel?.Variables;
+                var variables = _sharedStateService?.Variables;
                 if (variables == null)
                 {
                     StatusMessage = "Error: Variables not found";
@@ -255,7 +260,13 @@ namespace teams_phonemanager.ViewModels
                 _loggingService.Log($"Attaching holiday {holidayName} to auto attendant {AutoAttendantName}", LogLevel.Info);
 
                 var command = _powerShellCommandService.GetAttachHolidayToAutoAttendantCommand(holidayName, AutoAttendantName, variables.HolidayGreetingPromptDE);
-                var result = await ExecutePowerShellCommandAsync(command, "AttachHolidayToAutoAttendant");
+                var result = await PreviewAndExecuteAsync(command, "Attach Holiday to Auto Attendant");
+                
+                if (result == null)
+                {
+                    StatusMessage = "Operation cancelled by user";
+                    return;
+                }
                 
                 if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
                 {

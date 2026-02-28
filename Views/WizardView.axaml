@@ -1,0 +1,252 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             x:Class="teams_phonemanager.Views.WizardView"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:fi="using:FluentIcons.Avalonia"
+             xmlns:fic="using:FluentIcons.Common"
+             xmlns:local="clr-namespace:teams_phonemanager.Views"
+             xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
+             xmlns:converters="clr-namespace:teams_phonemanager.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="900">
+
+    <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <Border Classes="card" Margin="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="240"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Step Sidebar -->
+                <Border Grid.Column="0"
+                        Background="{DynamicResource ControlFillColorSecondaryBrush}"
+                        CornerRadius="8,0,0,8"
+                        Padding="0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Margin="16,20,16,12">
+                            <TextBlock Text="Setup Wizard"
+                                     FontSize="18"
+                                     FontWeight="SemiBold"
+                                     Margin="0,0,0,4"/>
+                            <TextBlock Text="Step-by-step phone system setup"
+                                     FontSize="12"
+                                     Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                     TextWrapping="Wrap"/>
+                        </StackPanel>
+
+                        <ScrollViewer Grid.Row="1">
+                            <ItemsControl ItemsSource="{Binding Steps}" Margin="8,0,8,8">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="8,6" 
+                                                Margin="0,1"
+                                                CornerRadius="4"
+                                                Background="Transparent">
+                                            <Grid ColumnDefinitions="24,*">
+                                                <TextBlock Grid.Column="0"
+                                                         Text="{Binding StatusIcon}"
+                                                         FontSize="14"
+                                                         VerticalAlignment="Center"/>
+                                                <StackPanel Grid.Column="1" Spacing="1">
+                                                    <TextBlock Text="{Binding Title}"
+                                                             FontSize="12"
+                                                             FontWeight="SemiBold"
+                                                             TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <!-- Main Content Area -->
+                <Grid Grid.Column="1" Margin="24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Step Header -->
+                    <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <Border Background="{DynamicResource AccentFillColorDefaultBrush}"
+                                    CornerRadius="16"
+                                    Width="32" Height="32"
+                                    HorizontalAlignment="Left">
+                                <TextBlock Text="{Binding CurrentStep, StringFormat={}{0}}"
+                                         Foreground="White"
+                                         FontWeight="Bold"
+                                         FontSize="14"
+                                         HorizontalAlignment="Center"
+                                         VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="{Binding StepTitle}"
+                                     FontSize="22"
+                                     FontWeight="SemiBold"
+                                     VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding StepDescription}"
+                                 FontSize="14"
+                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                 Margin="44,4,0,0"
+                                 TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <!-- Progress Bar -->
+                    <Grid Grid.Row="1" Margin="0,0,0,16">
+                        <ProgressBar Minimum="0"
+                                     Maximum="{Binding TotalSteps}"
+                                     Value="{Binding CurrentStep}"
+                                     Height="4"/>
+                    </Grid>
+
+                    <!-- Script Preview / Content -->
+                    <Border Grid.Row="2" 
+                            Background="{DynamicResource ControlFillColorDefaultBrush}"
+                            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Margin="0,0,0,12">
+                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Auto">
+                            <TextBox Text="{Binding StepScript}"
+                                     IsReadOnly="True"
+                                     AcceptsReturn="True"
+                                     TextWrapping="NoWrap"
+                                     FontFamily="Cascadia Code, Consolas, Courier New, monospace"
+                                     FontSize="12"
+                                     BorderThickness="0"
+                                     Padding="16"
+                                     Watermark="Script preview will appear here..."/>
+                        </ScrollViewer>
+                    </Border>
+
+                    <!-- Step Result -->
+                    <Border Grid.Row="3"
+                            IsVisible="{Binding StepResult, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                            Background="{DynamicResource ControlFillColorDefaultBrush}"
+                            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12"
+                            Margin="0,0,0,12"
+                            MaxHeight="120">
+                        <ScrollViewer>
+                            <TextBlock Text="{Binding StepResult}"
+                                     FontSize="12"
+                                     FontFamily="Cascadia Code, Consolas, Courier New, monospace"
+                                     TextWrapping="Wrap"/>
+                        </ScrollViewer>
+                    </Border>
+
+                    <!-- Action Buttons -->
+                    <Grid Grid.Row="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left: Back -->
+                        <Button Grid.Column="0"
+                                Command="{Binding GoToPreviousStepCommand}"
+                                IsEnabled="{Binding CanGoPrevious}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <fi:SymbolIcon Symbol="ArrowLeft" FontSize="14"/>
+                                <TextBlock Text="Back" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Center: Execute / Skip / Retry -->
+                        <StackPanel Grid.Column="1" 
+                                    Orientation="Horizontal" 
+                                    HorizontalAlignment="Center"
+                                    Spacing="8">
+                            
+                            <!-- Execute Step -->
+                            <Button Command="{Binding ExecuteCurrentStepCommand}"
+                                    Classes="accent"
+                                    IsEnabled="{Binding CanExecuteStep}">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <fi:SymbolIcon Symbol="Play" FontSize="14"/>
+                                    <TextBlock Text="Execute Step" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Skip -->
+                            <Button Command="{Binding SkipStepCommand}"
+                                    IsEnabled="{Binding !IsBusy}">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <fi:SymbolIcon Symbol="Next" FontSize="14"/>
+                                    <TextBlock Text="Skip" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            
+                            <!-- Retry (visible on failure) -->
+                            <Button Command="{Binding RetryStepCommand}"
+                                    IsVisible="{Binding StepFailed}">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <fi:SymbolIcon Symbol="ArrowSync" FontSize="14"/>
+                                    <TextBlock Text="Retry" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Navigate to Variables (step 0 only) -->
+                            <Button Command="{Binding GoToVariablesPageCommand}"
+                                    IsVisible="{Binding StepTitle, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                    Tag="edit_variables">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <fi:SymbolIcon Symbol="Edit" FontSize="14"/>
+                                    <TextBlock Text="Edit Variables" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+
+                        <!-- Right: Next -->
+                        <Button Grid.Column="2"
+                                Command="{Binding GoToNextStepCommand}"
+                                IsEnabled="{Binding CanGoNext}"
+                                Classes="accent">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock Text="Next" VerticalAlignment="Center"/>
+                                <fi:SymbolIcon Symbol="ArrowRight" FontSize="14"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- Busy Overlay -->
+        <Border IsVisible="{Binding IsBusy}"
+                Background="#80000000"
+                CornerRadius="8">
+            <StackPanel HorizontalAlignment="Center" 
+                        VerticalAlignment="Center"
+                        Spacing="12">
+                <ProgressBar IsIndeterminate="True" Width="200"/>
+                <TextBlock Text="{Binding StatusMessage}"
+                         Foreground="White"
+                         HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

@@ -14,55 +14,10 @@ namespace teams_phonemanager.Services.ScriptBuilders
 
         public string GetCheckModulesCommand()
         {
-            return @"
-$ErrorActionPreference = 'Stop'
+            // Reuse GetCommonSetupScript() to avoid duplicating TLS/WAM/PSModulePath bootstrapping
+            return GetCommonSetupScript() + @"
 $output = @()
-
-# Force MSAL and Azure.Identity to use system browser instead of WAM
-$env:MSAL_DISABLE_WAM = 'true'
-$env:AZURE_IDENTITY_DISABLE_WAM = 'true'
-
-# Enable TLS 1.2 for secure communication
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-$output += 'TLS 1.2 security protocol enabled'
-
-# Add bundled modules to PSModulePath
-# Get the application's base directory (where the executable is located)
-$appDir = [System.IO.Path]::GetDirectoryName([System.Reflection.Assembly]::GetExecutingAssembly().Location)
-if (-not $appDir) {
-    $appDir = [System.AppDomain]::CurrentDomain.BaseDirectory
-}
-$possiblePaths = @(
-    (Join-Path $appDir 'Modules'),
-    (Join-Path $appDir 'win-x64/Modules'),
-    (Join-Path $appDir 'osx-x64/Modules'),
-    (Join-Path $appDir 'osx-arm64/Modules'),
-    (Join-Path $appDir 'linux-x64/Modules'),
-    (Join-Path $appDir '../Modules'),
-    (Join-Path $appDir '../win-x64/Modules'),
-    (Join-Path $appDir '../osx-x64/Modules'),
-    (Join-Path $appDir '../osx-arm64/Modules'),
-    (Join-Path $appDir '../linux-x64/Modules')
-)
-
-$bundledModulesPath = $null
-foreach ($path in $possiblePaths) {
-    if (Test-Path $path) {
-        $bundledModulesPath = $path
-        break
-    }
-}
-
-if ($bundledModulesPath) {
-    $pathSeparator = [System.IO.Path]::PathSeparator
-    $env:PSModulePath = $bundledModulesPath + $pathSeparator + $env:PSModulePath
-    $output += 'Bundled modules path added to PSModulePath: ' + $bundledModulesPath
-} else {
-    $output += 'WARNING: Bundled modules path not found in any expected location'
-    $output += 'App directory: ' + $appDir
-    $output += 'Checked paths: ' + ($possiblePaths -join ', ')
-    $output += 'Current location: ' + (Get-Location)
-}
+$output += 'Common setup completed successfully'
 
 # Check MicrosoftTeams module
 if (Get-Module -ListAvailable -Name " + ConstantsService.PowerShellModules.MicrosoftTeams + @") {
@@ -158,8 +113,7 @@ try {
     }
 }
 catch {
-    Write-Error ""Failed to connect to Microsoft Teams: $_""
-    exit " + ConstantsService.PowerShell.ExitCodeError + @"
+    Write-Host ""ERROR: Failed to connect to Microsoft Teams: $_""
 }";
         }
 
@@ -195,8 +149,7 @@ try {
 catch {
     # Ensure token is cleared even on error
     $env:TEAMS_PM_TOKEN = $null
-    Write-Error ""Failed to connect to Microsoft Graph: $_""
-    exit " + ConstantsService.PowerShell.ExitCodeError + @"
+    Write-Host ""ERROR: Failed to connect to Microsoft Graph: $_""
 }";
         }
 
@@ -208,8 +161,7 @@ try {
     Write-Host 'SUCCESS: Disconnected from Microsoft Teams'
 }
 catch {
-    Write-Error ""Failed to disconnect from Microsoft Teams: $_""
-    exit " + ConstantsService.PowerShell.ExitCodeError + @"
+    Write-Host ""ERROR: Failed to disconnect from Microsoft Teams: $_""
 }";
         }
 
@@ -224,8 +176,7 @@ try {
     Write-Host 'SUCCESS: Disconnected from Microsoft Graph'
 }
 catch {
-    Write-Error ""Failed to disconnect from Microsoft Graph: $_""
-    exit " + ConstantsService.PowerShell.ExitCodeError + @"
+    Write-Host ""ERROR: Failed to disconnect from Microsoft Graph: $_""
 }";
         }
 
@@ -307,8 +258,27 @@ try {{
     Write-Host ""{sanitizedGroupName} created successfully with ID: $global:m365groupId""
 }}
 catch {{
-    Write-Host ""{sanitizedGroupName} failed to create: $_""
-    exit
+    Write-Host ""ERROR: {sanitizedGroupName} failed to create: $_""
+}}";
+        }
+
+        public string GetRemoveM365GroupCommand(string groupId, string groupName)
+        {
+            var sanitizedId = _sanitizer.SanitizeString(groupId);
+            var sanitizedName = _sanitizer.SanitizeString(groupName);
+
+            return $@"
+try {{
+    $group = Get-MgGroup -GroupId ""{sanitizedId}"" -ErrorAction Stop
+    if ($group) {{
+        Remove-MgGroup -GroupId ""{sanitizedId}"" -ErrorAction Stop
+        Write-Host ""SUCCESS: M365 Group '{sanitizedName}' (ID: {sanitizedId}) removed successfully""
+    }} else {{
+        Write-Host ""ERROR: M365 Group with ID '{sanitizedId}' not found""
+    }}
+}}
+catch {{
+    Write-Host ""ERROR: Failed to remove M365 Group '{sanitizedName}': $_""
 }}";
         }
 
