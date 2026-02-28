@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel;
+using teams_phonemanager.Services;
 using teams_phonemanager.Services.Interfaces;
 
 namespace teams_phonemanager.ViewModels
@@ -13,6 +14,8 @@ namespace teams_phonemanager.ViewModels
         protected readonly INavigationService _navigationService;
         protected readonly IErrorHandlingService _errorHandlingService;
         protected readonly IValidationService _validationService;
+        protected readonly ISharedStateService? _sharedStateService;
+        protected readonly IDialogService? _dialogService;
 
         [ObservableProperty]
         private bool _isBusy;
@@ -41,7 +44,9 @@ namespace teams_phonemanager.ViewModels
             ISessionManager sessionManager,
             INavigationService navigationService,
             IErrorHandlingService errorHandlingService,
-            IValidationService validationService)
+            IValidationService validationService,
+            ISharedStateService? sharedStateService = null,
+            IDialogService? dialogService = null)
         {
             _powerShellContextService = powerShellContextService;
             _powerShellCommandService = powerShellCommandService;
@@ -50,6 +55,8 @@ namespace teams_phonemanager.ViewModels
             _navigationService = navigationService;
             _errorHandlingService = errorHandlingService;
             _validationService = validationService;
+            _sharedStateService = sharedStateService;
+            _dialogService = dialogService;
         }
 
         protected void UpdateStatus(string message)
@@ -65,6 +72,16 @@ namespace teams_phonemanager.ViewModels
 
         protected async Task<string> ExecutePowerShellCommandAsync(string command, Dictionary<string, string>? environmentVariables, string context = "")
         {
+            // Check session expiry before executing commands that require a connection
+            if (_sessionManager.IsSessionExpired && _sessionManager.IsSessionValid)
+            {
+                _sessionManager.ResetSession();
+                await _errorHandlingService.HandleConnectionError(
+                    "Session",
+                    "Your session has expired (24h timeout). Please reconnect to Teams and Microsoft Graph.");
+                return "ERROR: Session expired. Please reconnect.";
+            }
+
             try
             {
                 var result = await _powerShellContextService.ExecuteCommandAsync(command, environmentVariables);
@@ -144,6 +161,47 @@ namespace teams_phonemanager.ViewModels
         protected void NavigateToWelcome()
         {
             NavigateTo(Services.ConstantsService.Pages.Welcome);
+        }
+
+        /// <summary>
+        /// Shows a script preview dialog and executes the command if the user confirms.
+        /// Returns the execution result, or null if the user cancelled.
+        /// </summary>
+        protected async Task<string?> PreviewAndExecuteAsync(string command, string context = "", Dictionary<string, string>? environmentVariables = null)
+        {
+            if (_dialogService != null && !(_sharedStateService?.SkipScriptPreview ?? false))
+            {
+                var confirmed = await _dialogService.ShowScriptPreviewAsync($"Preview: {context}", command);
+                if (!confirmed)
+                {
+                    _loggingService.Log($"User cancelled script preview for: {context}", LogLevel.Info);
+                    return null;
+                }
+            }
+
+            return await ExecutePowerShellCommandAsync(command, environmentVariables, context);
+        }
+
+        /// <summary>
+        /// Shows a confirmation dialog with script preview for destructive operations.
+        /// Returns the execution result, or null if the user cancelled.
+        /// </summary>
+        protected async Task<string?> ConfirmAndExecuteAsync(string command, string confirmMessage, string context = "", Dictionary<string, string>? environmentVariables = null)
+        {
+            if (_dialogService != null && !(_sharedStateService?.SkipDeleteConfirmation ?? false))
+            {
+                var confirmed = await _dialogService.ShowConfirmationWithPreviewAsync(
+                    $"Confirm: {context}",
+                    confirmMessage,
+                    command);
+                if (!confirmed)
+                {
+                    _loggingService.Log($"User cancelled destructive operation: {context}", LogLevel.Info);
+                    return null;
+                }
+            }
+
+            return await ExecutePowerShellCommandAsync(command, environmentVariables, context);
         }
     }
 }

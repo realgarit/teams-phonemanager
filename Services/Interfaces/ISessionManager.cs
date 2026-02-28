@@ -9,6 +9,8 @@ public interface ISessionManager
     bool TeamsConnected { get; set; }
     bool GraphConnected { get; set; }
     bool IsSessionValid { get; }
+    bool IsSessionExpired { get; }
+    TimeSpan SessionTimeout { get; }
     string? TeamsAccount { get; }
     string? GraphAccount { get; }
     string? TenantId { get; }

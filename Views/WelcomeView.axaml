@@ -9,285 +9,229 @@
              x:Class="teams_phonemanager.Views.WelcomeView"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1000">
-    
-    <!-- DataContext is set via data binding from MainWindow -->
 
     <UserControl.Styles>
-        <!-- Local styles removed, using App.axaml styles -->
+        <!--
+            FluentIcons SymbolIcon renders as a font glyph. The glyph bounding box
+            includes invisible descent space below the visible icon (~3px at 24px).
+            When Avalonia centers the glyph box, the visible icon appears shifted down.
+            
+            Fix: Use RenderTransform TranslateY to nudge the icon up, compensating
+            for the descent offset without clipping anything.
+        -->
+        <Style Selector="fi|SymbolIcon.welcome-icon">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="RenderTransform" Value="translate(0px, -3px)"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
+        <Style Selector="fi|SymbolIcon.welcome-icon-hero">
+            <Setter Property="FontSize" Value="28"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="RenderTransform" Value="translate(0px, -4px)"/>
+            <Setter Property="Margin" Value="0"/>
+        </Style>
     </UserControl.Styles>
 
     <ScrollViewer HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="24">
-            <!-- Header Section -->
-            <Border Classes="card" Margin="0,0,0,24">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,16" VerticalAlignment="Center">
-                        <fi:SymbolIcon Symbol="PeopleTeam" FontSize="72"
-                                      Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                      Margin="0,0,16,0"/>
-                        <TextBlock Text="Teams Phone Manager"
-                                 FontSize="32"
-                                 FontWeight="SemiBold"
-                                 VerticalAlignment="Center"/>
-                    </StackPanel>
-                    
-                    <TextBlock Text="Your complete solution for Microsoft Teams Phone"
-                             FontSize="16"
-                             TextAlignment="Center"
-                             TextWrapping="Wrap"
-                             Opacity="0.7"
-                             Margin="0,0,0,24"/>
-                    
-                    <!-- Action Buttons with Icons -->
-                    <StackPanel Orientation="Horizontal" 
-                              HorizontalAlignment="Center"
-                              Margin="0,0,0,24">
-                        <Button Command="{Binding NavigateToGetStartedCommand}"
-                                Classes="IconTextCentered"
-                                Margin="0,0,16,0"
-                                FontSize="16"
-                                FontWeight="Bold"
-                                MinWidth="200">
-                            <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="Rocket" 
-                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                                <TextBlock Text="Get Started"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Command="{Binding OpenDocumentationCommand}"
-                                Classes="IconTextCentered"
-                                FontSize="16"
-                                FontWeight="Bold"
-                                MinWidth="200">
-                            <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="Code" 
-                                         Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                                <TextBlock Text="GitHub"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
+
+            <!-- Hero -->
+            <StackPanel HorizontalAlignment="Center" Margin="0,8,0,32">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12" Margin="0,0,0,8">
+                    <fi:SymbolIcon Symbol="PeopleTeam" Classes="welcome-icon-hero"/>
+                    <TextBlock Text="Teams Phone Manager"
+                             Classes="page-title"
+                             VerticalAlignment="Center"/>
                 </StackPanel>
-            </Border>
+                <TextBlock Text="Configure and deploy Microsoft Teams Phone infrastructure"
+                         FontSize="14"
+                         TextAlignment="Center"
+                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+            </StackPanel>
 
-            <!-- Features Grid -->
-            <TextBlock Text="What you can do"
-                     FontSize="24"
-                     Margin="0,0,0,16"
-                     FontWeight="Bold"/>
+            <!-- Quick Actions -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12" Margin="0,0,0,32">
+                <Button Command="{Binding NavigateToGetStartedCommand}"
+                        Classes="IconTextCentered" MinWidth="180">
+                    <StackPanel Orientation="Horizontal">
+                        <fi:SymbolIcon Symbol="Rocket" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                        <TextBlock Text="Get Started"/>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding OpenDocumentationCommand}"
+                        Classes="IconTextCentered" MinWidth="180">
+                    <StackPanel Orientation="Horizontal">
+                        <fi:SymbolIcon Symbol="Open" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                        <TextBlock Text="GitHub"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <!-- Setup & Configuration -->
-                <Border Grid.Row="0" Grid.Column="0" 
-                       Classes="card"
-                       Margin="0,0,12,16"
-                       CornerRadius="8">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="Settings" FontSize="32"
-                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                     />
-                            <TextBlock Text="Setup &amp; Config"
-                                     FontSize="18"
-                                     FontWeight="Bold"
-                                     VerticalAlignment="Center"/>
+            <!-- Workflow Steps -->
+            <TextBlock Text="Workflow" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
+            <Grid ColumnDefinitions="*,Auto,*,Auto,*,Auto,*" Margin="0,0,0,32">
+                <!-- Step 1 -->
+                <Border Grid.Column="0" Classes="card" CornerRadius="8" Padding="12">
+                    <StackPanel Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="Rocket" Classes="welcome-icon"/>
+                            <TextBlock Text="1. Connect" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <TextBlock TextWrapping="Wrap"
-                                 FontSize="14"
-                                 Opacity="0.7">
-                            Install PowerShell modules and connect to Teams and Graph services.
-                        </TextBlock>
+                        <TextBlock Text="Install modules, connect to Teams &amp; Graph" 
+                                 FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Border>
-
-                <!-- Variables Management -->
-                <Border Grid.Row="0" Grid.Column="1" 
-                       Classes="card"
-                       Margin="12,0,0,16"
-                       CornerRadius="8">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="Code" FontSize="32"
-                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                     />
-                            <TextBlock Text="Variables"
-                                     FontSize="18"
-                                     FontWeight="Bold"
-                                     VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="›" FontSize="20" Opacity="0.3"
+                         VerticalAlignment="Center" Margin="8,0"/>
+                <!-- Step 2 -->
+                <Border Grid.Column="2" Classes="card" CornerRadius="8" Padding="12">
+                    <StackPanel Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="Code" Classes="welcome-icon"/>
+                            <TextBlock Text="2. Configure" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <TextBlock TextWrapping="Wrap"
-                                 FontSize="14"
-                                 Opacity="0.7">
-                            Set up customer details, domains, languages, and time zones.
-                        </TextBlock>
+                        <TextBlock Text="Set variables, domains, time zones, holidays" 
+                                 FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Border>
-
-                <!-- M365 Groups -->
-                <Border Grid.Row="1" Grid.Column="0" 
-                       Classes="card"
-                       Margin="0,0,12,16"
-                       CornerRadius="8">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="People" FontSize="32"
-                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                     />
-                            <TextBlock Text="M365 Groups"
-                                     FontSize="18"
-                                     FontWeight="Bold"
-                                     VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="›" FontSize="20" Opacity="0.3"
+                         VerticalAlignment="Center" Margin="8,0"/>
+                <!-- Step 3 -->
+                <Border Grid.Column="4" Classes="card" CornerRadius="8" Padding="12">
+                    <StackPanel Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="PeopleTeam" Classes="welcome-icon"/>
+                            <TextBlock Text="3. Build" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <TextBlock TextWrapping="Wrap"
-                                 FontSize="14"
-                                 Opacity="0.7">
-                            Create and manage Microsoft 365 groups for your phone system.
-                        </TextBlock>
+                        <TextBlock Text="Create groups, queues, auto attendants" 
+                                 FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Border>
-
-                <!-- Call Queues -->
-                <Border Grid.Row="1" Grid.Column="1" 
-                       Classes="card"
-                       Margin="12,0,0,16"
-                       CornerRadius="8">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="CallInbound" FontSize="32"
-                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                     />
-                            <TextBlock Text="Call Queues"
-                                     FontSize="18"
-                                     FontWeight="Bold"
-                                     VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="5" Text="›" FontSize="20" Opacity="0.3"
+                         VerticalAlignment="Center" Margin="8,0"/>
+                <!-- Step 4 -->
+                <Border Grid.Column="6" Classes="card" CornerRadius="8" Padding="12">
+                    <StackPanel Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="DocumentText" Classes="welcome-icon"/>
+                            <TextBlock Text="4. Export" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <TextBlock TextWrapping="Wrap"
-                                 FontSize="14"
-                                 Opacity="0.7">
-                            Set up call queues with resource accounts and licensing. 
-                            Manage routing methods and agent assignments.
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
-
-                <!-- Auto Attendants -->
-                <Border Grid.Row="2" Grid.Column="0" 
-                       Classes="card"
-                        
-                       CornerRadius="8">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="Bot" FontSize="32"
-                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                     />
-                            <TextBlock Text="Auto Attendants"
-                                     FontSize="18"
-                                     FontWeight="Bold"
-                                     VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <TextBlock TextWrapping="Wrap"
-                                 FontSize="14"
-                                 Opacity="0.7">
-                            Configure auto attendants with call flows and schedules. 
-                            Set up business hours and after-hours routing.
-                        </TextBlock>
-                    </StackPanel>
-                </Border>
-
-                <!-- Holidays -->
-                <Border Grid.Row="2" Grid.Column="1" 
-                       Classes="card"
-                       Margin="12,0,0,0" 
-                       CornerRadius="8">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="Calendar" FontSize="32"
-                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                     />
-                            <TextBlock Text="Holidays"
-                                     FontSize="18"
-                                     FontWeight="Bold"
-                                     VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <TextBlock TextWrapping="Wrap"
-                                 FontSize="14"
-                                 Opacity="0.7">
-                            Manage holiday schedules with Swiss holiday support.
-                        </TextBlock>
+                        <TextBlock Text="Generate documentation &amp; scripts" 
+                                 FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Border>
             </Grid>
 
-            <!-- Quick Start Section -->
-            <Border Classes="card" Margin="0,24,0,0">
-                <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16" VerticalAlignment="Center">
-                            <fi:SymbolIcon Symbol="Flash" FontSize="28"
-                                     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                     />
-                            <TextBlock Text="Quick Start Guide"
-                                 FontSize="18"
-                                 FontWeight="Bold"
-                                 VerticalAlignment="Center"/>
+            <!-- Features -->
+            <TextBlock Text="Features" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
+            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,0">
+
+                <!-- Row 0 -->
+                <Border Grid.Row="0" Grid.Column="0" Classes="card" CornerRadius="8" Margin="0,0,8,8">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="Rocket" Classes="welcome-icon"/>
+                            <TextBlock Text="Get Started" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                    
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        
-                        <StackPanel Grid.Column="0" >
-                            <TextBlock Text="1. Setup"
-                                     FontSize="16"
-                                     FontWeight="Bold"
-                                     Margin="0,0,0,12"/>
-                            <TextBlock TextWrapping="Wrap"
-                                     FontSize="14"
-                                     Opacity="0.9"
-                                     LineHeight="20">
-                                Start with the Get Started page to install PowerShell modules and connect to Microsoft services.
-                            </TextBlock>
+                        <TextBlock Text="Install PowerShell modules and connect to Microsoft Teams and Graph services."
+                                 FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="0" Grid.Column="1" Classes="card" CornerRadius="8" Margin="4,0,4,8">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="Code" Classes="welcome-icon"/>
+                            <TextBlock Text="Variables" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                        
-                        <StackPanel Grid.Column="1" Margin="6,0">
-                            <TextBlock Text="2. Configure"
-                                     FontSize="16"
-                                     FontWeight="Bold"
-                                     Margin="0,0,0,12"/>
-                            <TextBlock TextWrapping="Wrap"
-                                     FontSize="14"
-                                     Opacity="0.9"
-                                     LineHeight="20">
-                                Set up your variables with customer details, domains, and system preferences.
-                            </TextBlock>
+                        <TextBlock Text="Customer details, domains, languages, time zones, and phone system settings."
+                                 FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="0" Grid.Column="2" Classes="card" CornerRadius="8" Margin="8,0,0,8">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="PeopleTeam" Classes="welcome-icon"/>
+                            <TextBlock Text="M365 Groups" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                        
-                        <StackPanel Grid.Column="2" Margin="12,0,0,0">
-                            <TextBlock Text="3. Deploy"
-                                     FontSize="16"
-                                     FontWeight="Bold"
-                                     Margin="0,0,0,12"/>
-                            <TextBlock TextWrapping="Wrap"
-                                     FontSize="14"
-                                     Opacity="0.9"
-                                     LineHeight="20">
-                                Create M365 groups, call queues, auto attendants, and configure holiday schedules.
-                            </TextBlock>
+                        <TextBlock Text="Create and manage Microsoft 365 groups for your phone system."
+                                 FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Row 1 -->
+                <Border Grid.Row="1" Grid.Column="0" Classes="card" CornerRadius="8" Margin="0,0,8,8">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="CallInbound" Classes="welcome-icon"/>
+                            <TextBlock Text="Call Queues" FontWeight="SemiBold" VerticalAlignment="Center"/>
                         </StackPanel>
-                    </Grid>
-                </StackPanel>
-            </Border>
+                        <TextBlock Text="Resource accounts, licensing, routing methods, and agent assignments."
+                                 FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1" Grid.Column="1" Classes="card" CornerRadius="8" Margin="4,0,4,8">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="Bot" Classes="welcome-icon"/>
+                            <TextBlock Text="Auto Attendants" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="Call flows, business hours, after-hours routing, and schedules."
+                                 FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1" Grid.Column="2" Classes="card" CornerRadius="8" Margin="8,0,0,8">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="Calendar" Classes="welcome-icon"/>
+                            <TextBlock Text="Holidays" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="Holiday schedules with Swiss canton support and custom entries."
+                                 FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Row 2 -->
+                <Border Grid.Row="2" Grid.Column="0" Classes="card" CornerRadius="8" Margin="0,0,8,0">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="DocumentText" Classes="welcome-icon"/>
+                            <TextBlock Text="Documentation" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="Export your configuration as Markdown documentation."
+                                 FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="2" Grid.Column="1" Classes="card" CornerRadius="8" Margin="4,0,4,0">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="Wand" Classes="welcome-icon"/>
+                            <TextBlock Text="Setup Wizard" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="Step-by-step guided deployment of your entire phone system."
+                                 FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="2" Grid.Column="2" Classes="card" CornerRadius="8" Margin="8,0,0,0">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <fi:SymbolIcon Symbol="TableMultiple" Classes="welcome-icon"/>
+                            <TextBlock Text="Bulk Operations" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="Import/export CSV data for batch provisioning of users and queues."
+                                 FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+
+            </Grid>
 
         </StackPanel>
     </ScrollViewer>

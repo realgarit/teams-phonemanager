@@ -29,21 +29,32 @@
             </Grid.RowDefinitions>
 
             <!-- Main Content -->
-            <Grid Grid.Row="0" Margin="32,32,32,0">
+            <Grid Grid.Row="0" Margin="24">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Status Message -->
+                <!-- Page Header -->
                 <StackPanel Grid.Row="0" Margin="0,0,0,16">
-                    <TextBlock Text="{Binding StatusMessage}"
-                             FontSize="14"
-                             TextWrapping="Wrap"/>
+                    <TextBlock Text="Call Queues" Classes="page-title"/>
+                    <TextBlock Text="Manage resource accounts, call queues, and step-by-step creation."
+                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                             TextWrapping="Wrap"
+                             Margin="0,4,0,0"/>
                 </StackPanel>
 
+                <!-- Status Message -->
+                <TextBlock Grid.Row="1" Text="{Binding StatusMessage}"
+                         FontSize="13"
+                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                         TextWrapping="Wrap"
+                         Margin="0,0,0,12"
+                         IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
                 <!-- Tab Control -->
-                <TabControl Grid.Row="1">
+                <TabControl Grid.Row="2">
                     
                     <!-- Resource Accounts Tab -->
                     <TabItem Header="Resource Accounts">
@@ -57,6 +68,7 @@
                             <!-- Resource Accounts Actions -->
                             <Grid Grid.Row="0" Margin="0,0,0,16">
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
@@ -77,14 +89,25 @@
                                         Command="{Binding OpenCreateResourceAccountDialogCommand}"
                                         ToolTip.Tip="Open dialog to create a new resource account"
                                         AutomationProperties.Name="Create Resource Account"
-                                        Margin="0,0,16,0" Classes="IconText">
+                                        Margin="0,0,8,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
                                         <fi:SymbolIcon  Symbol="PersonAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                                         <TextBlock Text="Create Account" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
 
-                                <TextBox Grid.Column="2"
+                                <Button Grid.Column="2"
+                                        Command="{Binding RemoveResourceAccountCommand}"
+                                        ToolTip.Tip="Remove the selected resource account"
+                                        AutomationProperties.Name="Remove Resource Account"
+                                        Margin="0,0,16,0" Classes="IconText">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fi:SymbolIcon Symbol="PersonDelete" Foreground="OrangeRed"/>
+                                        <TextBlock Text="Remove Account" VerticalAlignment="Center" Foreground="OrangeRed"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <TextBox Grid.Column="3"
                                          Text="{Binding SearchResourceAccountsText}"
                                          Watermark="Search resource accounts..."
                                          ToolTip.Tip="Search resource accounts"
@@ -128,6 +151,7 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
@@ -146,14 +170,25 @@
                                         Command="{Binding OpenCreateCallQueueDialogCommand}"
                                         ToolTip.Tip="Open dialog to create a new call queue"
                                         AutomationProperties.Name="Create Call Queue"
-                                        Margin="0,0,16,0" Classes="IconText">
+                                        Margin="0,0,8,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
                                         <fi:SymbolIcon  Symbol="CallAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
                                         <TextBlock Text="Create Queue" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
 
-                                <TextBox Grid.Column="2"
+                                <Button Grid.Column="2"
+                                        Command="{Binding RemoveCallQueueCommand}"
+                                        ToolTip.Tip="Remove the selected call queue"
+                                        AutomationProperties.Name="Remove Call Queue"
+                                        Margin="0,0,16,0" Classes="IconText">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fi:SymbolIcon Symbol="CallDismiss" Foreground="OrangeRed"/>
+                                        <TextBlock Text="Remove Queue" VerticalAlignment="Center" Foreground="OrangeRed"/>
+                                    </StackPanel>
+                                </Button>
+
+                                <TextBox Grid.Column="3"
                                          Text="{Binding SearchCallQueuesText}"
                                          Watermark="Search call queues..."
                                          ToolTip.Tip="Search call queues"

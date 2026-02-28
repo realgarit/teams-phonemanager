@@ -14,7 +14,7 @@ namespace teams_phonemanager.ViewModels
 {
     public partial class CallQueuesViewModel : ViewModelBase
     {
-        private readonly MainWindowViewModel? _mainWindowViewModel;
+        
 
         [ObservableProperty]
         private string _statusMessage = string.Empty;
@@ -69,14 +69,12 @@ namespace teams_phonemanager.ViewModels
             ISessionManager sessionManager,
             INavigationService navigationService,
             IErrorHandlingService errorHandlingService,
-            IValidationService validationService)
+            IValidationService validationService,
+            ISharedStateService sharedStateService,
+            IDialogService dialogService)
             : base(powerShellContextService, powerShellCommandService, loggingService,
-                  sessionManager, navigationService, errorHandlingService, validationService)
+                  sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
         {
-            _mainWindowViewModel = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
-                ? desktop.MainWindow?.DataContext as MainWindowViewModel
-                : null;
-
             _loggingService.Log("Call Queues page loaded", LogLevel.Info);
 
             ResourceAccounts.CollectionChanged += (s, e) => OnPropertyChanged(nameof(ResourceAccountsView));
@@ -162,7 +160,7 @@ namespace teams_phonemanager.ViewModels
         [RelayCommand]
         private void OpenCreateResourceAccountDialog()
         {
-            var variables = _mainWindowViewModel?.Variables;
+            var variables = _sharedStateService?.Variables;
             if (variables != null && !string.IsNullOrEmpty(variables.Customer) && !string.IsNullOrEmpty(variables.CustomerGroupName))
             {
                 ResourceAccountUpn = variables.RacqUPN;
@@ -203,7 +201,7 @@ namespace teams_phonemanager.ViewModels
         [RelayCommand]
         private async Task AssignLicenseAsync()
         {
-            var variables = _mainWindowViewModel?.Variables;
+            var variables = _sharedStateService?.Variables;
             if (variables == null)
             {
                 StatusMessage = "Error: Variables not found";
@@ -256,7 +254,7 @@ namespace teams_phonemanager.ViewModels
         [RelayCommand]
         private async Task GetM365GroupIdAsync()
         {
-            var variables = _mainWindowViewModel?.Variables;
+            var variables = _sharedStateService?.Variables;
             if (variables == null)
             {
                 StatusMessage = "Error: Variables not found";
@@ -328,7 +326,7 @@ namespace teams_phonemanager.ViewModels
                 IsBusy = true;
                 ShowCreateResourceAccountDialog = false;
 
-                var variables = _mainWindowViewModel?.Variables;
+                var variables = _sharedStateService?.Variables;
                 if (variables == null)
                 {
                     StatusMessage = "Error: Variables not found";
@@ -348,14 +346,21 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
 
-                if (!variables.RacqUPN.Contains("@"))
+                // Build UPN: if user typed a value without @, append the domain
+                var upn = ResourceAccountUpn;
+                if (!upn.Contains("@"))
                 {
-                    StatusMessage = "Error: Resource Account UPN must include a domain name. Please check your MS Fallback Domain setting.";
-                    return;
+                    upn = upn + variables.MsFallbackDomain;
                 }
 
-                var command = _powerShellCommandService.GetCreateResourceAccountCommand(variables);
-                var result = await ExecutePowerShellCommandAsync(command, "CreateResourceAccount");
+                var command = _powerShellCommandService.GetCreateResourceAccountCommand(upn, ResourceAccountDisplayName, variables.CsAppCqId);
+                var result = await PreviewAndExecuteAsync(command, "Create Resource Account");
+                
+                if (result == null)
+                {
+                    StatusMessage = "Operation cancelled by user";
+                    return;
+                }
                 
                 if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
                 {
@@ -383,7 +388,7 @@ namespace teams_phonemanager.ViewModels
         [RelayCommand]
         private void OpenUpdateUsageLocationDialog()
         {
-            var variables = _mainWindowViewModel?.Variables;
+            var variables = _sharedStateService?.Variables;
             if (variables != null)
             {
                 ResourceAccountUpn = variables.RacqUPN;
@@ -410,7 +415,7 @@ namespace teams_phonemanager.ViewModels
                 IsBusy = true;
                 ShowUpdateUsageLocationDialog = false;
 
-                var variables = _mainWindowViewModel?.Variables;
+                var variables = _sharedStateService?.Variables;
                 if (variables == null)
                 {
                     StatusMessage = "Error: Variables not found";
@@ -448,7 +453,7 @@ namespace teams_phonemanager.ViewModels
         [RelayCommand]
         private void OpenCreateCallQueueDialog()
         {
-            var variables = _mainWindowViewModel?.Variables;
+            var variables = _sharedStateService?.Variables;
             if (variables != null && !string.IsNullOrEmpty(variables.Customer) && !string.IsNullOrEmpty(variables.CustomerGroupName))
             {
                 CallQueueName = variables.CqDisplayName;
@@ -477,7 +482,7 @@ namespace teams_phonemanager.ViewModels
                 IsBusy = true;
                 ShowCreateCallQueueDialog = false;
 
-                var variables = _mainWindowViewModel?.Variables;
+                var variables = _sharedStateService?.Variables;
                 if (variables == null)
                 {
                     StatusMessage = "Error: Variables not found";
@@ -487,7 +492,13 @@ namespace teams_phonemanager.ViewModels
                 _loggingService.Log($"Creating call queue: {CallQueueName}", LogLevel.Info);
 
                 var command = _powerShellCommandService.GetCreateCallQueueCommand(CallQueueName, variables.LanguageId, variables.M365GroupId, variables);
-                var result = await ExecutePowerShellCommandAsync(command, "CreateCallQueue");
+                var result = await PreviewAndExecuteAsync(command, "Create Call Queue");
+                
+                if (result == null)
+                {
+                    StatusMessage = "Operation cancelled by user";
+                    return;
+                }
                 
                 if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
                 {
@@ -515,7 +526,7 @@ namespace teams_phonemanager.ViewModels
         [RelayCommand]
         private void OpenAssociateDialog()
         {
-            var variables = _mainWindowViewModel?.Variables;
+            var variables = _sharedStateService?.Variables;
             if (variables != null)
             {
                 ResourceAccountUpn = variables.RacqUPN;
@@ -547,7 +558,13 @@ namespace teams_phonemanager.ViewModels
                 _loggingService.Log($"Associating resource account {ResourceAccountUpn} with call queue {CallQueueName}", LogLevel.Info);
 
                 var command = _powerShellCommandService.GetAssociateResourceAccountWithCallQueueCommand(ResourceAccountUpn, CallQueueName);
-                var result = await ExecutePowerShellCommandAsync(command, "AssociateResourceAccountWithCallQueue");
+                var result = await PreviewAndExecuteAsync(command, "Associate Resource Account");
+                
+                if (result == null)
+                {
+                    StatusMessage = "Operation cancelled by user";
+                    return;
+                }
                 
                 if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
                 {
@@ -564,6 +581,104 @@ namespace teams_phonemanager.ViewModels
             {
                 StatusMessage = $"Error: {ex.Message}";
                 _loggingService.Log($"Exception in AssociateResourceAccountWithCallQueueAsync: {ex}", LogLevel.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task RemoveCallQueueAsync(string? callQueueName = null)
+        {
+            var name = callQueueName ?? CallQueueName;
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                StatusMessage = "Error: Call queue name cannot be empty";
+                return;
+            }
+
+            try
+            {
+                IsBusy = true;
+
+                var command = _powerShellCommandService.GetRemoveCallQueueCommand(name);
+                var result = await ConfirmAndExecuteAsync(command,
+                    $"This will permanently remove the call queue '{name}'. This action cannot be undone.",
+                    "Remove Call Queue");
+
+                if (result == null)
+                {
+                    StatusMessage = "Operation cancelled by user";
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                {
+                    StatusMessage = $"Call queue '{name}' removed successfully";
+                    _loggingService.Log($"Call queue {name} removed successfully", LogLevel.Info);
+                    if (_sharedStateService?.AutoRefreshAfterOperations ?? true)
+                        await RetrieveCallQueuesAsync();
+                }
+                else
+                {
+                    StatusMessage = $"Error removing call queue: {result}";
+                    _loggingService.Log($"Error removing call queue {name}: {result}", LogLevel.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error: {ex.Message}";
+                _loggingService.Log($"Exception in RemoveCallQueueAsync: {ex}", LogLevel.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task RemoveResourceAccountAsync(string? upn = null)
+        {
+            var accountUpn = upn ?? ResourceAccountUpn;
+            if (string.IsNullOrWhiteSpace(accountUpn))
+            {
+                StatusMessage = "Error: Resource account UPN cannot be empty";
+                return;
+            }
+
+            try
+            {
+                IsBusy = true;
+
+                var command = _powerShellCommandService.GetRemoveResourceAccountCommand(accountUpn);
+                var result = await ConfirmAndExecuteAsync(command,
+                    $"This will permanently remove the resource account '{accountUpn}'. This action cannot be undone.",
+                    "Remove Resource Account");
+
+                if (result == null)
+                {
+                    StatusMessage = "Operation cancelled by user";
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                {
+                    StatusMessage = $"Resource account '{accountUpn}' removed successfully";
+                    _loggingService.Log($"Resource account {accountUpn} removed successfully", LogLevel.Info);
+                    if (_sharedStateService?.AutoRefreshAfterOperations ?? true)
+                        await RetrieveResourceAccountsAsync();
+                }
+                else
+                {
+                    StatusMessage = $"Error removing resource account: {result}";
+                    _loggingService.Log($"Error removing resource account {accountUpn}: {result}", LogLevel.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error: {ex.Message}";
+                _loggingService.Log($"Exception in RemoveResourceAccountAsync: {ex}", LogLevel.Error);
             }
             finally
             {

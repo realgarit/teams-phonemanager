@@ -29,19 +29,28 @@
             </Grid.RowDefinitions>
 
             <!-- Main Content -->
-            <Grid Grid.Row="0" Margin="0">
+            <Grid Grid.Row="0" Margin="24">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
+                <!-- Page Header -->
+                <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                    <TextBlock Text="M365 Groups" Classes="page-title"/>
+                    <TextBlock Text="Search and manage Microsoft 365 Groups for your Teams Phone setup."
+                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                             TextWrapping="Wrap"
+                             Margin="0,4,0,0"/>
+                </StackPanel>
+
                 <!-- Group Status -->
-                <StackPanel Grid.Row="0" Margin="0,16">
+                <StackPanel Grid.Row="1" Margin="0,0,0,12">
                     <TextBlock Text="Group Status"
-                             FontSize="18"
-                             FontWeight="SemiBold"
+                             Classes="section-title"
                              Margin="0,0,0,8"/>
                     <TextBlock Text="{Binding GroupStatus}"
                              FontSize="14"
@@ -52,8 +61,9 @@
                 </StackPanel>
 
                 <!-- Action + Search -->
-                <Grid Grid.Row="1" Margin="0,16">
+                <Grid Grid.Row="2" Margin="0,12">
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -79,7 +89,16 @@
                         </StackPanel>
                     </Button>
 
-                    <TextBox Grid.Column="2"
+                    <Button Grid.Column="2"
+                            Command="{Binding RemoveM365GroupCommand}"
+                            Margin="0,0,16,0" Classes="IconText">
+                        <StackPanel Orientation="Horizontal">
+                            <fi:SymbolIcon Symbol="Delete" Foreground="OrangeRed"/>
+                            <TextBlock Text="Remove Group" Foreground="OrangeRed" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <TextBox Grid.Column="3"
                              Text="{Binding SearchText}"
                              Watermark="Search groups..."
                              ToolTip.Tip="Search groups"
@@ -87,10 +106,11 @@
                 </Grid>
 
                 <!-- Groups List -->
-                <DataGrid Grid.Row="2" 
+                <DataGrid Grid.Row="3" 
                           Margin="0,16"
                           AutomationProperties.Name="M365 Groups List"
                           ItemsSource="{Binding GroupsView}"
+                          SelectedItem="{Binding SelectedGroup}"
                           AutoGenerateColumns="False"
                           HeadersVisibility="Column"
                           IsReadOnly="True"

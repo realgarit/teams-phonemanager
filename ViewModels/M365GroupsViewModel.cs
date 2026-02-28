@@ -15,7 +15,7 @@ namespace teams_phonemanager.ViewModels
 {
     public partial class M365GroupsViewModel : ViewModelBase
     {
-        private readonly MainWindowViewModel? _mainWindowViewModel;
+        
 
         [ObservableProperty]
         private string _welcomeMessage = "Welcome to the M365 Groups page. Here you can retrieve all groups starting with 'ttgrp', view their details, and create new groups for your phone system.";
@@ -61,14 +61,12 @@ namespace teams_phonemanager.ViewModels
             ISessionManager sessionManager,
             INavigationService navigationService,
             IErrorHandlingService errorHandlingService,
-            IValidationService validationService)
+            IValidationService validationService,
+            ISharedStateService sharedStateService,
+            IDialogService dialogService)
             : base(powerShellContextService, powerShellCommandService, loggingService,
-                  sessionManager, navigationService, errorHandlingService, validationService)
+                  sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
         {
-            _mainWindowViewModel = Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
-                ? desktop.MainWindow?.DataContext as MainWindowViewModel
-                : null;
-
             _loggingService.Log("M365 Groups page loaded", LogLevel.Info);
 
             // Initialize with auto-generated group name if variables are available
@@ -159,7 +157,13 @@ namespace teams_phonemanager.ViewModels
                 _loggingService.Log($"Creating new M365 group: {NewGroupName}", LogLevel.Info);
 
                 var command = _powerShellCommandService.GetCreateM365GroupCommand(NewGroupName);
-                var result = await ExecutePowerShellCommandAsync(command, "CreateM365Group");
+                var result = await PreviewAndExecuteAsync(command, "Create M365 Group");
+                
+                if (result == null)
+                {
+                    GroupStatus = "Operation cancelled by user";
+                    return;
+                }
                 
                 if (!string.IsNullOrEmpty(result))
                 {
@@ -170,7 +174,8 @@ namespace teams_phonemanager.ViewModels
                         _loggingService.Log($"M365 Group {NewGroupName} created successfully", LogLevel.Info);
                         
                         // Refresh the groups list
-                        await RetrieveM365GroupsAsync();
+                        if (_sharedStateService?.AutoRefreshAfterOperations ?? true)
+                            await RetrieveM365GroupsAsync();
                     }
                     else if (output.Contains("already exists"))
                     {
@@ -201,6 +206,54 @@ namespace teams_phonemanager.ViewModels
         }
 
         [RelayCommand]
+        private async Task RemoveM365GroupAsync()
+        {
+            if (SelectedGroup == null)
+            {
+                GroupStatus = "Error: Please select a group to remove";
+                return;
+            }
+
+            try
+            {
+                IsBusy = true;
+
+                var command = _powerShellCommandService.GetRemoveM365GroupCommand(SelectedGroup.Id, SelectedGroup.DisplayName);
+                var result = await ConfirmAndExecuteAsync(command,
+                    $"This will permanently remove the M365 Group '{SelectedGroup.DisplayName}'. This action cannot be undone.",
+                    "Remove M365 Group");
+
+                if (result == null)
+                {
+                    GroupStatus = "Operation cancelled by user";
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                {
+                    GroupStatus = $"Group '{SelectedGroup.DisplayName}' removed successfully";
+                    _loggingService.Log($"M365 Group {SelectedGroup.DisplayName} removed successfully", LogLevel.Info);
+                    if (_sharedStateService?.AutoRefreshAfterOperations ?? true)
+                        await RetrieveM365GroupsAsync();
+                }
+                else
+                {
+                    GroupStatus = $"Error removing group: {result}";
+                    _loggingService.Log($"Error removing M365 Group {SelectedGroup.DisplayName}: {result}", LogLevel.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                GroupStatus = $"Error: {ex.Message}";
+                _loggingService.Log($"Exception in RemoveM365GroupAsync: {ex}", LogLevel.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
         private async Task CheckM365GroupAsync()
         {
             string m365group = string.Empty;
@@ -209,7 +262,7 @@ namespace teams_phonemanager.ViewModels
                 IsBusy = true;
                 ShowConfirmation = false;
 
-                var variables = _mainWindowViewModel?.Variables;
+                var variables = _sharedStateService?.Variables;
                 if (variables == null)
                 {
                     _loggingService.Log("Variables not found. Please set variables first.", LogLevel.Error);
@@ -288,7 +341,7 @@ namespace teams_phonemanager.ViewModels
 
         private void UpdateNewGroupName()
         {
-            var variables = _mainWindowViewModel?.Variables;
+            var variables = _sharedStateService?.Variables;
             if (variables != null && !string.IsNullOrEmpty(variables.Customer) && !string.IsNullOrEmpty(variables.CustomerGroupName))
             {
                 NewGroupName = variables.M365Group;

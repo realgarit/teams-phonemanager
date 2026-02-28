@@ -38,7 +38,7 @@
     </UserControl.Styles>
 
     <Grid>
-        <Border Classes="card" Margin="16">
+        <Border Classes="card" Margin="0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -46,11 +46,18 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Status Message -->
-                <StackPanel Grid.Row="0" Margin="16,16,16,8">
+                <!-- Page Header -->
+                <StackPanel Grid.Row="0" Margin="24,24,24,8">
+                    <TextBlock Text="Configuration" Classes="page-title"/>
+                    <TextBlock Text="Define variables for your Teams Phone setup — customer details, hours, holidays, and more."
+                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                             TextWrapping="Wrap"
+                             Margin="0,4,0,8"/>
                     <TextBlock Text="{Binding WelcomeMessage}"
-                             FontSize="14"
-                             TextWrapping="Wrap"/>
+                             FontSize="13"
+                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                             TextWrapping="Wrap"
+                             IsVisible="{Binding WelcomeMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                 </StackPanel>
 
                 <!-- Tab Control -->
@@ -101,23 +108,35 @@
                                 </StackPanel>
                                 
                                 <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,4,8">
-                                    <TextBox Watermark="Language ID (e.g., de-DE)"
-                                             Text="{Binding Variables.LanguageId}"
-                                             />
+                                    <AutoCompleteBox
+                                              ItemsSource="{Binding LanguageOptions}"
+                                              Text="{Binding Variables.LanguageId}"
+                                              FilterMode="Contains"
+                                              Watermark="Language ID (e.g., de-DE)"
+                                              HorizontalAlignment="Stretch"
+                                              />
                                     <TextBlock Text="Example: de-DE" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
                                 
                                 <StackPanel Grid.Row="2" Grid.Column="1" Margin="4,0,0,8">
-                                    <TextBox Watermark="Time Zone ID"
-                                             Text="{Binding Variables.TimeZoneId}"
-                                             />
+                                    <AutoCompleteBox
+                                              ItemsSource="{Binding TimeZoneOptions}"
+                                              Text="{Binding Variables.TimeZoneId}"
+                                              FilterMode="Contains"
+                                              Watermark="Time Zone ID"
+                                              HorizontalAlignment="Stretch"
+                                              />
                                     <TextBlock Text="Example: W. Europe Standard Time" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
                                 
                                 <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,0,4,8">
-                                    <TextBox Watermark="Usage Location (e.g., CH)"
-                                             Text="{Binding Variables.UsageLocation}"
-                                             />
+                                    <AutoCompleteBox
+                                              ItemsSource="{Binding UsageLocationOptions}"
+                                              Text="{Binding Variables.UsageLocation}"
+                                              FilterMode="Contains"
+                                              Watermark="Usage Location (e.g., CH)"
+                                              HorizontalAlignment="Stretch"
+                                              />
                                     <TextBlock Text="Example: CH" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
                                 
@@ -207,9 +226,13 @@
                                 </StackPanel>
                                 
                                 <StackPanel Grid.Row="0" Grid.Column="1" Margin="4,8,0,8">
-                                    <TextBox Watermark="Phone Number Type"
-                                             Text="{Binding Variables.PhoneNumberType}"
-                                             />
+                                    <AutoCompleteBox
+                                              ItemsSource="{Binding PhoneNumberTypeOptions}"
+                                              Text="{Binding Variables.PhoneNumberType}"
+                                              FilterMode="Contains"
+                                              Watermark="Phone Number Type"
+                                              HorizontalAlignment="Stretch"
+                                              />
                                     <TextBlock Text="Example: DirectRouting" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
                                 </StackPanel>
 
@@ -239,54 +262,92 @@
                                 </StackPanel>
 
                                 <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
-                                         Text="Opening Hours 1"
+                                         Text="Business Hours"
                                          FontSize="18"
                                          FontWeight="SemiBold"
-                                         Margin="0,0,0,8"/>
+                                         Margin="0,8,0,8"/>
 
-                                <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
-                                         Text="Note: Both Opening Hours 1 and 2 currently apply to Monday through Friday."
-                                         FontSize="11"
-                                         Margin="0,4,0,8"/>
+                                <!-- Per-Day Toggle -->
+                                <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,8">
+                                    <ToggleSwitch IsChecked="{Binding Variables.UsePerDaySchedule}"
+                                                  Content="Use per-day schedule (instead of uniform Mon-Fri)"/>
+                                </StackPanel>
 
-                                <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8" Spacing="16">
-                                    <StackPanel MinWidth="100" MaxWidth="150" >
-                                        <TextBox 
-                                                 Text="{Binding Variables.OpeningHours1Start, Converter={StaticResource TimeSpanConverter}}"
-                                                 VerticalContentAlignment="Center"
-                                                 />
-                                        <TextBlock Text="Example: 08:00" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
+                                <!-- Uniform Hours (default) -->
+                                <StackPanel Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"
+                                          IsVisible="{Binding Variables.UsePerDaySchedule, Converter={StaticResource InverseBooleanConverter}}">
+                                    <TextBlock Text="Opening Hours 1 (Monday – Friday)"
+                                             Classes="section-title"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12" Spacing="16">
+                                        <StackPanel MinWidth="100" MaxWidth="150">
+                                            <TextBox Text="{Binding Variables.OpeningHours1Start, Converter={StaticResource TimeSpanConverter}}"
+                                                     VerticalContentAlignment="Center"/>
+                                            <TextBlock Text="Example: 08:00" Classes="hint"/>
+                                        </StackPanel>
+                                        <StackPanel MinWidth="100" MaxWidth="150">
+                                            <TextBox Text="{Binding Variables.OpeningHours1End, Converter={StaticResource TimeSpanConverter}}"
+                                                     VerticalContentAlignment="Center"/>
+                                            <TextBlock Text="Example: 12:00" Classes="hint"/>
+                                        </StackPanel>
                                     </StackPanel>
-                                    <StackPanel MinWidth="100" MaxWidth="150">
-                                        <TextBox 
-                                                 Text="{Binding Variables.OpeningHours1End, Converter={StaticResource TimeSpanConverter}}"
-                                                 VerticalContentAlignment="Center"
-                                                 />
-                                        <TextBlock Text="Example: 12:00" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
+
+                                    <TextBlock Text="Opening Hours 2 (Monday – Friday)"
+                                             Classes="section-title"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8" Spacing="16">
+                                        <StackPanel MinWidth="100" MaxWidth="150">
+                                            <TextBox Text="{Binding Variables.OpeningHours2Start, Converter={StaticResource TimeSpanConverter}}"
+                                                     VerticalContentAlignment="Center"/>
+                                            <TextBlock Text="Example: 13:30" Classes="hint"/>
+                                        </StackPanel>
+                                        <StackPanel MinWidth="100" MaxWidth="150">
+                                            <TextBox Text="{Binding Variables.OpeningHours2End, Converter={StaticResource TimeSpanConverter}}"
+                                                     VerticalContentAlignment="Center"/>
+                                            <TextBlock Text="Example: 17:00" Classes="hint"/>
+                                        </StackPanel>
                                     </StackPanel>
                                 </StackPanel>
 
-                                <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2"
-                                         Text="Opening Hours 2"
-                                         FontSize="18"
-                                         FontWeight="SemiBold"
-                                         Margin="0,0,0,8"/>
-
-                                <StackPanel Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,0,0,8" Spacing="16">
-                                    <StackPanel MinWidth="100" MaxWidth="150" >
-                                        <TextBox 
-                                                 Text="{Binding Variables.OpeningHours2Start, Converter={StaticResource TimeSpanConverter}}"
-                                                 VerticalContentAlignment="Center"
-                                                 />
-                                        <TextBlock Text="Example: 13:30" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                    <StackPanel MinWidth="100" MaxWidth="150">
-                                        <TextBox 
-                                                 Text="{Binding Variables.OpeningHours2End, Converter={StaticResource TimeSpanConverter}}"
-                                                 VerticalContentAlignment="Center"
-                                                 />
-                                        <TextBlock Text="Example: 17:00" FontSize="11" Margin="0,4,0,0" VerticalAlignment="Center"/>
-                                    </StackPanel>
+                                <!-- Per-Day Hours -->
+                                <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2"
+                                          IsVisible="{Binding Variables.UsePerDaySchedule}">
+                                    <TextBlock Text="Configure hours for each day individually:"
+                                             Classes="hint" Margin="0,0,0,12"/>
+                                    <ItemsControl ItemsSource="{Binding Variables.WeeklySchedule}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Padding="0,6" Margin="0,0,0,4">
+                                                    <Grid ColumnDefinitions="100,Auto,120,120,Auto,120,120">
+                                                        <ToggleSwitch Grid.Column="0"
+                                                                      IsChecked="{Binding IsEnabled}"
+                                                                      Content="{Binding DayName}"
+                                                                      Margin="0,0,12,0"/>
+                                                        <TextBlock Grid.Column="1" Text="Hours 1:" 
+                                                                 VerticalAlignment="Center" Margin="0,0,8,0"
+                                                                 FontSize="12" Opacity="0.7"/>
+                                                        <TextBox Grid.Column="2" 
+                                                                 Text="{Binding Hours1Start, Converter={StaticResource TimeSpanConverter}}"
+                                                                 IsEnabled="{Binding IsEnabled}"
+                                                                 Margin="0,0,4,0" MinWidth="80"/>
+                                                        <TextBox Grid.Column="3" 
+                                                                 Text="{Binding Hours1End, Converter={StaticResource TimeSpanConverter}}"
+                                                                 IsEnabled="{Binding IsEnabled}"
+                                                                 Margin="4,0,12,0" MinWidth="80"/>
+                                                        <TextBlock Grid.Column="4" Text="Hours 2:" 
+                                                                 VerticalAlignment="Center" Margin="0,0,8,0"
+                                                                 FontSize="12" Opacity="0.7"/>
+                                                        <TextBox Grid.Column="5" 
+                                                                 Text="{Binding Hours2Start, Converter={StaticResource TimeSpanConverter}}"
+                                                                 IsEnabled="{Binding IsEnabled}"
+                                                                 Margin="0,0,4,0" MinWidth="80"/>
+                                                        <TextBox Grid.Column="6" 
+                                                                 Text="{Binding Hours2End, Converter={StaticResource TimeSpanConverter}}"
+                                                                 IsEnabled="{Binding IsEnabled}"
+                                                                 Margin="4,0,0,0" MinWidth="80"/>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </StackPanel>
                             </Grid>
                         </ScrollViewer>
@@ -738,18 +799,16 @@
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,16"/>
                         
-                        <TextBlock Text="Holiday Date:"
-                                 FontSize="16"
-                                 FontWeight="SemiBold"
+                        <TextBlock Text="Start Date:"
+                                 Classes="section-title"
                                  Margin="0,0,0,8"/>
                         <CalendarDatePicker SelectedDate="{Binding DialogHolidayDate, TargetNullValue={x:Static sys:DateTime.Today}}"
                                           HorizontalAlignment="Stretch"
                                           VerticalContentAlignment="Center"
                                           Margin="0,0,0,16"/>
                         
-                        <TextBlock Text="Holiday Time:"
-                                 FontSize="16"
-                                 FontWeight="SemiBold"
+                        <TextBlock Text="Start Time:"
+                                 Classes="section-title"
                                  Margin="0,0,0,8"/>
                         <ComboBox ItemsSource="{Binding TimeOptions}"
                                  SelectedItem="{Binding SelectedEditHolidayTime, Mode=TwoWay}"
@@ -760,6 +819,36 @@
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
+
+                        <!-- End Date Toggle -->
+                        <ToggleSwitch IsChecked="{Binding DialogHasEndDate}"
+                                      Content="Set explicit end date/time"
+                                      Margin="0,0,0,12"/>
+
+                        <StackPanel IsVisible="{Binding DialogHasEndDate}" Margin="0,0,0,16">
+                            <TextBlock Text="End Date:"
+                                     Classes="section-title"
+                                     Margin="0,0,0,8"/>
+                            <CalendarDatePicker SelectedDate="{Binding DialogEndDate}"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalContentAlignment="Center"
+                                              Margin="0,0,0,16"/>
+
+                            <TextBlock Text="End Time:"
+                                     Classes="section-title"
+                                     Margin="0,0,0,8"/>
+                            <ComboBox ItemsSource="{Binding TimeOptions}"
+                                     SelectedItem="{Binding SelectedEditEndTime, Mode=TwoWay}"
+                                     Margin="0,0,0,8">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding StringFormat='{}{0:hh\\:mm}'}" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <TextBlock Text="If not set, Teams defaults to next day at 12:00"
+                                     Classes="hint"/>
+                        </StackPanel>
                         
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right"

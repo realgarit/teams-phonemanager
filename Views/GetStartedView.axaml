@@ -23,11 +23,9 @@
             <!-- Header Section -->
             <StackPanel Spacing="8" Margin="0,0,0,16">
                 <TextBlock Text="Setup Steps"
-                         FontSize="32"
-                         FontWeight="SemiBold"/>
+                         Classes="page-title"/>
                 <TextBlock Text="Follow these steps to connect to your Microsoft 365 environment and configure the phone manager."
-                         FontSize="16"
-                         Opacity="0.7"
+                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                          TextWrapping="Wrap"/>
             </StackPanel>
 

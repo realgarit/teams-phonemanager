@@ -173,6 +173,50 @@ catch {{
 }}";
         }
 
+        /// <summary>
+        /// Removes a call queue by name.
+        /// </summary>
+        public string GetRemoveCallQueueCommand(string callQueueName)
+        {
+            var sanitizedName = _sanitizer.SanitizeString(callQueueName);
+            
+            return $@"
+try {{
+    $cq = Get-CsCallQueue -NameFilter ""{sanitizedName}"" | Where-Object {{$_.Name -eq ""{sanitizedName}""}} | Select-Object -First 1
+    if (-not $cq) {{
+        Write-Host ""ERROR: Call queue '{sanitizedName}' not found""
+    }} else {{
+        Remove-CsCallQueue -Identity $cq.Identity
+        Write-Host ""SUCCESS: Call queue '{sanitizedName}' removed successfully""
+    }}
+}}
+catch {{
+    Write-Host ""ERROR: Failed to remove call queue '{sanitizedName}': $_""
+}}";
+        }
+
+        /// <summary>
+        /// Removes a resource account (application instance) by UPN.
+        /// </summary>
+        public string GetRemoveResourceAccountCommand(string upn)
+        {
+            var sanitizedUpn = _sanitizer.SanitizeString(upn);
+            
+            return $@"
+try {{
+    $user = Get-CsOnlineUser ""{sanitizedUpn}"" -ErrorAction Stop
+    if (-not $user) {{
+        Write-Host ""ERROR: Resource account '{sanitizedUpn}' not found""
+    }} else {{
+        Remove-CsOnlineUser -Identity $user.Identity -ErrorAction Stop
+        Write-Host ""SUCCESS: Resource account '{sanitizedUpn}' removed successfully""
+    }}
+}}
+catch {{
+    Write-Host ""ERROR: Failed to remove resource account '{sanitizedUpn}': $_""
+}}";
+        }
+
         private string BuildCallQueueParameters(PhoneManagerVariables variables)
         {
             var parameters = new StringBuilder();

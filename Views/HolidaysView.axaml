@@ -30,21 +30,32 @@
                 </Grid.RowDefinitions>
 
                 <!-- Main Content -->
-                <Grid Grid.Row="0" Margin="0">
+                <Grid Grid.Row="0" Margin="24">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Status Message -->
+                    <!-- Page Header -->
                     <StackPanel Grid.Row="0" Margin="0,0,0,16">
-                    <TextBlock Text="{Binding StatusMessage}"
-                             FontSize="14"
-                             TextWrapping="Wrap"/>
+                        <TextBlock Text="Holiday Management" Classes="page-title"/>
+                        <TextBlock Text="Create and manage holiday schedules for your auto attendants."
+                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                 TextWrapping="Wrap"
+                                 Margin="0,4,0,0"/>
                     </StackPanel>
 
+                    <!-- Status Message -->
+                    <TextBlock Grid.Row="1" Text="{Binding StatusMessage}"
+                             FontSize="13"
+                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                             TextWrapping="Wrap"
+                             Margin="0,0,0,12"
+                             IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
                     <!-- Holiday Management Content -->
-                    <ScrollViewer Grid.Row="1" Margin="16">
+                    <ScrollViewer Grid.Row="2" Margin="0">
                         <StackPanel>
                             <TextBlock Text="Follow these steps in order to create a holiday for your auto attendant:"
                                      FontSize="18"

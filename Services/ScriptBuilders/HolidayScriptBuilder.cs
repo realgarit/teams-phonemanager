@@ -1,3 +1,4 @@
+using teams_phonemanager.Models;
 using teams_phonemanager.Services.Interfaces;
 using teams_phonemanager.Services;
 using System.Text;
@@ -35,35 +36,53 @@ catch {{
 
         public string GetCreateHolidaySeriesCommand(string holidayName, List<DateTime> holidayDates)
         {
+            // Convert simple DateTime list to HolidayEntry list (backward compatibility)
+            var entries = holidayDates.Select(d => new HolidayEntry(d, d.TimeOfDay)).ToList();
+            return GetCreateHolidaySeriesFromEntriesCommand(holidayName, entries);
+        }
+
+        /// <summary>
+        /// Creates a holiday series command supporting optional end dates for multi-day holidays.
+        /// When a HolidayEntry has EndDate set, the -End parameter is included in the date range.
+        /// </summary>
+        public string GetCreateHolidaySeriesFromEntriesCommand(string holidayName, List<HolidayEntry> holidayEntries)
+        {
             var sanitizedHolidayName = _sanitizer.SanitizeString(holidayName);
 
-            var formattedDateTimes = new List<string>();
-            var formattedDates = new List<string>();
+            var sb = new StringBuilder();
+            sb.AppendLine(@"
+try {");
+            sb.AppendLine("    $HolidayDateRange = @()");
 
-            foreach (var date in holidayDates)
+            var displayDates = new List<string>();
+            for (int i = 0; i < holidayEntries.Count; i++)
             {
-                var formattedDateTime = date.ToString("d/M/yyyy H:mm", System.Globalization.CultureInfo.InvariantCulture);
-                var formattedDateShort = date.ToString("d/M/yyyy", System.Globalization.CultureInfo.InvariantCulture);
-                // Use single-quoted string literals for PowerShell date strings
-                formattedDateTimes.Add($"'{formattedDateTime}'");
-                formattedDates.Add(formattedDateShort);
+                var entry = holidayEntries[i];
+                var formattedStart = entry.DateTime.ToString("d/M/yyyy H:mm", System.Globalization.CultureInfo.InvariantCulture);
+                var formattedDateShort = entry.Date.ToString("d/M/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                displayDates.Add(formattedDateShort);
+
+                if (entry.HasEndDate && entry.EndDateTime.HasValue)
+                {
+                    var formattedEnd = entry.EndDateTime.Value.ToString("d/M/yyyy H:mm", System.Globalization.CultureInfo.InvariantCulture);
+                    sb.AppendLine($"    $HolidayDateRange += New-CsOnlineDateTimeRange -Start '{formattedStart}' -End '{formattedEnd}'");
+                }
+                else
+                {
+                    sb.AppendLine($"    $HolidayDateRange += New-CsOnlineDateTimeRange -Start '{formattedStart}'");
+                }
             }
 
-            var datesArray = string.Join(", ", formattedDateTimes);
-            var datesList = string.Join(", ", formattedDates);
+            var datesList = string.Join(", ", displayDates);
 
-            return $@"
-try {{
-    $dates = @({datesArray})
-    $HolidayDateRange = foreach ($d in $dates) {{
-        New-CsOnlineDateTimeRange -Start $d
-    }}
-    New-CsOnlineSchedule -Name ""{sanitizedHolidayName}"" -FixedSchedule -DateTimeRanges @($HolidayDateRange)
-    Write-Host ""SUCCESS: Holiday series {sanitizedHolidayName} created successfully for dates: {datesList}""
-}}
-catch {{
-    Write-Host ""ERROR: Failed to create holiday series {sanitizedHolidayName}: $_""
-}}";
+            sb.AppendLine($@"    New-CsOnlineSchedule -Name ""{sanitizedHolidayName}"" -FixedSchedule -DateTimeRanges @($HolidayDateRange)");
+            sb.AppendLine($@"    Write-Host ""SUCCESS: Holiday series {sanitizedHolidayName} created successfully for dates: {datesList}""");
+            sb.AppendLine("}");
+            sb.AppendLine("catch {");
+            sb.AppendLine($@"    Write-Host ""ERROR: Failed to create holiday series {sanitizedHolidayName}: $_""");
+            sb.AppendLine("}");
+
+            return sb.ToString();
         }
     }
 }

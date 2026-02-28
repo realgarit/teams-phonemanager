@@ -18,6 +18,9 @@ namespace teams_phonemanager.Converters
         public required IDataTemplate CallQueuesTemplate { get; set; }
         public required IDataTemplate AutoAttendantsTemplate { get; set; }
         public required IDataTemplate HolidaysTemplate { get; set; }
+        public required IDataTemplate DocumentationTemplate { get; set; }
+        public required IDataTemplate WizardTemplate { get; set; }
+        public required IDataTemplate BulkOperationsTemplate { get; set; }
 
         public IDataTemplate SelectTemplate(object? item, Control? container)
         {
@@ -31,6 +34,9 @@ namespace teams_phonemanager.Converters
                 var normalizedCallQueues = ConstantsService.Pages.CallQueues.Replace(" ", "");
                 var normalizedAutoAttendants = ConstantsService.Pages.AutoAttendants.Replace(" ", "");
                 var normalizedHolidays = ConstantsService.Pages.Holidays.Replace(" ", "");
+                var normalizedDocumentation = ConstantsService.Pages.Documentation.Replace(" ", "");
+                var normalizedWizard = ConstantsService.Pages.Wizard.Replace(" ", "");
+                var normalizedBulkOperations = ConstantsService.Pages.BulkOperations.Replace(" ", "");
                 
                 IDataTemplate template = normalizedPageName switch
                 {
@@ -41,6 +47,9 @@ namespace teams_phonemanager.Converters
                     var name when name == normalizedCallQueues => CallQueuesTemplate,
                     var name when name == normalizedAutoAttendants => AutoAttendantsTemplate,
                     var name when name == normalizedHolidays => HolidaysTemplate,
+                    var name when name == normalizedDocumentation => DocumentationTemplate,
+                    var name when name == normalizedWizard => WizardTemplate,
+                    var name when name == normalizedBulkOperations => BulkOperationsTemplate,
                     _ => WelcomeTemplate
                 };
 

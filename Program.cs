@@ -41,6 +41,7 @@ class Program
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IPowerShellContextService, PowerShellContextService>();
         services.AddSingleton<IMsalGraphAuthenticationService, MsalGraphAuthenticationService>();
+        services.AddSingleton<ISharedStateService, SharedStateService>();
         
         // UI Services (singleton - manages UI state)
         services.AddSingleton<IDialogService, DialogService>();
@@ -57,6 +58,8 @@ class Program
         services.AddTransient<AutoAttendantScriptBuilder>();
         services.AddTransient<HolidayScriptBuilder>();
         services.AddTransient<ResourceAccountScriptBuilder>();
+        services.AddTransient<DocumentationScriptBuilder>();
+        services.AddTransient<BulkOperationsScriptBuilder>();
 
         // ViewModels (transient - new instance per navigation)
         services.AddTransient<MainWindowViewModel>();
@@ -67,6 +70,9 @@ class Program
         services.AddTransient<CallQueuesViewModel>();
         services.AddTransient<AutoAttendantsViewModel>();
         services.AddTransient<HolidaysViewModel>();
+        services.AddTransient<DocumentationViewModel>();
+        services.AddTransient<WizardViewModel>();
+        services.AddTransient<BulkOperationsViewModel>();
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.

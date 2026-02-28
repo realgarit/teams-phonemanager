@@ -19,20 +19,36 @@ namespace teams_phonemanager.Services
         [ObservableProperty]
         private string _latestLogEntry = string.Empty;
 
+        [ObservableProperty]
+        private LogLevel _minimumLogLevel = LogLevel.Info;
+
+        // Store the log level for each entry so we can filter later
+        private readonly List<(string Entry, LogLevel Level)> _allEntries = new();
+
         public LoggingService() { }
 
         public void Log(string message, LogLevel level = LogLevel.Info)
         {
             var sanitizedMessage = SanitizeLogMessage(message);
             var formattedMessage = $"[{DateTime.Now:HH:mm:ss}] [{level}] {sanitizedMessage}";
+            _allEntries.Add((formattedMessage, level));
             LogEntries.Add(formattedMessage);
             LatestLogEntry = formattedMessage;
         }
 
         public void Clear()
         {
+            _allEntries.Clear();
             LogEntries.Clear();
             LatestLogEntry = string.Empty;
+        }
+
+        public IReadOnlyList<string> GetFilteredEntries()
+        {
+            return _allEntries
+                .Where(e => e.Level >= MinimumLogLevel)
+                .Select(e => e.Entry)
+                .ToList();
         }
 
         private static string SanitizeLogMessage(string message)
