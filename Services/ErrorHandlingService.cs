@@ -17,12 +17,6 @@ namespace teams_phonemanager.Services
             _dialogService = dialogService;
         }
 
-        public async Task ShowContentDialogAsync(string title, string message, FluentAvalonia.UI.Controls.ContentDialogButton defaultButton = FluentAvalonia.UI.Controls.ContentDialogButton.Primary)
-        {
-            // Delegate to dialog service - defaultButton parameter kept for backward compatibility but ignored
-            await _dialogService.ShowMessageAsync(title, message);
-        }
-
         public async Task HandlePowerShellError(string command, string error, string context = "")
         {
             var cleanCommand = command?.Replace("\r", "").Replace("\n", " ") ?? "";

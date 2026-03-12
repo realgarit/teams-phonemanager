@@ -12,9 +12,6 @@ namespace teams_phonemanager.ViewModels
     public partial class WizardViewModel : ViewModelBase
     {
         [ObservableProperty]
-        private string _statusMessage = string.Empty;
-
-        [ObservableProperty]
         private int _currentStep = 0;
 
         [ObservableProperty]
