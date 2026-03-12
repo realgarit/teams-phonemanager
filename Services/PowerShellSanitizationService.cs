@@ -44,7 +44,8 @@ public partial class PowerShellSanitizationService : IPowerShellSanitizationServ
                             .Replace("|", "")     // Pipeline
                             .Replace("&", "")     // Command separator
                             .Replace("<", "")     // Input redirection
-                            .Replace(">", "");    // Output redirection
+                            .Replace(">", "")     // Output redirection
+                            .Replace("\"", "");   // Double quote (prevents string breakout)
 
         return sanitized;
     }

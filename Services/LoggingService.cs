@@ -77,8 +77,8 @@ namespace teams_phonemanager.Services
     public enum LogLevel
     {
         Info,
+        Success,
         Warning,
-        Error,
-        Success
+        Error
     }
 } 

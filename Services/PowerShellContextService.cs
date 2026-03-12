@@ -178,11 +178,11 @@ $ErrorActionPreference = 'Continue'
             }
         }
 
+        [Obsolete("Use IsConnectedAsync instead. This synchronous wrapper can deadlock when called from the UI thread.")]
         public bool IsConnected(string service)
         {
-            // Synchronous wrapper for backward compatibility
-            // Deprecated: Use IsConnectedAsync instead
-            return IsConnectedAsync(service).GetAwaiter().GetResult();
+            // Return false to avoid deadlock — callers should use IsConnectedAsync
+            return false;
         }
 
         public async Task<bool> IsConnectedAsync(string service, CancellationToken cancellationToken = default)

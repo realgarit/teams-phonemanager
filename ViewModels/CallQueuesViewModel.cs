@@ -14,11 +14,6 @@ namespace teams_phonemanager.ViewModels
 {
     public partial class CallQueuesViewModel : ViewModelBase
     {
-        
-
-        [ObservableProperty]
-        private string _statusMessage = string.Empty;
-
         [ObservableProperty]
         private ObservableCollection<ResourceAccount> _resourceAccounts = new();
 
