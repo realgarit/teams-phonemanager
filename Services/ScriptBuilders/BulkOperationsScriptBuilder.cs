@@ -1,4 +1,5 @@
 using teams_phonemanager.Models;
+using teams_phonemanager.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -18,17 +19,20 @@ namespace teams_phonemanager.Services.ScriptBuilders
         private readonly CallQueueScriptBuilder _callQueueBuilder;
         private readonly AutoAttendantScriptBuilder _autoAttendantBuilder;
         private readonly ResourceAccountScriptBuilder _resourceAccountBuilder;
+        private readonly IPowerShellSanitizationService _sanitizer;
 
         public BulkOperationsScriptBuilder(
             CommonScriptBuilder commonBuilder,
             CallQueueScriptBuilder callQueueBuilder,
             AutoAttendantScriptBuilder autoAttendantBuilder,
-            ResourceAccountScriptBuilder resourceAccountBuilder)
+            ResourceAccountScriptBuilder resourceAccountBuilder,
+            IPowerShellSanitizationService sanitizer)
         {
             _commonBuilder = commonBuilder;
             _callQueueBuilder = callQueueBuilder;
             _autoAttendantBuilder = autoAttendantBuilder;
             _resourceAccountBuilder = resourceAccountBuilder;
+            _sanitizer = sanitizer;
         }
 
         /// <summary>
@@ -134,23 +138,32 @@ namespace teams_phonemanager.Services.ScriptBuilders
                 var vars = entries[i];
                 var num = i + 1;
 
+                // Sanitize all CSV-sourced values for safe use in Write-Host strings
+                var safeCustomer = _sanitizer.SanitizeString(vars.Customer);
+                var safeGroupName = _sanitizer.SanitizeString(vars.CustomerGroupName);
+                var safeM365Group = _sanitizer.SanitizeString(vars.M365Group);
+                var safeRacqUPN = _sanitizer.SanitizeString(vars.RacqUPN);
+                var safeCqDisplayName = _sanitizer.SanitizeString(vars.CqDisplayName);
+                var safeRaaaUPN = _sanitizer.SanitizeString(vars.RaaaUPN);
+                var safeAaDisplayName = _sanitizer.SanitizeString(vars.AaDisplayName);
+
                 sb.AppendLine($"# ──────────────────────────────────────────────────────────────");
-                sb.AppendLine($"# Entry {num}/{entries.Count}: {vars.Customer} - {vars.CustomerGroupName}");
+                sb.AppendLine($"# Entry {num}/{entries.Count}: {safeCustomer} - {safeGroupName}");
                 sb.AppendLine($"# ──────────────────────────────────────────────────────────────");
                 sb.AppendLine();
 
-                sb.AppendLine($"Write-Host '▶ [{num}/{entries.Count}] Processing: {vars.Customer} - {vars.CustomerGroupName}'");
+                sb.AppendLine($"Write-Host '▶ [{num}/{entries.Count}] Processing: {safeCustomer} - {safeGroupName}'");
                 sb.AppendLine();
 
                 // Step 1: M365 Group
                 sb.AppendLine($"# Step 1: Create M365 Group");
-                sb.AppendLine($"Write-Host '  [1/6] Creating M365 Group: {vars.M365Group}'");
+                sb.AppendLine($"Write-Host '  [1/6] Creating M365 Group: {safeM365Group}'");
                 sb.AppendLine(_commonBuilder.GetCreateM365GroupCommand(vars.M365Group));
                 sb.AppendLine();
 
                 // Step 2: CQ Resource Account + License
                 sb.AppendLine($"# Step 2: Create CQ Resource Account + License");
-                sb.AppendLine($"Write-Host '  [2/6] Creating CQ Resource Account: {vars.RacqUPN}'");
+                sb.AppendLine($"Write-Host '  [2/6] Creating CQ Resource Account: {safeRacqUPN}'");
                 sb.AppendLine(_resourceAccountBuilder.GetCreateResourceAccountCommand(vars));
                 sb.AppendLine(_resourceAccountBuilder.GetUpdateResourceAccountUsageLocationCommand(vars.RacqUPN, vars.UsageLocation));
                 sb.AppendLine(_commonBuilder.GetAssignLicenseCommand(vars.RacqUPN, vars.SkuId));
@@ -158,13 +171,13 @@ namespace teams_phonemanager.Services.ScriptBuilders
 
                 // Step 3: Call Queue
                 sb.AppendLine($"# Step 3: Create Call Queue");
-                sb.AppendLine($"Write-Host '  [3/6] Creating Call Queue: {vars.CqDisplayName}'");
+                sb.AppendLine($"Write-Host '  [3/6] Creating Call Queue: {safeCqDisplayName}'");
                 sb.AppendLine(_callQueueBuilder.GetCreateCallQueueCommand(vars));
                 sb.AppendLine();
 
                 // Step 4: AA Resource Account + License + Phone
                 sb.AppendLine($"# Step 4: Create AA Resource Account + License + Phone");
-                sb.AppendLine($"Write-Host '  [4/6] Creating AA Resource Account: {vars.RaaaUPN}'");
+                sb.AppendLine($"Write-Host '  [4/6] Creating AA Resource Account: {safeRaaaUPN}'");
                 sb.AppendLine(_resourceAccountBuilder.GetCreateAutoAttendantResourceAccountCommand(vars));
                 sb.AppendLine(_resourceAccountBuilder.GetUpdateAutoAttendantResourceAccountUsageLocationCommand(vars.RaaaUPN, vars.UsageLocation));
                 sb.AppendLine(_resourceAccountBuilder.GetAssignAutoAttendantLicenseCommand(vars.RaaaUPN, vars.SkuId));
@@ -176,7 +189,7 @@ namespace teams_phonemanager.Services.ScriptBuilders
 
                 // Step 5: Auto Attendant (monolithic — runs as one connected script)
                 sb.AppendLine($"# Step 5: Create Auto Attendant");
-                sb.AppendLine($"Write-Host '  [5/6] Creating Auto Attendant: {vars.AaDisplayName}'");
+                sb.AppendLine($"Write-Host '  [5/6] Creating Auto Attendant: {safeAaDisplayName}'");
                 sb.AppendLine(_autoAttendantBuilder.GetCreateAutoAttendantCommand(vars));
                 sb.AppendLine();
 
@@ -186,7 +199,7 @@ namespace teams_phonemanager.Services.ScriptBuilders
                 sb.AppendLine(_autoAttendantBuilder.GetAssociateResourceAccountWithAutoAttendantCommand(vars.RaaaUPN, vars.AaDisplayName));
                 sb.AppendLine();
 
-                sb.AppendLine($"Write-Host '✅ [{num}/{entries.Count}] Complete: {vars.Customer} - {vars.CustomerGroupName}'");
+                sb.AppendLine($"Write-Host '✅ [{num}/{entries.Count}] Complete: {safeCustomer} - {safeGroupName}'");
                 sb.AppendLine();
             }
 

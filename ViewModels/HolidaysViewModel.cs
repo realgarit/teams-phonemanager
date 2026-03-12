@@ -14,11 +14,6 @@ namespace teams_phonemanager.ViewModels
 {
     public partial class HolidaysViewModel : ViewModelBase
     {
-        
-
-        [ObservableProperty]
-        private string _statusMessage = string.Empty;
-
         [ObservableProperty]
         private bool _showCreateHolidayDialog;
 

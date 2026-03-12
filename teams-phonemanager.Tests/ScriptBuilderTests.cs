@@ -46,6 +46,9 @@ namespace teams_phonemanager.Tests
             Assert.Contains("-Name \"aa-Cust-Anr-Grp\"", script);
             Assert.Contains("-LanguageId \"en-US\"", script);
             Assert.Contains("-TimeZoneId \"UTC\"", script);
+
+            // Verify sanitization is invoked
+            _mockSanitizer.Verify(s => s.SanitizeString(It.IsAny<string>()), Times.AtLeastOnce());
         }
 
         [Fact]
@@ -58,6 +61,30 @@ namespace teams_phonemanager.Tests
             Assert.Contains("New-CsOnlineSchedule", script);
             Assert.Contains("-Name \"Christmas\"", script);
             Assert.Contains("25/12/2023", script);
+
+            // Verify sanitization is invoked
+            _mockSanitizer.Verify(s => s.SanitizeString(It.IsAny<string>()), Times.AtLeastOnce());
+        }
+
+        [Fact]
+        public void AutoAttendantScriptBuilder_WithInjectionInput_SanitizesValues()
+        {
+            // Use real sanitizer to test end-to-end
+            var realSanitizer = new teams_phonemanager.Services.PowerShellSanitizationService();
+            var builder = new AutoAttendantScriptBuilder(realSanitizer);
+            var variables = new PhoneManagerVariables
+            {
+                Customer = "test'; Remove-Item C:\\ -Recurse; '",
+                RaaAnrName = "normal",
+                CustomerGroupName = "group",
+                LanguageId = "en-US",
+                TimeZoneId = "UTC"
+            };
+
+            var script = builder.GetCreateSimpleAutoAttendantCommand(variables);
+
+            // Dangerous characters should be stripped
+            Assert.DoesNotContain(";", script.Replace("$ErrorActionPreference", ""));
         }
     }
 }

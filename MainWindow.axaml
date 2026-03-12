@@ -74,70 +74,70 @@
                 
                 <ListBox x:Name="NavigationListBox" Grid.Column="0" Classes="nav"
                          SelectionChanged="NavigationListBox_SelectionChanged">
-                    <ListBoxItem Tag="Welcome" Classes="nav">
+                    <ListBoxItem Tag="Welcome" Classes="nav" AutomationProperties.Name="Welcome">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                             <fi:SymbolIcon Symbol="Home"/>
                             <TextBlock Text="Welcome" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem Tag="GetStarted" Classes="nav">
+                    <ListBoxItem Tag="GetStarted" Classes="nav" AutomationProperties.Name="Get Started">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                             <fi:SymbolIcon Symbol="Rocket"/>
                             <TextBlock Text="Get Started" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem Tag="Variables" Classes="nav">
+                    <ListBoxItem Tag="Variables" Classes="nav" AutomationProperties.Name="Variables">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                             <fi:SymbolIcon Symbol="Code"/>
                             <TextBlock Text="Variables" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem Tag="M365Groups" Classes="nav">
+                    <ListBoxItem Tag="M365Groups" Classes="nav" AutomationProperties.Name="M365 Groups">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                             <fi:SymbolIcon Symbol="PeopleTeam"/>
                             <TextBlock Text="M365 Groups" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem Tag="CallQueues" Classes="nav">
+                    <ListBoxItem Tag="CallQueues" Classes="nav" AutomationProperties.Name="Call Queues">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                             <fi:SymbolIcon Symbol="CallInbound"/>
                             <TextBlock Text="Call Queues" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem Tag="AutoAttendants" Classes="nav">
+                    <ListBoxItem Tag="AutoAttendants" Classes="nav" AutomationProperties.Name="Auto Attendants">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                             <fi:SymbolIcon Symbol="Bot"/>
                             <TextBlock Text="Auto Attendants" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem Tag="Holidays" Classes="nav">
+                    <ListBoxItem Tag="Holidays" Classes="nav" AutomationProperties.Name="Holidays">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                             <fi:SymbolIcon Symbol="Calendar"/>
                             <TextBlock Text="Holidays" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem Tag="Documentation" Classes="nav">
+                    <ListBoxItem Tag="Documentation" Classes="nav" AutomationProperties.Name="Documentation">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                             <fi:SymbolIcon Symbol="DocumentText"/>
                             <TextBlock Text="Documentation" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem Tag="Wizard" Classes="nav">
+                    <ListBoxItem Tag="Wizard" Classes="nav" AutomationProperties.Name="Setup Wizard">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                             <fi:SymbolIcon Symbol="Wand"/>
                             <TextBlock Text="Setup Wizard" FontSize="14" VerticalAlignment="Center"/>
                         </StackPanel>
                     </ListBoxItem>
 
-                    <ListBoxItem Tag="BulkOperations" Classes="nav">
+                    <ListBoxItem Tag="BulkOperations" Classes="nav" AutomationProperties.Name="Bulk Operations">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                             <fi:SymbolIcon Symbol="TableMultiple"/>
                             <TextBlock Text="Bulk Operations" FontSize="14" VerticalAlignment="Center"/>

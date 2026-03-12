@@ -17,9 +17,6 @@ namespace teams_phonemanager.ViewModels
         private readonly BulkOperationsScriptBuilder _bulkBuilder;
 
         [ObservableProperty]
-        private string _statusMessage = string.Empty;
-
-        [ObservableProperty]
         private string _csvContent = string.Empty;
 
         [ObservableProperty]

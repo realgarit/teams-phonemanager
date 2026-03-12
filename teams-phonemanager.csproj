@@ -6,9 +6,12 @@
     <RootNamespace>teams_phonemanager</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>3.11.0</Version>
-    <AssemblyVersion>3.11.0</AssemblyVersion>
-    <FileVersion>3.11.0</FileVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <Version>3.11.1</Version>
+    <AssemblyVersion>3.11.1</AssemblyVersion>
+    <FileVersion>3.11.1</FileVersion>
     
     <!-- Publish Settings for Framework-Dependent Deployment -->
     <PublishSingleFile>false</PublishSingleFile>
