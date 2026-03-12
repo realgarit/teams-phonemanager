@@ -19,14 +19,14 @@ namespace teams_phonemanager.Services
 
         public static class Application
         {
-            public const string Version = "Version 3.11.0";
+            public const string Version = "Version 3.11.1";
             public const string Copyright = "Realgar © 2026. MIT License.";
         }
 
         public static class Messages
         {
-            public const string WaitingMessage = "Bitte warte bis die vorherige Operation im Backend von Microsoft ankommmt";
-            public const string LicenseWaitingMessage = "Bitte warte bis die Teams Phone Resource Lizenz richtig gesetzt ist";
+            public const string WaitingMessage = "Please wait while the previous operation is processed by Microsoft";
+            public const string LicenseWaitingMessage = "Please wait while the Teams Phone Resource License is being applied";
         }
 
         public static class CallQueue

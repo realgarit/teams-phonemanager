@@ -5,6 +5,8 @@ on:
     branches: [ main, master ]
     tags:
       - 'v*'
+  pull_request:
+    branches: [ main, master ]
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
@@ -117,7 +119,10 @@ jobs:
     
     - name: Build
       run: dotnet build --configuration Release --no-restore
-    
+
+    - name: Run tests
+      run: dotnet test --configuration Release --no-build --verbosity normal
+
     - name: Publish
       run: dotnet publish --configuration Release --runtime ${{ matrix.runtime }} --self-contained false --output ./publish/${{ matrix.runtime }} /p:OutputType=${{ matrix.output-type }}
     
@@ -151,28 +156,24 @@ jobs:
     
     - name: Download Windows artifacts
       uses: actions/download-artifact@v4
-      continue-on-error: true
       with:
         name: teams-phonemanager-win-x64
         path: ./artifacts/win-x64
-    
+
     - name: Download macOS Intel artifacts
       uses: actions/download-artifact@v4
-      continue-on-error: true
       with:
         name: teams-phonemanager-osx-x64
         path: ./artifacts/osx-x64
-    
+
     - name: Download macOS Apple Silicon artifacts
       uses: actions/download-artifact@v4
-      continue-on-error: true
       with:
         name: teams-phonemanager-osx-arm64
         path: ./artifacts/osx-arm64
 
     - name: Download Linux artifacts
       uses: actions/download-artifact@v4
-      continue-on-error: true
       with:
         name: teams-phonemanager-linux-x64
         path: ./artifacts/linux-x64
@@ -251,7 +252,7 @@ jobs:
         ls -lh artifacts/*.zip 2>/dev/null || echo "No zip files found"
     
     - name: Create Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@4634c16e79c963813287e889244c50009e7f0981 # v2.0.8
       with:
         tag_name: ${{ steps.tag.outputs.tag_name }}
         name: ${{ steps.tag.outputs.tag_name }}

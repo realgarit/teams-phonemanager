@@ -12,5 +12,4 @@ public interface IErrorHandlingService
     Task<bool> HandleConfirmation(string message, string title = "Confirmation");
     Task ShowSuccess(string message, string title = "Success");
     Task ShowInfo(string message, string title = "Information");
-    Task ShowContentDialogAsync(string title, string message, FluentAvalonia.UI.Controls.ContentDialogButton defaultButton = FluentAvalonia.UI.Controls.ContentDialogButton.Primary);
 }

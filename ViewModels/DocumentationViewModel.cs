@@ -16,9 +16,6 @@ namespace teams_phonemanager.ViewModels
         private readonly DocumentationScriptBuilder _docBuilder;
 
         [ObservableProperty]
-        private string _statusMessage = string.Empty;
-
-        [ObservableProperty]
         private string _documentationOutput = string.Empty;
 
         [ObservableProperty]
