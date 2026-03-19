@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Microsoft.Extensions.DependencyInjection;
+using teams_phonemanager.Helpers;
 using teams_phonemanager.ViewModels;
 
 namespace teams_phonemanager.Views
@@ -13,43 +14,19 @@ namespace teams_phonemanager.Views
             DataContext = Program.Services?.GetService<HolidaysViewModel>();
         }
 
-        private void CreateHolidayBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            if (DataContext is ViewModels.HolidaysViewModel viewModel)
-            {
-                viewModel.CloseCreateHolidayDialogCommand.Execute(null);
-            }
-        }
+        private HolidaysViewModel? VM => DataContext as HolidaysViewModel;
 
-        private void CreateHolidayCard_PointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            e.Handled = true;
-        }
+        private void CreateHolidayBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
+            => DialogEventHelper.CloseOnBackdropClick(VM, VM?.CloseCreateHolidayDialogCommand);
 
         private void CheckAutoAttendantBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            if (DataContext is ViewModels.HolidaysViewModel viewModel)
-            {
-                viewModel.CloseCheckAutoAttendantDialogCommand.Execute(null);
-            }
-        }
-
-        private void CheckAutoAttendantCard_PointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            e.Handled = true;
-        }
+            => DialogEventHelper.CloseOnBackdropClick(VM, VM?.CloseCheckAutoAttendantDialogCommand);
 
         private void AttachHolidayBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            if (DataContext is ViewModels.HolidaysViewModel viewModel)
-            {
-                viewModel.CloseAttachHolidayDialogCommand.Execute(null);
-            }
-        }
+            => DialogEventHelper.CloseOnBackdropClick(VM, VM?.CloseAttachHolidayDialogCommand);
 
-        private void AttachHolidayCard_PointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            e.Handled = true;
-        }
+        private void CreateHolidayCard_PointerPressed(object? sender, PointerPressedEventArgs e) => DialogEventHelper.StopPropagation(sender, e);
+        private void CheckAutoAttendantCard_PointerPressed(object? sender, PointerPressedEventArgs e) => DialogEventHelper.StopPropagation(sender, e);
+        private void AttachHolidayCard_PointerPressed(object? sender, PointerPressedEventArgs e) => DialogEventHelper.StopPropagation(sender, e);
     }
-} 
+}

@@ -126,6 +126,18 @@ namespace teams_phonemanager.ViewModels
 
         public string Copyright => Services.ConstantsService.Application.Copyright;
 
+        public bool IsTeamsConnected => _sessionManager.TeamsConnected;
+        public bool IsGraphConnected => _sessionManager.GraphConnected;
+        public string ConnectionStatusText
+        {
+            get
+            {
+                var teams = _sessionManager.TeamsConnected ? "Connected" : "Disconnected";
+                var graph = _sessionManager.GraphConnected ? "Connected" : "Disconnected";
+                return $"Teams: {teams} | Graph: {graph}";
+            }
+        }
+
         public PhoneManagerVariables Variables
         {
             get => _sharedStateService?.Variables ?? new PhoneManagerVariables();
@@ -182,6 +194,7 @@ namespace teams_phonemanager.ViewModels
                 if (e.PropertyName == nameof(INavigationService.CurrentPage))
                 {
                     CurrentPage = _navigationService.CurrentPage;
+                    RefreshConnectionStatus();
                 }
             };
             _navigationService.PropertyChanged += _navigationPropertyHandler;
@@ -203,6 +216,13 @@ namespace teams_phonemanager.ViewModels
         public new void NavigateTo(string page)
         {
             _navigationService.NavigateTo(page);
+        }
+
+        public void RefreshConnectionStatus()
+        {
+            OnPropertyChanged(nameof(IsTeamsConnected));
+            OnPropertyChanged(nameof(IsGraphConnected));
+            OnPropertyChanged(nameof(ConnectionStatusText));
         }
 
         [RelayCommand]

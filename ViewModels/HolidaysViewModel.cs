@@ -5,10 +5,7 @@ using teams_phonemanager.Services;
 using teams_phonemanager.Models;
 using System;
 using System.Threading.Tasks;
-using Avalonia.Input;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-
 
 namespace teams_phonemanager.ViewModels
 {

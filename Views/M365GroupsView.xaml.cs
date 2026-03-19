@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Microsoft.Extensions.DependencyInjection;
+using teams_phonemanager.Helpers;
 using teams_phonemanager.ViewModels;
 
 namespace teams_phonemanager.Views
@@ -13,28 +14,15 @@ namespace teams_phonemanager.Views
             DataContext = Program.Services?.GetService<M365GroupsViewModel>();
         }
 
-        private void ConfirmVariablesBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            // This dialog doesn't have a close command, it only has action buttons
-            // So we don't close it on backdrop click
-        }
+        private M365GroupsViewModel? VM => DataContext as M365GroupsViewModel;
 
-        private void ConfirmVariablesCard_PointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            e.Handled = true;
-        }
+        // Confirm dialog intentionally does not close on backdrop click - it has action buttons only
+        private void ConfirmVariablesBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e) { }
 
         private void CreateGroupBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            if (DataContext is ViewModels.M365GroupsViewModel viewModel)
-            {
-                viewModel.CloseCreateGroupDialogCommand.Execute(null);
-            }
-        }
+            => DialogEventHelper.CloseOnBackdropClick(VM, VM?.CloseCreateGroupDialogCommand);
 
-        private void CreateGroupCard_PointerPressed(object? sender, PointerPressedEventArgs e)
-        {
-            e.Handled = true;
-        }
+        private void ConfirmVariablesCard_PointerPressed(object? sender, PointerPressedEventArgs e) => DialogEventHelper.StopPropagation(sender, e);
+        private void CreateGroupCard_PointerPressed(object? sender, PointerPressedEventArgs e) => DialogEventHelper.StopPropagation(sender, e);
     }
-} 
+}

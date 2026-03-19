@@ -13,13 +13,14 @@ namespace teams_phonemanager.Services
         {
             public const int DefaultWaitTimeSeconds = 30;
             public const int LongWaitTimeSeconds = 120;
+            public const int ConnectionCheckTimeoutSeconds = 30;
             public const string ExecutionPolicy = "Bypass";
             public const int ExitCodeError = 1;
         }
 
         public static class Application
         {
-            public const string Version = "Version 3.11.1";
+            public const string Version = "Version 3.12.0";
             public const string Copyright = "Realgar © 2026. MIT License.";
         }
 

@@ -13,6 +13,24 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        KeyDown += OnKeyDown;
+    }
+
+    private void OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape && DataContext is ViewModels.MainWindowViewModel vm)
+        {
+            if (vm.IsLogDialogOpen)
+            {
+                vm.CloseLogDialogCommand.Execute(null);
+                e.Handled = true;
+            }
+            else if (vm.IsSettingsOpen)
+            {
+                vm.CloseSettingsCommand.Execute(null);
+                e.Handled = true;
+            }
+        }
     }
 
     private void LogDialogBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)

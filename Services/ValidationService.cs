@@ -124,7 +124,7 @@ namespace teams_phonemanager.Services
         {
             var result = new ValidationResult();
 
-            if (holidayDate < DateTime.Now.AddDays(-1))
+            if (holidayDate.Date < DateTime.Today)
             {
                 result.AddError("Holiday date cannot be in the past.");
             }

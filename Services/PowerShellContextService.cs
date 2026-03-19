@@ -178,17 +178,10 @@ $ErrorActionPreference = 'Continue'
             }
         }
 
-        [Obsolete("Use IsConnectedAsync instead. This synchronous wrapper can deadlock when called from the UI thread.")]
-        public bool IsConnected(string service)
-        {
-            // Return false to avoid deadlock — callers should use IsConnectedAsync
-            return false;
-        }
-
         public async Task<bool> IsConnectedAsync(string service, CancellationToken cancellationToken = default)
         {
             // Use timeout to prevent indefinite blocking
-            if (!await _semaphore.WaitAsync(TimeSpan.FromSeconds(30), cancellationToken))
+            if (!await _semaphore.WaitAsync(TimeSpan.FromSeconds(ConstantsService.PowerShell.ConnectionCheckTimeoutSeconds), cancellationToken))
             {
                 _loggingService.Log("IsConnectedAsync timed out waiting for semaphore", LogLevel.Warning);
                 return false;

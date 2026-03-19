@@ -123,6 +123,29 @@ namespace teams_phonemanager.ViewModels
             return true;
         }
 
+        /// <summary>
+        /// Wraps an async operation with IsBusy tracking and error handling.
+        /// Reduces the try/catch/finally boilerplate in every command method.
+        /// </summary>
+        protected async Task RunBusyAsync(Func<Task> action, string context = "", string? waitingMessage = null)
+        {
+            try
+            {
+                WaitingMessage = waitingMessage ?? string.Empty;
+                IsBusy = true;
+                await action();
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error: {ex.Message}";
+                _loggingService.Log($"Exception in {context}: {ex}", LogLevel.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
         protected void NavigateTo(string page)
         {
             _navigationService.NavigateTo(page);
