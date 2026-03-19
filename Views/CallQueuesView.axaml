@@ -115,25 +115,31 @@
                             </Grid>
 
                             <!-- Resource Accounts List -->
-                            <DataGrid Grid.Row="2"
-                                      AutomationProperties.Name="Resource Accounts List"
-                                      ItemsSource="{Binding ResourceAccountsView}"
-                                      AutoGenerateColumns="False"
-                                      HeadersVisibility="Column"
-                                      
-                                      
-                                      IsReadOnly="True"
-                                      GridLinesVisibility="None"
-                                      SelectionMode="Single"
-                                      
-                                      HorizontalScrollBarVisibility="Auto">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" Width="2*"/>
-                                    <DataGridTextColumn Header="UPN" Binding="{Binding UserPrincipalName}" Width="2*"/>
-                                    <DataGridTextColumn Header="Identity" Binding="{Binding Identity}" Width="2*"/>
-                                    <DataGridTextColumn Header="Usage Location" Binding="{Binding UsageLocation}" Width="*"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
+                            <Grid Grid.Row="2">
+                                <DataGrid AutomationProperties.Name="Resource Accounts List"
+                                          ItemsSource="{Binding ResourceAccountsView}"
+                                          AutoGenerateColumns="False"
+                                          HeadersVisibility="Column"
+                                          IsReadOnly="True"
+                                          GridLinesVisibility="None"
+                                          SelectionMode="Single"
+                                          HorizontalScrollBarVisibility="Auto">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" Width="2*"/>
+                                        <DataGridTextColumn Header="UPN" Binding="{Binding UserPrincipalName}" Width="2*"/>
+                                        <DataGridTextColumn Header="Identity" Binding="{Binding Identity}" Width="2*"/>
+                                        <DataGridTextColumn Header="Usage Location" Binding="{Binding UsageLocation}" Width="*"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <!-- Empty State -->
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            IsVisible="{Binding !ResourceAccountsView.Count}"
+                                            Opacity="0.5" Spacing="8">
+                                    <fi:SymbolIcon Symbol="PersonSearch" FontSize="32" HorizontalAlignment="Center" Margin="0"/>
+                                    <TextBlock Text="No resource accounts loaded" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Click 'Retrieve Accounts' to load data from Teams" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
                         </Grid>
                     </TabItem>
 
@@ -196,25 +202,31 @@
                             </Grid>
 
                             <!-- Call Queues List -->
-                            <DataGrid Grid.Row="2"
-                                      AutomationProperties.Name="Call Queues List"
-                                      ItemsSource="{Binding CallQueuesView}"
-                                      AutoGenerateColumns="False"
-                                      HeadersVisibility="Column"
-                                      
-                                      
-                                      IsReadOnly="True"
-                                      GridLinesVisibility="None"
-                                      SelectionMode="Single"
-                                      
-                                      HorizontalScrollBarVisibility="Auto">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*"/>
-                                    <DataGridTextColumn Header="Identity" Binding="{Binding Identity}" Width="2*"/>
-                                    <DataGridTextColumn Header="Routing Method" Binding="{Binding RoutingMethod}" Width="*"/>
-                                    <DataGridTextColumn Header="Agent Alert Time" Binding="{Binding AgentAlertTime}" Width="*"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
+                            <Grid Grid.Row="2">
+                                <DataGrid AutomationProperties.Name="Call Queues List"
+                                          ItemsSource="{Binding CallQueuesView}"
+                                          AutoGenerateColumns="False"
+                                          HeadersVisibility="Column"
+                                          IsReadOnly="True"
+                                          GridLinesVisibility="None"
+                                          SelectionMode="Single"
+                                          HorizontalScrollBarVisibility="Auto">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*"/>
+                                        <DataGridTextColumn Header="Identity" Binding="{Binding Identity}" Width="2*"/>
+                                        <DataGridTextColumn Header="Routing Method" Binding="{Binding RoutingMethod}" Width="*"/>
+                                        <DataGridTextColumn Header="Agent Alert Time" Binding="{Binding AgentAlertTime}" Width="*"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <!-- Empty State -->
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            IsVisible="{Binding !CallQueuesView.Count}"
+                                            Opacity="0.5" Spacing="8">
+                                    <fi:SymbolIcon Symbol="CallInbound" FontSize="32" HorizontalAlignment="Center" Margin="0"/>
+                                    <TextBlock Text="No call queues loaded" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Click 'Retrieve Queues' to load data from Teams" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
                         </Grid>
                     </TabItem>
 

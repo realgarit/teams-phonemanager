@@ -106,24 +106,31 @@
                 </Grid>
 
                 <!-- Groups List -->
-                <DataGrid Grid.Row="3" 
-                          Margin="0,16"
-                          AutomationProperties.Name="M365 Groups List"
-                          ItemsSource="{Binding GroupsView}"
-                          SelectedItem="{Binding SelectedGroup}"
-                          AutoGenerateColumns="False"
-                          HeadersVisibility="Column"
-                          IsReadOnly="True"
-                          GridLinesVisibility="None"
-                          SelectionMode="Single"
-                          HorizontalScrollBarVisibility="Auto">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" Width="2*"/>
-                        <DataGridTextColumn Header="Mail Nickname" Binding="{Binding MailNickname}" Width="*"/>
-                        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
-                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="2*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
+                <Grid Grid.Row="3" Margin="0,16">
+                    <DataGrid AutomationProperties.Name="M365 Groups List"
+                              ItemsSource="{Binding GroupsView}"
+                              SelectedItem="{Binding SelectedGroup}"
+                              AutoGenerateColumns="False"
+                              HeadersVisibility="Column"
+                              IsReadOnly="True"
+                              GridLinesVisibility="None"
+                              SelectionMode="Single"
+                              HorizontalScrollBarVisibility="Auto">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" Width="2*"/>
+                            <DataGridTextColumn Header="Mail Nickname" Binding="{Binding MailNickname}" Width="*"/>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="2*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                                IsVisible="{Binding !GroupsView.Count}"
+                                Opacity="0.5" Spacing="8">
+                        <fi:SymbolIcon Symbol="PeopleTeam" FontSize="32" HorizontalAlignment="Center" Margin="0"/>
+                        <TextBlock Text="No M365 groups loaded" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Click 'Retrieve Groups' to load data from your tenant" FontSize="12" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
 
             </Grid>
 

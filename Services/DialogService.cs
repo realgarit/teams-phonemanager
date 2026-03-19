@@ -7,12 +7,10 @@ using teams_phonemanager.Services.Interfaces;
 
 namespace teams_phonemanager.Services
 {
-    /// <summary>
-    /// Avalonia implementation of the dialog service.
-    /// This class contains UI framework dependencies and should be registered in DI.
-    /// </summary>
     public class DialogService : IDialogService
     {
+        private static readonly FontFamily MonospaceFont = new("Cascadia Code, Consolas, Courier New, monospace");
+
         private Window? GetMainWindow()
         {
             return Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop
@@ -56,7 +54,7 @@ namespace teams_phonemanager.Services
                 var result = await dialog.ShowAsync(window);
                 return result == ContentDialogResult.Primary;
             }
-            
+
             System.Diagnostics.Debug.WriteLine($"DialogService: Cannot show confirmation dialog - window not available. Title: {title}");
             return false;
         }
@@ -66,33 +64,13 @@ namespace teams_phonemanager.Services
             var window = GetMainWindow();
             if (window == null) return false;
 
-            var scriptTextBox = new TextBox
-            {
-                Text = script,
-                IsReadOnly = true,
-                AcceptsReturn = true,
-                TextWrapping = TextWrapping.Wrap,
-                FontFamily = new FontFamily("Cascadia Code, Consolas, Courier New, monospace"),
-                FontSize = 12,
-                MaxHeight = 400,
-                MinHeight = 200,
-                Watermark = "PowerShell Script"
-            };
-
-            var scrollViewer = new ScrollViewer
-            {
-                Content = scriptTextBox,
-                MaxHeight = 400,
-                VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto
-            };
-
             var panel = new StackPanel
             {
                 Spacing = 8,
                 Children =
                 {
                     new TextBlock { Text = "Review the PowerShell script that will be executed:", TextWrapping = TextWrapping.Wrap },
-                    scrollViewer
+                    CreateScriptViewer(script, maxHeight: 400, minHeight: 200)
                 }
             };
 
@@ -114,26 +92,6 @@ namespace teams_phonemanager.Services
             var window = GetMainWindow();
             if (window == null) return false;
 
-            var scriptTextBox = new TextBox
-            {
-                Text = script,
-                IsReadOnly = true,
-                AcceptsReturn = true,
-                TextWrapping = TextWrapping.Wrap,
-                FontFamily = new FontFamily("Cascadia Code, Consolas, Courier New, monospace"),
-                FontSize = 12,
-                MaxHeight = 300,
-                MinHeight = 150,
-                Watermark = "PowerShell Script"
-            };
-
-            var scrollViewer = new ScrollViewer
-            {
-                Content = scriptTextBox,
-                MaxHeight = 300,
-                VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto
-            };
-
             var panel = new StackPanel
             {
                 Spacing = 8,
@@ -147,7 +105,7 @@ namespace teams_phonemanager.Services
                         FontWeight = FontWeight.SemiBold
                     },
                     new TextBlock { Text = "Script to be executed:", TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0) },
-                    scrollViewer
+                    CreateScriptViewer(script, maxHeight: 300, minHeight: 150)
                 }
             };
 
@@ -162,6 +120,29 @@ namespace teams_phonemanager.Services
 
             var result = await dialog.ShowAsync(window);
             return result == ContentDialogResult.Primary;
+        }
+
+        private static ScrollViewer CreateScriptViewer(string script, double maxHeight, double minHeight)
+        {
+            var textBox = new TextBox
+            {
+                Text = script,
+                IsReadOnly = true,
+                AcceptsReturn = true,
+                TextWrapping = TextWrapping.Wrap,
+                FontFamily = MonospaceFont,
+                FontSize = 12,
+                MaxHeight = maxHeight,
+                MinHeight = minHeight,
+                Watermark = "PowerShell Script"
+            };
+
+            return new ScrollViewer
+            {
+                Content = textBox,
+                MaxHeight = maxHeight,
+                VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto
+            };
         }
     }
 }

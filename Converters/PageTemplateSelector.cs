@@ -6,9 +6,29 @@ namespace teams_phonemanager.Converters
 {
     public class PageTemplateSelector : IDataTemplate
     {
-        public PageTemplateSelector()
+        private static readonly Dictionary<string, string> PageKeyMap = BuildPageKeyMap();
+
+        private static Dictionary<string, string> BuildPageKeyMap()
         {
-            // PageTemplateSelector is created by XAML, so we cannot use constructor injection here
+            var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var page in new[]
+            {
+                ConstantsService.Pages.Welcome,
+                ConstantsService.Pages.GetStarted,
+                ConstantsService.Pages.Variables,
+                ConstantsService.Pages.M365Groups,
+                ConstantsService.Pages.CallQueues,
+                ConstantsService.Pages.AutoAttendants,
+                ConstantsService.Pages.Holidays,
+                ConstantsService.Pages.Documentation,
+                ConstantsService.Pages.Wizard,
+                ConstantsService.Pages.BulkOperations,
+            })
+            {
+                map[page] = page;
+                map[page.Replace(" ", "")] = page;
+            }
+            return map;
         }
 
         public required IDataTemplate WelcomeTemplate { get; set; }
@@ -24,36 +44,22 @@ namespace teams_phonemanager.Converters
 
         public IDataTemplate SelectTemplate(object? item, Control? container)
         {
-            if (item is string pageName)
+            if (item is string pageName && PageKeyMap.TryGetValue(pageName, out var normalizedPage))
             {
-                var normalizedPageName = pageName.Replace(" ", "");
-                var normalizedWelcome = ConstantsService.Pages.Welcome.Replace(" ", "");
-                var normalizedGetStarted = ConstantsService.Pages.GetStarted.Replace(" ", "");
-                var normalizedVariables = ConstantsService.Pages.Variables.Replace(" ", "");
-                var normalizedM365Groups = ConstantsService.Pages.M365Groups.Replace(" ", "");
-                var normalizedCallQueues = ConstantsService.Pages.CallQueues.Replace(" ", "");
-                var normalizedAutoAttendants = ConstantsService.Pages.AutoAttendants.Replace(" ", "");
-                var normalizedHolidays = ConstantsService.Pages.Holidays.Replace(" ", "");
-                var normalizedDocumentation = ConstantsService.Pages.Documentation.Replace(" ", "");
-                var normalizedWizard = ConstantsService.Pages.Wizard.Replace(" ", "");
-                var normalizedBulkOperations = ConstantsService.Pages.BulkOperations.Replace(" ", "");
-                
-                IDataTemplate template = normalizedPageName switch
+                return normalizedPage switch
                 {
-                    var name when name == normalizedWelcome => WelcomeTemplate,
-                    var name when name == normalizedGetStarted => GetStartedTemplate,
-                    var name when name == normalizedVariables => VariablesTemplate,
-                    var name when name == normalizedM365Groups => M365GroupsTemplate,
-                    var name when name == normalizedCallQueues => CallQueuesTemplate,
-                    var name when name == normalizedAutoAttendants => AutoAttendantsTemplate,
-                    var name when name == normalizedHolidays => HolidaysTemplate,
-                    var name when name == normalizedDocumentation => DocumentationTemplate,
-                    var name when name == normalizedWizard => WizardTemplate,
-                    var name when name == normalizedBulkOperations => BulkOperationsTemplate,
+                    ConstantsService.Pages.Welcome => WelcomeTemplate,
+                    ConstantsService.Pages.GetStarted => GetStartedTemplate,
+                    ConstantsService.Pages.Variables => VariablesTemplate,
+                    ConstantsService.Pages.M365Groups => M365GroupsTemplate,
+                    ConstantsService.Pages.CallQueues => CallQueuesTemplate,
+                    ConstantsService.Pages.AutoAttendants => AutoAttendantsTemplate,
+                    ConstantsService.Pages.Holidays => HolidaysTemplate,
+                    ConstantsService.Pages.Documentation => DocumentationTemplate,
+                    ConstantsService.Pages.Wizard => WizardTemplate,
+                    ConstantsService.Pages.BulkOperations => BulkOperationsTemplate,
                     _ => WelcomeTemplate
                 };
-
-                return template;
             }
 
             return WelcomeTemplate;

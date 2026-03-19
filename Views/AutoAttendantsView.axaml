@@ -113,27 +113,30 @@
                             </Grid>
 
                             <!-- Resource Accounts List -->
-                            <DataGrid Grid.Row="2"
-                                      AutomationProperties.Name="Resource Accounts List"
-                                      ItemsSource="{Binding ResourceAccountsView}"
-                                      AutoGenerateColumns="False"
-                                      HeadersVisibility="Column"
-                                      
-                                      
-                                      IsReadOnly="True"
-                                      GridLinesVisibility="None"
-                                      SelectionMode="Single"
-                                      
-                                      HorizontalScrollBarVisibility="Auto"
-                                      
-                                      >
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" Width="2*"/>
-                                    <DataGridTextColumn Header="UPN" Binding="{Binding UserPrincipalName}" Width="2*"/>
-                                    <DataGridTextColumn Header="Identity" Binding="{Binding Identity}" Width="2*"/>
-                                    <DataGridTextColumn Header="Usage Location" Binding="{Binding UsageLocation}" Width="*"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
+                            <Grid Grid.Row="2">
+                                <DataGrid AutomationProperties.Name="Resource Accounts List"
+                                          ItemsSource="{Binding ResourceAccountsView}"
+                                          AutoGenerateColumns="False"
+                                          HeadersVisibility="Column"
+                                          IsReadOnly="True"
+                                          GridLinesVisibility="None"
+                                          SelectionMode="Single"
+                                          HorizontalScrollBarVisibility="Auto">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" Width="2*"/>
+                                        <DataGridTextColumn Header="UPN" Binding="{Binding UserPrincipalName}" Width="2*"/>
+                                        <DataGridTextColumn Header="Identity" Binding="{Binding Identity}" Width="2*"/>
+                                        <DataGridTextColumn Header="Usage Location" Binding="{Binding UsageLocation}" Width="*"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            IsVisible="{Binding !ResourceAccountsView.Count}"
+                                            Opacity="0.5" Spacing="8">
+                                    <fi:SymbolIcon Symbol="PersonSearch" FontSize="32" HorizontalAlignment="Center" Margin="0"/>
+                                    <TextBlock Text="No resource accounts loaded" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Click 'Retrieve Accounts' to load data from Teams" FontSize="12" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
                         </Grid>
                     </TabItem>
 
@@ -193,13 +196,11 @@
                             </Grid>
 
                             <!-- Auto Attendants List -->
-                            <DataGrid Grid.Row="2"
-                                      AutomationProperties.Name="Auto Attendants List"
+                            <Grid Grid.Row="2">
+                            <DataGrid AutomationProperties.Name="Auto Attendants List"
                                       ItemsSource="{Binding AutoAttendantsView}"
                                       AutoGenerateColumns="False"
                                       HeadersVisibility="Column"
-                                      
-                                      
                                       IsReadOnly="True"
                                       GridLinesVisibility="None"
                                       SelectionMode="Single"
@@ -214,6 +215,14 @@
                                     <DataGridTextColumn Header="Time Zone ID" Binding="{Binding TimeZoneId}" Width="*"/>
                                 </DataGrid.Columns>
                             </DataGrid>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        IsVisible="{Binding !AutoAttendantsView.Count}"
+                                        Opacity="0.5" Spacing="8">
+                                <fi:SymbolIcon Symbol="Bot" FontSize="32" HorizontalAlignment="Center" Margin="0"/>
+                                <TextBlock Text="No auto attendants loaded" HorizontalAlignment="Center"/>
+                                <TextBlock Text="Click 'Retrieve Auto Attendants' to load data from Teams" FontSize="12" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                            </Grid>
                         </Grid>
                     </TabItem>
 

@@ -5,20 +5,12 @@ using teams_phonemanager.Services;
 using teams_phonemanager.Models;
 using System;
 using System.Threading.Tasks;
-using Avalonia.Input;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.ComponentModel;
-
 
 namespace teams_phonemanager.ViewModels
 {
     public partial class M365GroupsViewModel : ViewModelBase
     {
-        
-
-        [ObservableProperty]
-        private string _welcomeMessage = "Welcome to the M365 Groups page. Here you can retrieve all groups starting with 'ttgrp', view their details, and create new groups for your phone system.";
 
         [ObservableProperty]
         private bool _isGroupChecked;
@@ -361,10 +353,10 @@ namespace teams_phonemanager.ViewModels
                 return true;
 
             var query = SearchText.Trim();
-            return (group.DisplayName?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (group.MailNickname?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (group.Description?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (group.Id?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0);
+            return (group.DisplayName?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (group.MailNickname?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (group.Description?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (group.Id?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false);
         }
 
         partial void OnSearchTextChanged(string value)

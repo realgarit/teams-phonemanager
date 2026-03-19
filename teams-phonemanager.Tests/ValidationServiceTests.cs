@@ -99,6 +99,62 @@ namespace teams_phonemanager.Tests
             Assert.Equal(3, result.Errors.Count);
         }
 
+        [Fact]
+        public void ValidateHolidayDate_Today_IsValid()
+        {
+            var result = _validationService.ValidateHolidayDate(DateTime.Today);
+            Assert.True(result.IsValid);
+        }
+
+        [Fact]
+        public void ValidateHolidayDate_Tomorrow_IsValid()
+        {
+            var result = _validationService.ValidateHolidayDate(DateTime.Today.AddDays(1));
+            Assert.True(result.IsValid);
+        }
+
+        [Fact]
+        public void ValidateHolidayDate_Yesterday_IsInvalid()
+        {
+            var result = _validationService.ValidateHolidayDate(DateTime.Today.AddDays(-1));
+            Assert.False(result.IsValid);
+            Assert.Contains(result.Errors, e => e.Contains("past"));
+        }
+
+        [Fact]
+        public void ValidateVariables_TtsGreetingWithoutText_ReturnsError()
+        {
+            var vars = CreateValidVariables();
+            vars.AaDefaultGreetingType = "TextToSpeech";
+            vars.AaDefaultGreetingTextToSpeechPrompt = "";
+            var result = _validationService.ValidateVariables(vars);
+            Assert.False(result.IsValid);
+            Assert.Contains(result.Errors, e => e.Contains("greeting text"));
+        }
+
+        [Fact]
+        public void ValidateVariables_AudioGreetingWithoutFileId_ReturnsError()
+        {
+            var vars = CreateValidVariables();
+            vars.AaDefaultGreetingType = "AudioFile";
+            vars.AaDefaultGreetingAudioFileId = "";
+            var result = _validationService.ValidateVariables(vars);
+            Assert.False(result.IsValid);
+            Assert.Contains(result.Errors, e => e.Contains("audio file"));
+        }
+
+        [Fact]
+        public void ValidationResult_GetErrorMessage_JoinsErrors()
+        {
+            var result = new ValidationResult();
+            result.AddError("Error 1");
+            result.AddError("Error 2");
+            var message = result.GetErrorMessage();
+            Assert.Contains("Error 1", message);
+            Assert.Contains("Error 2", message);
+            Assert.Contains("\n", message);
+        }
+
         private static PhoneManagerVariables CreateValidVariables()
         {
             return new PhoneManagerVariables

@@ -34,9 +34,8 @@ namespace teams_phonemanager.Services
         
         public TimeSpan SessionTimeout => TimeSpan.FromHours(24);
         
-        public bool IsSessionExpired => 
-            TeamsSessionDuration > SessionTimeout || 
-            GraphSessionDuration > SessionTimeout;
+        public bool IsSessionExpired =>
+            IsSessionValid && (TeamsSessionDuration > SessionTimeout || GraphSessionDuration > SessionTimeout);
         
         public void UpdateTeamsConnection(bool connected, string? account = null)
         {

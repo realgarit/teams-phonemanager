@@ -5,10 +5,7 @@ using teams_phonemanager.Services;
 using teams_phonemanager.Models;
 using System;
 using System.Threading.Tasks;
-using Avalonia.Input;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-
 
 namespace teams_phonemanager.ViewModels
 {
@@ -671,10 +668,10 @@ namespace teams_phonemanager.ViewModels
                 return true;
 
             var query = SearchResourceAccountsText.Trim();
-            return (account.DisplayName?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (account.UserPrincipalName?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (account.Identity?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (account.UsageLocation?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0);
+            return (account.DisplayName?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (account.UserPrincipalName?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (account.Identity?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (account.UsageLocation?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false);
         }
 
         private bool FilterAutoAttendant(object obj)
@@ -686,10 +683,10 @@ namespace teams_phonemanager.ViewModels
                 return true;
 
             var query = SearchAutoAttendantsText.Trim();
-            return (autoAttendant.Name?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (autoAttendant.Identity?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (autoAttendant.LanguageId?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (autoAttendant.TimeZoneId?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0);
+            return (autoAttendant.Name?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (autoAttendant.Identity?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (autoAttendant.LanguageId?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (autoAttendant.TimeZoneId?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false);
         }
 
         partial void OnSearchResourceAccountsTextChanged(string value)

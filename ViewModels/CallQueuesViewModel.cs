@@ -5,10 +5,7 @@ using teams_phonemanager.Services;
 using teams_phonemanager.Models;
 using System;
 using System.Threading.Tasks;
-using Avalonia.Input;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-
 
 namespace teams_phonemanager.ViewModels
 {
@@ -738,10 +735,10 @@ namespace teams_phonemanager.ViewModels
                 return true;
 
             var query = SearchResourceAccountsText.Trim();
-            return (account.DisplayName?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (account.UserPrincipalName?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (account.Identity?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (account.UsageLocation?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0);
+            return (account.DisplayName?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (account.UserPrincipalName?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (account.Identity?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (account.UsageLocation?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false);
         }
 
         private bool FilterCallQueue(object obj)
@@ -753,9 +750,9 @@ namespace teams_phonemanager.ViewModels
                 return true;
 
             var query = SearchCallQueuesText.Trim();
-            return (queue.Name?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (queue.Identity?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0)
-                || (queue.RoutingMethod?.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0);
+            return (queue.Name?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (queue.Identity?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (queue.RoutingMethod?.Contains(query, StringComparison.OrdinalIgnoreCase) ?? false);
         }
 
         partial void OnSearchResourceAccountsTextChanged(string value)
