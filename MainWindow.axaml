@@ -153,8 +153,12 @@
 
             <!-- Content Area -->
             <Grid Grid.Column="1" Margin="16">
-                <ContentControl Content="{Binding CurrentPage}">
-                    <ContentControl.ContentTemplate>
+                <TransitioningContentControl Content="{Binding CurrentPage}"
+                                              PageTransition="{x:Null}">
+                    <TransitioningContentControl.PageTransition>
+                        <CrossFade Duration="0:0:0.15"/>
+                    </TransitioningContentControl.PageTransition>
+                    <TransitioningContentControl.ContentTemplate>
                         <converters:PageTemplateSelector>
                             <converters:PageTemplateSelector.WelcomeTemplate>
                                 <DataTemplate>
@@ -207,8 +211,8 @@
                                 </DataTemplate>
                             </converters:PageTemplateSelector.BulkOperationsTemplate>
                         </converters:PageTemplateSelector>
-                    </ContentControl.ContentTemplate>
-                </ContentControl>
+                    </TransitioningContentControl.ContentTemplate>
+                </TransitioningContentControl>
             </Grid>
         </Grid>
 

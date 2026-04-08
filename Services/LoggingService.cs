@@ -13,6 +13,9 @@ namespace teams_phonemanager.Services
         [GeneratedRegex(@"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", RegexOptions.Compiled)]
         private static partial Regex GuidPattern();
 
+        [GeneratedRegex(@"eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]*", RegexOptions.Compiled)]
+        private static partial Regex JwtPattern();
+
         [ObservableProperty]
         private ObservableCollection<string> _logEntries = new();
 
@@ -69,6 +72,9 @@ namespace teams_phonemanager.Services
 
             // Mask GUIDs (tenant IDs, etc.)
             message = GuidPattern().Replace(message, "***-****-****-****-************");
+
+            // Mask JWT tokens (access tokens from MSAL)
+            message = JwtPattern().Replace(message, "[TOKEN REDACTED]");
 
             return message;
         }

@@ -8,7 +8,8 @@
              xmlns:local="clr-namespace:teams_phonemanager.Views"
              xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
              xmlns:converters="clr-namespace:teams_phonemanager.Converters"
-             mc:Ignorable="d" 
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     
     <!-- DataContext is set via data binding from MainWindow -->
@@ -46,12 +47,11 @@
                 </StackPanel>
 
                 <!-- Status Message -->
-                <TextBlock Grid.Row="1" Text="{Binding StatusMessage}"
-                         FontSize="13"
-                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                         TextWrapping="Wrap"
-                         Margin="0,0,0,12"
-                         IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                <ui:InfoBar Grid.Row="1"
+                           Title="{Binding StatusMessage}"
+                           IsOpen="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                           IsClosable="True"
+                           Margin="0,0,0,12"/>
 
                 <!-- Tab Control -->
                 <TabControl Grid.Row="2">

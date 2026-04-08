@@ -9,9 +9,9 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisLevel>latest</AnalysisLevel>
-    <Version>3.12.0</Version>
-    <AssemblyVersion>3.12.0</AssemblyVersion>
-    <FileVersion>3.12.0</FileVersion>
+    <Version>3.13.0</Version>
+    <AssemblyVersion>3.13.0</AssemblyVersion>
+    <FileVersion>3.13.0</FileVersion>
     
     <!-- Publish Settings for Framework-Dependent Deployment -->
     <PublishSingleFile>false</PublishSingleFile>

@@ -4,16 +4,64 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using System.ComponentModel;
 using teams_phonemanager.Services;
 
 namespace teams_phonemanager;
 
 public partial class MainWindow : Window
 {
+    private bool _isSyncingNavSelection;
+
     public MainWindow()
     {
         InitializeComponent();
         KeyDown += OnKeyDown;
+        DataContextChanged += OnDataContextChanged;
+    }
+
+    private void OnDataContextChanged(object? sender, EventArgs e)
+    {
+        if (DataContext is ViewModels.MainWindowViewModel vm)
+        {
+            vm.PropertyChanged += OnViewModelPropertyChanged;
+        }
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ViewModels.MainWindowViewModel.CurrentPage))
+        {
+            SyncNavSelectionToCurrentPage();
+        }
+    }
+
+    /// <summary>
+    /// Syncs the sidebar ListBox selection to match the current page.
+    /// This handles the case where navigation happens programmatically
+    /// (e.g. from Wizard "Edit Variables" or Welcome "Get Started").
+    /// </summary>
+    private void SyncNavSelectionToCurrentPage()
+    {
+        if (_isSyncingNavSelection) return;
+        if (DataContext is not ViewModels.MainWindowViewModel vm) return;
+
+        var listBox = this.FindControl<ListBox>("NavigationListBox");
+        if (listBox == null) return;
+
+        // Normalize page name for matching (strip spaces to match Tag values)
+        var targetTag = vm.CurrentPage.Replace(" ", "");
+
+        foreach (var item in listBox.Items)
+        {
+            if (item is ListBoxItem listBoxItem && listBoxItem.Tag is string tag && tag == targetTag)
+            {
+                _isSyncingNavSelection = true;
+                listBox.SelectedItem = listBoxItem;
+                _isSyncingNavSelection = false;
+                return;
+            }
+        }
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
@@ -35,7 +83,6 @@ public partial class MainWindow : Window
 
     private void LogDialogBackdrop_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        // Close dialog when clicking on backdrop
         if (DataContext is ViewModels.MainWindowViewModel viewModel)
         {
             viewModel.CloseLogDialogCommand.Execute(null);
@@ -44,7 +91,6 @@ public partial class MainWindow : Window
 
     private void LogDialogCard_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        // Stop event propagation so clicking on card doesn't close the dialog
         e.Handled = true;
     }
 
@@ -52,10 +98,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            // Try to find TextBox by name first (if accessible)
             var textBox = this.FindControl<TextBox>("LogView");
-
-            // If not accessible by name, try to find it in the visual tree
             if (textBox == null)
             {
                 textBox = this.FindDescendantOfType<TextBox>();
@@ -63,21 +106,16 @@ public partial class MainWindow : Window
 
             if (textBox != null)
             {
-                // Wait for text to be populated if it's empty
                 if (string.IsNullOrEmpty(textBox.Text))
                 {
-                    return; // Try again later
+                    return;
                 }
 
-                // Find the parent ScrollViewer
                 var scrollViewer = textBox.FindAncestorOfType<ScrollViewer>();
-
-                // Move caret to end
                 textBox.CaretIndex = textBox.Text?.Length ?? 0;
                 textBox.SelectionStart = textBox.CaretIndex;
                 textBox.SelectionEnd = textBox.CaretIndex;
-                
-                // Also scroll the ScrollViewer parent if available
+
                 if (scrollViewer != null)
                 {
                     scrollViewer.Offset = new Avalonia.Vector(0, scrollViewer.Extent.Height);
@@ -94,14 +132,12 @@ public partial class MainWindow : Window
     {
         if (sender is TextBox textBox)
         {
-            // Scroll to end when text changes (new log entries)
             Dispatcher.UIThread.Post(() =>
             {
                 textBox.CaretIndex = textBox.Text?.Length ?? 0;
                 textBox.SelectionStart = textBox.CaretIndex;
                 textBox.SelectionEnd = textBox.CaretIndex;
-                
-                // Find the parent ScrollViewer and scroll it too
+
                 var scrollViewer = textBox.FindAncestorOfType<ScrollViewer>();
                 if (scrollViewer != null)
                 {
@@ -113,7 +149,6 @@ public partial class MainWindow : Window
 
     private void SettingsOverlay_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        // Close settings when clicking on the overlay
         if (DataContext is ViewModels.MainWindowViewModel viewModel)
         {
             viewModel.CloseSettingsCommand.Execute(null);
@@ -122,6 +157,8 @@ public partial class MainWindow : Window
 
     private void NavigationListBox_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
+        if (_isSyncingNavSelection) return;
+
         if (sender is ListBox listBox && listBox.SelectedItem is ListBoxItem item && item.Tag is string page)
         {
             if (DataContext is ViewModels.MainWindowViewModel viewModel)
@@ -134,7 +171,6 @@ public partial class MainWindow : Window
     protected override void OnClosed(EventArgs e)
     {
         base.OnClosed(e);
-        // PowerShell context is now managed by DI container and will be disposed automatically
         var psContext = Program.Services?.GetService(typeof(Services.Interfaces.IPowerShellContextService)) as IDisposable;
         psContext?.Dispose();
     }
