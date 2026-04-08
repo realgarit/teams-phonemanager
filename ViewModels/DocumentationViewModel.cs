@@ -29,7 +29,7 @@ namespace teams_phonemanager.ViewModels
         private record CallFlow(string AaName, string FlowName, string MenuName);
         private record ChaInfo(string AaName, string Type, string ScheduleId, string CallFlowId);
         private record AssocInfo(string RaName, string RaId, string ConfigId, string ConfigType);
-        private record AgentInfo(string CqName, string ObjectId, string OptIn);
+        private record AgentInfo(string CqName, string ObjectId, string OptIn, string DisplayName, string Upn);
         private record PhoneInfo(string Number, string Type, string AssignedTo, string Status, string Activation, string City, string Capability);
         private record UserInfo(string Name, string Upn, string LineUri, string VoiceRoutingPolicy, string CallingPolicy, string DialPlan);
         private record ScheduleInfo(string Name, string Id, string Type, int DateCount);
@@ -290,8 +290,10 @@ namespace teams_phonemanager.ViewModels
                 else if (line.StartsWith("DOCDATA_CQ_AGENT:"))
                 {
                     var p = line.Substring(17).Split('|');
-                    if (p.Length >= 3)
-                        agentList.Add(new AgentInfo(p[0].Trim(), p[1].Trim(), p[2].Trim()));
+                    if (p.Length >= 5)
+                        agentList.Add(new AgentInfo(p[0].Trim(), p[1].Trim(), p[2].Trim(), p[3].Trim(), p[4].Trim()));
+                    else if (p.Length >= 3)
+                        agentList.Add(new AgentInfo(p[0].Trim(), p[1].Trim(), p[2].Trim(), p[1].Trim(), ""));
                 }
                 else if (line.StartsWith("DOCDATA_CQ_OVERFLOW:"))
                 {
@@ -599,11 +601,16 @@ namespace teams_phonemanager.ViewModels
                     if (agents.Count > 0)
                     {
                         doc.AppendLine($"  ║");
-                        doc.AppendLine($"  ║  Agent List:");
+                        doc.AppendLine($"  ║  Agent List (✓ = opted in, ✗ = opted out):");
                         foreach (var agent in agents)
                         {
                             var optIn = agent.OptIn.Equals("True", StringComparison.OrdinalIgnoreCase) ? "✓" : "✗";
-                            doc.AppendLine($"  ║    {optIn}  {agent.ObjectId}");
+                            var agentLabel = !string.IsNullOrWhiteSpace(agent.Upn)
+                                ? $"{agent.DisplayName} ({agent.Upn})"
+                                : !string.IsNullOrWhiteSpace(agent.DisplayName) && agent.DisplayName != agent.ObjectId
+                                    ? agent.DisplayName
+                                    : agent.ObjectId;
+                            doc.AppendLine($"  ║    {optIn}  {agentLabel}");
                         }
                     }
 

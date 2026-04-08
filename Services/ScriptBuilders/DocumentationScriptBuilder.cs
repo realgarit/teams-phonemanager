@@ -86,10 +86,19 @@ try {
             $agentCount = if ($cq.Agents) { $cq.Agents.Count } else { 0 }
             Write-Host ""DOCDATA_CQ: $($cq.Name)|$($cq.Identity)|$($cq.RoutingMethod)|$($cq.AgentAlertTime)|$($cq.LanguageId)|$agentCount|$($cq.OverflowThreshold)|$($cq.TimeoutThreshold)|$($cq.OverflowAction)|$($cq.TimeoutAction)""
             
-            # Agent details
+            # Agent details (resolve display name and UPN)
             if ($cq.Agents) {
                 foreach ($agent in $cq.Agents) {
-                    Write-Host ""DOCDATA_CQ_AGENT: $($cq.Name)|$($agent.ObjectId)|$($agent.OptIn)""
+                    $agentName = $agent.ObjectId
+                    $agentUpn = """"
+                    try {
+                        $agentUser = Get-MgUser -UserId $agent.ObjectId -Property DisplayName,UserPrincipalName -ErrorAction SilentlyContinue
+                        if ($agentUser) {
+                            $agentName = $agentUser.DisplayName
+                            $agentUpn = $agentUser.UserPrincipalName
+                        }
+                    } catch { }
+                    Write-Host ""DOCDATA_CQ_AGENT: $($cq.Name)|$($agent.ObjectId)|$($agent.OptIn)|$agentName|$agentUpn""
                 }
             }
 
