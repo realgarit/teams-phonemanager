@@ -112,6 +112,17 @@ namespace teams_phonemanager.Tests
         }
 
         [Fact]
+        public void Log_SanitizesJwtTokens()
+        {
+            var fakeToken = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature_here";
+            _loggingService.Log($"Token: {fakeToken}", LogLevel.Info);
+
+            var entry = _loggingService.LogEntries[0];
+            Assert.DoesNotContain("eyJ", entry);
+            Assert.Contains("[TOKEN REDACTED]", entry);
+        }
+
+        [Fact]
         public void LogLevel_Ordering_InfoIsLowest()
         {
             Assert.True(LogLevel.Info < LogLevel.Success);

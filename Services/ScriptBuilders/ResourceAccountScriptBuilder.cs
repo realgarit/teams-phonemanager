@@ -88,10 +88,11 @@ catch {
         {
             var sanitizedUpn = _sanitizer.SanitizeString(upn);
             var sanitizedDisplayName = _sanitizer.SanitizeString(displayName);
+            var sanitizedAppId = _sanitizer.SanitizeString(appId);
 
             return $@"
 try {{
-    New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedUpn}"" -ApplicationId ""{appId}"" -DisplayName ""{sanitizedDisplayName}""
+    New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedUpn}"" -ApplicationId ""{sanitizedAppId}"" -DisplayName ""{sanitizedDisplayName}""
     Write-Host ""SUCCESS: Resource account created successfully""
 }}
 catch {{

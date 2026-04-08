@@ -87,16 +87,14 @@ namespace teams_phonemanager.Services
             await _semaphore.WaitAsync(cancellationToken);
             try
             {
-                // SECURITY: Set environment variables if provided (e.g., for secure token passing)
-                // These will be cleared after command execution
+                // SECURITY: Set variables in the PowerShell runspace only (not process-level env vars)
+                // This prevents other processes from reading tokens via /proc/<pid>/environ
                 var varsToClear = new List<string>();
                 if (environmentVariables != null)
                 {
                     foreach (var kvp in environmentVariables)
                     {
                         _runspace.SessionStateProxy.SetVariable(kvp.Key, kvp.Value);
-                        // Also set as environment variable for PowerShell scripts
-                        Environment.SetEnvironmentVariable(kvp.Key, kvp.Value);
                         varsToClear.Add(kvp.Key);
                     }
                 }
@@ -152,13 +150,12 @@ $ErrorActionPreference = 'Continue'
                 }
                 finally
                 {
-                    // SECURITY: Clear sensitive environment variables immediately after execution
+                    // SECURITY: Clear sensitive runspace variables immediately after execution
                     foreach (var varName in varsToClear)
                     {
                         try
                         {
                             _runspace.SessionStateProxy.SetVariable(varName, null);
-                            Environment.SetEnvironmentVariable(varName, null);
                         }
                         catch
                         {
