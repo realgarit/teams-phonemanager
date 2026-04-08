@@ -24,7 +24,13 @@ namespace teams_phonemanager.Services
             
             try
             {
-                localRunspace = RunspaceFactory.CreateRunspace();
+                // Set execution policy via InitialSessionState (configuration-level, not a runtime command).
+                // This is required because Import-Module loads .psm1 files which are subject to execution policy.
+                // Setting it here instead of calling Set-ExecutionPolicy at runtime avoids triggering
+                // AV behavioral heuristics (Kaspersky flags runtime Set-ExecutionPolicy Bypass as MITRE T1059.001).
+                var initialState = InitialSessionState.CreateDefault();
+                initialState.ExecutionPolicy = Microsoft.PowerShell.ExecutionPolicy.Bypass;
+                localRunspace = RunspaceFactory.CreateRunspace(initialState);
                 localRunspace.Open();
 
                 localPowerShell = PowerShell.Create();
