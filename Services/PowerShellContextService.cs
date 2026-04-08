@@ -34,7 +34,7 @@ namespace teams_phonemanager.Services
                 _runspace = localRunspace;
                 _powerShell = localPowerShell;
 
-                InitializeExecutionPolicy();
+                InitializeRunspacePreferences();
                 _loggingService.Log("PowerShell context service initialized with persistent runspace", LogLevel.Info);
             }
             catch
@@ -46,27 +46,24 @@ namespace teams_phonemanager.Services
             }
         }
 
-        private void InitializeExecutionPolicy()
+        private void InitializeRunspacePreferences()
         {
             try
             {
-                _powerShell.Commands.Clear();
-                _powerShell.AddCommand("Set-ExecutionPolicy")
-                    .AddParameter("ExecutionPolicy", ConstantsService.PowerShell.ExecutionPolicy)
-                    .AddParameter("Scope", "Process")
-                    .AddParameter("Force", true)
-                    .Invoke();
+                // Note: Set-ExecutionPolicy is intentionally NOT called here.
+                // When hosting PowerShell via System.Management.Automation with our own Runspace,
+                // execution policy does not apply to AddScript() calls - only to .ps1 file execution.
+                // Calling Set-ExecutionPolicy Bypass is unnecessary and triggers AV heuristics
+                // (MITRE ATT&CK T1059.001).
 
                 _powerShell.Commands.Clear();
-                // Set InformationPreference using command-based approach instead of script
                 _powerShell.AddCommand("Set-Variable")
                     .AddParameter("Name", "InformationPreference")
                     .AddParameter("Value", "Continue")
                     .Invoke();
 
-                _powerShell.Commands.Clear();
-                _powerShell.AddScript("$env:MSAL_DISABLE_WAM = 'true'; $env:AZURE_IDENTITY_DISABLE_WAM = 'true'");
-                _powerShell.Invoke();
+                // WAM bypass flags are already set at process level in Program.cs Main().
+                // No need to set them again in the runspace.
             }
             catch (Exception ex)
             {
@@ -87,14 +84,15 @@ namespace teams_phonemanager.Services
             await _semaphore.WaitAsync(cancellationToken);
             try
             {
-                // SECURITY: Set variables in the PowerShell runspace only (not process-level env vars)
-                // This prevents other processes from reading tokens via /proc/<pid>/environ
+                // Set environment variables for the PowerShell script to consume via $env:VAR_NAME.
+                // These are set at process level because runspace session variables don't map to $env: scope.
+                // Cleared in the finally block immediately after execution to minimize exposure window.
                 var varsToClear = new List<string>();
                 if (environmentVariables != null)
                 {
                     foreach (var kvp in environmentVariables)
                     {
-                        _runspace.SessionStateProxy.SetVariable(kvp.Key, kvp.Value);
+                        Environment.SetEnvironmentVariable(kvp.Key, kvp.Value);
                         varsToClear.Add(kvp.Key);
                     }
                 }
@@ -150,12 +148,12 @@ $ErrorActionPreference = 'Continue'
                 }
                 finally
                 {
-                    // SECURITY: Clear sensitive runspace variables immediately after execution
+                    // SECURITY: Clear sensitive environment variables immediately after execution
                     foreach (var varName in varsToClear)
                     {
                         try
                         {
-                            _runspace.SessionStateProxy.SetVariable(varName, null);
+                            Environment.SetEnvironmentVariable(varName, null);
                         }
                         catch
                         {
