@@ -54,6 +54,13 @@ try {{
 
     Update-MgUser -UserId ""{sanitizedRacqUPN}"" -UsageLocation ""{sanitizedUsageLocation}""
 
+    Write-Host ""Assigning Teams Phone Resource License...""
+    $SkuId = ""{_sanitizer.SanitizeString(variables.SkuId)}""
+    Set-MgUserLicense -UserId ""{sanitizedRacqUPN}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
+
+    Write-Host """ + ConstantsService.Messages.LicenseWaitingMessage + @"""
+    Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
+
     New-CsCallQueue `
     -Name ""{sanitizedCqDisplayName}"" `
     -RoutingMethod Attendant `

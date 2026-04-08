@@ -51,10 +51,16 @@ catch {
             return $@"
 New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedRaaaUPN}"" -ApplicationId ""{variables.CsAppAaId}"" -DisplayName ""{sanitizedRaaaDisplayName}""
 
+Write-Host ""{ConstantsService.Messages.WaitingMessage}""
+Start-Sleep -Seconds {ConstantsService.PowerShell.DefaultWaitTimeSeconds}
+
 Update-MgUser -UserId ""{sanitizedRaaaUPN}"" -UsageLocation ""{sanitizedUsageLocation}""
 
 $SkuId = ""{sanitizedSkuId}""
 Set-MgUserLicense -UserId ""{sanitizedRaaaUPN}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
+
+Write-Host ""{ConstantsService.Messages.LicenseWaitingMessage}""
+Start-Sleep -Seconds {ConstantsService.PowerShell.DefaultWaitTimeSeconds}
 
 Set-CsPhoneNumberAssignment -Identity ""{sanitizedRaaaUPN}"" -PhoneNumber ""{sanitizedPhoneNumber}"" -PhoneNumberType ""{sanitizedPhoneNumberType}""
 
