@@ -48,14 +48,14 @@
             <Button Command="{Binding NavigateToGetStartedCommand}"
                     Classes="IconTextCentered" MinWidth="180">
                 <StackPanel Orientation="Horizontal">
-                    <fi:SymbolIcon Symbol="Rocket" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                    <fi:SymbolIcon Symbol="Rocket"/>
                     <TextBlock Text="Get Started"/>
                 </StackPanel>
             </Button>
             <Button Command="{Binding OpenDocumentationCommand}"
                     Classes="IconTextCentered" MinWidth="180">
                 <StackPanel Orientation="Horizontal">
-                    <fi:SymbolIcon Symbol="Open" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                    <fi:SymbolIcon Symbol="Open"/>
                     <TextBlock Text="GitHub"/>
                 </StackPanel>
             </Button>

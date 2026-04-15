@@ -24,6 +24,12 @@
             <Setter Property="Background" Value="{DynamicResource TeamsPrimaryBrush}"/>
             <Setter Property="Padding" Value="16"/>
         </Style>
+        <Style Selector="Border.header TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style Selector="Border.header fi|SymbolIcon">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
     </Window.Styles>
 
     <Grid x:Name="MainGrid">
@@ -36,24 +42,19 @@
         <!-- Top Bar -->
         <Border Grid.Row="0" Classes="header">
             <DockPanel LastChildFill="False">
-                <TextBlock Text="Teams Phone Manager" 
+                <TextBlock Text="Teams Phone Manager"
                          FontSize="18"
                          FontWeight="SemiBold"
-                         VerticalAlignment="Center"
-                         Foreground="White"/>
+                         VerticalAlignment="Center"/>
                 <Button x:Name="SettingsButton"
-                        DockPanel.Dock="Right" 
+                        DockPanel.Dock="Right"
                         Command="{Binding ToggleSettingsCommand}"
-                        Background="Transparent"
-                        Foreground="White"
                         Width="40"
                         Height="40"
                         Classes="IconOnly"
                         AutomationProperties.Name="Settings"
                         ToolTip.Tip="Settings">
-                    <fi:SymbolIcon 
-                              Symbol="Settings"
-                              Foreground="White"/>
+                    <fi:SymbolIcon Symbol="Settings"/>
                 </Button>
             </DockPanel>
         </Border>
@@ -71,7 +72,6 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                
                 <ListBox x:Name="NavigationListBox" Grid.Column="0" Classes="nav"
                          SelectionChanged="NavigationListBox_SelectionChanged">
                     <ListBoxItem Tag="Welcome" Classes="nav" AutomationProperties.Name="Welcome">
@@ -144,7 +144,6 @@
                         </StackPanel>
                     </ListBoxItem>
                 </ListBox>
-                
                 <Border Grid.Column="1"
                         Background="{DynamicResource DividerStrokeColorDefaultBrush}"
                         Width="1"
@@ -272,8 +271,6 @@
                         <fi:SymbolIcon Grid.Column="0"
                                   FontSize="16"
                                   Symbol="Code"
-                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-
                                   VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="1"
                                  Text="{Binding LatestLogEntry}"
@@ -284,7 +281,6 @@
                         <fi:SymbolIcon Grid.Column="2"
                                   FontSize="14"
                                   Symbol="ChevronRight"
-                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                                   Margin="8,0,0,0"
                                   Opacity="0.6"
                                   VerticalAlignment="Center"/>
@@ -329,31 +325,23 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        
                         <!-- Dialog Header -->
                         <Border Grid.Row="0" Classes="header" Padding="16">
                             <DockPanel LastChildFill="False">
-                                <TextBlock Text="Log Viewer" 
-                                         
+                                <TextBlock Text="Log Viewer"
                                          FontWeight="SemiBold"
-                                         Foreground="White"
                                          VerticalAlignment="Center"/>
-                                <Button DockPanel.Dock="Right" 
-                                        Background="Transparent"
-                                        Foreground="White"
+                                <Button DockPanel.Dock="Right"
                                         Command="{Binding CloseLogDialogCommand}"
                                         Width="40"
                                         Height="40"
                                         Classes="IconOnly"
                                         AutomationProperties.Name="Close Log Viewer"
                                         ToolTip.Tip="Close">
-                                    <fi:SymbolIcon 
-                                             Symbol="Dismiss"
-                                             Foreground="White"/>
+                                    <fi:SymbolIcon Symbol="Dismiss"/>
                                 </Button>
                             </DockPanel>
                         </Border>
-                        
                         <!-- Log Content -->
                         <ScrollViewer x:Name="LogScrollViewer"
                                     Grid.Row="1"
@@ -379,7 +367,6 @@
                                 </TextBox.ContextMenu>
                             </TextBox>
                         </ScrollViewer>
-                        
                         <!-- Dialog Footer -->
                         <StackPanel Grid.Row="2" 
                                    Orientation="Horizontal" 
@@ -389,20 +376,14 @@
                             <Button Command="{Binding ClearLogCommand}"
                                     Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon FontSize="16"
-                                             Symbol="Delete"
-                                             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                             />
+                                    <fi:SymbolIcon FontSize="16" Symbol="Delete"/>
                                     <TextBlock Text="Clear Log" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                             <Button Command="{Binding CloseLogDialogCommand}"
                                     Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon FontSize="16"
-                                             Symbol="Dismiss"
-                                             Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                             />
+                                    <fi:SymbolIcon FontSize="16" Symbol="Dismiss"/>
                                     <TextBlock Text="Close" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
@@ -434,7 +415,6 @@
                 </Style>
             </Border.Styles>
         </Border>
-        
         <!-- Side panel -->
         <Border Grid.RowSpan="3"
                 Background="{DynamicResource SolidBackgroundFillColorBase}"
@@ -451,31 +431,24 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                
                 <!-- Header -->
                 <Border Grid.Row="0" Classes="header" Padding="24,16">
                     <DockPanel LastChildFill="False">
-                        <TextBlock Text="Settings" 
+                        <TextBlock Text="Settings"
                                  FontSize="18"
                                  FontWeight="SemiBold"
-                                 Foreground="White"
                                  VerticalAlignment="Center"/>
                         <Button DockPanel.Dock="Right" 
-                                Background="Transparent"
-                                Foreground="White"
                                 Command="{Binding CloseSettingsCommand}"
                                 Width="36"
                                 Height="36"
                                 Classes="IconOnly"
                                 AutomationProperties.Name="Close Settings"
                                 ToolTip.Tip="Close">
-                            <fi:SymbolIcon 
-                                     Symbol="Dismiss"
-                                     Foreground="White"/>
+                            <fi:SymbolIcon Symbol="Dismiss"/>
                         </Button>
                     </DockPanel>
                 </Border>
-                
                 <!-- Content -->
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="24,20" Spacing="20">

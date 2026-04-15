@@ -9,7 +9,6 @@
              x:Class="teams_phonemanager.Views.GetStartedView"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="1000">
-    
     <!-- DataContext is set via data binding from MainWindow -->
 
     <UserControl.Resources>
@@ -60,7 +59,6 @@
                                      AutomationProperties.Name="Step 1: Completed"
                                      ToolTip.Tip="Step 1: Completed"/>
                     </Panel>
-                    
                     <!-- Content -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
                         <TextBlock Text="Check PowerShell Modules"
@@ -71,7 +69,6 @@
                                  Opacity="0.7"
                                  TextWrapping="Wrap"/>
                     </StackPanel>
-                    
                     <!-- Action -->
                     <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="24,0,0,0">
                         <Button Command="{Binding CheckModulesCommand}"
@@ -116,7 +113,6 @@
                                      AutomationProperties.Name="Step 2: Completed"
                                      ToolTip.Tip="Step 2: Completed"/>
                     </Panel>
-                    
                     <!-- Content -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
                         <TextBlock Text="Connect to Microsoft Teams"
@@ -127,7 +123,6 @@
                                  Opacity="0.7"
                                  TextWrapping="Wrap"/>
                     </StackPanel>
-                    
                     <!-- Action -->
                     <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="24,0,0,0">
                         <Button Command="{Binding ConnectTeamsCommand}"
@@ -183,7 +178,6 @@
                                      AutomationProperties.Name="Step 3: Completed"
                                      ToolTip.Tip="Step 3: Completed"/>
                     </Panel>
-                    
                     <!-- Content -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
                         <TextBlock Text="Connect to Microsoft Graph"
@@ -194,7 +188,6 @@
                                  Opacity="0.7"
                                  TextWrapping="Wrap"/>
                     </StackPanel>
-                    
                     <!-- Action -->
                     <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="24,0,0,0">
                          <Button Command="{Binding ConnectGraphCommand}"
@@ -253,7 +246,6 @@
                                  FontSize="14"
                                  Opacity="0.7"/>
                     </StackPanel>
-                    
                     <Button Grid.Column="1"
                             Command="{Binding NavigateToPageCommand}"
                             CommandParameter="Variables"
