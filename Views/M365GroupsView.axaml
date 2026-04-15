@@ -11,7 +11,6 @@
              x:Class="teams_phonemanager.Views.M365GroupsView"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
-    
     <!-- DataContext is set via data binding from MainWindow -->
 
     <UserControl.Resources>
@@ -70,20 +69,17 @@
 
                     <Button Grid.Column="0"
                             Command="{Binding RetrieveM365GroupsCommand}"
-                            
                             Margin="0,0,16,0" Classes="IconText">
                         <StackPanel Orientation="Horizontal">
-                            <fi:SymbolIcon  Symbol="ArrowSync" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <fi:SymbolIcon  Symbol="ArrowSync"/>
                             <TextBlock Text="Retrieve Groups" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
-                    
                     <Button Grid.Column="1"
                             Command="{Binding OpenCreateGroupDialogCommand}"
-                            
                             Margin="0,0,16,0" Classes="IconText">
                         <StackPanel Orientation="Horizontal">
-                            <fi:SymbolIcon  Symbol="Add" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                            <fi:SymbolIcon  Symbol="Add"/>
                             <TextBlock Text="Create New Group" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
@@ -169,13 +165,13 @@
                             <Button Command="{Binding NavigateToVariablesPageCommand}"
                                      Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon  Symbol="Code" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <fi:SymbolIcon  Symbol="Code"/>
                                     <TextBlock Text="Go to Variables" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                             <Button Command="{Binding CheckM365GroupCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon  Symbol="Checkmark" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <fi:SymbolIcon  Symbol="Checkmark"/>
                                     <TextBlock Text="Continue" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
@@ -210,14 +206,12 @@
                         <StackPanel>
                         <TextBlock Text="Create New M365 Group"
                                  Classes="dialog-title"/>
-                        
                         <TextBlock Text="Group Name:"
                                  FontSize="16"
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding NewGroupName}"
                                Margin="0,0,0,16"/>
-                        
                         <TextBlock Text="Description (Optional):"
                                  FontSize="16"
                                  FontWeight="SemiBold"
@@ -228,26 +222,24 @@
                                Height="60"
                                VerticalContentAlignment="Top"
                                Margin="0,0,0,16"/>
-                        
                         <TextBlock Text="The group name is auto-generated from your variables. You can modify it if needed."
                                  FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
-                        
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right"
                                   Spacing="16">
                             <Button Command="{Binding CloseCreateGroupDialogCommand}"
                                     Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <fi:SymbolIcon Symbol="Dismiss"/>
                                     <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                             <Button Command="{Binding CreateNewGroupCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon  Symbol="Add" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <fi:SymbolIcon  Symbol="Add"/>
                                     <TextBlock Text="Create Group" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>

@@ -38,7 +38,7 @@
                                 Classes="IconText"
                                 IsEnabled="{Binding !IsBusy}">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="ArrowDownload" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                <fi:SymbolIcon Symbol="ArrowDownload"/>
                                 <TextBlock Text="Export Documentation" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -47,7 +47,7 @@
                                 Classes="IconText"
                                 IsEnabled="{Binding !IsBusy}">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="Copy" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                <fi:SymbolIcon Symbol="Copy"/>
                                 <TextBlock Text="Copy to Clipboard" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -59,7 +59,6 @@
                              FontSize="13"
                              Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                              IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-                    
                     <!-- Progress indicator -->
                     <ProgressBar IsIndeterminate="True"
                                  IsVisible="{Binding IsExporting}"
