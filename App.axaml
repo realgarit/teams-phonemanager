@@ -8,7 +8,6 @@
              RequestedThemeVariant="Dark">
     <Application.Styles>
         <fa:FluentAvaloniaTheme />
-        
         <!-- Global Control Styles -->
         <Style Selector="TextBox">
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -34,7 +33,6 @@
             <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Padding" Value="16"/>
         </Style>
-        
         <Style Selector="Border.dialog">
             <Setter Property="Background" Value="{DynamicResource SolidBackgroundFillColorBase}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeColorDefaultBrush}"/>
@@ -42,7 +40,6 @@
             <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Padding" Value="16"/>
         </Style>
-        
         <!-- Reusable Button Styles for Icon+Text patterns -->
         <Style Selector="Button.IconText">
             <Setter Property="Height" Value="40"/>
@@ -50,14 +47,12 @@
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="12,0"/>
         </Style>
-        
         <Style Selector="Button.IconTextLarge">
             <Setter Property="Height" Value="50"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="16,0"/>
         </Style>
-        
         <!-- Centered Icon+Text Button (for Welcome page) -->
         <Style Selector="Button.IconTextCentered">
             <Setter Property="Height" Value="50"/>
@@ -65,14 +60,14 @@
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="16,0"/>
         </Style>
-        
         <!-- Icon Only Button (for Settings, etc.) -->
         <Style Selector="Button.IconOnly">
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Padding" Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
         </Style>
-        
         <!--
             Icon styles - Cross-platform vertical centering fix
 
@@ -84,7 +79,7 @@
             as icons may have custom FontSize values that need to scale naturally.
         -->
 
-        <!-- Default: Standard icon with right margin for icon+text spacing -->
+        <!-- Default: Standard icon styling -->
         <Style Selector="fi|SymbolIcon">
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
@@ -92,9 +87,24 @@
             <Setter Property="Margin" Value="0,0,8,0"/>
         </Style>
 
-        <!-- NavBar override: No right margin (uses StackPanel Spacing) -->
+        <!-- Ensure icons inherit theme foreground in all common containers -->
         <Style Selector="ListBoxItem fi|SymbolIcon">
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
             <Setter Property="Margin" Value="0"/>
+        </Style>
+        <Style Selector="Button fi|SymbolIcon">
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+        </Style>
+        <Style Selector="StackPanel fi|SymbolIcon">
+            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+        </Style>
+
+        <!-- Accent button: white text/icons on Teams purple background -->
+        <Style Selector="Button.accent fi|SymbolIcon">
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style Selector="Button.accent TextBlock">
+            <Setter Property="Foreground" Value="White"/>
         </Style>
 
         <!-- IconOnly override: No margin (centered in button) -->
@@ -155,12 +165,10 @@
             <Setter Property="Margin" Value="0,0,0,16"/>
         </Style>
     </Application.Styles>
-    
     <Application.Resources>
         <!-- Value Converters -->
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
-        
         <!-- Note: Icon geometries removed - now using FluentIcons.Avalonia SymbolIcon -->
 
         <!-- Teams Violet Color Palette -->

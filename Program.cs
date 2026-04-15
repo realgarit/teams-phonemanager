@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using teams_phonemanager.Services;
@@ -80,7 +79,6 @@ class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
-            .LogToTrace()
-            .UseReactiveUI();
+            .LogToTrace();
 }
 

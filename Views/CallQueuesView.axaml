@@ -11,7 +11,6 @@
              xmlns:ui="using:FluentAvalonia.UI.Controls"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
-    
     <!-- DataContext is set via data binding from MainWindow -->
 
     <UserControl.Resources>
@@ -55,7 +54,6 @@
 
                 <!-- Tab Control -->
                 <TabControl Grid.Row="2">
-                    
                     <!-- Resource Accounts Tab -->
                     <TabItem Header="Resource Accounts">
                         <Grid Margin="16">
@@ -80,7 +78,7 @@
                                         AutomationProperties.Name="Retrieve Resource Accounts"
                                         Margin="0,0,16,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
-                                        <fi:SymbolIcon  Symbol="ArrowSync" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <fi:SymbolIcon  Symbol="ArrowSync"/>
                                         <TextBlock Text="Retrieve Accounts" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
@@ -91,7 +89,7 @@
                                         AutomationProperties.Name="Create Resource Account"
                                         Margin="0,0,8,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
-                                        <fi:SymbolIcon  Symbol="PersonAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <fi:SymbolIcon  Symbol="PersonAdd"/>
                                         <TextBlock Text="Create Account" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
@@ -167,7 +165,7 @@
                                         AutomationProperties.Name="Retrieve Call Queues"
                                         Margin="0,0,16,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
-                                        <fi:SymbolIcon  Symbol="ArrowSync" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <fi:SymbolIcon  Symbol="ArrowSync"/>
                                         <TextBlock Text="Retrieve Queues" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
@@ -178,7 +176,7 @@
                                         AutomationProperties.Name="Create Call Queue"
                                         Margin="0,0,8,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
-                                        <fi:SymbolIcon  Symbol="CallAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                        <fi:SymbolIcon  Symbol="CallAdd"/>
                                         <TextBlock Text="Create Queue" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Button>
@@ -254,7 +252,7 @@
                                                 Command="{Binding OpenCreateResourceAccountDialogCommand}"
                                                 HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon  Symbol="PersonAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <fi:SymbolIcon  Symbol="PersonAdd"/>
                                                 <TextBlock Text="Create Resource Account" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
@@ -276,7 +274,7 @@
                                                 Command="{Binding OpenUpdateUsageLocationDialogCommand}"
                                                 HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon  Symbol="Location" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <fi:SymbolIcon  Symbol="Location"/>
                                                 <TextBlock Text="Update Usage Location" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
@@ -298,7 +296,7 @@
                                                 Command="{Binding AssignLicenseCommand}"
                                                 HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon  Symbol="Certificate" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <fi:SymbolIcon  Symbol="Certificate"/>
                                                 <TextBlock Text="Assign License" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
@@ -320,7 +318,7 @@
                                                 Command="{Binding GetM365GroupIdCommand}"
                                                 HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon  Symbol="PersonSearch" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <fi:SymbolIcon  Symbol="PersonSearch"/>
                                                 <TextBlock Text="Get M365 Group ID" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
@@ -342,7 +340,7 @@
                                                 Command="{Binding OpenCreateCallQueueDialogCommand}"
                                                 HorizontalAlignment="Left" Classes="IconText">
                     <StackPanel Orientation="Horizontal">
-                        <fi:SymbolIcon  Symbol="CallAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                        <fi:SymbolIcon  Symbol="CallAdd"/>
                         <TextBlock Text="Create Call Queue" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Button>
@@ -364,7 +362,7 @@
                                                 Command="{Binding OpenAssociateDialogCommand}"
                                                 HorizontalAlignment="Left" Classes="IconText">
                                             <StackPanel Orientation="Horizontal">
-                                                <fi:SymbolIcon  Symbol="Link" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                                <fi:SymbolIcon  Symbol="Link"/>
                                                 <TextBlock Text="Associate Account" VerticalAlignment="Center"/>
                                             </StackPanel>
                                         </Button>
@@ -401,40 +399,36 @@
                         <StackPanel>
                         <TextBlock Text="Create Resource Account"
                                  Classes="dialog-title"/>
-                        
                         <TextBlock Text="UPN:"
                                  FontSize="16"
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding ResourceAccountUpn}"
                                Margin="0,0,0,16"/>
-                        
                         <TextBlock Text="Display Name:"
                                  FontSize="16"
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding ResourceAccountDisplayName}"
                                Margin="0,0,0,16"/>
-                        
                         <TextBlock Text="The values are auto-generated from your variables. You can modify them if needed."
                                  FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
-                        
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right"
                                   Spacing="16">
                             <Button Command="{Binding CloseCreateResourceAccountDialogCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <fi:SymbolIcon Symbol="Dismiss"/>
                                     <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                             <Button
                                     Command="{Binding CreateResourceAccountCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon  Symbol="PersonAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <fi:SymbolIcon  Symbol="PersonAdd"/>
                                     <TextBlock Text="Create Account" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
@@ -469,7 +463,6 @@
                         <StackPanel>
                         <TextBlock Text="Update Usage Location"
                                  Classes="dialog-title"/>
-                        
                         <TextBlock Text="Resource Account UPN:"
                                  FontSize="16"
                                  FontWeight="SemiBold"
@@ -477,26 +470,24 @@
                         <TextBox Text="{Binding ResourceAccountUpn}"
                                IsReadOnly="True"
                                Margin="0,0,0,16"/>
-                        
                         <TextBlock Text="This will update the usage location for the resource account. The value is taken from your variables."
                                  FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
-                        
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right"
                                   Spacing="16">
                             <Button Command="{Binding CloseUpdateUsageLocationDialogCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <fi:SymbolIcon Symbol="Dismiss"/>
                                     <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                             <Button
                                     Command="{Binding UpdateUsageLocationCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon  Symbol="Location" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <fi:SymbolIcon  Symbol="Location"/>
                                     <TextBlock Text="Update Location" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
@@ -531,14 +522,12 @@
                         <StackPanel>
                         <TextBlock Text="Create Call Queue"
                                  Classes="dialog-title"/>
-                        
                         <TextBlock Text="Call Queue Name:"
                                  FontSize="16"
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding CallQueueName}"
                                Margin="0,0,0,16"/>
-                        
                         <TextBlock Text="M365 Group ID:"
                                  FontSize="16"
                                  FontWeight="SemiBold"
@@ -550,26 +539,24 @@
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
-                        
                         <TextBlock Text="The call queue name is auto-generated from your variables. Use the 'Get M365 Group ID' button to retrieve the Group ID."
                                  FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
-                        
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right"
                                   Spacing="16">
                             <Button Command="{Binding CloseCreateCallQueueDialogCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <fi:SymbolIcon Symbol="Dismiss"/>
                                     <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                             <Button
                                     Command="{Binding CreateCallQueueCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon  Symbol="CallAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <fi:SymbolIcon  Symbol="CallAdd"/>
                                     <TextBlock Text="Create Queue" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
@@ -604,40 +591,36 @@
                         <StackPanel>
                         <TextBlock Text="Associate Resource Account with Call Queue"
                                  Classes="dialog-title"/>
-                        
                         <TextBlock Text="Resource Account UPN:"
                                  FontSize="16"
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding ResourceAccountUpn}"
                                Margin="0,0,0,16"/>
-                        
                         <TextBlock Text="Call Queue Name:"
                                  FontSize="16"
                                  FontWeight="SemiBold"
                                  Margin="0,0,0,8"/>
                         <TextBox Text="{Binding CallQueueName}"
                                Margin="0,0,0,16"/>
-                        
                         <TextBlock Text="This will associate the resource account with the call queue to complete the setup."
                                  FontSize="12"
                                  Opacity="0.7"
                                  TextWrapping="Wrap"
                                  Margin="0,0,0,16"/>
-                        
                         <StackPanel Orientation="Horizontal" 
                                   HorizontalAlignment="Right"
                                   Spacing="16">
                             <Button Command="{Binding CloseAssociateDialogCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon Symbol="Dismiss" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <fi:SymbolIcon Symbol="Dismiss"/>
                                     <TextBlock Text="Cancel" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                             <Button
                                     Command="{Binding AssociateResourceAccountWithCallQueueCommand}" Classes="IconText">
                                 <StackPanel Orientation="Horizontal">
-                                    <fi:SymbolIcon  Symbol="Link" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                    <fi:SymbolIcon  Symbol="Link"/>
                                     <TextBlock Text="Associate" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
@@ -659,7 +642,6 @@
                                IsIndeterminate="True"
                                Width="50"
                                Margin="0,0,0,16"/>
-                
                     <!-- Waiting Message -->
                     <TextBlock Text="{Binding WaitingMessage, TargetNullValue=''}"
                                FontSize="14"
