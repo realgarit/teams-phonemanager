@@ -36,31 +36,31 @@
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Button Command="{Binding ExportTemplateFileCommand}" Classes="IconText">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="ArrowDownload" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                <fi:SymbolIcon Symbol="ArrowDownload"/>
                                 <TextBlock Text="Download Template" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                         <Button Command="{Binding ImportCsvFileCommand}" Classes="IconText">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="ArrowUpload" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                <fi:SymbolIcon Symbol="ArrowUpload"/>
                                 <TextBlock Text="Import CSV" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                         <Button Command="{Binding GenerateTemplateCommand}" Classes="IconText">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="DocumentAdd" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                <fi:SymbolIcon Symbol="DocumentAdd"/>
                                 <TextBlock Text="Generate Template" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                         <Button Command="{Binding ParseCsvCommand}" IsEnabled="{Binding !IsBusy}" Classes="IconText">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="TableSearch" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                <fi:SymbolIcon Symbol="TableSearch"/>
                                 <TextBlock Text="Parse CSV" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                         <Button Command="{Binding PreviewScriptCommand}" IsEnabled="{Binding !IsBusy}" Classes="IconText">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="Eye" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                <fi:SymbolIcon Symbol="Eye"/>
                                 <TextBlock Text="Preview Script" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -68,7 +68,7 @@
                                 Classes="IconText"
                                 IsEnabled="{Binding !IsBusy}">
                             <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="Play" Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                                <fi:SymbolIcon Symbol="Play"/>
                                 <TextBlock Text="Execute All" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -80,7 +80,6 @@
                              FontSize="13"
                              Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                              IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-                    
                     <!-- Progress -->
                     <ProgressBar IsIndeterminate="True"
                                  IsVisible="{Binding IsExecuting}"
@@ -89,7 +88,6 @@
 
                 <!-- Content Tabs -->
                 <TabControl Grid.Row="1" Margin="24,0,24,24">
-                    
                     <!-- CSV Editor Tab -->
                     <TabItem Header="CSV Data">
                         <Border Background="{DynamicResource ControlFillColorDefaultBrush}"

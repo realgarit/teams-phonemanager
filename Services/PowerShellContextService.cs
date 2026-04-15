@@ -29,7 +29,12 @@ namespace teams_phonemanager.Services
                 // Setting it here instead of calling Set-ExecutionPolicy at runtime avoids triggering
                 // AV behavioral heuristics (Kaspersky flags runtime Set-ExecutionPolicy Bypass as MITRE T1059.001).
                 var initialState = InitialSessionState.CreateDefault();
-                initialState.ExecutionPolicy = Microsoft.PowerShell.ExecutionPolicy.Bypass;
+                // ExecutionPolicy is Windows-only; setting it on macOS/Linux throws
+                // PlatformNotSupportedException in PowerShell SDK 7.6+.
+                if (OperatingSystem.IsWindows())
+                {
+                    initialState.ExecutionPolicy = Microsoft.PowerShell.ExecutionPolicy.Bypass;
+                }
                 localRunspace = RunspaceFactory.CreateRunspace(initialState);
                 localRunspace.Open();
 
