@@ -26,8 +26,10 @@
 
                 <!-- Step Sidebar -->
                 <Border Grid.Column="0"
-                        Background="{DynamicResource ControlFillColorSecondaryBrush}"
-                        CornerRadius="8,0,0,8"
+                        Background="{DynamicResource SurfaceSunkenBrush}"
+                        BorderBrush="{DynamicResource HairlineBrush}"
+                        BorderThickness="0,0,1,0"
+                        CornerRadius="12,0,0,12"
                         Padding="0">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -37,7 +39,8 @@
 
                         <StackPanel Grid.Row="0" Margin="16,20,16,12">
                             <TextBlock Text="Setup Wizard"
-                                     FontSize="18"
+                                     FontFamily="{StaticResource DisplayFontFamily}"
+                                     FontSize="17"
                                      FontWeight="SemiBold"
                                      Margin="0,0,0,4"/>
                             <TextBlock Text="Step-by-step phone system setup"
@@ -99,8 +102,10 @@
                                          VerticalAlignment="Center"/>
                             </Border>
                             <TextBlock Text="{Binding StepTitle}"
-                                     FontSize="22"
+                                     FontFamily="{StaticResource DisplayFontFamily}"
+                                     FontSize="21"
                                      FontWeight="SemiBold"
+                                     LetterSpacing="-0.2"
                                      VerticalAlignment="Center"/>
                         </StackPanel>
                         <TextBlock Text="{Binding StepDescription}"
@@ -119,11 +124,8 @@
                     </Grid>
 
                     <!-- Script Preview / Content -->
-                    <Border Grid.Row="2" 
-                            Background="{DynamicResource ControlFillColorDefaultBrush}"
-                            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8"
+                    <Border Grid.Row="2"
+                            Classes="sunken"
                             Margin="0,0,0,12">
                         <ScrollViewer HorizontalScrollBarVisibility="Auto"
                                       VerticalScrollBarVisibility="Auto">
@@ -131,7 +133,7 @@
                                      IsReadOnly="True"
                                      AcceptsReturn="True"
                                      TextWrapping="NoWrap"
-                                     FontFamily="Cascadia Code, Consolas, Courier New, monospace"
+                                     FontFamily="{StaticResource CodeFontFamily}"
                                      FontSize="12"
                                      BorderThickness="0"
                                      Padding="16"
@@ -142,17 +144,14 @@
                     <!-- Step Result -->
                     <Border Grid.Row="3"
                             IsVisible="{Binding StepResult, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                            Background="{DynamicResource ControlFillColorDefaultBrush}"
-                            BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
-                            BorderThickness="1"
-                            CornerRadius="8"
+                            Classes="sunken"
                             Padding="12"
                             Margin="0,0,0,12"
                             MaxHeight="120">
                         <ScrollViewer>
                             <TextBlock Text="{Binding StepResult}"
                                      FontSize="12"
-                                     FontFamily="Cascadia Code, Consolas, Courier New, monospace"
+                                     FontFamily="{StaticResource CodeFontFamily}"
                                      TextWrapping="Wrap"/>
                         </ScrollViewer>
                     </Border>

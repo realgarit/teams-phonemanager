@@ -38,11 +38,17 @@
 
                     <!-- Page Header -->
                     <StackPanel Grid.Row="0" Margin="0,0,0,16">
-                        <TextBlock Text="Holiday Management" Classes="page-title"/>
+                        <StackPanel Orientation="Horizontal" Spacing="14">
+                    <Border Classes="icon-badge">
+                        <fi:SymbolIcon Symbol="Calendar"/>
+                    </Border>
+                    <StackPanel Spacing="4" VerticalAlignment="Center">
+                        <TextBlock Text="Holiday Management" Classes="page-title" Margin="0"/>
                         <TextBlock Text="Create and manage holiday schedules for your auto attendants."
-                                 Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                 TextWrapping="Wrap"
-                                 Margin="0,4,0,0"/>
+                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                             TextWrapping="Wrap"/>
+                    </StackPanel>
+                </StackPanel>
                     </StackPanel>
 
                     <!-- Status Message -->
@@ -62,7 +68,7 @@
                                      Margin="0,0,0,24"/>
 
                             <!-- Step 1: Create Holiday -->
-                            <Border Classes="card" Margin="0,0,0,16">
+                            <Border Classes="card interactive" Margin="0,0,0,16">
                                 <StackPanel>
                                     <TextBlock Text="Step 1: Create Holiday"
                                              FontSize="18"
@@ -84,7 +90,7 @@
                             </Border>
 
                             <!-- Step 2: Check Auto Attendant -->
-                            <Border Classes="card" Margin="0,0,0,16">
+                            <Border Classes="card interactive" Margin="0,0,0,16">
                                 <StackPanel>
                                     <TextBlock Text="Step 2: Check Auto Attendant"
                                              FontSize="18"
@@ -106,7 +112,7 @@
                             </Border>
 
                             <!-- Step 3: Attach Holiday to Auto Attendant -->
-                            <Border Classes="card" Margin="0,0,0,16">
+                            <Border Classes="card interactive" Margin="0,0,0,16">
                                 <StackPanel>
                                     <TextBlock Text="Step 3: Attach Holiday to Auto Attendant"
                                              FontSize="18"
