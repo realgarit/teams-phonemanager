@@ -38,11 +38,17 @@
 
                 <!-- Page Header -->
                 <StackPanel Grid.Row="0" Margin="0,0,0,16">
-                    <TextBlock Text="Call Queues" Classes="page-title"/>
-                    <TextBlock Text="Manage resource accounts, call queues, and step-by-step creation."
+                    <StackPanel Orientation="Horizontal" Spacing="14">
+                    <Border Classes="icon-badge">
+                        <fi:SymbolIcon Symbol="CallInbound"/>
+                    </Border>
+                    <StackPanel Spacing="4" VerticalAlignment="Center">
+                        <TextBlock Text="Call Queues" Classes="page-title" Margin="0"/>
+                        <TextBlock Text="Manage resource accounts, call queues, and step-by-step creation."
                              Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                             TextWrapping="Wrap"
-                             Margin="0,4,0,0"/>
+                             TextWrapping="Wrap"/>
+                    </StackPanel>
+                </StackPanel>
                 </StackPanel>
 
                 <!-- Status Message -->
@@ -132,8 +138,10 @@
                                 <!-- Empty State -->
                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
                                             IsVisible="{Binding !ResourceAccountsView.Count}"
-                                            Opacity="0.5" Spacing="8">
-                                    <fi:SymbolIcon Symbol="PersonSearch" FontSize="32" HorizontalAlignment="Center" Margin="0"/>
+                                            Opacity="0.85" Spacing="10">
+                                    <Border Width="56" Height="56" CornerRadius="28" Background="{DynamicResource AccentSoftBrush}" HorizontalAlignment="Center">
+                                        <fi:SymbolIcon Symbol="PersonSearch" IsFilled="True" FontSize="26" Foreground="{DynamicResource TeamsPrimaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0"/>
+                                    </Border>
                                     <TextBlock Text="No resource accounts loaded" HorizontalAlignment="Center"/>
                                     <TextBlock Text="Click 'Retrieve Accounts' to load data from Teams" FontSize="12" HorizontalAlignment="Center"/>
                                 </StackPanel>
@@ -219,8 +227,10 @@
                                 <!-- Empty State -->
                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
                                             IsVisible="{Binding !CallQueuesView.Count}"
-                                            Opacity="0.5" Spacing="8">
-                                    <fi:SymbolIcon Symbol="CallInbound" FontSize="32" HorizontalAlignment="Center" Margin="0"/>
+                                            Opacity="0.85" Spacing="10">
+                                    <Border Width="56" Height="56" CornerRadius="28" Background="{DynamicResource AccentSoftBrush}" HorizontalAlignment="Center">
+                                        <fi:SymbolIcon Symbol="CallInbound" IsFilled="True" FontSize="26" Foreground="{DynamicResource TeamsPrimaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0"/>
+                                    </Border>
                                     <TextBlock Text="No call queues loaded" HorizontalAlignment="Center"/>
                                     <TextBlock Text="Click 'Retrieve Queues' to load data from Teams" FontSize="12" HorizontalAlignment="Center"/>
                                 </StackPanel>
@@ -238,7 +248,7 @@
                                          Margin="0,0,0,24"/>
 
                                 <!-- Step 1: Create Resource Account -->
-                                <Border Classes="card" Margin="0,0,0,16">
+                                <Border Classes="card interactive" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 1: Create Resource Account"
                                                  FontSize="18"
@@ -260,7 +270,7 @@
                                 </Border>
 
                                 <!-- Step 2: Update Usage Location -->
-                                <Border Classes="card" Margin="0,0,0,16">
+                                <Border Classes="card interactive" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 2: Update Usage Location"
                                                  FontSize="18"
@@ -282,7 +292,7 @@
                                 </Border>
 
                                 <!-- Step 3: Assign License -->
-                                <Border Classes="card" Margin="0,0,0,16">
+                                <Border Classes="card interactive" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 3: Assign License"
                                                  FontSize="18"
@@ -304,7 +314,7 @@
                                 </Border>
 
                                 <!-- Step 4: Get M365 Group ID -->
-                                <Border Classes="card" Margin="0,0,0,16">
+                                <Border Classes="card interactive" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 4: Get M365 Group ID"
                                                  FontSize="18"
@@ -326,7 +336,7 @@
                                 </Border>
 
                                 <!-- Step 5: Create Call Queue -->
-                                <Border Classes="card" Margin="0,0,0,16">
+                                <Border Classes="card interactive" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 5: Create Call Queue"
                                                  FontSize="18"
@@ -348,7 +358,7 @@
                                 </Border>
 
                                 <!-- Step 6: Associate Resource Account -->
-                                <Border Classes="card" Margin="0,0,0,16">
+                                <Border Classes="card interactive" Margin="0,0,0,16">
                                     <StackPanel>
                                         <TextBlock Text="Step 6: Associate Resource Account"
                                                  FontSize="18"

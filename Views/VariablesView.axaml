@@ -47,11 +47,17 @@
 
                 <!-- Page Header -->
                 <StackPanel Grid.Row="0" Margin="24,24,24,8">
-                    <TextBlock Text="Configuration" Classes="page-title"/>
-                    <TextBlock Text="Define variables for your Teams Phone setup — customer details, hours, holidays, and more."
+                    <StackPanel Orientation="Horizontal" Spacing="14">
+                    <Border Classes="icon-badge">
+                        <fi:SymbolIcon Symbol="Code"/>
+                    </Border>
+                    <StackPanel Spacing="4" VerticalAlignment="Center">
+                        <TextBlock Text="Configuration" Classes="page-title" Margin="0"/>
+                        <TextBlock Text="Define variables for your Teams Phone setup — customer details, hours, holidays, and more."
                              Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                             TextWrapping="Wrap"
-                             Margin="0,4,0,8"/>
+                             TextWrapping="Wrap"/>
+                    </StackPanel>
+                </StackPanel>
                     <TextBlock Text="{Binding WelcomeMessage}"
                              FontSize="13"
                              Foreground="{DynamicResource TextFillColorSecondaryBrush}"

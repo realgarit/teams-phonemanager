@@ -20,16 +20,22 @@
         <StackPanel Margin="32" MaxWidth="850" HorizontalAlignment="Center" Spacing="24">
 
             <!-- Header Section -->
-            <StackPanel Spacing="8" Margin="0,0,0,16">
-                <TextBlock Text="Setup Steps"
-                         Classes="page-title"/>
-                <TextBlock Text="Follow these steps to connect to your Microsoft 365 environment and configure the phone manager."
-                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                         TextWrapping="Wrap"/>
+            <StackPanel Orientation="Horizontal" Spacing="14" Margin="0,0,0,16">
+                <Border Classes="icon-badge">
+                    <fi:SymbolIcon Symbol="Rocket"/>
+                </Border>
+                <StackPanel Spacing="4" VerticalAlignment="Center">
+                    <TextBlock Text="Setup Steps"
+                             Classes="page-title"
+                             Margin="0"/>
+                    <TextBlock Text="Follow these steps to connect to your Microsoft 365 environment and configure the phone manager."
+                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                             TextWrapping="Wrap"/>
+                </StackPanel>
             </StackPanel>
 
             <!-- Step 1: PowerShell Modules -->
-            <Border Classes="card" AutomationProperties.Name="{Binding ModulesStatusText}">
+            <Border Classes="card interactive" AutomationProperties.Name="{Binding ModulesStatusText}">
                 <Grid ColumnDefinitions="Auto,*,Auto" Margin="8">
                     <!-- Step Indicator -->
                     <Panel Grid.Column="0" Width="32" Height="32" VerticalAlignment="Center" Margin="0,0,24,0"
@@ -37,16 +43,18 @@
                            AutomationProperties.LiveSetting="Polite"
                            ToolTip.Tip="{Binding ModulesStatusText}">
                         <!-- Pending State: Ring with Number -->
-                        <Border CornerRadius="16" 
-                                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                        <Border CornerRadius="16"
+                                BorderBrush="{DynamicResource AccentHairlineBrush}"
                                 BorderThickness="2"
                                 IsVisible="{Binding !ModulesChecked}"
                                 AutomationProperties.Name="Step 1: Pending"
                                 ToolTip.Tip="Step 1: Pending">
                             <TextBlock Text="1" 
-                                     FontSize="18" 
+                                     FontSize="15"
                                      FontWeight="Bold"
-                                     HorizontalAlignment="Center" 
+                                     FontFamily="{StaticResource DisplayFontFamily}"
+                                     Foreground="{DynamicResource TeamsPrimaryBrush}"
+                                     HorizontalAlignment="Center"
                                      VerticalAlignment="Center"/>
                         </Border>
                         <!-- Completed State: Clean Icon -->
@@ -85,23 +93,25 @@
             </Border>
 
             <!-- Step 2: Teams Connection -->
-            <Border Classes="card" AutomationProperties.Name="{Binding TeamsStatusText}">
+            <Border Classes="card interactive" AutomationProperties.Name="{Binding TeamsStatusText}">
                 <Grid ColumnDefinitions="Auto,*,Auto" Margin="8">
                     <!-- Step Indicator -->
                     <Panel Grid.Column="0" Width="32" Height="32" VerticalAlignment="Center" Margin="0,0,24,0"
                            AutomationProperties.Name="{Binding TeamsStatusText}"
                            AutomationProperties.LiveSetting="Polite"
                            ToolTip.Tip="{Binding TeamsStatusText}">
-                        <Border CornerRadius="16" 
-                                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                        <Border CornerRadius="16"
+                                BorderBrush="{DynamicResource AccentHairlineBrush}"
                                 BorderThickness="2"
                                 IsVisible="{Binding !TeamsConnected}"
                                 AutomationProperties.Name="Step 2: Pending"
                                 ToolTip.Tip="Step 2: Pending">
                             <TextBlock Text="2" 
-                                     FontSize="18" 
+                                     FontSize="15"
                                      FontWeight="Bold"
-                                     HorizontalAlignment="Center" 
+                                     FontFamily="{StaticResource DisplayFontFamily}"
+                                     Foreground="{DynamicResource TeamsPrimaryBrush}"
+                                     HorizontalAlignment="Center"
                                      VerticalAlignment="Center"/>
                         </Border>
                         <fi:SymbolIcon Symbol="CheckmarkCircle" 
@@ -150,23 +160,25 @@
             </Border>
 
             <!-- Step 3: Graph Connection -->
-            <Border Classes="card" AutomationProperties.Name="{Binding GraphStatusText}">
+            <Border Classes="card interactive" AutomationProperties.Name="{Binding GraphStatusText}">
                 <Grid ColumnDefinitions="Auto,*,Auto" Margin="8">
                     <!-- Step Indicator -->
                     <Panel Grid.Column="0" Width="32" Height="32" VerticalAlignment="Center" Margin="0,0,24,0"
                            AutomationProperties.Name="{Binding GraphStatusText}"
                            AutomationProperties.LiveSetting="Polite"
                            ToolTip.Tip="{Binding GraphStatusText}">
-                        <Border CornerRadius="16" 
-                                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                        <Border CornerRadius="16"
+                                BorderBrush="{DynamicResource AccentHairlineBrush}"
                                 BorderThickness="2"
                                 IsVisible="{Binding !GraphConnected}"
                                 AutomationProperties.Name="Step 3: Pending"
                                 ToolTip.Tip="Step 3: Pending">
                             <TextBlock Text="3" 
-                                     FontSize="18" 
+                                     FontSize="15"
                                      FontWeight="Bold"
-                                     HorizontalAlignment="Center" 
+                                     FontFamily="{StaticResource DisplayFontFamily}"
+                                     Foreground="{DynamicResource TeamsPrimaryBrush}"
+                                     HorizontalAlignment="Center"
                                      VerticalAlignment="Center"/>
                         </Border>
                         <fi:SymbolIcon Symbol="CheckmarkCircle" 
@@ -215,9 +227,9 @@
             </Border>
 
             <!-- Proceed Section -->
-            <Border Classes="card" 
-                    Background="{DynamicResource SolidBackgroundFillColorTertiaryBrush}"
-                    BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+            <Border Classes="card"
+                    Background="{DynamicResource SuccessSoftBrush}"
+                    BorderBrush="{DynamicResource SuccessHairlineBrush}"
                     Margin="0,16,0,0"
                     IsVisible="{Binding CanProceed}">
                 <Border.Styles>
@@ -249,7 +261,7 @@
                     <Button Grid.Column="1"
                             Command="{Binding NavigateToPageCommand}"
                             CommandParameter="Variables"
-                            Classes="Accent IconTextLarge"
+                            Classes="accent IconTextLarge"
                             FontWeight="Bold"
                             MinWidth="200">
                         <StackPanel Orientation="Horizontal" Spacing="12">

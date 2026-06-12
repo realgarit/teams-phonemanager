@@ -11,110 +11,179 @@
              d:DesignHeight="600" d:DesignWidth="1000">
 
     <UserControl.Styles>
-        <Style Selector="fi|SymbolIcon.welcome-icon">
-            <Setter Property="FontSize" Value="24"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="RenderTransform" Value="translate(0px, -3px)"/>
-            <Setter Property="Margin" Value="0"/>
+        <!-- Staggered entrance for hero elements -->
+        <Style Selector="StackPanel.hero">
+            <Style.Animations>
+                <Animation Duration="0:0:0.45" Easing="CubicEaseOut">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="0"/>
+                        <Setter Property="TranslateTransform.Y" Value="14"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1"/>
+                        <Setter Property="TranslateTransform.Y" Value="0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
         </Style>
-        <Style Selector="fi|SymbolIcon.welcome-icon-hero">
-            <Setter Property="FontSize" Value="28"/>
-            <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}"/>
+        <Style Selector="Grid.workflow">
+            <Style.Animations>
+                <Animation Duration="0:0:0.6" Easing="CubicEaseOut">
+                    <KeyFrame Cue="0%">
+                        <Setter Property="Opacity" Value="0"/>
+                        <Setter Property="TranslateTransform.Y" Value="18"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="40%">
+                        <Setter Property="Opacity" Value="0"/>
+                        <Setter Property="TranslateTransform.Y" Value="18"/>
+                    </KeyFrame>
+                    <KeyFrame Cue="100%">
+                        <Setter Property="Opacity" Value="1"/>
+                        <Setter Property="TranslateTransform.Y" Value="0"/>
+                    </KeyFrame>
+                </Animation>
+            </Style.Animations>
+        </Style>
+        <!-- Step number badge -->
+        <Style Selector="Border.step-badge">
+            <Setter Property="Width" Value="28"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="CornerRadius" Value="9"/>
+            <Setter Property="Background" Value="{DynamicResource AccentSoftBrush}"/>
+        </Style>
+        <Style Selector="Border.step-badge TextBlock">
+            <Setter Property="FontFamily" Value="{StaticResource DisplayFontFamily}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource TeamsPrimaryBrush}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="RenderTransform" Value="translate(0px, -4px)"/>
-            <Setter Property="Margin" Value="0"/>
         </Style>
     </UserControl.Styles>
 
-    <StackPanel Margin="24" VerticalAlignment="Center">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="24" VerticalAlignment="Center" MaxWidth="980">
 
-        <!-- Hero -->
-        <StackPanel HorizontalAlignment="Center" Margin="0,0,0,32">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12" Margin="0,0,0,8">
-                <fi:SymbolIcon Symbol="PeopleTeam" Classes="welcome-icon-hero"/>
+            <!-- Hero -->
+            <StackPanel Classes="hero" HorizontalAlignment="Center" Margin="0,16,0,36">
+                <Border Width="76" Height="76"
+                        CornerRadius="22"
+                        HorizontalAlignment="Center"
+                        Background="{DynamicResource BrandGradientBrush}"
+                        BoxShadow="0 10 36 0 #555B5FC7"
+                        Margin="0,0,0,22">
+                    <fi:SymbolIcon Symbol="Call"
+                                   IsFilled="True"
+                                   FontSize="36"
+                                   Foreground="White"
+                                   Margin="0"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+                </Border>
                 <TextBlock Text="Teams Phone Manager"
-                         Classes="page-title"
-                         VerticalAlignment="Center"/>
+                         FontFamily="{StaticResource DisplayFontFamily}"
+                         FontSize="36"
+                         FontWeight="Bold"
+                         LetterSpacing="-0.8"
+                         TextAlignment="Center"/>
+                <TextBlock Text="Configure and deploy Microsoft Teams Phone infrastructure"
+                         FontSize="15"
+                         TextAlignment="Center"
+                         Margin="0,10,0,0"
+                         Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+
+                <!-- Quick Actions -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12" Margin="0,28,0,0">
+                    <Button Command="{Binding NavigateToGetStartedCommand}"
+                            Classes="accent IconTextCentered" MinWidth="180">
+                        <StackPanel Orientation="Horizontal">
+                            <fi:SymbolIcon Symbol="Rocket"/>
+                            <TextBlock Text="Get Started"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding OpenDocumentationCommand}"
+                            Classes="IconTextCentered" MinWidth="180">
+                        <StackPanel Orientation="Horizontal">
+                            <fi:SymbolIcon Symbol="Open"/>
+                            <TextBlock Text="GitHub"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
             </StackPanel>
-            <TextBlock Text="Configure and deploy Microsoft Teams Phone infrastructure"
-                     FontSize="14"
-                     TextAlignment="Center"
-                     Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+
+            <!-- Workflow Steps -->
+            <Grid Classes="workflow">
+                <StackPanel>
+                    <TextBlock Text="HOW IT WORKS"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               LetterSpacing="2"
+                               Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,14"/>
+                    <Grid ColumnDefinitions="*,Auto,*,Auto,*,Auto,*">
+                        <!-- Step 1 -->
+                        <Border Grid.Column="0" Classes="card interactive" Padding="16">
+                            <StackPanel Spacing="10">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Border Classes="step-badge">
+                                        <TextBlock Text="1"/>
+                                    </Border>
+                                    <TextBlock Text="Connect" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="Install modules, connect to Teams &amp; Graph"
+                                         FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                        <fi:SymbolIcon Grid.Column="1" Symbol="ChevronRight" FontSize="14" Opacity="0.35"
+                                       VerticalAlignment="Center" Margin="6,0"/>
+                        <!-- Step 2 -->
+                        <Border Grid.Column="2" Classes="card interactive" Padding="16">
+                            <StackPanel Spacing="10">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Border Classes="step-badge">
+                                        <TextBlock Text="2"/>
+                                    </Border>
+                                    <TextBlock Text="Configure" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="Set variables, domains, time zones, holidays"
+                                         FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                        <fi:SymbolIcon Grid.Column="3" Symbol="ChevronRight" FontSize="14" Opacity="0.35"
+                                       VerticalAlignment="Center" Margin="6,0"/>
+                        <!-- Step 3 -->
+                        <Border Grid.Column="4" Classes="card interactive" Padding="16">
+                            <StackPanel Spacing="10">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Border Classes="step-badge">
+                                        <TextBlock Text="3"/>
+                                    </Border>
+                                    <TextBlock Text="Build" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="Create groups, queues, auto attendants"
+                                         FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                        <fi:SymbolIcon Grid.Column="5" Symbol="ChevronRight" FontSize="14" Opacity="0.35"
+                                       VerticalAlignment="Center" Margin="6,0"/>
+                        <!-- Step 4 -->
+                        <Border Grid.Column="6" Classes="card interactive" Padding="16">
+                            <StackPanel Spacing="10">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <Border Classes="step-badge">
+                                        <TextBlock Text="4"/>
+                                    </Border>
+                                    <TextBlock Text="Export" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <TextBlock Text="Generate documentation &amp; scripts"
+                                         FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+
         </StackPanel>
-
-        <!-- Quick Actions -->
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12" Margin="0,0,0,40">
-            <Button Command="{Binding NavigateToGetStartedCommand}"
-                    Classes="IconTextCentered" MinWidth="180">
-                <StackPanel Orientation="Horizontal">
-                    <fi:SymbolIcon Symbol="Rocket"/>
-                    <TextBlock Text="Get Started"/>
-                </StackPanel>
-            </Button>
-            <Button Command="{Binding OpenDocumentationCommand}"
-                    Classes="IconTextCentered" MinWidth="180">
-                <StackPanel Orientation="Horizontal">
-                    <fi:SymbolIcon Symbol="Open"/>
-                    <TextBlock Text="GitHub"/>
-                </StackPanel>
-            </Button>
-        </StackPanel>
-
-        <!-- Workflow Steps -->
-        <TextBlock Text="Workflow" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
-        <Grid ColumnDefinitions="*,Auto,*,Auto,*,Auto,*">
-            <!-- Step 1 -->
-            <Border Grid.Column="0" Classes="card" CornerRadius="8" Padding="12">
-                <StackPanel Spacing="4">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <fi:SymbolIcon Symbol="Rocket" Classes="welcome-icon"/>
-                        <TextBlock Text="1. Connect" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
-                    </StackPanel>
-                    <TextBlock Text="Install modules, connect to Teams &amp; Graph"
-                             FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
-                </StackPanel>
-            </Border>
-            <TextBlock Grid.Column="1" Text="›" FontSize="20" Opacity="0.3"
-                     VerticalAlignment="Center" Margin="8,0"/>
-            <!-- Step 2 -->
-            <Border Grid.Column="2" Classes="card" CornerRadius="8" Padding="12">
-                <StackPanel Spacing="4">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <fi:SymbolIcon Symbol="Code" Classes="welcome-icon"/>
-                        <TextBlock Text="2. Configure" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
-                    </StackPanel>
-                    <TextBlock Text="Set variables, domains, time zones, holidays"
-                             FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
-                </StackPanel>
-            </Border>
-            <TextBlock Grid.Column="3" Text="›" FontSize="20" Opacity="0.3"
-                     VerticalAlignment="Center" Margin="8,0"/>
-            <!-- Step 3 -->
-            <Border Grid.Column="4" Classes="card" CornerRadius="8" Padding="12">
-                <StackPanel Spacing="4">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <fi:SymbolIcon Symbol="PeopleTeam" Classes="welcome-icon"/>
-                        <TextBlock Text="3. Build" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
-                    </StackPanel>
-                    <TextBlock Text="Create groups, queues, auto attendants"
-                             FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
-                </StackPanel>
-            </Border>
-            <TextBlock Grid.Column="5" Text="›" FontSize="20" Opacity="0.3"
-                     VerticalAlignment="Center" Margin="8,0"/>
-            <!-- Step 4 -->
-            <Border Grid.Column="6" Classes="card" CornerRadius="8" Padding="12">
-                <StackPanel Spacing="4">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <fi:SymbolIcon Symbol="DocumentText" Classes="welcome-icon"/>
-                        <TextBlock Text="4. Export" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
-                    </StackPanel>
-                    <TextBlock Text="Generate documentation &amp; scripts"
-                             FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
-                </StackPanel>
-            </Border>
-        </Grid>
-
-    </StackPanel>
+    </ScrollViewer>
 </UserControl>

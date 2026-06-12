@@ -40,11 +40,17 @@
 
                 <!-- Page Header -->
                 <StackPanel Grid.Row="0" Margin="0,0,0,16">
-                    <TextBlock Text="M365 Groups" Classes="page-title"/>
-                    <TextBlock Text="Search and manage Microsoft 365 Groups for your Teams Phone setup."
+                    <StackPanel Orientation="Horizontal" Spacing="14">
+                    <Border Classes="icon-badge">
+                        <fi:SymbolIcon Symbol="People"/>
+                    </Border>
+                    <StackPanel Spacing="4" VerticalAlignment="Center">
+                        <TextBlock Text="M365 Groups" Classes="page-title" Margin="0"/>
+                        <TextBlock Text="Search and manage Microsoft 365 Groups for your Teams Phone setup."
                              Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                             TextWrapping="Wrap"
-                             Margin="0,4,0,0"/>
+                             TextWrapping="Wrap"/>
+                    </StackPanel>
+                </StackPanel>
                 </StackPanel>
 
                 <!-- Group Status -->
@@ -120,8 +126,10 @@
                     </DataGrid>
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center"
                                 IsVisible="{Binding !GroupsView.Count}"
-                                Opacity="0.5" Spacing="8">
-                        <fi:SymbolIcon Symbol="PeopleTeam" FontSize="32" HorizontalAlignment="Center" Margin="0"/>
+                                Opacity="0.85" Spacing="10">
+                        <Border Width="56" Height="56" CornerRadius="28" Background="{DynamicResource AccentSoftBrush}" HorizontalAlignment="Center">
+                                        <fi:SymbolIcon Symbol="People" IsFilled="True" FontSize="26" Foreground="{DynamicResource TeamsPrimaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0"/>
+                                    </Border>
                         <TextBlock Text="No M365 groups loaded" HorizontalAlignment="Center"/>
                         <TextBlock Text="Click 'Retrieve Groups' to load data from your tenant" FontSize="12" HorizontalAlignment="Center"/>
                     </StackPanel>
