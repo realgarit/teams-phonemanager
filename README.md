@@ -51,7 +51,7 @@ An Avalonia-based Microsoft Teams Phone Manager application built with .NET 10 t
 ## Architecture
 
 - .NET 10 Avalonia (cross-platform UI framework)
-- Material Design for Avalonia
+- FluentAvalonia (Fluent design) with a custom dark/light theme
 - MVVM Pattern
 - Microsoft.PowerShell.SDK
 - Custom logging service for debugging and monitoring
@@ -82,13 +82,36 @@ teams-phonemanager/
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Screenshots
-<img width="1792" height="1064" alt="SCR-20251122-nefg" src="https://github.com/user-attachments/assets/38fac33a-56a1-4380-9fb3-f47e4902c40c" />
-<img width="1792" height="1064" alt="SCR-20251122-nelf" src="https://github.com/user-attachments/assets/7de0b4e6-d7d5-4849-818c-d41aaeaa5d5f" />
-<img width="1792" height="1064" alt="SCR-20251122-nenb" src="https://github.com/user-attachments/assets/5ec138f7-3384-4bb5-b6aa-4085e05676fd" />
-<img width="1792" height="1064" alt="SCR-20251122-neqo" src="https://github.com/user-attachments/assets/28d691df-3cf1-4983-84ed-00994a47405d" />
-<img width="1792" height="1064" alt="SCR-20251122-nest" src="https://github.com/user-attachments/assets/0161502d-034b-4ae2-ab0a-96c456a77329" />
-<img width="1792" height="1064" alt="SCR-20251122-nexk" src="https://github.com/user-attachments/assets/aad1408e-60eb-42d9-b55b-8e3beaebf4cf" />
-<img width="1792" height="1064" alt="SCR-20251122-neyt" src="https://github.com/user-attachments/assets/f2ab416d-bc7a-4267-8394-77667d725b17" />
-<img width="1792" height="1064" alt="SCR-20251122-nfad" src="https://github.com/user-attachments/assets/1b8d014d-6b09-4996-a148-fce96663ec62" />
-<img width="1792" height="1064" alt="SCR-20251122-nfbp" src="https://github.com/user-attachments/assets/b4ac4949-8104-4ef7-bece-43955ca26550" />
-<img width="1792" height="1064" alt="SCR-20251122-nfcz" src="https://github.com/user-attachments/assets/e7b8d45f-f0b8-433d-a729-fe2718d4ee6a" />
+
+### Welcome
+<img src="docs/screenshots/welcome.png" width="1280" alt="Welcome page (dark theme)"/>
+
+### Get Started
+<img src="docs/screenshots/get-started.png" width="1280" alt="Get Started page with connection steps"/>
+
+### Variables
+<img src="docs/screenshots/variables.png" width="1280" alt="Variables configuration page"/>
+
+### M365 Groups
+<img src="docs/screenshots/m365-groups.png" width="1280" alt="M365 Groups management"/>
+
+### Call Queues
+<img src="docs/screenshots/call-queues.png" width="1280" alt="Call Queues management"/>
+
+### Auto Attendants
+<img src="docs/screenshots/auto-attendants.png" width="1280" alt="Auto Attendants management"/>
+
+### Holidays
+<img src="docs/screenshots/holidays.png" width="1280" alt="Holiday management"/>
+
+### Setup Wizard
+<img src="docs/screenshots/setup-wizard.png" width="1280" alt="Step-by-step setup wizard"/>
+
+### Bulk Operations
+<img src="docs/screenshots/bulk-operations.png" width="1280" alt="CSV bulk operations"/>
+
+### Documentation
+<img src="docs/screenshots/documentation.png" width="1280" alt="Tenant documentation export"/>
+
+### Light Theme
+<img src="docs/screenshots/welcome-light.png" width="1280" alt="Welcome page (light theme)"/>
