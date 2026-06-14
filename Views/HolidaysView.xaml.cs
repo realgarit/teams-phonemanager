@@ -11,7 +11,6 @@ namespace teams_phonemanager.Views
         public HolidaysView()
         {
             InitializeComponent();
-            DataContext = Program.Services?.GetService<HolidaysViewModel>();
         }
 
         private HolidaysViewModel? VM => DataContext as HolidaysViewModel;

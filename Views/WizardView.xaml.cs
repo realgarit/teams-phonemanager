@@ -9,7 +9,6 @@ namespace teams_phonemanager.Views
         public WizardView()
         {
             InitializeComponent();
-            DataContext = Program.Services?.GetService<WizardViewModel>();
         }
     }
 }

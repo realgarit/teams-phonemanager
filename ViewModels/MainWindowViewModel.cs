@@ -25,6 +25,8 @@ namespace teams_phonemanager.ViewModels
         private NotifyCollectionChangedEventHandler? _logEntriesHandler;
         private PropertyChangedEventHandler? _navigationPropertyHandler;
 
+        private readonly IPageViewModelFactory _pageViewModelFactory;
+
         public ObservableCollection<string> LogEntries => _loggingService.LogEntries;
         public string LatestLogEntry => _loggingService.LatestLogEntry;
 
@@ -115,6 +117,18 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private string _currentPage = Services.ConstantsService.Pages.Welcome;
 
+        /// <summary>
+        /// The ViewModel for the current page. Bound by the content host; the ViewLocator renders
+        /// the matching View with this as its DataContext (VM-first; no service locator).
+        /// </summary>
+        [ObservableProperty]
+        private object? _currentViewModel;
+
+        partial void OnCurrentPageChanged(string value)
+        {
+            CurrentViewModel = _pageViewModelFactory.Create(value);
+        }
+
         [ObservableProperty]
         private bool _isSettingsOpen;
 
@@ -160,10 +174,14 @@ namespace teams_phonemanager.ViewModels
             IErrorHandlingService errorHandlingService,
             IValidationService validationService,
             ISharedStateService sharedStateService,
-            IDialogService dialogService)
+            IDialogService dialogService,
+            IPageViewModelFactory pageViewModelFactory)
             : base(powerShellContextService, powerShellCommandService, loggingService,
                   sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
         {
+            _pageViewModelFactory = pageViewModelFactory;
+            CurrentViewModel = _pageViewModelFactory.Create(CurrentPage);
+
             _loggingService.Log("Application started", LogLevel.Info);
 
             _loggingPropertyHandler = (s, e) =>

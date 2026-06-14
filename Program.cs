@@ -11,8 +11,6 @@ namespace teams_phonemanager;
 
 class Program
 {
-    public static IServiceProvider? Services { get; private set; }
-
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
@@ -27,9 +25,18 @@ class Program
 
         var services = new ServiceCollection();
         ConfigureServices(services);
-        Services = services.BuildServiceProvider();
+        var provider = services.BuildServiceProvider();
 
-        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        // Hand the composed container to the App instance (no global static service locator).
+        BuildAvaloniaApp()
+            .AfterSetup(builder =>
+            {
+                if (builder.Instance is App app)
+                {
+                    app.Services = provider;
+                }
+            })
+            .StartWithClassicDesktopLifetime(args);
     }
 
     private static void ConfigureServices(IServiceCollection services)
@@ -44,6 +51,7 @@ class Program
         
         // UI Services (singleton - manages UI state)
         services.AddSingleton<IDialogService, DialogService>();
+        services.AddSingleton<IPageViewModelFactory, PageViewModelFactory>();
 
         // Transient services (new instance per request)
         services.AddTransient<IPowerShellCommandService, PowerShellCommandService>();

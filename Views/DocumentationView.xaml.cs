@@ -9,7 +9,6 @@ namespace teams_phonemanager.Views
         public DocumentationView()
         {
             InitializeComponent();
-            DataContext = Program.Services?.GetService<DocumentationViewModel>();
         }
     }
 }

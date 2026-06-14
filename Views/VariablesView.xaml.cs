@@ -11,7 +11,6 @@ namespace teams_phonemanager.Views
         public VariablesView()
         {
             InitializeComponent();
-            DataContext = Program.Services?.GetService<VariablesViewModel>();
         }
 
         private VariablesViewModel? VM => DataContext as VariablesViewModel;

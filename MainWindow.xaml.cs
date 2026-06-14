@@ -167,11 +167,4 @@ public partial class MainWindow : Window
             }
         }
     }
-
-    protected override void OnClosed(EventArgs e)
-    {
-        base.OnClosed(e);
-        var psContext = Program.Services?.GetService(typeof(Services.Interfaces.IPowerShellContextService)) as IDisposable;
-        psContext?.Dispose();
-    }
 }

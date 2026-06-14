@@ -203,65 +203,10 @@
 
                 <!-- Content Area -->
                 <Grid Grid.Row="0" Margin="20,18,20,10">
-                    <TransitioningContentControl Content="{Binding CurrentPage}"
-                                                  PageTransition="{x:Null}">
+                    <TransitioningContentControl Content="{Binding CurrentViewModel}">
                         <TransitioningContentControl.PageTransition>
                             <CrossFade Duration="0:0:0.15"/>
                         </TransitioningContentControl.PageTransition>
-                        <TransitioningContentControl.ContentTemplate>
-                            <converters:PageTemplateSelector>
-                                <converters:PageTemplateSelector.WelcomeTemplate>
-                                    <DataTemplate>
-                                        <views:WelcomeView/>
-                                    </DataTemplate>
-                                </converters:PageTemplateSelector.WelcomeTemplate>
-                                <converters:PageTemplateSelector.GetStartedTemplate>
-                                    <DataTemplate>
-                                        <views:GetStartedView/>
-                                    </DataTemplate>
-                                </converters:PageTemplateSelector.GetStartedTemplate>
-                                <converters:PageTemplateSelector.VariablesTemplate>
-                                    <DataTemplate>
-                                        <views:VariablesView/>
-                                    </DataTemplate>
-                                </converters:PageTemplateSelector.VariablesTemplate>
-                                <converters:PageTemplateSelector.M365GroupsTemplate>
-                                    <DataTemplate>
-                                        <views:M365GroupsView/>
-                                    </DataTemplate>
-                                </converters:PageTemplateSelector.M365GroupsTemplate>
-                                <converters:PageTemplateSelector.CallQueuesTemplate>
-                                    <DataTemplate>
-                                        <views:CallQueuesView/>
-                                    </DataTemplate>
-                                </converters:PageTemplateSelector.CallQueuesTemplate>
-                                <converters:PageTemplateSelector.AutoAttendantsTemplate>
-                                    <DataTemplate>
-                                        <views:AutoAttendantsView/>
-                                    </DataTemplate>
-                                </converters:PageTemplateSelector.AutoAttendantsTemplate>
-                                <converters:PageTemplateSelector.HolidaysTemplate>
-                                    <DataTemplate>
-                                        <views:HolidaysView/>
-                                    </DataTemplate>
-                                </converters:PageTemplateSelector.HolidaysTemplate>
-                                <converters:PageTemplateSelector.DocumentationTemplate>
-                                    <DataTemplate>
-                                        <views:DocumentationView/>
-                                    </DataTemplate>
-                                </converters:PageTemplateSelector.DocumentationTemplate>
-                                <converters:PageTemplateSelector.WizardTemplate>
-                                    <DataTemplate>
-                                        <views:WizardView/>
-                                    </DataTemplate>
-                                </converters:PageTemplateSelector.WizardTemplate>
-                                <converters:PageTemplateSelector.BulkOperationsTemplate>
-                                    <DataTemplate>
-                                        <views:BulkOperationsView/>
-                                    </DataTemplate>
-                                </converters:PageTemplateSelector.BulkOperationsTemplate>
-                            </converters:PageTemplateSelector>
-                        </TransitioningContentControl.ContentTemplate>
                     </TransitioningContentControl>
                 </Grid>
 

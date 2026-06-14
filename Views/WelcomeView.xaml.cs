@@ -9,7 +9,6 @@ namespace teams_phonemanager.Views
         public WelcomeView()
         {
             InitializeComponent();
-            DataContext = Program.Services?.GetService<WelcomeViewModel>();
         }
     }
 } 
