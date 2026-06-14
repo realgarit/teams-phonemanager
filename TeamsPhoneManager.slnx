@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="teams-phonemanager.csproj" />
+  <Project Path="teams-phonemanager.Tests/teams-phonemanager.Tests.csproj" />
+</Solution>
