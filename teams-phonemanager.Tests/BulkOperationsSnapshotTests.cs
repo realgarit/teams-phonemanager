@@ -59,7 +59,13 @@ namespace teams_phonemanager.Tests
             var bulk = new BulkOperationsScriptBuilder(facade, san);
 
             var script = bulk.GenerateBulkScript(SampleEntries());
-            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(script)));
+
+            // Normalize line endings: the builders use StringBuilder.AppendLine (Environment.NewLine),
+            // which is CRLF on Windows and LF elsewhere. Hash the LF-normalized content so the snapshot
+            // is platform-independent while still catching any real content change. The expected hash
+            // was captured from LF output.
+            var normalized = script.Replace("\r\n", "\n");
+            var hash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(normalized)));
 
             Assert.Equal(ExpectedBulkScriptHash, hash);
         }
