@@ -4,6 +4,9 @@ obj/
 out/
 Modules/
 
+# Local-only planning / working notes (kept out of the public repo)
+plans/
+
 # User-specific files
 *.user
 *.suo

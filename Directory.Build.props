@@ -1,0 +1,21 @@
+<Project>
+
+  <!--
+    Shared build settings inherited by every project in the repository
+    (app, tests, and the Clean Architecture layer libraries added in later stages).
+    Per-project files override these where needed.
+
+    NOTE: Version/AssemblyVersion/FileVersion intentionally stay in the application
+    project (teams-phonemanager.csproj) — CI version extraction and Scripts/bump-version.*
+    grep/sed them there. They move to TeamsPhoneManager.App.csproj in the final stage.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+
+</Project>
