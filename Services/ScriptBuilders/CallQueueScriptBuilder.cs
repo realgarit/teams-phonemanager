@@ -33,7 +33,7 @@ catch {
 }";
         }
 
-        public string GetCreateCallQueueCommand(PhoneManagerVariables variables)
+        public string GetCreateCallQueueCommand(IPhoneManagerVariables variables)
         {
             var callQueueParams = BuildCallQueueParameters(variables);
             // SECURITY: Sanitize all user inputs and wrap in quotes
@@ -86,7 +86,7 @@ catch {{
 }}";
         }
 
-        public string GetCreateCallQueueCommand(string name, string languageId, string m365GroupId, PhoneManagerVariables? variables = null)
+        public string GetCreateCallQueueCommand(string name, string languageId, string m365GroupId, IPhoneManagerVariables? variables = null)
         {
             var callQueueParams = variables != null ? BuildCallQueueParameters(variables) : BuildDefaultCallQueueParameters();
 
@@ -224,7 +224,7 @@ catch {{
 }}";
         }
 
-        private string BuildCallQueueParameters(PhoneManagerVariables variables)
+        private string BuildCallQueueParameters(IPhoneManagerVariables variables)
         {
             var parameters = new StringBuilder();
 
@@ -237,7 +237,7 @@ catch {{
             return parameters.ToString().TrimEnd();
         }
 
-        private void AppendGreetingParameters(StringBuilder parameters, PhoneManagerVariables variables)
+        private void AppendGreetingParameters(StringBuilder parameters, IPhoneManagerVariables variables)
         {
             if (variables.CqGreetingType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqGreetingAudioFileId))
             {
@@ -249,7 +249,7 @@ catch {{
             }
         }
 
-        private void AppendMusicOnHoldParameters(StringBuilder parameters, PhoneManagerVariables variables)
+        private void AppendMusicOnHoldParameters(StringBuilder parameters, IPhoneManagerVariables variables)
         {
             if (variables.CqMusicOnHoldType == "AudioFile" && !string.IsNullOrWhiteSpace(variables.CqMusicOnHoldAudioFileId))
             {
@@ -262,7 +262,7 @@ catch {{
             }
         }
 
-        private void AppendOverflowParameters(StringBuilder parameters, PhoneManagerVariables variables)
+        private void AppendOverflowParameters(StringBuilder parameters, IPhoneManagerVariables variables)
         {
             var threshold = variables.CqOverflowThreshold ?? ConstantsService.CallQueue.OverflowThreshold;
             parameters.AppendLine($"-OverflowThreshold {threshold} `");
@@ -277,7 +277,7 @@ catch {{
                 defaultAction: "DisconnectWithBusy");
         }
 
-        private void AppendTimeoutParameters(StringBuilder parameters, PhoneManagerVariables variables)
+        private void AppendTimeoutParameters(StringBuilder parameters, IPhoneManagerVariables variables)
         {
             var threshold = variables.CqTimeoutThreshold ?? ConstantsService.CallQueue.TimeoutThreshold;
             if (threshold < ConstantsService.CallQueue.MinTimeoutThreshold)
@@ -296,7 +296,7 @@ catch {{
                 defaultAction: "Disconnect");
         }
 
-        private void AppendNoAgentParameters(StringBuilder parameters, PhoneManagerVariables variables)
+        private void AppendNoAgentParameters(StringBuilder parameters, IPhoneManagerVariables variables)
         {
             if (string.IsNullOrWhiteSpace(variables.CqNoAgentAction) || variables.CqNoAgentAction == "QueueCall")
             {

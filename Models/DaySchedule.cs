@@ -6,7 +6,7 @@ namespace teams_phonemanager.Models
     /// Represents business hours configuration for a single day of the week.
     /// Supports two time ranges per day (e.g., morning and afternoon shifts).
     /// </summary>
-    public partial class DaySchedule : ObservableObject
+    public partial class DaySchedule : ObservableObject, IDaySchedule
     {
         [ObservableProperty]
         private string _dayName = string.Empty;
