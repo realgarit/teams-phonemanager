@@ -27,6 +27,7 @@ namespace teams_phonemanager.Services
         }
 
         public string GetCheckModulesCommand() => _commonBuilder.GetCheckModulesCommand();
+        public string GetCommonSetupScript() => _commonBuilder.GetCommonSetupScript();
         public string GetConnectTeamsCommand() => _commonBuilder.GetConnectTeamsCommand();
         public string GetConnectGraphCommand() => _commonBuilder.GetConnectGraphWithTokenCommand("");
         public string GetConnectGraphWithTokenCommand(string accessToken) => _commonBuilder.GetConnectGraphWithTokenCommand(accessToken);
