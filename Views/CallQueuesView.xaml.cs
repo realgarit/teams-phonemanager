@@ -11,7 +11,6 @@ namespace teams_phonemanager.Views
         public CallQueuesView()
         {
             InitializeComponent();
-            DataContext = Program.Services?.GetService<CallQueuesViewModel>();
         }
 
         private CallQueuesViewModel? VM => DataContext as CallQueuesViewModel;

@@ -9,7 +9,6 @@ namespace teams_phonemanager.Views
         public GetStartedView()
         {
             InitializeComponent();
-            DataContext = Program.Services?.GetService<GetStartedViewModel>();
         }
     }
 } 

@@ -9,7 +9,6 @@ namespace teams_phonemanager.Views
         public BulkOperationsView()
         {
             InitializeComponent();
-            DataContext = Program.Services?.GetService<BulkOperationsViewModel>();
         }
     }
 }

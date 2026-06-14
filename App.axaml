@@ -6,6 +6,10 @@
              xmlns:fi="using:FluentIcons.Avalonia"
              x:Class="teams_phonemanager.App"
              RequestedThemeVariant="Dark">
+    <Application.DataTemplates>
+        <!-- VM-first view resolution (replaces the per-View service-locator). -->
+        <local:ViewLocator/>
+    </Application.DataTemplates>
     <Application.Resources>
         <ResourceDictionary>
             <!-- Value Converters -->

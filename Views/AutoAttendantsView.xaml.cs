@@ -11,7 +11,6 @@ namespace teams_phonemanager.Views
         public AutoAttendantsView()
         {
             InitializeComponent();
-            DataContext = Program.Services?.GetService<AutoAttendantsViewModel>();
         }
 
         private AutoAttendantsViewModel? VM => DataContext as AutoAttendantsViewModel;

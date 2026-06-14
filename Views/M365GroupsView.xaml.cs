@@ -11,7 +11,6 @@ namespace teams_phonemanager.Views
         public M365GroupsView()
         {
             InitializeComponent();
-            DataContext = Program.Services?.GetService<M365GroupsViewModel>();
         }
 
         private M365GroupsViewModel? VM => DataContext as M365GroupsViewModel;
