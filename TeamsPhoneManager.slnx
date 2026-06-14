@@ -3,6 +3,7 @@
     <Project Path="src/TeamsPhoneManager.Application/TeamsPhoneManager.Application.csproj" />
     <Project Path="src/TeamsPhoneManager.Domain/TeamsPhoneManager.Domain.csproj" />
     <Project Path="src/TeamsPhoneManager.Infrastructure/TeamsPhoneManager.Infrastructure.csproj" />
+    <Project Path="src/TeamsPhoneManager.Presentation/TeamsPhoneManager.Presentation.csproj" />
   </Folder>
   <Project Path="teams-phonemanager.csproj" />
   <Project Path="teams-phonemanager.Tests/teams-phonemanager.Tests.csproj" />

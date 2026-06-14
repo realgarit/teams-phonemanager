@@ -124,7 +124,10 @@ jobs:
       run: dotnet test teams-phonemanager.Tests/teams-phonemanager.Tests.csproj --configuration Release --no-build --verbosity normal
 
     - name: Publish
-      run: dotnet publish teams-phonemanager.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained false --output ./publish/${{ matrix.runtime }} /p:OutputType=${{ matrix.output-type }}
+      # OutputType is set in the project (WinExe). It must NOT be passed as a global -p:OutputType,
+      # because that propagates to the referenced class libraries and makes them fail with CS5001
+      # (no Main). The matrix output-type column is retained for documentation only.
+      run: dotnet publish teams-phonemanager.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained false --output ./publish/${{ matrix.runtime }}
     
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4

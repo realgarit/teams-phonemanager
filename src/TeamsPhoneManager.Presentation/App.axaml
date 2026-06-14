@@ -17,8 +17,8 @@
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
 
             <!-- Typography assets -->
-            <FontFamily x:Key="DisplayFontFamily">avares://teams-phonemanager/Resources/Fonts#Sora</FontFamily>
-            <FontFamily x:Key="CodeFontFamily">avares://teams-phonemanager/Resources/Fonts#JetBrains Mono</FontFamily>
+            <FontFamily x:Key="DisplayFontFamily">avares://TeamsPhoneManager.Presentation/Resources/Fonts#Sora</FontFamily>
+            <FontFamily x:Key="CodeFontFamily">avares://TeamsPhoneManager.Presentation/Resources/Fonts#JetBrains Mono</FontFamily>
 
             <!-- Softer default corner radii for inputs and flyouts -->
             <CornerRadius x:Key="ControlCornerRadius">8</CornerRadius>

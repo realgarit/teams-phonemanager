@@ -1010,7 +1010,7 @@
                                 BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
                                 CornerRadius="4"
                                 Margin="0,0,0,16">
-                            <Image Source="avares://teams-phonemanager/Resources/AargauHolidaysReference.png"
+                            <Image Source="avares://TeamsPhoneManager.Presentation/Resources/AargauHolidaysReference.png"
                                    Stretch="Uniform"
                                    MaxHeight="400"
                                    AutomationProperties.Name="Aargau Holiday Reference Table"/>
