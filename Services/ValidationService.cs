@@ -38,7 +38,7 @@ namespace teams_phonemanager.Services
             return result;
         }
 
-        public ValidationResult ValidateVariables(PhoneManagerVariables variables)
+        public ValidationResult ValidateVariables(IPhoneManagerVariables variables)
         {
             var result = new ValidationResult();
 
