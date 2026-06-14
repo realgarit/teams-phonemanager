@@ -270,3 +270,43 @@ jobs:
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+
+  pr-validate:
+    name: PR Validate ${{ matrix.runtime }}
+    # Pre-merge gate: build + test + publish on every runtime, WITHOUT tagging or releasing.
+    # The release jobs above are main-only, so without this a PR would have no CI to gate on.
+    if: github.event_name == 'pull_request'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            runtime: win-x64
+          - os: macos-latest
+            runtime: osx-x64
+          - os: macos-latest
+            runtime: osx-arm64
+          - os: ubuntu-latest
+            runtime: linux-x64
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore TeamsPhoneManager.slnx
+
+    - name: Build
+      run: dotnet build TeamsPhoneManager.slnx --configuration Release --no-restore
+
+    - name: Run tests
+      run: dotnet test teams-phonemanager.Tests/teams-phonemanager.Tests.csproj --configuration Release --no-build --verbosity normal
+
+    - name: Publish (packaging smoke, not released)
+      run: dotnet publish teams-phonemanager.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained false --output ./publish/${{ matrix.runtime }}
