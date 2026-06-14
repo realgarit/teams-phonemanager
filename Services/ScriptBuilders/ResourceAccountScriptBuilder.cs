@@ -23,7 +23,7 @@ namespace teams_phonemanager.Services.ScriptBuilders
             return BuildRetrieveCommand(ConstantsService.Naming.ResourceAccountAutoAttendantPrefix);
         }
 
-        public string GetCreateResourceAccountCommand(PhoneManagerVariables variables)
+        public string GetCreateResourceAccountCommand(IPhoneManagerVariables variables)
             => GetCreateResourceAccountCommand(variables.RacqUPN, variables.RacqDisplayName, variables.CsAppCqId);
 
         public string GetCreateResourceAccountCommand(string upn, string displayName, string appId)
@@ -31,7 +31,7 @@ namespace teams_phonemanager.Services.ScriptBuilders
             return BuildCreateCommand(upn, displayName, appId);
         }
 
-        public string GetCreateAutoAttendantResourceAccountCommand(PhoneManagerVariables variables)
+        public string GetCreateAutoAttendantResourceAccountCommand(IPhoneManagerVariables variables)
             => GetCreateAutoAttendantResourceAccountCommand(variables.RaaaUPN, variables.RaaaDisplayName, variables.CsAppAaId);
 
         public string GetCreateAutoAttendantResourceAccountCommand(string upn, string displayName, string appId)

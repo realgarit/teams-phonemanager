@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace teams_phonemanager.Models
 {
-    public partial class HolidayEntry : ObservableObject
+    public partial class HolidayEntry : ObservableObject, IHolidayEntry
     {
         [ObservableProperty]
         private DateTime _date = DateTime.Now;

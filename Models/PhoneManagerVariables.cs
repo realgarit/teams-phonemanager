@@ -7,7 +7,7 @@ using teams_phonemanager.Services;
 
 namespace teams_phonemanager.Models
 {
-    public partial class PhoneManagerVariables : ObservableObject
+    public partial class PhoneManagerVariables : ObservableObject, IPhoneManagerVariables
     {
         [ObservableProperty]
         private string _groupName = string.Empty;
@@ -230,6 +230,10 @@ namespace teams_phonemanager.Models
         public string RaaaUPN => $"raaa-{Customer}-{RaaAnrName}-{CustomerGroupName}{MsFallbackDomain}";
         public string RaaaDisplayName => $"raaa-{Customer}-{RaaAnrName}-{CustomerGroupName}";
         public string AaDisplayName => $"aa-{Customer}-{RaaAnrName}-{CustomerGroupName}";
+
+        // Explicit IPhoneManagerVariables member: expose the bindable ObservableCollection as the
+        // read-only Domain contract (covariant ObservableCollection<DaySchedule> -> IReadOnlyList<IDaySchedule>).
+        IReadOnlyList<IDaySchedule> IPhoneManagerVariables.WeeklySchedule => WeeklySchedule;
 
         public string HolidayName
         {

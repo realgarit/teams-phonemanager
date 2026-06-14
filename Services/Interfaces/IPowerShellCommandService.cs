@@ -25,8 +25,8 @@ public interface IPowerShellCommandService
 
     // Call Queue operations
     string GetRetrieveCallQueuesCommand();
-    string GetCreateCallQueueCommand(PhoneManagerVariables variables);
-    string GetCreateCallQueueCommand(string name, string languageId, string m365GroupId, PhoneManagerVariables? variables = null);
+    string GetCreateCallQueueCommand(IPhoneManagerVariables variables);
+    string GetCreateCallQueueCommand(string name, string languageId, string m365GroupId, IPhoneManagerVariables? variables = null);
     string GetAssociateResourceAccountWithCallQueueCommand(string resourceAccountUpn, string callQueueName);
     string GetValidateCallQueueResourceAccountCommand(string racqUpn);
     string GetCreateCallTargetCommand(string racqUpn);
@@ -35,16 +35,16 @@ public interface IPowerShellCommandService
 
     // Auto Attendant operations
     string GetRetrieveAutoAttendantsCommand();
-    string GetCreateAutoAttendantCommand(PhoneManagerVariables variables);
-    string GetCreateSimpleAutoAttendantCommand(PhoneManagerVariables variables);
+    string GetCreateAutoAttendantCommand(IPhoneManagerVariables variables);
+    string GetCreateSimpleAutoAttendantCommand(IPhoneManagerVariables variables);
     string GetCreateSimpleAutoAttendantCommand(string aaName, string languageId, string timeZoneId);
     string GetVerifyAutoAttendantCommand(string aaDisplayName);
     string GetAttachHolidayToAutoAttendantCommand(string holidayName, string aaDisplayName, string holidayGreetingPrompt);
     string GetAssociateResourceAccountWithAutoAttendantCommand(string resourceAccountUpn, string autoAttendantName);
     string GetAssignPhoneNumberToAutoAttendantCommand(string upn, string phoneNumber, string phoneNumberType);
-    string GetCreateDefaultCallFlowCommand(PhoneManagerVariables variables);
-    string GetCreateAfterHoursCallFlowCommand(PhoneManagerVariables variables);
-    string GetCreateAfterHoursScheduleCommand(PhoneManagerVariables variables);
+    string GetCreateDefaultCallFlowCommand(IPhoneManagerVariables variables);
+    string GetCreateAfterHoursCallFlowCommand(IPhoneManagerVariables variables);
+    string GetCreateAfterHoursScheduleCommand(IPhoneManagerVariables variables);
     string GetCreateCallHandlingAssociationCommand();
     string GetRemoveAutoAttendantCommand(string autoAttendantName);
     string GetRemoveScheduleCommand(string scheduleName);
@@ -52,14 +52,14 @@ public interface IPowerShellCommandService
     // Holiday operations
     string GetCreateHolidayCommand(string holidayName, DateTime holidayDate);
     string GetCreateHolidaySeriesCommand(string holidayName, List<DateTime> holidayDates);
-    string GetCreateHolidaySeriesFromEntriesCommand(string holidayName, List<HolidayEntry> holidayEntries);
+    string GetCreateHolidaySeriesFromEntriesCommand(string holidayName, IReadOnlyList<IHolidayEntry> holidayEntries);
 
     // Resource Account operations
     string GetRetrieveResourceAccountsCommand();
     string GetRetrieveAutoAttendantResourceAccountsCommand();
-    string GetCreateResourceAccountCommand(PhoneManagerVariables variables);
+    string GetCreateResourceAccountCommand(IPhoneManagerVariables variables);
     string GetCreateResourceAccountCommand(string upn, string displayName, string appId);
-    string GetCreateAutoAttendantResourceAccountCommand(PhoneManagerVariables variables);
+    string GetCreateAutoAttendantResourceAccountCommand(IPhoneManagerVariables variables);
     string GetCreateAutoAttendantResourceAccountCommand(string upn, string displayName, string appId);
     string GetUpdateResourceAccountUsageLocationCommand(string upn, string usageLocation);
     string GetUpdateAutoAttendantResourceAccountUsageLocationCommand(string upn, string usageLocation);

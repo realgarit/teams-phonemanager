@@ -33,7 +33,7 @@ catch {
 }";
         }
 
-        public string GetCreateAutoAttendantCommand(PhoneManagerVariables variables)
+        public string GetCreateAutoAttendantCommand(IPhoneManagerVariables variables)
         {
             var defaultCallFlow = BuildCallFlow(variables, "Default", variables.AaDefaultGreetingType, variables.AaDefaultGreetingTextToSpeechPrompt, variables.AaDefaultGreetingAudioFileId, variables.AaDefaultAction, variables.AaDefaultActionTarget);
             var afterHoursCallFlow = BuildCallFlow(variables, "After Hours", variables.AaAfterHoursGreetingType, variables.AaAfterHoursGreetingTextToSpeechPrompt, variables.AaAfterHoursGreetingAudioFileId, variables.AaAfterHoursAction, variables.AaAfterHoursActionTarget);
@@ -87,7 +87,7 @@ $aaautoAttendantId = (Get-CsAutoAttendant -NameFilter ""{sanitizedAaDisplayName}
 New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceId) -ConfigurationId $aaautoAttendantId -ConfigurationType AutoAttendant";
         }
 
-        private string BuildCallFlow(PhoneManagerVariables variables, string flowName, string? greetingType, string? ttsPrompt, string? audioFileId, string? action, string? actionTarget)
+        private string BuildCallFlow(IPhoneManagerVariables variables, string flowName, string? greetingType, string? ttsPrompt, string? audioFileId, string? action, string? actionTarget)
         {
             var sb = new StringBuilder();
             var prefix = flowName.Replace(" ", "").ToLower();
@@ -222,7 +222,7 @@ catch {{
 }}";
         }
 
-        public string GetCreateDefaultCallFlowCommand(PhoneManagerVariables variables)
+        public string GetCreateDefaultCallFlowCommand(IPhoneManagerVariables variables)
         {
             var callFlowScript = BuildCallFlow(variables, "Default", variables.AaDefaultGreetingType, variables.AaDefaultGreetingTextToSpeechPrompt, variables.AaDefaultGreetingAudioFileId, variables.AaDefaultAction, variables.AaDefaultActionTarget);
             return $@"
@@ -235,7 +235,7 @@ catch {{
 }}";
         }
 
-        public string GetCreateAfterHoursCallFlowCommand(PhoneManagerVariables variables)
+        public string GetCreateAfterHoursCallFlowCommand(IPhoneManagerVariables variables)
         {
             var callFlowScript = BuildCallFlow(variables, "After Hours", variables.AaAfterHoursGreetingType, variables.AaAfterHoursGreetingTextToSpeechPrompt, variables.AaAfterHoursGreetingAudioFileId, variables.AaAfterHoursAction, variables.AaAfterHoursActionTarget);
             return $@"
@@ -248,7 +248,7 @@ catch {{
 }}";
         }
 
-        public string GetCreateAfterHoursScheduleCommand(PhoneManagerVariables variables)
+        public string GetCreateAfterHoursScheduleCommand(IPhoneManagerVariables variables)
         {
             if (variables.UsePerDaySchedule)
             {
@@ -289,7 +289,7 @@ catch {{
 }}";
         }
 
-        public string GetCreateSimpleAutoAttendantCommand(PhoneManagerVariables variables)
+        public string GetCreateSimpleAutoAttendantCommand(IPhoneManagerVariables variables)
             => GetCreateSimpleAutoAttendantCommand(variables.AaDisplayName, variables.LanguageId, variables.TimeZoneId);
 
         public string GetCreateSimpleAutoAttendantCommand(string aaName, string languageId, string timeZoneId)
@@ -377,7 +377,7 @@ catch {{
 }}";
         }
 
-        private string BuildPerDayScheduleScript(PhoneManagerVariables variables)
+        private string BuildPerDayScheduleScript(IPhoneManagerVariables variables)
         {
             var sb = new StringBuilder();
             sb.AppendLine(@"

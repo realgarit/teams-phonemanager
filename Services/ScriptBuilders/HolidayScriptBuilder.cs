@@ -37,7 +37,7 @@ catch {{
         public string GetCreateHolidaySeriesCommand(string holidayName, List<DateTime> holidayDates)
         {
             // Convert simple DateTime list to HolidayEntry list (backward compatibility)
-            var entries = holidayDates.Select(d => new HolidayEntry(d, d.TimeOfDay)).ToList();
+            var entries = holidayDates.Select(d => new HolidayDate(d, d.TimeOfDay)).ToList();
             return GetCreateHolidaySeriesFromEntriesCommand(holidayName, entries);
         }
 
@@ -45,7 +45,7 @@ catch {{
         /// Creates a holiday series command supporting optional end dates for multi-day holidays.
         /// When a HolidayEntry has EndDate set, the -End parameter is included in the date range.
         /// </summary>
-        public string GetCreateHolidaySeriesFromEntriesCommand(string holidayName, List<HolidayEntry> holidayEntries)
+        public string GetCreateHolidaySeriesFromEntriesCommand(string holidayName, IReadOnlyList<IHolidayEntry> holidayEntries)
         {
             var sanitizedHolidayName = _sanitizer.SanitizeString(holidayName);
 
