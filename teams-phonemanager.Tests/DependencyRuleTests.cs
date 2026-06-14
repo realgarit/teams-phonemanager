@@ -62,5 +62,29 @@ namespace teams_phonemanager.Tests
                 leaks.Length == 0,
                 $"Application must be free of UI/IO frameworks but references: {string.Join(", ", leaks)}");
         }
+
+        [Fact]
+        public void Infrastructure_assembly_does_not_reference_ui_frameworks()
+        {
+            // Infrastructure may use System.Management.Automation / Microsoft.Identity.Client,
+            // but must never depend on a UI framework (the Dependency Rule points inward).
+            var infrastructure = typeof(teams_phonemanager.Services.PowerShellContextService).Assembly;
+            Assert.Equal("TeamsPhoneManager.Infrastructure", infrastructure.GetName().Name);
+
+            string[] forbiddenUi = { "Avalonia", "CommunityToolkit.Mvvm", "FluentAvalonia", "FluentIcons" };
+
+            var referenced = infrastructure.GetReferencedAssemblies()
+                .Select(a => a.Name ?? string.Empty)
+                .ToArray();
+
+            var leaks = referenced
+                .Where(name => forbiddenUi.Any(f =>
+                    name.StartsWith(f, StringComparison.OrdinalIgnoreCase)))
+                .ToArray();
+
+            Assert.True(
+                leaks.Length == 0,
+                $"Infrastructure must not reference UI frameworks but references: {string.Join(", ", leaks)}");
+        }
     }
 }
