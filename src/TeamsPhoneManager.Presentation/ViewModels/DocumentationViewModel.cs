@@ -13,7 +13,7 @@ namespace teams_phonemanager.ViewModels
 {
     public partial class DocumentationViewModel : ViewModelBase
     {
-        private readonly DocumentationScriptBuilder _docBuilder;
+        private readonly IDocumentationScriptBuilder _docBuilder;
 
         [ObservableProperty]
         private string _documentationOutput = string.Empty;
@@ -47,7 +47,7 @@ namespace teams_phonemanager.ViewModels
             IValidationService validationService,
             ISharedStateService sharedStateService,
             IDialogService dialogService,
-            DocumentationScriptBuilder docBuilder)
+            IDocumentationScriptBuilder docBuilder)
             : base(powerShellContextService, powerShellCommandService, loggingService,
                   sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
         {

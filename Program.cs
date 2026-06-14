@@ -65,7 +65,7 @@ class Program
         services.AddTransient<AutoAttendantScriptBuilder>();
         services.AddTransient<HolidayScriptBuilder>();
         services.AddTransient<ResourceAccountScriptBuilder>();
-        services.AddTransient<DocumentationScriptBuilder>();
+        services.AddTransient<IDocumentationScriptBuilder, DocumentationScriptBuilder>();
         services.AddTransient<BulkOperationsScriptBuilder>();
 
         // ViewModels (transient - new instance per navigation)

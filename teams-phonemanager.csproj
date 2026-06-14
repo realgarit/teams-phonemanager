@@ -45,11 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AvaloniaResource Include="Resources\AargauHolidaysReference.png" />
-    <AvaloniaResource Include="Resources\Fonts\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <!-- Exclude archived test files from build -->
     <Compile Remove="Archive\**\*.cs" />
     <Compile Remove="Archive\**\*.axaml.cs" />
@@ -76,6 +71,7 @@
     <ProjectReference Include="src\TeamsPhoneManager.Domain\TeamsPhoneManager.Domain.csproj" />
     <ProjectReference Include="src\TeamsPhoneManager.Application\TeamsPhoneManager.Application.csproj" />
     <ProjectReference Include="src\TeamsPhoneManager.Infrastructure\TeamsPhoneManager.Infrastructure.csproj" />
+    <ProjectReference Include="src\TeamsPhoneManager.Presentation\TeamsPhoneManager.Presentation.csproj" />
   </ItemGroup>
 
   <ItemGroup>

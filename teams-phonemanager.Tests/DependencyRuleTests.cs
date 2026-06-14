@@ -86,5 +86,35 @@ namespace teams_phonemanager.Tests
                 leaks.Length == 0,
                 $"Infrastructure must not reference UI frameworks but references: {string.Join(", ", leaks)}");
         }
+
+        [Fact]
+        public void Presentation_assembly_does_not_reference_infrastructure_or_io_frameworks()
+        {
+            // Presentation depends inward on Domain + Application only. Concrete implementations
+            // (PowerShell/MSAL) are wired by the composition root, never referenced by the UI.
+            var presentation = typeof(teams_phonemanager.ViewModels.MainWindowViewModel).Assembly;
+            Assert.Equal("TeamsPhoneManager.Presentation", presentation.GetName().Name);
+
+            string[] forbidden =
+            {
+                "TeamsPhoneManager.Infrastructure",
+                "System.Management.Automation",
+                "Microsoft.PowerShell",
+                "Microsoft.Identity.Client",
+            };
+
+            var referenced = presentation.GetReferencedAssemblies()
+                .Select(a => a.Name ?? string.Empty)
+                .ToArray();
+
+            var leaks = referenced
+                .Where(name => forbidden.Any(f =>
+                    name.StartsWith(f, StringComparison.OrdinalIgnoreCase)))
+                .ToArray();
+
+            Assert.True(
+                leaks.Length == 0,
+                $"Presentation must depend only inward (Domain/Application) but references: {string.Join(", ", leaks)}");
+        }
     }
 }

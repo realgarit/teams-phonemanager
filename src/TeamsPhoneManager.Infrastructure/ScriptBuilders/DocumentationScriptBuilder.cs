@@ -6,7 +6,7 @@ namespace teams_phonemanager.Services.ScriptBuilders
     /// <summary>
     /// Builds PowerShell scripts for gathering tenant documentation data.
     /// </summary>
-    public class DocumentationScriptBuilder
+    public class DocumentationScriptBuilder : IDocumentationScriptBuilder
     {
         private readonly CommonScriptBuilder _commonBuilder;
 
