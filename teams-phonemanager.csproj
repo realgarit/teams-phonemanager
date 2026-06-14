@@ -62,6 +62,18 @@
     <Compile Remove="teams-phonemanager.Tests\**\*.cs" />
     <None Remove="teams-phonemanager.Tests\**" />
     <EmbeddedResource Remove="teams-phonemanager.Tests\**" />
+
+    <!-- Exclude Clean Architecture layer libraries: they are built as their own projects
+         under src\, but the app project (rooted at the repo root) would otherwise glob and
+         double-compile their sources. -->
+    <Compile Remove="src\**\*.cs" />
+    <None Remove="src\**" />
+    <EmbeddedResource Remove="src\**" />
+    <AvaloniaXaml Remove="src\**\*.axaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="src\TeamsPhoneManager.Domain\TeamsPhoneManager.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

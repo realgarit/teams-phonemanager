@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\teams-phonemanager.csproj" />
+    <ProjectReference Include="..\src\TeamsPhoneManager.Domain\TeamsPhoneManager.Domain.csproj" />
   </ItemGroup>
 
 </Project>
