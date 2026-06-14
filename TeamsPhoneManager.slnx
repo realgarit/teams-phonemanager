@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/TeamsPhoneManager.Application/TeamsPhoneManager.Application.csproj" />
     <Project Path="src/TeamsPhoneManager.Domain/TeamsPhoneManager.Domain.csproj" />
   </Folder>
   <Project Path="teams-phonemanager.csproj" />

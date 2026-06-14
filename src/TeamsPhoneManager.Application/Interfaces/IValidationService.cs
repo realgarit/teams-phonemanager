@@ -8,7 +8,7 @@ namespace teams_phonemanager.Services.Interfaces;
 public interface IValidationService
 {
     ValidationResult ValidatePrerequisites();
-    ValidationResult ValidateVariables(PhoneManagerVariables variables);
+    ValidationResult ValidateVariables(IPhoneManagerVariables variables);
     ValidationResult ValidateHolidayDate(DateTime holidayDate);
     bool IsValidEmail(string email);
     bool IsValidPhoneNumber(string phoneNumber);
