@@ -9,6 +9,7 @@ public interface IPowerShellCommandService
 {
     // Common commands
     string GetCheckModulesCommand();
+    string GetCommonSetupScript();
     string GetConnectTeamsCommand();
     string GetConnectGraphCommand();
     string GetConnectGraphWithTokenCommand(string accessToken);

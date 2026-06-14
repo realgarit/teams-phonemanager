@@ -15,23 +15,14 @@ namespace teams_phonemanager.Services.ScriptBuilders
     /// </summary>
     public class BulkOperationsScriptBuilder
     {
-        private readonly CommonScriptBuilder _commonBuilder;
-        private readonly CallQueueScriptBuilder _callQueueBuilder;
-        private readonly AutoAttendantScriptBuilder _autoAttendantBuilder;
-        private readonly ResourceAccountScriptBuilder _resourceAccountBuilder;
+        private readonly IPowerShellCommandService _commands;
         private readonly IPowerShellSanitizationService _sanitizer;
 
         public BulkOperationsScriptBuilder(
-            CommonScriptBuilder commonBuilder,
-            CallQueueScriptBuilder callQueueBuilder,
-            AutoAttendantScriptBuilder autoAttendantBuilder,
-            ResourceAccountScriptBuilder resourceAccountBuilder,
+            IPowerShellCommandService commands,
             IPowerShellSanitizationService sanitizer)
         {
-            _commonBuilder = commonBuilder;
-            _callQueueBuilder = callQueueBuilder;
-            _autoAttendantBuilder = autoAttendantBuilder;
-            _resourceAccountBuilder = resourceAccountBuilder;
+            _commands = commands;
             _sanitizer = sanitizer;
         }
 
@@ -126,7 +117,7 @@ namespace teams_phonemanager.Services.ScriptBuilders
         public string GenerateBulkScript(List<PhoneManagerVariables> entries)
         {
             var sb = new StringBuilder();
-            sb.AppendLine(_commonBuilder.GetCommonSetupScript());
+            sb.AppendLine(_commands.GetCommonSetupScript());
             sb.AppendLine();
             sb.AppendLine("# ══════════════════════════════════════════════════════════════");
             sb.AppendLine($"# Bulk Operations — {entries.Count} entries");
@@ -158,45 +149,45 @@ namespace teams_phonemanager.Services.ScriptBuilders
                 // Step 1: M365 Group
                 sb.AppendLine($"# Step 1: Create M365 Group");
                 sb.AppendLine($"Write-Host '  [1/6] Creating M365 Group: {safeM365Group}'");
-                sb.AppendLine(_commonBuilder.GetCreateM365GroupCommand(vars.M365Group));
+                sb.AppendLine(_commands.GetCreateM365GroupCommand(vars.M365Group));
                 sb.AppendLine();
 
                 // Step 2: CQ Resource Account + License
                 sb.AppendLine($"# Step 2: Create CQ Resource Account + License");
                 sb.AppendLine($"Write-Host '  [2/6] Creating CQ Resource Account: {safeRacqUPN}'");
-                sb.AppendLine(_resourceAccountBuilder.GetCreateResourceAccountCommand(vars));
-                sb.AppendLine(_resourceAccountBuilder.GetUpdateResourceAccountUsageLocationCommand(vars.RacqUPN, vars.UsageLocation));
-                sb.AppendLine(_commonBuilder.GetAssignLicenseCommand(vars.RacqUPN, vars.SkuId));
+                sb.AppendLine(_commands.GetCreateResourceAccountCommand(vars));
+                sb.AppendLine(_commands.GetUpdateResourceAccountUsageLocationCommand(vars.RacqUPN, vars.UsageLocation));
+                sb.AppendLine(_commands.GetAssignLicenseCommand(vars.RacqUPN, vars.SkuId));
                 sb.AppendLine();
 
                 // Step 3: Call Queue
                 sb.AppendLine($"# Step 3: Create Call Queue");
                 sb.AppendLine($"Write-Host '  [3/6] Creating Call Queue: {safeCqDisplayName}'");
-                sb.AppendLine(_callQueueBuilder.GetCreateCallQueueCommand(vars));
+                sb.AppendLine(_commands.GetCreateCallQueueCommand(vars));
                 sb.AppendLine();
 
                 // Step 4: AA Resource Account + License + Phone
                 sb.AppendLine($"# Step 4: Create AA Resource Account + License + Phone");
                 sb.AppendLine($"Write-Host '  [4/6] Creating AA Resource Account: {safeRaaaUPN}'");
-                sb.AppendLine(_resourceAccountBuilder.GetCreateAutoAttendantResourceAccountCommand(vars));
-                sb.AppendLine(_resourceAccountBuilder.GetUpdateAutoAttendantResourceAccountUsageLocationCommand(vars.RaaaUPN, vars.UsageLocation));
-                sb.AppendLine(_resourceAccountBuilder.GetAssignAutoAttendantLicenseCommand(vars.RaaaUPN, vars.SkuId));
+                sb.AppendLine(_commands.GetCreateAutoAttendantResourceAccountCommand(vars));
+                sb.AppendLine(_commands.GetUpdateAutoAttendantResourceAccountUsageLocationCommand(vars.RaaaUPN, vars.UsageLocation));
+                sb.AppendLine(_commands.GetAssignAutoAttendantLicenseCommand(vars.RaaaUPN, vars.SkuId));
                 if (!string.IsNullOrEmpty(vars.RaaAnr))
                 {
-                    sb.AppendLine(_autoAttendantBuilder.GetAssignPhoneNumberToAutoAttendantCommand(vars.RaaaUPN, vars.RaaAnr, vars.PhoneNumberType));
+                    sb.AppendLine(_commands.GetAssignPhoneNumberToAutoAttendantCommand(vars.RaaaUPN, vars.RaaAnr, vars.PhoneNumberType));
                 }
                 sb.AppendLine();
 
                 // Step 5: Auto Attendant (monolithic — runs as one connected script)
                 sb.AppendLine($"# Step 5: Create Auto Attendant");
                 sb.AppendLine($"Write-Host '  [5/6] Creating Auto Attendant: {safeAaDisplayName}'");
-                sb.AppendLine(_autoAttendantBuilder.GetCreateAutoAttendantCommand(vars));
+                sb.AppendLine(_commands.GetCreateAutoAttendantCommand(vars));
                 sb.AppendLine();
 
                 // Step 6: Associate AA RA
                 sb.AppendLine($"# Step 6: Associate AA Resource Account");
                 sb.AppendLine($"Write-Host '  [6/6] Associating RA with AA'");
-                sb.AppendLine(_autoAttendantBuilder.GetAssociateResourceAccountWithAutoAttendantCommand(vars.RaaaUPN, vars.AaDisplayName));
+                sb.AppendLine(_commands.GetAssociateResourceAccountWithAutoAttendantCommand(vars.RaaaUPN, vars.AaDisplayName));
                 sb.AppendLine();
 
                 sb.AppendLine($"Write-Host '✅ [{num}/{entries.Count}] Complete: {safeCustomer} - {safeGroupName}'");
