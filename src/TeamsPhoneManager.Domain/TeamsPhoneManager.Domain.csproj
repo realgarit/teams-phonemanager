@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    TeamsPhoneManager.Domain — the framework-free heart (Clean Architecture inner layer).
+
+    HARD RULE: this project MUST NOT reference any framework — no Avalonia, no
+    CommunityToolkit.Mvvm, no System.Management.Automation, no Microsoft.Identity.Client.
+    It contains only pure business rules and value objects. Enforced by DependencyRuleTests.
+
+    TargetFramework, Nullable, ImplicitUsings, analyzers inherited from Directory.Build.props.
+  -->
+  <PropertyGroup>
+    <RootNamespace>teams_phonemanager</RootNamespace>
+  </PropertyGroup>
+
+</Project>

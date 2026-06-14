@@ -67,7 +67,7 @@ Set-Content -Path $manifestPath -Value $manifestContent -NoNewline
 Write-Host "✓ Updated app.manifest" -ForegroundColor Green
 
 # Update ConstantsService.cs (use 3-part version for display)
-$constantsPath = Join-Path $repoRoot "Services\ConstantsService.cs"
+$constantsPath = Join-Path $repoRoot "src\TeamsPhoneManager.Domain\ConstantsService.cs"
 $constantsContent = Get-Content $constantsPath -Raw
 # Use 3-part version for display (major.minor.patch)
 $displayVersion = "$major.$minor.$patch"
