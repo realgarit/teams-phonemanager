@@ -1,17 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <!-- TargetFramework, Nullable, ImplicitUsings, TreatWarningsAsErrors,
+         EnableNETAnalyzers and AnalysisLevel are inherited from Directory.Build.props. -->
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>teams_phonemanager</RootNamespace>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <AnalysisLevel>latest</AnalysisLevel>
-    <Version>3.15.0</Version>
-    <AssemblyVersion>3.15.0</AssemblyVersion>
-    <FileVersion>3.15.0</FileVersion>
+    <Version>3.16.0</Version>
+    <AssemblyVersion>3.16.0</AssemblyVersion>
+    <FileVersion>3.16.0</FileVersion>
     
     <!-- Publish Settings for Framework-Dependent Deployment -->
     <PublishSingleFile>false</PublishSingleFile>
@@ -49,11 +45,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AvaloniaResource Include="Resources\AargauHolidaysReference.png" />
-    <AvaloniaResource Include="Resources\Fonts\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <!-- Exclude archived test files from build -->
     <Compile Remove="Archive\**\*.cs" />
     <Compile Remove="Archive\**\*.axaml.cs" />
@@ -66,6 +57,21 @@
     <Compile Remove="teams-phonemanager.Tests\**\*.cs" />
     <None Remove="teams-phonemanager.Tests\**" />
     <EmbeddedResource Remove="teams-phonemanager.Tests\**" />
+
+    <!-- Exclude Clean Architecture layer libraries: they are built as their own projects
+         under src\, but the app project (rooted at the repo root) would otherwise glob and
+         double-compile their sources. -->
+    <Compile Remove="src\**\*.cs" />
+    <None Remove="src\**" />
+    <EmbeddedResource Remove="src\**" />
+    <AvaloniaXaml Remove="src\**\*.axaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="src\TeamsPhoneManager.Domain\TeamsPhoneManager.Domain.csproj" />
+    <ProjectReference Include="src\TeamsPhoneManager.Application\TeamsPhoneManager.Application.csproj" />
+    <ProjectReference Include="src\TeamsPhoneManager.Infrastructure\TeamsPhoneManager.Infrastructure.csproj" />
+    <ProjectReference Include="src\TeamsPhoneManager.Presentation\TeamsPhoneManager.Presentation.csproj" />
   </ItemGroup>
 
   <ItemGroup>

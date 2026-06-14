@@ -50,23 +50,38 @@ An Avalonia-based Microsoft Teams Phone Manager application built with .NET 10 t
 
 ## Architecture
 
-- .NET 10 Avalonia (cross-platform UI framework)
-- FluentAvalonia (Fluent design) with a custom dark/light theme
-- MVVM Pattern
-- Microsoft.PowerShell.SDK
-- Custom logging service for debugging and monitoring
+The solution follows **Clean Architecture** (Robert C. Martin): four layers as separate
+assemblies with dependencies pointing strictly inward. The Dependency Rule is enforced at
+build time by `DependencyRuleTests` (the build fails if a forbidden dependency leaks inward).
+
+- **Domain** — framework-free business rules and value objects (validation rules, the Swiss
+  holiday computus, naming/UPN contracts, constants). Zero framework dependencies.
+- **Application** — use-case orchestration and the ports (interfaces) the outer layers implement.
+- **Infrastructure** — adapters to the outside world; the only layer that references
+  `System.Management.Automation` and `Microsoft.Identity.Client`. Holds the PowerShell script
+  builders and the MSAL/Graph authentication flow.
+- **Presentation** — the Avalonia/MVVM UI (FluentAvalonia, custom dark/light theme); depends only
+  on Domain + Application. VM-first view resolution via a `ViewLocator` (no service locator).
+- The **executable** (`teams-phonemanager`) is the composition root: it wires implementations to
+  ports via dependency injection and references all four layers.
+
+Tech: .NET 10, Avalonia, CommunityToolkit.Mvvm, Microsoft.PowerShell.SDK, MSAL.
 
 ## Project Structure
 
 ```
 teams-phonemanager/
-├── Models/              # Data models
-├── ViewModels/          # MVVM ViewModels
-├── Views/               # Avalonia Views (AXAML)
-├── Services/            # Business logic services
-├── Helpers/             # Utility classes and converters
-├── Resources/           # Application resources
-├── Scripts/             # Publish & Download pwsh Modules
+├── Program.cs                         # Composition root (DI wiring, app entry point)
+├── teams-phonemanager.csproj          # Executable (references all four layers)
+├── TeamsPhoneManager.slnx             # Solution
+├── Directory.Build.props              # Shared compiler/analyzer settings
+├── src/
+│   ├── TeamsPhoneManager.Domain/         # Entities, rules, value objects (no frameworks)
+│   ├── TeamsPhoneManager.Application/     # Use cases + ports (interfaces)
+│   ├── TeamsPhoneManager.Infrastructure/  # PowerShell/Graph adapters (frozen script builders)
+│   └── TeamsPhoneManager.Presentation/    # Avalonia Views, ViewModels, Converters, Resources
+├── teams-phonemanager.Tests/          # xUnit tests incl. Dependency-Rule guards
+└── Scripts/                           # Publish & download PowerShell modules
 ```
 
 ## Contributing

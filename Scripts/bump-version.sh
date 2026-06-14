@@ -103,7 +103,7 @@ rm -f "$MANIFEST_PATH.bak"
 echo -e "\033[32m✓ Updated app.manifest\033[0m"
 
 # Update ConstantsService.cs (use 3-part version for display)
-CONSTANTS_PATH="$REPO_ROOT/Services/ConstantsService.cs"
+CONSTANTS_PATH="$REPO_ROOT/src/TeamsPhoneManager.Domain/ConstantsService.cs"
 sed -i.bak "s/public const string Version = \"Version [0-9.]*\";/public const string Version = \"Version $NEW_VERSION_SHORT\";/g" "$CONSTANTS_PATH"
 rm -f "$CONSTANTS_PATH.bak"
 echo -e "\033[32m✓ Updated ConstantsService.cs\033[0m"
