@@ -67,18 +67,14 @@
             <!-- Hero -->
             <StackPanel Classes="hero" HorizontalAlignment="Center" Margin="0,16,0,36">
                 <Border Width="76" Height="76"
-                        CornerRadius="22"
+                        CornerRadius="17"
                         HorizontalAlignment="Center"
-                        Background="{DynamicResource BrandGradientBrush}"
                         BoxShadow="0 10 36 0 #555B5FC7"
                         Margin="0,0,0,22">
-                    <fi:SymbolIcon Symbol="Call"
-                                   IsFilled="True"
-                                   FontSize="36"
-                                   Foreground="White"
-                                   Margin="0"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"/>
+                    <!-- The actual app icon, so branding matches the dock/taskbar/installer.
+                         CornerRadius mirrors the icon's own corner radius (76 * 230/1024). -->
+                    <Image Source="avares://TeamsPhoneManager.Presentation/Resources/app-icon.png"
+                           Width="76" Height="76"/>
                 </Border>
                 <TextBlock Text="Teams Phone Manager"
                          FontFamily="{StaticResource DisplayFontFamily}"

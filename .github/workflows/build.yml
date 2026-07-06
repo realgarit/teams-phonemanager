@@ -130,13 +130,30 @@ jobs:
       # (no Main).
       run: dotnet publish teams-phonemanager.csproj --configuration Release --runtime ${{ matrix.runtime }} --self-contained true --output ./publish/${{ matrix.runtime }}
 
-    - name: Package (macOS .app bundle, ad-hoc signed)
+    - name: Import signing certificate (macOS)
+      if: startsWith(matrix.runtime, 'osx-')
+      env:
+        P12_BASE64: ${{ secrets.SIGNING_CERT_P12_BASE64 }}
+        P12_PASSWORD: ${{ secrets.SIGNING_CERT_PASSWORD }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+      run: |
+        printf '%s' "$P12_BASE64" | base64 --decode > "$RUNNER_TEMP/signing.p12"
+        export KEYCHAIN="$RUNNER_TEMP/tpm-ci.keychain-db"
+        chmod +x Scripts/import-cert.sh
+        Scripts/import-cert.sh "$RUNNER_TEMP/signing.p12"
+        rm -f "$RUNNER_TEMP/signing.p12"
+        echo "KEYCHAIN=$KEYCHAIN" >> "$GITHUB_ENV"
+
+    - name: Package (macOS .app bundle, stable self-signed identity)
       if: startsWith(matrix.runtime, 'osx-')
       env:
         VERSION: ${{ needs.create-tag.outputs.tag_name }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       run: |
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
         chmod +x Scripts/package-macos.sh
-        ./Scripts/package-macos.sh ./publish/${{ matrix.runtime }} "${VERSION#v}" ./dist
+        SIGN_IDENTITY="Teams Phone Manager Self-Signed" \
+          ./Scripts/package-macos.sh ./publish/${{ matrix.runtime }} "${VERSION#v}" ./dist
         ditto -c -k --keepParent "./dist/Teams Phone Manager.app" "./dist/teams-phonemanager-${{ matrix.runtime }}.zip"
 
     - name: Package (Windows zip + Inno Setup installer)
