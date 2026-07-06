@@ -17,6 +17,34 @@ APP_NAME="Teams Phone Manager"
 BUNDLE_ID="ch.realgar.teams-phonemanager"
 APP="$OUTPUT_DIR/$APP_NAME.app"
 
+# Optional stable signing identity (tertius pattern): when SIGN_IDENTITY is
+# set (self-signed cert CN imported via Scripts/import-cert.sh), every Mach-O
+# is signed with it. Reusing the same certificate on every release keeps the
+# codesign designated requirement stable, so macOS treats upgrades as the same
+# app and keychain items (MSAL token cache) and TCC grants survive
+# `brew upgrade`. Without it, binaries keep/receive ad-hoc signatures.
+#
+# Signing happens on the PUBLISH output, BEFORE bundle assembly: codesign
+# refuses to sign a bundle's main executable in place (it would attempt to
+# seal the bundle and reject the .NET managed-dll layout as nested code).
+SIGN_IDENTITY="${SIGN_IDENTITY:-}"
+chmod +x "$PUBLISH_DIR/teams-phonemanager"
+find "$PUBLISH_DIR" -type f | while read -r f; do
+  if file "$f" | grep -q "Mach-O"; then
+    if [ -n "$SIGN_IDENTITY" ]; then
+      if [ "$(basename "$f")" = "teams-phonemanager" ]; then
+        codesign --force --sign "$SIGN_IDENTITY" --identifier "$BUNDLE_ID" \
+          ${KEYCHAIN:+--keychain "$KEYCHAIN"} "$f"
+      else
+        codesign --force --sign "$SIGN_IDENTITY" \
+          ${KEYCHAIN:+--keychain "$KEYCHAIN"} "$f"
+      fi
+    elif ! codesign --display "$f" >/dev/null 2>&1; then
+      codesign --force --sign - "$f"
+    fi
+  fi
+done
+
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
@@ -55,22 +83,18 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 
-# Ad-hoc signing, no paid Developer ID certificate. Homebrew downloads are not
-# quarantined, so signed Mach-Os are enough for a double-click launch via the
-# cask. dotnet publish already ad-hoc signs its output; sign only stragglers.
-# The bundle itself is NOT sealed: codesign rejects the .NET payload layout
-# (managed satellite dlls under Contents/MacOS read as unsigned "nested code"),
-# and re-signing the bundle's main executable would trigger that seal attempt.
-find "$APP/Contents/MacOS" -type f | while read -r f; do
-  if file "$f" | grep -q "Mach-O" && ! codesign --display "$f" >/dev/null 2>&1; then
-    codesign --force --sign - "$f"
-  fi
-done
-# Assert every Mach-O carries a signature.
+# Assert every Mach-O carries a signature (signing happened pre-assembly on
+# the publish output — codesign refuses to re-sign a bundle main executable
+# in place, and the bundle is never sealed because codesign rejects the .NET
+# managed-dll layout as unsigned "nested code").
 find "$APP/Contents/MacOS" -type f | while read -r f; do
   if file "$f" | grep -q "Mach-O"; then
     codesign --display "$f" >/dev/null 2>&1 || { echo "UNSIGNED: $f" >&2; exit 1; }
   fi
 done
 
+if [ -n "$SIGN_IDENTITY" ]; then
+  echo "Signed with identity: $SIGN_IDENTITY"
+  codesign -d --requirements - "$APP/Contents/MacOS/teams-phonemanager" 2>&1 | sed -n 's/^designated => /DR: /p'
+fi
 echo "Packaged: $APP"
