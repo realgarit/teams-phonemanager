@@ -14,9 +14,9 @@ BASE = 1024  # master render size
 SS = 4       # supersampling factor
 S = BASE * SS
 
-# Palette: indigo gradient badge, white glyph.
-GRAD_TOP = (99, 91, 213)     # #635BD5
-GRAD_BOTTOM = (65, 55, 165)  # #4137A5
+# Palette: matches the app's BrandGradientBrush (App.axaml), white glyph.
+GRAD_TOP = (106, 111, 221)   # #6A6FDD
+GRAD_BOTTOM = (75, 77, 158)  # #4B4D9E
 WHITE = (255, 255, 255, 255)
 
 
@@ -40,9 +40,11 @@ def rounded_badge():
 def draw_glyph(img):
     """Dial-pad glyph: 3x3 dots plus a bottom bar. Legible at 16px."""
     d = ImageDraw.Draw(img)
-    cx, cy = S * 0.5, S * 0.47   # pad slightly above center to make room for the bar
     gap = S * 0.155              # spacing between dot centers
     r = S * 0.058                # dot radius
+    # The glyph spans from (cy - gap - r) to (cy + 2*gap + r); solving for the
+    # optical center at S/2 gives cy = S/2 - gap/2.
+    cx, cy = S * 0.5, S * 0.5 - gap / 2
 
     for row in range(3):
         for col in range(3):
