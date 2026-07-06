@@ -45,3 +45,9 @@ TestResults/
 packages/
 *.nupkg
 project.lock.json
+
+# Local packaging outputs
+publish/
+artifacts-local/
+dist/
+assets/icon.iconset/

@@ -11,10 +11,55 @@ An Avalonia-based Microsoft Teams Phone Manager application built with .NET 10 t
 - Resource Accounts
 - Modern UI
 
+## Installation
+
+Builds are self-contained — no .NET runtime install required. The Microsoft Teams &
+Graph PowerShell modules and PowerShell 7 are included with the app.
+
+### macOS (Homebrew — recommended)
+
+```bash
+brew tap realgarit/tap
+brew install --cask teams-phonemanager
+```
+
+Update later with `brew upgrade --cask teams-phonemanager`.
+
+Manual alternative: download `teams-phonemanager-osx-arm64.zip` (Apple Silicon) or
+`teams-phonemanager-osx-x64.zip` (Intel) from the
+[latest release](https://github.com/realgarit/teams-phonemanager/releases/latest),
+unzip, and drag **Teams Phone Manager.app** to Applications. The app is not notarized,
+so for a manual download you must clear the quarantine flag once:
+`xattr -dr com.apple.quarantine "/Applications/Teams Phone Manager.app"`.
+
+### Windows (installer — recommended)
+
+Download `teams-phonemanager-win-x64-setup.exe` from the
+[latest release](https://github.com/realgarit/teams-phonemanager/releases/latest) and run it.
+It installs per-user (no admin rights needed) with a Start-menu shortcut and uninstaller.
+The installer is not code-signed yet, so SmartScreen may warn — choose
+**More info → Run anyway**. Running a newer installer upgrades in place.
+
+Portable alternative: download `teams-phonemanager-win-x64.zip`, extract, run
+`teams-phonemanager.exe`.
+
+### Linux
+
+Download `teams-phonemanager-linux-x64.zip`, extract, then:
+
+```bash
+chmod +x teams-phonemanager
+./teams-phonemanager
+```
+
+### Staying up to date
+
+The app checks GitHub Releases on startup and shows a banner when a newer version is
+available (silent when offline).
+
 ## Prerequisites
 
-- Windows 10/11, Windows Server 2019+, macOS 10.15+, or Linux (Ubuntu 20.04+)
-- .NET 10 Runtime (Desktop) - [Download here](https://dotnet.microsoft.com/download/dotnet/10.0)
+- Windows 10/11, Windows Server 2019+, macOS 12+, or Linux (Ubuntu 20.04+)
 - Microsoft Teams & Graph PowerShell Module (included with the app)
 - PowerShell 7.4+ (included with the app)
 
@@ -39,14 +84,6 @@ An Avalonia-based Microsoft Teams Phone Manager application built with .NET 10 t
    ```bash
    dotnet run
    ```
-
-## Usage
-
-1. Download from the latest release
-2. Run the application:
-   - Windows: `teams-phonemanager.exe`
-   - macOS: `teams-phonemanager` (or the .app bundle)
-   - Linux: `./teams-phonemanager`
 
 ## Architecture
 
