@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Teams Phone Manager app icon: dial-pad glyph. Geometry mirrors generate-icons.py — keep in sync. -->
+  <defs>
+    <linearGradient id="badge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#635BD5"/>
+      <stop offset="1" stop-color="#4137A5"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="230" fill="url(#badge)"/>
+  <!-- 3x3 dots: center (512,481.3), gap 158.7, r 59.4 -->
+  <g fill="#FFFFFF">
+    <circle cx="353.3" cy="322.6" r="59.4"/><circle cx="512" cy="322.6" r="59.4"/><circle cx="670.7" cy="322.6" r="59.4"/>
+    <circle cx="353.3" cy="481.3" r="59.4"/><circle cx="512" cy="481.3" r="59.4"/><circle cx="670.7" cy="481.3" r="59.4"/>
+    <circle cx="353.3" cy="640"   r="59.4"/><circle cx="512" cy="640"   r="59.4"/><circle cx="670.7" cy="640"   r="59.4"/>
+    <rect x="293.9" y="739.3" width="436.2" height="118.8" rx="59.4"/>
+  </g>
+</svg>

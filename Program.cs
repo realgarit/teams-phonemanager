@@ -48,6 +48,7 @@ class Program
         services.AddSingleton<IPowerShellContextService, PowerShellContextService>();
         services.AddSingleton<IMsalGraphAuthenticationService, MsalGraphAuthenticationService>();
         services.AddSingleton<ISharedStateService, SharedStateService>();
+        services.AddSingleton<IUpdateCheckService, GitHubUpdateCheckService>();
         
         // UI Services (singleton - manages UI state)
         services.AddSingleton<IDialogService, DialogService>();
