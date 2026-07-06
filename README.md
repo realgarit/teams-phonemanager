@@ -20,6 +20,7 @@ Graph PowerShell modules and PowerShell 7 are included with the app.
 
 ```bash
 brew tap realgarit/tap
+brew trust realgarit/tap   # newer Homebrew requires trusting third-party taps once
 brew install --cask teams-phonemanager
 ```
 
