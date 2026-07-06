@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="using:FluentAvalonia.UI.Controls"
         xmlns:fi="using:FluentIcons.Avalonia"
         xmlns:fic="using:FluentIcons.Common"
         xmlns:local="clr-namespace:teams_phonemanager"
@@ -12,6 +13,7 @@
         mc:Ignorable="d"
         x:Class="teams_phonemanager.MainWindow"
         Title="Teams Phone Manager"
+        Icon="avares://TeamsPhoneManager.Presentation/Resources/app-icon.png"
         Width="1280"
         Height="720"
         MinWidth="1024"
@@ -536,5 +538,20 @@
                 </ScrollViewer>
             </Grid>
         </Border>
+
+        <!-- Update notification banner (top overlay, dismissible) -->
+        <ui:InfoBar Grid.Column="0" Grid.ColumnSpan="2"
+                    Title="Update available"
+                    Message="{Binding UpdateBannerMessage}"
+                    IsOpen="{Binding IsUpdateBannerVisible, Mode=TwoWay}"
+                    Severity="Informational"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Center"
+                    MinWidth="420"
+                    Margin="0,8,0,0">
+            <ui:InfoBar.ActionButton>
+                <Button Content="View release" Command="{Binding OpenUpdatePageCommand}"/>
+            </ui:InfoBar.ActionButton>
+        </ui:InfoBar>
     </Grid>
 </Window>

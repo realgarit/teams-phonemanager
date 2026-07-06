@@ -26,6 +26,57 @@ namespace teams_phonemanager.ViewModels
         private PropertyChangedEventHandler? _navigationPropertyHandler;
 
         private readonly IPageViewModelFactory _pageViewModelFactory;
+        private readonly IUpdateCheckService _updateCheckService;
+
+        [ObservableProperty]
+        private bool _isUpdateBannerVisible;
+
+        [ObservableProperty]
+        private string _updateBannerMessage = string.Empty;
+
+        private string? _updateReleaseUrl;
+
+        private async Task CheckForUpdateAsync()
+        {
+            var update = await _updateCheckService.CheckForUpdateAsync();
+            if (update is null)
+            {
+                return;
+            }
+
+            _updateReleaseUrl = update.ReleaseUrl;
+            UpdateBannerMessage = $"Version {update.LatestVersion} is available.";
+            IsUpdateBannerVisible = true;
+            _loggingService.Log($"Update available: {update.LatestVersion}", LogLevel.Info);
+        }
+
+        [RelayCommand]
+        private void OpenUpdatePage()
+        {
+            if (_updateReleaseUrl is null)
+            {
+                return;
+            }
+
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = _updateReleaseUrl,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Could not open release page: {ex.Message}", LogLevel.Warning);
+            }
+        }
+
+        [RelayCommand]
+        private void DismissUpdateBanner()
+        {
+            IsUpdateBannerVisible = false;
+        }
 
         public ObservableCollection<string> LogEntries => _loggingService.LogEntries;
         public string LatestLogEntry => _loggingService.LatestLogEntry;
@@ -175,14 +226,18 @@ namespace teams_phonemanager.ViewModels
             IValidationService validationService,
             ISharedStateService sharedStateService,
             IDialogService dialogService,
-            IPageViewModelFactory pageViewModelFactory)
+            IPageViewModelFactory pageViewModelFactory,
+            IUpdateCheckService updateCheckService)
             : base(powerShellContextService, powerShellCommandService, loggingService,
                   sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
         {
             _pageViewModelFactory = pageViewModelFactory;
+            _updateCheckService = updateCheckService;
             CurrentViewModel = _pageViewModelFactory.Create(CurrentPage);
 
             _loggingService.Log("Application started", LogLevel.Info);
+
+            _ = CheckForUpdateAsync();
 
             _loggingPropertyHandler = (s, e) =>
             {
