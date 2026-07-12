@@ -88,9 +88,25 @@
                              Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                              IsVisible="{Binding StatusMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                     <!-- Progress -->
-                    <ProgressBar IsIndeterminate="True"
+                    <ProgressBar Minimum="0"
+                                 Maximum="100"
+                                 Value="{Binding ProgressValue}"
+                                 IsIndeterminate="{Binding IsProgressIndeterminate}"
                                  IsVisible="{Binding IsExecuting}"
                                  Margin="0,6,0,0"/>
+                    <!-- Native PowerShell progress detail -->
+                    <TextBlock Text="{Binding ProgressText}"
+                               IsVisible="{Binding ProgressText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                               Margin="0,4,0,0"
+                               FontSize="12"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               TextWrapping="Wrap"/>
+                    <!-- Cancel affordance -->
+                    <Button Content="Cancel"
+                            Command="{Binding CancelOperationCommand}"
+                            IsVisible="{Binding IsCancellable}"
+                            Margin="0,8,0,0"
+                            HorizontalAlignment="Left"/>
                 </StackPanel>
 
                 <!-- Content Tabs -->
