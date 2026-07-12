@@ -41,16 +41,12 @@
                     <!-- Brand block -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="16,18,16,10">
                         <Border Width="38" Height="38"
-                                CornerRadius="11"
-                                Background="{DynamicResource BrandGradientBrush}"
+                                CornerRadius="9"
                                 BoxShadow="0 4 14 0 #405B5FC7">
-                            <fi:SymbolIcon Symbol="Call"
-                                           IsFilled="True"
-                                           FontSize="19"
-                                           Foreground="White"
-                                           Margin="0"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
+                            <!-- The actual app icon, so branding matches the dock/taskbar/installer.
+                                 CornerRadius mirrors the icon's own corner radius (38 * 230/1024). -->
+                            <Image Source="avares://TeamsPhoneManager.Presentation/Resources/app-icon.png"
+                                   Width="38" Height="38"/>
                         </Border>
                         <StackPanel VerticalAlignment="Center" Spacing="1">
                             <TextBlock Text="Teams Phone"
