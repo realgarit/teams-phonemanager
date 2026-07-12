@@ -219,21 +219,23 @@ namespace teams_phonemanager.ViewModels
                 return;
             }
 
-            if (result.Contains("ERROR:"))
+            var output = result.Value ?? string.Empty;
+
+            if (result.HasErrorMarker)
             {
                 step.IsFailed = true;
-                step.Result = result;
+                step.Result = output;
                 StepFailed = true;
-                StepResult = result;
+                StepResult = output;
                 StatusMessage = $"Step {CurrentStep} failed. Review the output and retry or skip.";
-                _loggingService.Log($"Wizard step {CurrentStep} ({step.Title}) failed: {result}", LogLevel.Error);
+                _loggingService.Log($"Wizard step {CurrentStep} ({step.Title}) failed: {output}", LogLevel.Error);
             }
             else
             {
                 step.IsCompleted = true;
-                step.Result = result;
+                step.Result = output;
                 StepCompleted = true;
-                StepResult = string.IsNullOrWhiteSpace(result) ? "Step completed successfully." : result;
+                StepResult = string.IsNullOrWhiteSpace(output) ? "Step completed successfully." : output;
                 StatusMessage = $"Step {CurrentStep} completed: {step.Title}";
                 _loggingService.Log($"Wizard step {CurrentStep} ({step.Title}) completed successfully", LogLevel.Info);
             }

@@ -88,9 +88,9 @@ namespace teams_phonemanager.ViewModels
                 var command = _powerShellCommandService.GetRetrieveResourceAccountsCommand();
                 var result = await ExecutePowerShellCommandAsync(command, "RetrieveResourceAccounts");
                 
-                if (!string.IsNullOrEmpty(result))
+                if (!string.IsNullOrEmpty(result.Value))
                 {
-                    ParseResourceAccountsFromResult(result);
+                    ParseResourceAccountsFromResult(result.Value);
                     StatusMessage = $"Found {ResourceAccounts.Count} resource accounts starting with 'racq-'";
                     _loggingService.Log($"Retrieved {ResourceAccounts.Count} resource accounts", LogLevel.Info);
                 }
@@ -126,9 +126,9 @@ namespace teams_phonemanager.ViewModels
                 var command = _powerShellCommandService.GetRetrieveCallQueuesCommand();
                 var result = await ExecutePowerShellCommandAsync(command, "RetrieveCallQueues");
                 
-                if (!string.IsNullOrEmpty(result))
+                if (!string.IsNullOrEmpty(result.Value))
                 {
-                    ParseCallQueuesFromResult(result);
+                    ParseCallQueuesFromResult(result.Value);
                     StatusMessage = $"Found {CallQueues.Count} call queues containing 'cq-'";
                     _loggingService.Log($"Retrieved {CallQueues.Count} call queues", LogLevel.Info);
                 }
@@ -221,15 +221,15 @@ namespace teams_phonemanager.ViewModels
                 var command = _powerShellCommandService.GetAssignLicenseCommand(variables.RacqUPN, variables.SkuId);
                 var result = await ExecutePowerShellCommandAsync(command, "AssignLicense");
                 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"License assigned to resource account '{variables.RacqUPN}' successfully";
                     _loggingService.Log($"License assigned to resource account {variables.RacqUPN}", LogLevel.Info);
                 }
                 else
                 {
-                    StatusMessage = $"Error assigning license: {result}";
-                    _loggingService.Log($"Error assigning license to {variables.RacqUPN}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error assigning license: {result.Value}";
+                    _loggingService.Log($"Error assigning license to {variables.RacqUPN}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
@@ -268,10 +268,10 @@ namespace teams_phonemanager.ViewModels
                 var command = _powerShellCommandService.GetM365GroupIdCommand(variables.M365Group);
                 var result = await ExecutePowerShellCommandAsync(command, "GetM365GroupId");
                 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     // Parse the group ID from the result
-                    var lines = result.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                    var lines = (result.Value ?? string.Empty).Split('\n', StringSplitOptions.RemoveEmptyEntries);
                     foreach (var line in lines)
                     {
                         if (line.StartsWith("M365GROUPID:") && line.Length > 12)
@@ -288,8 +288,8 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Error retrieving M365 Group ID: {result}";
-                    _loggingService.Log($"Error retrieving M365 Group ID: {result}", LogLevel.Error);
+                    StatusMessage = $"Error retrieving M365 Group ID: {result.Value}";
+                    _loggingService.Log($"Error retrieving M365 Group ID: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
@@ -354,7 +354,7 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
                 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Resource account '{ResourceAccountUpn}' created successfully";
                     _loggingService.Log($"Resource account {ResourceAccountUpn} created successfully", LogLevel.Info);
@@ -362,8 +362,8 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Error creating resource account: {result}";
-                    _loggingService.Log($"Error creating resource account {ResourceAccountUpn}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error creating resource account: {result.Value}";
+                    _loggingService.Log($"Error creating resource account {ResourceAccountUpn}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
@@ -419,7 +419,7 @@ namespace teams_phonemanager.ViewModels
                 var command = _powerShellCommandService.GetUpdateResourceAccountUsageLocationCommand(ResourceAccountUpn, variables.UsageLocation);
                 var result = await ExecutePowerShellCommandAsync(command, "UpdateUsageLocation");
                 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Usage location updated for '{ResourceAccountUpn}' to '{variables.UsageLocation}'";
                     _loggingService.Log($"Usage location updated for {ResourceAccountUpn}", LogLevel.Info);
@@ -427,8 +427,8 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Error updating usage location: {result}";
-                    _loggingService.Log($"Error updating usage location for {ResourceAccountUpn}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error updating usage location: {result.Value}";
+                    _loggingService.Log($"Error updating usage location for {ResourceAccountUpn}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
@@ -492,7 +492,7 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
                 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Call queue '{CallQueueName}' created successfully";
                     _loggingService.Log($"Call queue {CallQueueName} created successfully", LogLevel.Info);
@@ -500,8 +500,8 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Error creating call queue: {result}";
-                    _loggingService.Log($"Error creating call queue {CallQueueName}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error creating call queue: {result.Value}";
+                    _loggingService.Log($"Error creating call queue {CallQueueName}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
@@ -558,15 +558,15 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
                 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Successfully associated resource account '{ResourceAccountUpn}' with call queue '{CallQueueName}'";
                     _loggingService.Log($"Successfully associated resource account {ResourceAccountUpn} with call queue {CallQueueName}", LogLevel.Info);
                 }
                 else
                 {
-                    StatusMessage = $"Error associating resource account with call queue: {result}";
-                    _loggingService.Log($"Error associating resource account {ResourceAccountUpn} with call queue {CallQueueName}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error associating resource account with call queue: {result.Value}";
+                    _loggingService.Log($"Error associating resource account {ResourceAccountUpn} with call queue {CallQueueName}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
@@ -605,7 +605,7 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Call queue '{name}' removed successfully";
                     _loggingService.Log($"Call queue {name} removed successfully", LogLevel.Info);
@@ -614,8 +614,8 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Error removing call queue: {result}";
-                    _loggingService.Log($"Error removing call queue {name}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error removing call queue: {result.Value}";
+                    _loggingService.Log($"Error removing call queue {name}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
@@ -654,7 +654,7 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Resource account '{accountUpn}' removed successfully";
                     _loggingService.Log($"Resource account {accountUpn} removed successfully", LogLevel.Info);
@@ -663,8 +663,8 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Error removing resource account: {result}";
-                    _loggingService.Log($"Error removing resource account {accountUpn}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error removing resource account: {result.Value}";
+                    _loggingService.Log($"Error removing resource account {accountUpn}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
