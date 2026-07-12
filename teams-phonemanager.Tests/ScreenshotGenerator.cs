@@ -17,6 +17,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Microsoft.Extensions.DependencyInjection;
 using teams_phonemanager;
+using teams_phonemanager.Services;
 using teams_phonemanager.Services.Interfaces;
 using teams_phonemanager.ViewModels;
 
@@ -384,6 +385,9 @@ namespace teams_phonemanager.Tests
 
             public Task<string> ExecuteCommandAsync(string command, Dictionary<string, string>? environmentVariables, CancellationToken cancellationToken = default)
                 => Task.FromResult(string.Empty);
+
+            public Task<PowerShellExecutionResult> ExecuteCommandWithDetailsAsync(string command, Dictionary<string, string>? environmentVariables, IProgress<PowerShellProgress>? progress = null, CancellationToken cancellationToken = default)
+                => Task.FromResult(new PowerShellExecutionResult());
 
             public Task<bool> IsConnectedAsync(string service, CancellationToken cancellationToken = default)
                 => Task.FromResult(false);

@@ -22,6 +22,9 @@ namespace teams_phonemanager.Services
         Validation,
 
         /// <summary>An error occurred but it does not match a more specific category.</summary>
-        Unknown
+        Unknown,
+
+        /// <summary>The operation was cancelled cooperatively by the user before it completed.</summary>
+        Cancelled
     }
 }
