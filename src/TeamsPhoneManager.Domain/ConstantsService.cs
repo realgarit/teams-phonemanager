@@ -17,6 +17,38 @@ namespace teams_phonemanager.Services
             public const int ExitCodeError = 1;
         }
 
+        /// <summary>
+        /// Defaults for Microsoft Graph/Teams throttling (HTTP 429) handling: retry backoff schedule
+        /// and client-side bulk pacing. These are the single obvious home for the resilience knobs;
+        /// <c>ThrottleRetryOptions.Default</c> (Application layer) reads them.
+        /// </summary>
+        public static class Throttling
+        {
+            /// <summary>Maximum total attempts for an idempotent operation (1 initial + up to 4 retries).</summary>
+            public const int MaxRetryAttempts = 5;
+
+            /// <summary>Base delay for exponential backoff (base * 2^(attempt-1)).</summary>
+            public const double BaseDelaySeconds = 2.0;
+
+            /// <summary>Ceiling for a single computed backoff wait.</summary>
+            public const double MaxDelaySeconds = 60.0;
+
+            /// <summary>Full-jitter fraction of the base delay added to each backoff wait (0..1).</summary>
+            public const double JitterFactor = 0.25;
+
+            /// <summary>Ceiling applied to a server-provided <c>Retry-After</c> so a hostile/misparsed value cannot stall the UI indefinitely.</summary>
+            public const double MaxRetryAfterSeconds = 120.0;
+
+            /// <summary>Base inter-item delay inserted between items of a bulk loop.</summary>
+            public const double BulkInterItemDelaySeconds = 1.0;
+
+            /// <summary>Ceiling for the adaptive inter-item delay after repeated throttling.</summary>
+            public const double BulkMaxInterItemDelaySeconds = 30.0;
+
+            /// <summary>Factor the inter-item delay is multiplied by after a throttle event (reduce pace); the reciprocal is used to recover.</summary>
+            public const double BulkPaceMultiplierOnThrottle = 2.0;
+        }
+
         public static class Application
         {
             public const string Version = "Version 3.18.0";
