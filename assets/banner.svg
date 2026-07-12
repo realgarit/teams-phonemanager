@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300">
+  <!-- README banner: T-Pad icon + wordmark + tagline. Transparent background
+       so it reads on both GitHub light and dark themes. Text uses the brand
+       gradient / a mid-neutral gray rather than pure black or white. -->
+  <defs>
+    <linearGradient id="badge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7B80EE"/>
+      <stop offset="1" stop-color="#45478F"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.16"/>
+      <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="wordmark" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7B80EE"/>
+      <stop offset="1" stop-color="#5457B0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon badge, T-Pad monogram -->
+  <g transform="translate(60,54)">
+    <rect width="192" height="192" rx="43" fill="url(#badge)"/>
+    <rect width="192" height="192" rx="43" fill="url(#sheen)"/>
+    <g fill="#FFFFFF">
+      <circle cx="66.2" cy="51.4" r="11.2"/><circle cx="96" cy="51.4" r="11.2"/><circle cx="125.8" cy="51.4" r="11.2"/>
+      <circle cx="96" cy="81.2" r="11.2"/>
+      <circle cx="96" cy="111" r="11.2"/>
+      <circle cx="96" cy="140.8" r="11.2"/>
+    </g>
+    <g fill="#FFFFFF" opacity="0.38">
+      <circle cx="66.2" cy="81.2" r="11.2"/><circle cx="125.8" cy="81.2" r="11.2"/>
+      <circle cx="66.2" cy="111" r="11.2"/><circle cx="125.8" cy="111" r="11.2"/>
+      <circle cx="66.2" cy="140.8" r="11.2"/><circle cx="125.8" cy="140.8" r="11.2"/>
+    </g>
+  </g>
+
+  <!-- Wordmark + tagline -->
+  <g font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+    <text x="292" y="150" font-size="54" font-weight="700" letter-spacing="-1" fill="url(#wordmark)">Teams Phone Manager</text>
+    <text x="294" y="188" font-size="20" fill="#8A8F98">Manage Microsoft Teams telephony — auto attendants, call queues,</text>
+    <text x="294" y="214" font-size="20" fill="#8A8F98">and phone numbers — from one desktop app.</text>
+  </g>
+</svg>
