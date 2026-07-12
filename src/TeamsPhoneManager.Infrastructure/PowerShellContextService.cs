@@ -91,11 +91,11 @@ namespace teams_phonemanager.Services
         {
             // Delegate to the detailed overload and return only the text output, which is byte-identical
             // to the historic behavior. The structured error records are simply ignored here.
-            var execution = await ExecuteCommandWithDetailsAsync(command, environmentVariables, cancellationToken);
+            var execution = await ExecuteCommandWithDetailsAsync(command, environmentVariables, null, cancellationToken);
             return execution.Output;
         }
 
-        public async Task<PowerShellExecutionResult> ExecuteCommandWithDetailsAsync(string command, Dictionary<string, string>? environmentVariables, CancellationToken cancellationToken = default)
+        public async Task<PowerShellExecutionResult> ExecuteCommandWithDetailsAsync(string command, Dictionary<string, string>? environmentVariables, IProgress<PowerShellProgress>? progress = null, CancellationToken cancellationToken = default)
         {
             if (_disposed)
                 throw new ObjectDisposedException(nameof(PowerShellContextService));
@@ -129,11 +129,80 @@ $ErrorActionPreference = 'Continue'
 
                     _powerShell.AddScript(fullCommand);
 
-                    var result = await Task.Run(() =>
+                    // Forward native PowerShell progress records (Write-Progress from cmdlets) to the caller.
+                    // This only OBSERVES the existing Progress stream; it never alters the script text.
+                    void OnProgressAdded(object? sender, DataAddedEventArgs e)
                     {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        return _powerShell.Invoke();
-                    }, cancellationToken);
+                        try
+                        {
+                            var record = _powerShell.Streams.Progress[e.Index];
+                            progress?.Report(new PowerShellProgress
+                            {
+                                Activity = record.Activity ?? string.Empty,
+                                StatusDescription = record.StatusDescription ?? string.Empty,
+                                CurrentOperation = record.CurrentOperation ?? string.Empty,
+                                // A Completed record means the activity is done; treat it as 100%.
+                                PercentComplete = record.RecordType == ProgressRecordType.Completed
+                                    ? 100
+                                    : record.PercentComplete
+                            });
+                        }
+                        catch
+                        {
+                            // Progress reporting is best-effort and must never break command execution.
+                        }
+                    }
+
+                    if (progress != null)
+                    {
+                        _powerShell.Streams.Progress.DataAdded += OnProgressAdded;
+                    }
+
+                    System.Collections.ObjectModel.Collection<PSObject> result;
+                    try
+                    {
+                        result = await Task.Run(() =>
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+
+                            // Wire cooperative cancellation to the running pipeline. Stop() interrupts an
+                            // in-flight Invoke() (which then throws PipelineStoppedException) but leaves the
+                            // runspace in the Opened state, so the very next command reuses it unchanged.
+                            using var cancelRegistration = cancellationToken.Register(static state =>
+                            {
+                                try { ((PowerShell)state!).Stop(); }
+                                catch { /* pipeline may have already finished */ }
+                            }, _powerShell);
+
+                            try
+                            {
+                                var invoked = _powerShell.Invoke();
+
+                                // Depending on the host, Stop() either makes Invoke() throw
+                                // PipelineStoppedException or return an (empty) collection with the
+                                // invocation state set to Stopped. Handle the non-throwing case here.
+                                if (cancellationToken.IsCancellationRequested ||
+                                    _powerShell.InvocationStateInfo.State == PSInvocationState.Stopped)
+                                {
+                                    throw new OperationCanceledException(cancellationToken);
+                                }
+
+                                return invoked;
+                            }
+                            catch (PipelineStoppedException)
+                            {
+                                // The pipeline was stopped by our cancellation registration above.
+                                throw new OperationCanceledException(cancellationToken);
+                            }
+                        }, cancellationToken);
+                    }
+                    finally
+                    {
+                        if (progress != null)
+                        {
+                            _powerShell.Streams.Progress.DataAdded -= OnProgressAdded;
+                        }
+                    }
 
                     var output = new StringBuilder();
                     var errorInfos = new List<PowerShellErrorInfo>();
@@ -188,6 +257,14 @@ $ErrorActionPreference = 'Continue'
                         }
                     }
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                // Cooperative cancellation is not a failure: surface it to the caller (which shows a
+                // "cancelled" status rather than an error dialog). Environment variables were already
+                // cleared by the inner finally, and the semaphore is released by the outer finally.
+                _loggingService.Log("PowerShell command cancelled by user", LogLevel.Info);
+                throw;
             }
             catch (Exception ex)
             {
