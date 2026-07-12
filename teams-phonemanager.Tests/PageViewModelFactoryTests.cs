@@ -1,0 +1,189 @@
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using teams_phonemanager.Services;
+using teams_phonemanager.Services.Interfaces;
+using teams_phonemanager.Services.ScriptBuilders;
+using teams_phonemanager.Tests.TestSupport;
+using teams_phonemanager.ViewModels;
+
+namespace teams_phonemanager.Tests
+{
+    public class PageViewModelFactoryTests
+    {
+        private static IServiceProvider BuildServiceProvider(ViewModelTestHarness harness)
+        {
+            var msalAuthService = new Mock<IMsalGraphAuthenticationService>().Object;
+            var documentationScriptBuilder = new Mock<IDocumentationScriptBuilder>().Object;
+            var sanitizationService = new Mock<IPowerShellSanitizationService>().Object;
+
+            var services = new ServiceCollection();
+
+            services.AddSingleton(sp => new WelcomeViewModel(
+                harness.PowerShellContextService.Object,
+                harness.PowerShellCommandService.Object,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object));
+
+            services.AddSingleton(sp => new GetStartedViewModel(
+                harness.PowerShellContextService.Object,
+                harness.PowerShellCommandService.Object,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object,
+                msalAuthService));
+
+            services.AddSingleton(sp => new VariablesViewModel(
+                harness.PowerShellContextService.Object,
+                harness.PowerShellCommandService.Object,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object,
+                harness.SharedStateService.Object,
+                harness.DialogService.Object));
+
+            services.AddSingleton(sp => new M365GroupsViewModel(
+                harness.PowerShellContextService.Object,
+                harness.PowerShellCommandService.Object,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object,
+                harness.SharedStateService.Object,
+                harness.DialogService.Object));
+
+            services.AddSingleton(sp => new CallQueuesViewModel(
+                harness.PowerShellContextService.Object,
+                harness.PowerShellCommandService.Object,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object,
+                harness.SharedStateService.Object,
+                harness.DialogService.Object));
+
+            services.AddSingleton(sp => new AutoAttendantsViewModel(
+                harness.PowerShellContextService.Object,
+                harness.PowerShellCommandService.Object,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object,
+                harness.SharedStateService.Object,
+                harness.DialogService.Object));
+
+            services.AddSingleton(sp => new HolidaysViewModel(
+                harness.PowerShellContextService.Object,
+                harness.PowerShellCommandService.Object,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object,
+                harness.SharedStateService.Object,
+                harness.DialogService.Object));
+
+            services.AddSingleton(sp => new DocumentationViewModel(
+                harness.PowerShellContextService.Object,
+                harness.PowerShellCommandService.Object,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object,
+                harness.SharedStateService.Object,
+                harness.DialogService.Object,
+                documentationScriptBuilder));
+
+            services.AddSingleton(sp => new WizardViewModel(
+                harness.PowerShellContextService.Object,
+                harness.PowerShellCommandService.Object,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object,
+                harness.SharedStateService.Object,
+                harness.DialogService.Object));
+
+            services.AddSingleton(sp => new BulkOperationsViewModel(
+                harness.PowerShellContextService.Object,
+                harness.PowerShellCommandService.Object,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object,
+                harness.SharedStateService.Object,
+                harness.DialogService.Object,
+                new BulkOperationsScriptBuilder(harness.PowerShellCommandService.Object, sanitizationService)));
+
+            return services.BuildServiceProvider();
+        }
+
+        private static PageViewModelFactory CreateFactory(out IServiceProvider provider)
+        {
+            var harness = new ViewModelTestHarness();
+            provider = BuildServiceProvider(harness);
+            return new PageViewModelFactory(provider);
+        }
+
+        public static IEnumerable<object[]> KnownPages()
+        {
+            yield return new object[] { ConstantsService.Pages.Welcome, typeof(WelcomeViewModel) };
+            yield return new object[] { ConstantsService.Pages.GetStarted, typeof(GetStartedViewModel) };
+            yield return new object[] { ConstantsService.Pages.GetStarted.Replace(" ", ""), typeof(GetStartedViewModel) };
+            yield return new object[] { ConstantsService.Pages.Variables, typeof(VariablesViewModel) };
+            yield return new object[] { ConstantsService.Pages.M365Groups, typeof(M365GroupsViewModel) };
+            yield return new object[] { ConstantsService.Pages.M365Groups.Replace(" ", ""), typeof(M365GroupsViewModel) };
+            yield return new object[] { ConstantsService.Pages.CallQueues, typeof(CallQueuesViewModel) };
+            yield return new object[] { ConstantsService.Pages.CallQueues.Replace(" ", ""), typeof(CallQueuesViewModel) };
+            yield return new object[] { ConstantsService.Pages.AutoAttendants, typeof(AutoAttendantsViewModel) };
+            yield return new object[] { ConstantsService.Pages.AutoAttendants.Replace(" ", ""), typeof(AutoAttendantsViewModel) };
+            yield return new object[] { ConstantsService.Pages.Holidays, typeof(HolidaysViewModel) };
+            yield return new object[] { ConstantsService.Pages.Documentation, typeof(DocumentationViewModel) };
+            yield return new object[] { ConstantsService.Pages.Wizard, typeof(WizardViewModel) };
+            yield return new object[] { ConstantsService.Pages.BulkOperations, typeof(BulkOperationsViewModel) };
+        }
+
+        [Theory]
+        [MemberData(nameof(KnownPages))]
+        public void Create_KnownPage_ReturnsExpectedViewModelType(string page, Type expectedType)
+        {
+            var factory = CreateFactory(out _);
+
+            var result = factory.Create(page);
+
+            Assert.IsType(expectedType, result);
+        }
+
+        [Fact]
+        public void Create_UnknownPage_FallsBackToWelcomeViewModel()
+        {
+            var factory = CreateFactory(out _);
+
+            var result = factory.Create("SomeUnknownPage");
+
+            Assert.IsType<WelcomeViewModel>(result);
+        }
+
+        [Fact]
+        public void Create_NullPage_FallsBackToWelcomeViewModel()
+        {
+            var factory = CreateFactory(out _);
+
+            var result = factory.Create(null!);
+
+            Assert.IsType<WelcomeViewModel>(result);
+        }
+    }
+}
