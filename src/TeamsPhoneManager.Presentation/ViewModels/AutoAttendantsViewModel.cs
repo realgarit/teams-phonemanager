@@ -106,7 +106,7 @@ namespace teams_phonemanager.ViewModels
                 _loggingService.Log("Retrieving resource accounts starting with 'raaa-'", LogLevel.Info);
 
                 var command = _powerShellCommandService.GetRetrieveAutoAttendantResourceAccountsCommand();
-                var result = await ExecutePowerShellCommandAsync(command, "RetrieveAutoAttendantResourceAccounts");
+                var result = await ExecutePowerShellCommandAsync(command, null, "RetrieveAutoAttendantResourceAccounts", allowThrottleRetry: true);
 
                 if (!string.IsNullOrEmpty(result.Value))
                 {
@@ -143,7 +143,7 @@ namespace teams_phonemanager.ViewModels
                 _loggingService.Log("Retrieving auto attendants containing 'aa-'", LogLevel.Info);
 
                 var command = _powerShellCommandService.GetRetrieveAutoAttendantsCommand();
-                var result = await ExecutePowerShellCommandAsync(command, "RetrieveAutoAttendants");
+                var result = await ExecutePowerShellCommandAsync(command, null, "RetrieveAutoAttendants", allowThrottleRetry: true);
 
                 if (!string.IsNullOrEmpty(result.Value))
                 {

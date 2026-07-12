@@ -180,7 +180,7 @@ namespace teams_phonemanager.ViewModels
                 _loggingService.Log($"Verifying auto attendant: {AutoAttendantName}", LogLevel.Info);
 
                 var command = _powerShellCommandService.GetVerifyAutoAttendantCommand(AutoAttendantName);
-                var result = await ExecutePowerShellCommandAsync(command, "VerifyAutoAttendant");
+                var result = await ExecutePowerShellCommandAsync(command, null, "VerifyAutoAttendant", allowThrottleRetry: true);
                 
                 if (result.HasSuccessMarker)
                 {

@@ -120,12 +120,29 @@ namespace teams_phonemanager.ViewModels
             LogMessage = $"{DateTime.Now:HH:mm:ss} - {message}";
         }
 
-        protected async Task<OperationResult<string>> ExecutePowerShellCommandAsync(string command, string context = "")
-        {
-            return await ExecutePowerShellCommandAsync(command, null, context);
-        }
+        /// <summary>
+        /// Lazily-created throttle retry policy. Built from the shared <see cref="ILoggingService"/> so
+        /// retry attempts land in the application log. Only consulted when a caller opts in via
+        /// <c>allowThrottleRetry</c> (which also asserts the operation is idempotent).
+        /// </summary>
+        private IThrottleRetryPolicy? _throttleRetryPolicy;
+        protected IThrottleRetryPolicy ThrottleRetryPolicy => _throttleRetryPolicy ??= new ThrottleRetryPolicy(_loggingService);
 
-        protected async Task<OperationResult<string>> ExecutePowerShellCommandAsync(string command, Dictionary<string, string>? environmentVariables, string context = "")
+        protected Task<OperationResult<string>> ExecutePowerShellCommandAsync(string command, string context = "")
+            => ExecutePowerShellCommandAsync(command, null, context, allowThrottleRetry: false);
+
+        protected Task<OperationResult<string>> ExecutePowerShellCommandAsync(string command, Dictionary<string, string>? environmentVariables, string context = "")
+            => ExecutePowerShellCommandAsync(command, environmentVariables, context, allowThrottleRetry: false);
+
+        /// <summary>
+        /// Executes a PowerShell command and maps the result. When <paramref name="allowThrottleRetry"/> is
+        /// true the execution is wrapped in the throttle retry policy as an <b>idempotent</b> operation —
+        /// callers must only opt in for reads/queries that are safe to re-run. Mutating operations leave it
+        /// false, so a 429 surfaces the typed <see cref="OperationErrorCategory.Throttling"/> result instead
+        /// of being silently re-executed. With <paramref name="allowThrottleRetry"/> false the behavior is
+        /// unchanged from the single-shot path.
+        /// </summary>
+        protected async Task<OperationResult<string>> ExecutePowerShellCommandAsync(string command, Dictionary<string, string>? environmentVariables, string context, bool allowThrottleRetry)
         {
             // Check session expiry before executing commands that require a connection
             if (_sessionManager.IsSessionExpired && _sessionManager.IsSessionValid)
@@ -151,8 +168,21 @@ namespace teams_phonemanager.ViewModels
 
             try
             {
-                var execution = await _powerShellContextService.ExecuteCommandWithDetailsAsync(command, environmentVariables, progress, cts.Token);
-                var result = PowerShellOperationResultMapper.Map(execution);
+                OperationResult<string> result;
+                if (allowThrottleRetry)
+                {
+                    // Idempotent read/query: auto-retry on throttling with backoff (logged by the policy).
+                    result = await ThrottleRetryPolicy.ExecuteAsync(
+                        async ct => PowerShellOperationResultMapper.Map(
+                            await _powerShellContextService.ExecuteCommandWithDetailsAsync(command, environmentVariables, progress, ct)),
+                        new ThrottleRetryContext(string.IsNullOrEmpty(context) ? "PowerShell operation" : context, isIdempotent: true),
+                        cts.Token);
+                }
+                else
+                {
+                    var execution = await _powerShellContextService.ExecuteCommandWithDetailsAsync(command, environmentVariables, progress, cts.Token);
+                    result = PowerShellOperationResultMapper.Map(execution);
+                }
 
                 // Surface a user-facing error only for a reportable failure (error marker without success marker).
                 if (result.ShouldReportError)
