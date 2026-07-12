@@ -52,8 +52,8 @@
                     <SolidColorBrush x:Key="StatusOffBrush" Color="#55556A"/>
                     <!-- Brand mark gradient -->
                     <LinearGradientBrush x:Key="BrandGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
-                        <GradientStop Offset="0" Color="#7B83EB"/>
-                        <GradientStop Offset="1" Color="#4B4D9E"/>
+                        <GradientStop Offset="0" Color="#7B80EE"/>
+                        <GradientStop Offset="1" Color="#45478F"/>
                     </LinearGradientBrush>
                 </ResourceDictionary>
 
@@ -80,8 +80,8 @@
                     <SolidColorBrush x:Key="StatusOnBrush" Color="#16A34A"/>
                     <SolidColorBrush x:Key="StatusOffBrush" Color="#A6A4BC"/>
                     <LinearGradientBrush x:Key="BrandGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
-                        <GradientStop Offset="0" Color="#6A6FDD"/>
-                        <GradientStop Offset="1" Color="#4B4D9E"/>
+                        <GradientStop Offset="0" Color="#7B80EE"/>
+                        <GradientStop Offset="1" Color="#45478F"/>
                     </LinearGradientBrush>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>

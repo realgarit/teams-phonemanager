@@ -1,15 +1,41 @@
-# Teams Phone Manager
+<p align="center">
+  <img src="assets/banner.svg" width="800" alt="Teams Phone Manager"/>
+</p>
 
-An Avalonia-based Microsoft Teams Phone Manager application built with .NET 10 to simplify Microsoft Teams Phone System administration tasks. Cross-platform support for Windows, macOS and Linux.
+<p align="center">
+  <a href="https://github.com/realgarit/teams-phonemanager/releases/latest"><img src="https://img.shields.io/github/v/release/realgarit/teams-phonemanager?label=release&color=6A6FDD" alt="Latest release"/></a>
+  <a href="https://github.com/realgarit/teams-phonemanager/actions/workflows/build.yml"><img src="https://img.shields.io/github/actions/workflow/status/realgarit/teams-phonemanager/build.yml?branch=main&label=build" alt="Build status"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/realgarit/teams-phonemanager?color=blue" alt="License"/></a>
+  <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-6A6FDD" alt="Platform support"/>
+  <img src="https://img.shields.io/badge/.NET-10-512BD4" alt=".NET 10"/>
+</p>
+
+<p align="center">
+  <b>Manage Microsoft Teams telephony — auto attendants, call queues, and phone numbers — from one desktop app.</b>
+</p>
+
+<p align="center">
+  <a href="#installation">Install</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#screenshots">Screenshots</a> ·
+  <a href="#architecture">Architecture</a> ·
+  <a href="#contributing">Contributing</a>
+</p>
+
+---
+
+Teams Phone Manager is an Avalonia-based desktop app, built on .NET 10, that streamlines
+Microsoft Teams Phone System administration — no PowerShell scripting required. It runs
+natively on Windows, macOS, and Linux.
 
 ## Features
 
-- Auto Attendants Management
-- Call Queues Management
-- Holiday Management
-- 365 Groups Integration
-- Resource Accounts
-- Modern UI
+- **Auto Attendants** — create, configure, and manage call routing menus
+- **Call Queues** — set up and maintain queue distribution and agent lists
+- **Holidays** — manage holiday schedules with built-in regional computus support
+- **365 Groups** — integrate resource accounts with Microsoft 365 Groups
+- **Resource Accounts** — provision and assign telephony resource accounts
+- **Modern UI** — a fast, native, dark/light-themed interface
 
 ## Installation
 
@@ -66,27 +92,31 @@ available (silent when offline).
 - Microsoft Teams & Graph PowerShell Module (included with the app)
 - PowerShell 7.4+ (included with the app)
 
-## Development Setup
+## Screenshots
 
-1. Install .NET 10 SDK:
-   ```bash
-   # Download from: https://dotnet.microsoft.com/download/dotnet/10.0
-   ```
+<details open>
+<summary><b>Core workflows</b></summary>
+<br/>
 
-2. Restore dependencies:
-   ```bash
-   dotnet restore
-   ```
+| | |
+|---|---|
+| **Welcome** <br/> <img src="docs/screenshots/welcome.png" width="480" alt="Welcome page (dark theme)"/> | **Get Started** <br/> <img src="docs/screenshots/get-started.png" width="480" alt="Get Started page with connection steps"/> |
+| **Variables** <br/> <img src="docs/screenshots/variables.png" width="480" alt="Variables configuration page"/> | **M365 Groups** <br/> <img src="docs/screenshots/m365-groups.png" width="480" alt="M365 Groups management"/> |
+| **Call Queues** <br/> <img src="docs/screenshots/call-queues.png" width="480" alt="Call Queues management"/> | **Auto Attendants** <br/> <img src="docs/screenshots/auto-attendants.png" width="480" alt="Auto Attendants management"/> |
 
-3. Build the application:
-   ```bash
-   dotnet build
-   ```
+</details>
 
-4. Run the application:
-   ```bash
-   dotnet run
-   ```
+<details>
+<summary><b>More: holidays, setup wizard, bulk ops, documentation, light theme</b></summary>
+<br/>
+
+| | |
+|---|---|
+| **Holidays** <br/> <img src="docs/screenshots/holidays.png" width="480" alt="Holiday management"/> | **Setup Wizard** <br/> <img src="docs/screenshots/setup-wizard.png" width="480" alt="Step-by-step setup wizard"/> |
+| **Bulk Operations** <br/> <img src="docs/screenshots/bulk-operations.png" width="480" alt="CSV bulk operations"/> | **Documentation** <br/> <img src="docs/screenshots/documentation.png" width="480" alt="Tenant documentation export"/> |
+| **Light Theme** <br/> <img src="docs/screenshots/welcome-light.png" width="480" alt="Welcome page (light theme)"/> | |
+
+</details>
 
 ## Architecture
 
@@ -124,49 +154,39 @@ teams-phonemanager/
 └── Scripts/                           # Publish & download PowerShell modules
 ```
 
+## Development Setup
+
+1. Install .NET 10 SDK:
+   ```bash
+   # Download from: https://dotnet.microsoft.com/download/dotnet/10.0
+   ```
+
+2. Restore dependencies:
+   ```bash
+   dotnet restore
+   ```
+
+3. Build the application:
+   ```bash
+   dotnet build
+   ```
+
+4. Run the application:
+   ```bash
+   dotnet run
+   ```
+
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
 4. Test thoroughly
-5. Submit a pull request
+5. Submit a [pull request](https://github.com/realgarit/teams-phonemanager/pulls)
+
+Found a bug or have a feature request? Open an
+[issue](https://github.com/realgarit/teams-phonemanager/issues).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Screenshots
-
-### Welcome
-<img src="docs/screenshots/welcome.png" width="1280" alt="Welcome page (dark theme)"/>
-
-### Get Started
-<img src="docs/screenshots/get-started.png" width="1280" alt="Get Started page with connection steps"/>
-
-### Variables
-<img src="docs/screenshots/variables.png" width="1280" alt="Variables configuration page"/>
-
-### M365 Groups
-<img src="docs/screenshots/m365-groups.png" width="1280" alt="M365 Groups management"/>
-
-### Call Queues
-<img src="docs/screenshots/call-queues.png" width="1280" alt="Call Queues management"/>
-
-### Auto Attendants
-<img src="docs/screenshots/auto-attendants.png" width="1280" alt="Auto Attendants management"/>
-
-### Holidays
-<img src="docs/screenshots/holidays.png" width="1280" alt="Holiday management"/>
-
-### Setup Wizard
-<img src="docs/screenshots/setup-wizard.png" width="1280" alt="Step-by-step setup wizard"/>
-
-### Bulk Operations
-<img src="docs/screenshots/bulk-operations.png" width="1280" alt="CSV bulk operations"/>
-
-### Documentation
-<img src="docs/screenshots/documentation.png" width="1280" alt="Tenant documentation export"/>
-
-### Light Theme
-<img src="docs/screenshots/welcome-light.png" width="1280" alt="Welcome page (light theme)"/>
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
