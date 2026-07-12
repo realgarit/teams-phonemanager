@@ -86,7 +86,7 @@ namespace teams_phonemanager.ViewModels
                 _loggingService.Log("Retrieving resource accounts starting with 'racq-'", LogLevel.Info);
 
                 var command = _powerShellCommandService.GetRetrieveResourceAccountsCommand();
-                var result = await ExecutePowerShellCommandAsync(command, "RetrieveResourceAccounts");
+                var result = await ExecutePowerShellCommandAsync(command, null, "RetrieveResourceAccounts", allowThrottleRetry: true);
                 
                 if (!string.IsNullOrEmpty(result.Value))
                 {
@@ -124,7 +124,7 @@ namespace teams_phonemanager.ViewModels
                 _loggingService.Log("Retrieving call queues containing 'cq-'", LogLevel.Info);
 
                 var command = _powerShellCommandService.GetRetrieveCallQueuesCommand();
-                var result = await ExecutePowerShellCommandAsync(command, "RetrieveCallQueues");
+                var result = await ExecutePowerShellCommandAsync(command, null, "RetrieveCallQueues", allowThrottleRetry: true);
                 
                 if (!string.IsNullOrEmpty(result.Value))
                 {
@@ -266,7 +266,7 @@ namespace teams_phonemanager.ViewModels
                 StatusMessage = "Retrieving M365 Group ID...";
 
                 var command = _powerShellCommandService.GetM365GroupIdCommand(variables.M365Group);
-                var result = await ExecutePowerShellCommandAsync(command, "GetM365GroupId");
+                var result = await ExecutePowerShellCommandAsync(command, null, "GetM365GroupId", allowThrottleRetry: true);
                 
                 if (result.HasSuccessMarker)
                 {

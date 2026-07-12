@@ -11,6 +11,11 @@ namespace teams_phonemanager.Services
     /// decays it back toward the base on clean items. Stateful — use one instance per bulk run.
     ///
     /// The delay source is injectable so pacing is instant and observable under unit test.
+    ///
+    /// NOTE (#62): this is a DI-registered foundation only. It is not yet wired into a live loop, because
+    /// bulk operations currently run as a single monolithic PowerShell batch with no per-item C# seam.
+    /// Live pacing waits for the per-item bulk loop introduced by a later roadmap issue; wiring it in
+    /// without that loop would require changing the (frozen) generated script.
     /// </summary>
     public sealed class BulkPacer : IBulkPacer
     {
