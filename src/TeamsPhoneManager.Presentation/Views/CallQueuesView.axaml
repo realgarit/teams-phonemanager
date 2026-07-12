@@ -645,18 +645,31 @@
                   ZIndex="2000"
                   Background="#40000000"
                   IsVisible="{Binding IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12" MaxWidth="360">
                     <ProgressBar
                                AutomationProperties.Name="Operation Progress"
-                               Value="0"
-                               IsIndeterminate="True"
-                               Width="50"
-                               Margin="0,0,0,16"/>
+                               Minimum="0"
+                               Maximum="100"
+                               Value="{Binding ProgressValue}"
+                               IsIndeterminate="{Binding IsProgressIndeterminate}"
+                               Width="200"/>
                     <!-- Waiting Message -->
                     <TextBlock Text="{Binding WaitingMessage, TargetNullValue=''}"
                                FontSize="14"
                                TextWrapping="Wrap"
                                TextAlignment="Center"/>
+                    <!-- Native PowerShell progress detail -->
+                    <TextBlock Text="{Binding ProgressText}"
+                               IsVisible="{Binding ProgressText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                               FontSize="12"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"/>
+                    <!-- Cancel affordance -->
+                    <Button Content="Cancel"
+                            Command="{Binding CancelOperationCommand}"
+                            IsVisible="{Binding IsCancellable}"
+                            HorizontalAlignment="Center"/>
                 </StackPanel>
             </Grid>
         </Grid>
