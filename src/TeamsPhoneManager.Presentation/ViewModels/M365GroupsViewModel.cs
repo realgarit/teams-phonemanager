@@ -94,7 +94,7 @@ namespace teams_phonemanager.ViewModels
                 _loggingService.Log("Retrieving M365 groups starting with 'ttgrp'", LogLevel.Info);
 
                 var command = _powerShellCommandService.GetRetrieveM365GroupsCommand();
-                var result = await ExecutePowerShellCommandAsync(command, "RetrieveM365Groups");
+                var result = await ExecutePowerShellCommandAsync(command, null, "RetrieveM365Groups", allowThrottleRetry: true);
 
                 if (!string.IsNullOrEmpty(result.Value))
                 {

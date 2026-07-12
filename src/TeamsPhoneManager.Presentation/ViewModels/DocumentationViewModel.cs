@@ -86,7 +86,7 @@ namespace teams_phonemanager.ViewModels
 
                 // 1. Tenant Info
                 StatusMessage = "Exporting tenant info... (1/7)";
-                var tenantResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportTenantInfoCommand(), "ExportTenantInfo");
+                var tenantResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportTenantInfoCommand(), null, "ExportTenantInfo", allowThrottleRetry: true);
                 if (!string.IsNullOrEmpty(tenantResult.Value))
                 {
                     foreach (var line in tenantResult.Value.Split('\n', StringSplitOptions.RemoveEmptyEntries))
@@ -107,37 +107,37 @@ namespace teams_phonemanager.ViewModels
 
                 // 2. Resource Accounts + Associations
                 StatusMessage = "Exporting resource accounts... (2/7)";
-                var raResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportResourceAccountsCommand(), "ExportResourceAccounts");
+                var raResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportResourceAccountsCommand(), null, "ExportResourceAccounts", allowThrottleRetry: true);
                 if (!string.IsNullOrEmpty(raResult.Value))
                     ParseResourceAccountData(raResult.Value, raList, assocList);
 
                 // 3. Auto Attendants
                 StatusMessage = "Exporting auto attendants... (3/7)";
-                var aaResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportAutoAttendantsCommand(), "ExportAutoAttendants");
+                var aaResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportAutoAttendantsCommand(), null, "ExportAutoAttendants", allowThrottleRetry: true);
                 if (!string.IsNullOrEmpty(aaResult.Value))
                     ParseAutoAttendantData(aaResult.Value, aaList, menuOptions, callFlows, chaList, operatorList);
 
                 // 4. Call Queues
                 StatusMessage = "Exporting call queues... (4/7)";
-                var cqResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportCallQueuesCommand(), "ExportCallQueues");
+                var cqResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportCallQueuesCommand(), null, "ExportCallQueues", allowThrottleRetry: true);
                 if (!string.IsNullOrEmpty(cqResult.Value))
                     ParseCallQueueData(cqResult.Value, cqList, agentList, overflowList, timeoutList, dlList);
 
                 // 5. Schedules
                 StatusMessage = "Exporting schedules... (5/7)";
-                var schedResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportSchedulesCommand(), "ExportSchedules");
+                var schedResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportSchedulesCommand(), null, "ExportSchedules", allowThrottleRetry: true);
                 if (!string.IsNullOrEmpty(schedResult.Value))
                     ParseScheduleData(schedResult.Value, schedList, schedDateRanges, schedWeekly);
 
                 // 6. Phone Numbers
                 StatusMessage = "Exporting phone numbers... (6/7)";
-                var phoneResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportPhoneNumbersCommand(), "ExportPhoneNumbers");
+                var phoneResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportPhoneNumbersCommand(), null, "ExportPhoneNumbers", allowThrottleRetry: true);
                 if (!string.IsNullOrEmpty(phoneResult.Value))
                     ParsePhoneData(phoneResult.Value, phoneList);
 
                 // 7. Voice Users
                 StatusMessage = "Exporting voice users... (7/7)";
-                var userResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportVoiceUsersCommand(), "ExportVoiceUsers");
+                var userResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportVoiceUsersCommand(), null, "ExportVoiceUsers", allowThrottleRetry: true);
                 if (!string.IsNullOrEmpty(userResult.Value))
                     ParseUserData(userResult.Value, userList);
 
