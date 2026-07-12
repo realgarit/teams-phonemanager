@@ -8,6 +8,7 @@ Requires Pillow. The .icns is produced afterwards with:
 
 import math
 import os
+import numpy as np
 from PIL import Image, ImageDraw
 
 BASE = 1024  # master render size
@@ -15,48 +16,83 @@ SS = 4       # supersampling factor
 S = BASE * SS
 
 # Palette: matches the app's BrandGradientBrush (App.axaml), white glyph.
-GRAD_TOP = (106, 111, 221)   # #6A6FDD
-GRAD_BOTTOM = (75, 77, 158)  # #4B4D9E
+GRAD_START = (123, 128, 238)  # #7B80EE (top-left)
+GRAD_END = (69, 71, 143)      # #45478F (bottom-right)
 WHITE = (255, 255, 255, 255)
+SIDE_DOT_OPACITY = 0.38
 
 
 def rounded_badge():
     img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-    # vertical gradient
-    grad = Image.new("RGBA", (1, S))
-    for y in range(S):
-        t = y / (S - 1)
-        c = tuple(round(GRAD_TOP[i] + (GRAD_BOTTOM[i] - GRAD_TOP[i]) * t) for i in range(3))
-        grad.putpixel((0, y), c + (255,))
-    grad = grad.resize((S, S))
+
+    # diagonal gradient (top-left to bottom-right)
+    xs, ys = np.meshgrid(np.arange(S), np.arange(S))
+    t = (xs + ys) / (2 * (S - 1))
+    grad_arr = np.empty((S, S, 4), dtype=np.uint8)
+    for i in range(3):
+        grad_arr[:, :, i] = np.round(GRAD_START[i] + (GRAD_END[i] - GRAD_START[i]) * t)
+    grad_arr[:, :, 3] = 255
+    grad = Image.fromarray(grad_arr, "RGBA")
+
     mask = Image.new("L", (S, S), 0)
     d = ImageDraw.Draw(mask)
     r = round(S * 0.225)  # macOS-like corner radius
     d.rounded_rectangle([0, 0, S - 1, S - 1], radius=r, fill=255)
     img.paste(grad, (0, 0), mask)
+
+    # subtle top sheen (vertical, fading out by mid-height)
+    ty = np.clip(ys[:, :1] / (S * 0.5), 0, 1.0)
+    sheen_alpha = np.round(255 * 0.16 * (1 - ty)).astype(np.uint8)
+    sheen_arr = np.zeros((S, S, 4), dtype=np.uint8)
+    sheen_arr[:, :, 0:3] = 255
+    sheen_arr[:, :, 3:4] = sheen_alpha
+    sheen = Image.fromarray(sheen_arr, "RGBA")
+    sheen_layer = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    sheen_layer.paste(sheen, (0, 0), mask)
+    img = Image.alpha_composite(img, sheen_layer)
     return img
 
 
 def draw_glyph(img):
-    """Dial-pad glyph: 3x3 dots plus a bottom bar. Legible at 16px."""
-    d = ImageDraw.Draw(img)
-    gap = S * 0.155              # spacing between dot centers
-    r = S * 0.058                # dot radius
-    # The glyph spans from (cy - gap - r) to (cy + 2*gap + r); solving for the
-    # optical center at S/2 gives cy = S/2 - gap/2.
-    cx, cy = S * 0.5, S * 0.5 - gap / 2
+    """T-Pad glyph: dial-pad dots with the top row + center column forming a
+    "T" at full white; the remaining side dots dimmed. No bottom bar."""
+    gap = S * 0.155               # spacing between dot centers
+    r = S * 0.058                 # dot radius
+    # Four rows spaced by gap, centered on the badge: top row baseline is
+    # 1.5*gap above the optical center S/2.
+    cx, cy = S * 0.5, S * 0.5 - 1.5 * gap
 
-    for row in range(3):
-        for col in range(3):
-            x = cx + (col - 1) * gap
-            y = cy + (row - 1) * gap
-            d.ellipse([x - r, y - r, x + r, y + r], fill=WHITE)
+    full = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    side = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    d_full = ImageDraw.Draw(full)
+    d_side = ImageDraw.Draw(side)
 
-    # bottom bar (the "0" row), rounded
-    bar_y = cy + 2 * gap
-    bar_half = gap * 1.0 + r
-    d.rounded_rectangle([cx - bar_half, bar_y - r, cx + bar_half, bar_y + r],
-                        radius=r, fill=WHITE)
+    def dot(d, row, col):
+        x = cx + (col - 1) * gap
+        y = cy + row * gap
+        d.ellipse([x - r, y - r, x + r, y + r], fill=WHITE)
+
+    # Top row (3 dots) — full white.
+    dot(d_full, 0, 0)
+    dot(d_full, 0, 1)
+    dot(d_full, 0, 2)
+    # Center column, rows 1-3 — full white.
+    dot(d_full, 1, 1)
+    dot(d_full, 2, 1)
+    dot(d_full, 3, 1)
+    # Remaining side dots, rows 1-3 — dimmed.
+    dot(d_side, 1, 0)
+    dot(d_side, 1, 2)
+    dot(d_side, 2, 0)
+    dot(d_side, 2, 2)
+    dot(d_side, 3, 0)
+    dot(d_side, 3, 2)
+
+    side_alpha = side.split()[3].point(lambda a: round(a * SIDE_DOT_OPACITY))
+    side.putalpha(side_alpha)
+
+    img = Image.alpha_composite(img, side)
+    img = Image.alpha_composite(img, full)
     return img
 
 
