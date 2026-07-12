@@ -1031,10 +1031,10 @@ namespace teams_phonemanager.ViewModels
                         var command = _powerShellCommandService.GetImportAudioFileCommand(filePath);
                         var result = await ExecutePowerShellCommandAsync(command, "ImportAudioFile");
                         
-                        if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                        if (result.HasSuccessMarker)
                         {
                             // Parse the audio file ID from the result
-                            var audioFileId = ParseAudioFileIdFromResult(result);
+                            var audioFileId = ParseAudioFileIdFromResult(result.Value ?? string.Empty);
                             if (!string.IsNullOrEmpty(audioFileId))
                             {
                                 var fileName = fileInfo.Name;
@@ -1049,7 +1049,7 @@ namespace teams_phonemanager.ViewModels
                         }
                         else
                         {
-                            await _errorHandlingService.HandleGenericError($"Failed to import audio file:\n{result}", "Import Error");
+                            await _errorHandlingService.HandleGenericError($"Failed to import audio file:\n{result.Value}", "Import Error");
                         }
                     }
                 }
