@@ -54,6 +54,11 @@ class Program
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<IPageViewModelFactory, PageViewModelFactory>();
 
+        // Throttling resilience (foundations #62): shared options + retry policy, per-run bulk pacer.
+        services.AddSingleton(ThrottleRetryOptions.Default);
+        services.AddSingleton<IThrottleRetryPolicy, ThrottleRetryPolicy>();
+        services.AddTransient<IBulkPacer, BulkPacer>();
+
         // Transient services (new instance per request)
         services.AddTransient<IPowerShellCommandService, PowerShellCommandService>();
         services.AddTransient<IValidationService, ValidationService>();
