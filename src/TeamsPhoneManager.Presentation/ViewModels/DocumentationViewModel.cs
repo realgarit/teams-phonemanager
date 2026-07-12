@@ -87,9 +87,9 @@ namespace teams_phonemanager.ViewModels
                 // 1. Tenant Info
                 StatusMessage = "Exporting tenant info... (1/7)";
                 var tenantResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportTenantInfoCommand(), "ExportTenantInfo");
-                if (!string.IsNullOrEmpty(tenantResult))
+                if (!string.IsNullOrEmpty(tenantResult.Value))
                 {
-                    foreach (var line in tenantResult.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                    foreach (var line in tenantResult.Value.Split('\n', StringSplitOptions.RemoveEmptyEntries))
                     {
                         if (line.StartsWith("DOCDATA_TENANT:") && line.Length > 15)
                         {
@@ -108,38 +108,38 @@ namespace teams_phonemanager.ViewModels
                 // 2. Resource Accounts + Associations
                 StatusMessage = "Exporting resource accounts... (2/7)";
                 var raResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportResourceAccountsCommand(), "ExportResourceAccounts");
-                if (!string.IsNullOrEmpty(raResult))
-                    ParseResourceAccountData(raResult, raList, assocList);
+                if (!string.IsNullOrEmpty(raResult.Value))
+                    ParseResourceAccountData(raResult.Value, raList, assocList);
 
                 // 3. Auto Attendants
                 StatusMessage = "Exporting auto attendants... (3/7)";
                 var aaResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportAutoAttendantsCommand(), "ExportAutoAttendants");
-                if (!string.IsNullOrEmpty(aaResult))
-                    ParseAutoAttendantData(aaResult, aaList, menuOptions, callFlows, chaList, operatorList);
+                if (!string.IsNullOrEmpty(aaResult.Value))
+                    ParseAutoAttendantData(aaResult.Value, aaList, menuOptions, callFlows, chaList, operatorList);
 
                 // 4. Call Queues
                 StatusMessage = "Exporting call queues... (4/7)";
                 var cqResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportCallQueuesCommand(), "ExportCallQueues");
-                if (!string.IsNullOrEmpty(cqResult))
-                    ParseCallQueueData(cqResult, cqList, agentList, overflowList, timeoutList, dlList);
+                if (!string.IsNullOrEmpty(cqResult.Value))
+                    ParseCallQueueData(cqResult.Value, cqList, agentList, overflowList, timeoutList, dlList);
 
                 // 5. Schedules
                 StatusMessage = "Exporting schedules... (5/7)";
                 var schedResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportSchedulesCommand(), "ExportSchedules");
-                if (!string.IsNullOrEmpty(schedResult))
-                    ParseScheduleData(schedResult, schedList, schedDateRanges, schedWeekly);
+                if (!string.IsNullOrEmpty(schedResult.Value))
+                    ParseScheduleData(schedResult.Value, schedList, schedDateRanges, schedWeekly);
 
                 // 6. Phone Numbers
                 StatusMessage = "Exporting phone numbers... (6/7)";
                 var phoneResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportPhoneNumbersCommand(), "ExportPhoneNumbers");
-                if (!string.IsNullOrEmpty(phoneResult))
-                    ParsePhoneData(phoneResult, phoneList);
+                if (!string.IsNullOrEmpty(phoneResult.Value))
+                    ParsePhoneData(phoneResult.Value, phoneList);
 
                 // 7. Voice Users
                 StatusMessage = "Exporting voice users... (7/7)";
                 var userResult = await ExecutePowerShellCommandAsync(_docBuilder.GetExportVoiceUsersCommand(), "ExportVoiceUsers");
-                if (!string.IsNullOrEmpty(userResult))
-                    ParseUserData(userResult, userList);
+                if (!string.IsNullOrEmpty(userResult.Value))
+                    ParseUserData(userResult.Value, userList);
 
                 // Build the comprehensive documentation
                 StatusMessage = "Building documentation...";

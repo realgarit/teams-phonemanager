@@ -117,7 +117,7 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
                 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Holiday series '{holidayName}' created successfully with {holidayEntries.Count} dates!";
                     _loggingService.Log($"Holiday series {holidayName} created successfully", LogLevel.Info);
@@ -125,8 +125,8 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Error creating holiday series: {result}";
-                    _loggingService.Log($"Error creating holiday series {holidayName}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error creating holiday series: {result.Value}";
+                    _loggingService.Log($"Error creating holiday series {holidayName}: {result.Value}", LogLevel.Error);
                     IsHolidayCreated = false;
                 }
             }
@@ -182,15 +182,15 @@ namespace teams_phonemanager.ViewModels
                 var command = _powerShellCommandService.GetVerifyAutoAttendantCommand(AutoAttendantName);
                 var result = await ExecutePowerShellCommandAsync(command, "VerifyAutoAttendant");
                 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Auto attendant '{AutoAttendantName}' verified successfully and is ready for holiday configuration";
                     _loggingService.Log($"Auto attendant {AutoAttendantName} verified successfully", LogLevel.Info);
                 }
                 else
                 {
-                    StatusMessage = $"Error: Auto attendant '{AutoAttendantName}' not found or not accessible: {result}";
-                    _loggingService.Log($"Error verifying auto attendant {AutoAttendantName}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error: Auto attendant '{AutoAttendantName}' not found or not accessible: {result.Value}";
+                    _loggingService.Log($"Error verifying auto attendant {AutoAttendantName}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
@@ -260,15 +260,15 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
                 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Successfully attached holiday '{holidayName}' to auto attendant '{AutoAttendantName}'";
                     _loggingService.Log($"Successfully attached holiday {holidayName} to auto attendant {AutoAttendantName}", LogLevel.Info);
                 }
                 else
                 {
-                    StatusMessage = $"Error attaching holiday to auto attendant: {result}";
-                    _loggingService.Log($"Error attaching holiday {holidayName} to auto attendant {AutoAttendantName}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error attaching holiday to auto attendant: {result.Value}";
+                    _loggingService.Log($"Error attaching holiday {holidayName} to auto attendant {AutoAttendantName}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)

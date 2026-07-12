@@ -95,10 +95,10 @@ namespace teams_phonemanager.ViewModels
 
                 var command = _powerShellCommandService.GetRetrieveM365GroupsCommand();
                 var result = await ExecutePowerShellCommandAsync(command, "RetrieveM365Groups");
-                
-                if (!string.IsNullOrEmpty(result))
+
+                if (!string.IsNullOrEmpty(result.Value))
                 {
-                    ParseGroupsFromResult(result);
+                    ParseGroupsFromResult(result.Value);
                     GroupStatus = $"Found {Groups.Count} groups starting with 'ttgrp'";
                     _loggingService.Log($"Retrieved {Groups.Count} M365 groups", LogLevel.Info);
                 }
@@ -157,9 +157,9 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
                 
-                if (!string.IsNullOrEmpty(result))
+                if (!string.IsNullOrEmpty(result.Value))
                 {
-                    var output = result.Trim();
+                    var output = result.Value.Trim();
                     if (output.Contains("created successfully"))
                     {
                         GroupStatus = $"Group '{NewGroupName}' created successfully";
@@ -221,7 +221,7 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     GroupStatus = $"Group '{SelectedGroup.DisplayName}' removed successfully";
                     _loggingService.Log($"M365 Group {SelectedGroup.DisplayName} removed successfully", LogLevel.Info);
@@ -230,8 +230,8 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    GroupStatus = $"Error removing group: {result}";
-                    _loggingService.Log($"Error removing M365 Group {SelectedGroup.DisplayName}: {result}", LogLevel.Error);
+                    GroupStatus = $"Error removing group: {result.Value}";
+                    _loggingService.Log($"Error removing M365 Group {SelectedGroup.DisplayName}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
@@ -273,9 +273,9 @@ namespace teams_phonemanager.ViewModels
                 var command = _powerShellCommandService.GetCreateM365GroupCommand(m365group);
                 var result = await ExecutePowerShellCommandAsync(command, "CheckM365Group");
                 
-                if (!string.IsNullOrEmpty(result))
+                if (!string.IsNullOrEmpty(result.Value))
                 {
-                    var output = result.Trim();
+                    var output = result.Value.Trim();
                     var parts = output.Split(':');
                     if (parts.Length >= 2)
                     {

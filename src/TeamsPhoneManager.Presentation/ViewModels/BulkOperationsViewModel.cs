@@ -222,11 +222,11 @@ namespace teams_phonemanager.ViewModels
                 // Execute the entire script as one batch
                 var result = await ExecutePowerShellCommandAsync(bulkScript, "BulkOperations");
 
-                if (!string.IsNullOrEmpty(result))
+                if (!string.IsNullOrEmpty(result.Value))
                 {
-                    log.AppendLine(result);
+                    log.AppendLine(result.Value);
 
-                    if (result.Contains("ERROR:"))
+                    if (result.HasErrorMarker)
                     {
                         StatusMessage = "Bulk execution completed with errors. Check the log below.";
                         _loggingService.Log("Bulk execution completed with errors", LogLevel.Warning);

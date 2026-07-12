@@ -65,12 +65,12 @@ namespace teams_phonemanager.ViewModels
             LogMessage = $"{DateTime.Now:HH:mm:ss} - {message}";
         }
 
-        protected async Task<string> ExecutePowerShellCommandAsync(string command, string context = "")
+        protected async Task<OperationResult<string>> ExecutePowerShellCommandAsync(string command, string context = "")
         {
             return await ExecutePowerShellCommandAsync(command, null, context);
         }
 
-        protected async Task<string> ExecutePowerShellCommandAsync(string command, Dictionary<string, string>? environmentVariables, string context = "")
+        protected async Task<OperationResult<string>> ExecutePowerShellCommandAsync(string command, Dictionary<string, string>? environmentVariables, string context = "")
         {
             // Check session expiry before executing commands that require a connection
             if (_sessionManager.IsSessionExpired && _sessionManager.IsSessionValid)
@@ -79,17 +79,21 @@ namespace teams_phonemanager.ViewModels
                 await _errorHandlingService.HandleConnectionError(
                     "Session",
                     "Your session has expired (24h timeout). Please reconnect to Teams and Microsoft Graph.");
-                return "ERROR: Session expired. Please reconnect.";
+                return PowerShellOperationResultMapper.Failure(
+                    OperationErrorCategory.AuthSession,
+                    "Session expired. Please reconnect.",
+                    "ERROR: Session expired. Please reconnect.");
             }
 
             try
             {
-                var result = await _powerShellContextService.ExecuteCommandAsync(command, environmentVariables);
+                var execution = await _powerShellContextService.ExecuteCommandWithDetailsAsync(command, environmentVariables);
+                var result = PowerShellOperationResultMapper.Map(execution);
 
-                // Only treat as error if result contains ERROR: and not SUCCESS
-                if (result.Contains("ERROR:") && !result.Contains("SUCCESS"))
+                // Surface a user-facing error only for a reportable failure (error marker without success marker).
+                if (result.ShouldReportError)
                 {
-                    await _errorHandlingService.HandlePowerShellError(command, result, context);
+                    await _errorHandlingService.HandlePowerShellError(command, result.RawOutput, context);
                 }
 
                 return result;
@@ -97,7 +101,10 @@ namespace teams_phonemanager.ViewModels
             catch (Exception ex)
             {
                 await _errorHandlingService.HandlePowerShellError(command, ex.Message, context);
-                return $"ERROR: {ex.Message}";
+                return PowerShellOperationResultMapper.Failure(
+                    OperationErrorCategory.Unknown,
+                    ex.Message,
+                    $"ERROR: {ex.Message}");
             }
         }
 
@@ -190,7 +197,7 @@ namespace teams_phonemanager.ViewModels
         /// Shows a script preview dialog and executes the command if the user confirms.
         /// Returns the execution result, or null if the user cancelled.
         /// </summary>
-        protected async Task<string?> PreviewAndExecuteAsync(string command, string context = "", Dictionary<string, string>? environmentVariables = null)
+        protected async Task<OperationResult<string>?> PreviewAndExecuteAsync(string command, string context = "", Dictionary<string, string>? environmentVariables = null)
         {
             if (_dialogService != null && !(_sharedStateService?.SkipScriptPreview ?? false))
             {
@@ -209,7 +216,7 @@ namespace teams_phonemanager.ViewModels
         /// Shows a confirmation dialog with script preview for destructive operations.
         /// Returns the execution result, or null if the user cancelled.
         /// </summary>
-        protected async Task<string?> ConfirmAndExecuteAsync(string command, string confirmMessage, string context = "", Dictionary<string, string>? environmentVariables = null)
+        protected async Task<OperationResult<string>?> ConfirmAndExecuteAsync(string command, string confirmMessage, string context = "", Dictionary<string, string>? environmentVariables = null)
         {
             if (_dialogService != null && !(_sharedStateService?.SkipDeleteConfirmation ?? false))
             {

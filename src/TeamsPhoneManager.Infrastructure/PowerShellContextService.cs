@@ -89,6 +89,14 @@ namespace teams_phonemanager.Services
 
         public async Task<string> ExecuteCommandAsync(string command, Dictionary<string, string>? environmentVariables, CancellationToken cancellationToken = default)
         {
+            // Delegate to the detailed overload and return only the text output, which is byte-identical
+            // to the historic behavior. The structured error records are simply ignored here.
+            var execution = await ExecuteCommandWithDetailsAsync(command, environmentVariables, cancellationToken);
+            return execution.Output;
+        }
+
+        public async Task<PowerShellExecutionResult> ExecuteCommandWithDetailsAsync(string command, Dictionary<string, string>? environmentVariables, CancellationToken cancellationToken = default)
+        {
             if (_disposed)
                 throw new ObjectDisposedException(nameof(PowerShellContextService));
 
@@ -128,6 +136,7 @@ $ErrorActionPreference = 'Continue'
                     }, cancellationToken);
 
                     var output = new StringBuilder();
+                    var errorInfos = new List<PowerShellErrorInfo>();
 
                     foreach (var item in _powerShell.Streams.Information)
                     {
@@ -146,16 +155,23 @@ $ErrorActionPreference = 'Continue'
                         output.AppendLine(item.ToString());
                     }
 
-                    if (_powerShell.HadErrors)
+                    var hadErrors = _powerShell.HadErrors;
+                    if (hadErrors)
                     {
                         foreach (var error in _powerShell.Streams.Error)
                         {
                             _loggingService.Log($"PowerShell error: {error}", LogLevel.Error);
                             output.AppendLine($"ERROR: {error}");
+                            errorInfos.Add(ToErrorInfo(error));
                         }
                     }
 
-                    return output.ToString();
+                    return new PowerShellExecutionResult
+                    {
+                        Output = output.ToString(),
+                        HadErrors = hadErrors,
+                        Errors = errorInfos
+                    };
                 }
                 finally
                 {
@@ -176,12 +192,51 @@ $ErrorActionPreference = 'Continue'
             catch (Exception ex)
             {
                 _loggingService.Log($"Error executing PowerShell command: {ex.Message}", LogLevel.Error);
-                return $"ERROR: {ex.Message}";
+                return new PowerShellExecutionResult
+                {
+                    Output = $"ERROR: {ex.Message}",
+                    HadErrors = true,
+                    Errors = new List<PowerShellErrorInfo>
+                    {
+                        new()
+                        {
+                            ExceptionType = ex.GetType().FullName ?? ex.GetType().Name,
+                            Message = ex.Message,
+                            FailingCommand = string.Empty,
+                            CategoryInfo = string.Empty,
+                            RawText = ex.ToString()
+                        }
+                    }
+                };
             }
             finally
             {
                 _semaphore.Release();
             }
+        }
+
+        /// <summary>
+        /// Projects a PowerShell <see cref="ErrorRecord"/> into a framework-free <see cref="PowerShellErrorInfo"/>,
+        /// preserving the exception type, message and failing command rather than flattening to a single string.
+        /// </summary>
+        private static PowerShellErrorInfo ToErrorInfo(ErrorRecord error)
+        {
+            var exception = error.Exception;
+            var invocation = error.InvocationInfo;
+            var failingCommand = invocation?.MyCommand?.Name;
+            if (string.IsNullOrEmpty(failingCommand))
+            {
+                failingCommand = invocation?.Line?.Trim();
+            }
+
+            return new PowerShellErrorInfo
+            {
+                ExceptionType = exception?.GetType().FullName ?? exception?.GetType().Name ?? string.Empty,
+                Message = exception?.Message ?? error.ToString(),
+                FailingCommand = failingCommand ?? string.Empty,
+                CategoryInfo = error.CategoryInfo?.ToString() ?? string.Empty,
+                RawText = error.ToString()
+            };
         }
 
         public async Task<bool> IsConnectedAsync(string service, CancellationToken cancellationToken = default)

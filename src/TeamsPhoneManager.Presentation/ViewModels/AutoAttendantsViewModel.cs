@@ -107,10 +107,10 @@ namespace teams_phonemanager.ViewModels
 
                 var command = _powerShellCommandService.GetRetrieveAutoAttendantResourceAccountsCommand();
                 var result = await ExecutePowerShellCommandAsync(command, "RetrieveAutoAttendantResourceAccounts");
-                
-                if (!string.IsNullOrEmpty(result))
+
+                if (!string.IsNullOrEmpty(result.Value))
                 {
-                    ParseResourceAccountsFromResult(result);
+                    ParseResourceAccountsFromResult(result.Value);
                     StatusMessage = $"Found {ResourceAccounts.Count} resource accounts starting with 'raaa-'";
                     _loggingService.Log($"Retrieved {ResourceAccounts.Count} resource accounts", LogLevel.Info);
                 }
@@ -144,10 +144,10 @@ namespace teams_phonemanager.ViewModels
 
                 var command = _powerShellCommandService.GetRetrieveAutoAttendantsCommand();
                 var result = await ExecutePowerShellCommandAsync(command, "RetrieveAutoAttendants");
-                
-                if (!string.IsNullOrEmpty(result))
+
+                if (!string.IsNullOrEmpty(result.Value))
                 {
-                    ParseAutoAttendantsFromResult(result);
+                    ParseAutoAttendantsFromResult(result.Value);
                     StatusMessage = $"Found {AutoAttendants.Count} auto attendants containing 'aa-'";
                     _loggingService.Log($"Retrieved {AutoAttendants.Count} auto attendants", LogLevel.Info);
                 }
@@ -340,7 +340,7 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Resource account '{ResourceAccountUpn}' created successfully";
                     _loggingService.Log($"Resource account {ResourceAccountUpn} created successfully", LogLevel.Info);
@@ -349,8 +349,8 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Error creating resource account: {result}";
-                    _loggingService.Log($"Error creating resource account {ResourceAccountUpn}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error creating resource account: {result.Value}";
+                    _loggingService.Log($"Error creating resource account {ResourceAccountUpn}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
@@ -426,7 +426,7 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Auto attendant '{AutoAttendantName}' created successfully";
                     _loggingService.Log($"Auto attendant {AutoAttendantName} created successfully", LogLevel.Info);
@@ -435,8 +435,8 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Error creating auto attendant: {result}";
-                    _loggingService.Log($"Error creating auto attendant {AutoAttendantName}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error creating auto attendant: {result.Value}";
+                    _loggingService.Log($"Error creating auto attendant {AutoAttendantName}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
@@ -492,7 +492,7 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Auto attendant '{name}' removed successfully";
                     _loggingService.Log($"Auto attendant {name} removed successfully", LogLevel.Info);
@@ -501,8 +501,8 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Error removing auto attendant: {result}";
-                    _loggingService.Log($"Error removing auto attendant {name}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error removing auto attendant: {result.Value}";
+                    _loggingService.Log($"Error removing auto attendant {name}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
@@ -540,15 +540,15 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Schedule '{scheduleName}' removed successfully";
                     _loggingService.Log($"Schedule {scheduleName} removed successfully", LogLevel.Info);
                 }
                 else
                 {
-                    StatusMessage = $"Error removing schedule: {result}";
-                    _loggingService.Log($"Error removing schedule {scheduleName}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error removing schedule: {result.Value}";
+                    _loggingService.Log($"Error removing schedule {scheduleName}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
@@ -587,7 +587,7 @@ namespace teams_phonemanager.ViewModels
                     return;
                 }
 
-                if (!string.IsNullOrEmpty(result) && result.Contains("SUCCESS"))
+                if (result.HasSuccessMarker)
                 {
                     StatusMessage = $"Resource account '{accountUpn}' removed successfully";
                     _loggingService.Log($"Resource account {accountUpn} removed successfully", LogLevel.Info);
@@ -596,8 +596,8 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    StatusMessage = $"Error removing resource account: {result}";
-                    _loggingService.Log($"Error removing resource account {accountUpn}: {result}", LogLevel.Error);
+                    StatusMessage = $"Error removing resource account: {result.Value}";
+                    _loggingService.Log($"Error removing resource account {accountUpn}: {result.Value}", LogLevel.Error);
                 }
             }
             catch (Exception ex)
