@@ -73,16 +73,17 @@ namespace teams_phonemanager.ViewModels
 
                 var command = _powerShellCommandService.GetCheckModulesCommand();
                 var result = await ExecutePowerShellCommandAsync(command, "CheckModules");
+                var output = result.Value ?? string.Empty;
 
                 // Check for Teams module
-                bool teamsAvailable = result.Contains("MicrosoftTeams module is available") || result.Contains("MicrosoftTeams module installed successfully");
+                bool teamsAvailable = output.Contains("MicrosoftTeams module is available") || output.Contains("MicrosoftTeams module installed successfully");
 
                 // Check for all required Graph modules
-                bool graphAuthAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphAuthentication + " module is available");
-                bool graphUsersAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphUsers + " module is available");
-                bool graphUsersActionsAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphUsersActions + " module is available");
-                bool graphGroupsAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphGroups + " module is available");
-                bool graphIdentityAvailable = result.Contains(ConstantsService.PowerShellModules.MicrosoftGraphIdentityDirectoryManagement + " module is available");
+                bool graphAuthAvailable = output.Contains(ConstantsService.PowerShellModules.MicrosoftGraphAuthentication + " module is available");
+                bool graphUsersAvailable = output.Contains(ConstantsService.PowerShellModules.MicrosoftGraphUsers + " module is available");
+                bool graphUsersActionsAvailable = output.Contains(ConstantsService.PowerShellModules.MicrosoftGraphUsersActions + " module is available");
+                bool graphGroupsAvailable = output.Contains(ConstantsService.PowerShellModules.MicrosoftGraphGroups + " module is available");
+                bool graphIdentityAvailable = output.Contains(ConstantsService.PowerShellModules.MicrosoftGraphIdentityDirectoryManagement + " module is available");
 
                 ModulesChecked = teamsAvailable &&
                                 graphAuthAvailable &&
@@ -96,7 +97,7 @@ namespace teams_phonemanager.ViewModels
                 if (ModulesChecked)
                 {
                     _loggingService.Log("PowerShell modules are available", LogLevel.Success);
-                    foreach (var line in result.Split('\n'))
+                    foreach (var line in output.Split('\n'))
                     {
                         if (!string.IsNullOrWhiteSpace(line))
                         {
@@ -138,7 +139,7 @@ namespace teams_phonemanager.ViewModels
 
                 var command = _powerShellCommandService.GetConnectTeamsCommand();
                 var result = await ExecutePowerShellCommandAsync(command, "ConnectTeams");
-                TeamsConnected = result.Contains("SUCCESS:");
+                TeamsConnected = result.HasSuccessMarker;
 
                 string? tenantId = null;
                 string? tenantName = null;
@@ -147,7 +148,7 @@ namespace teams_phonemanager.ViewModels
                 {
                     _loggingService.Log("Connected to Microsoft Teams successfully", LogLevel.Success);
 
-                    foreach (var line in result.Split('\n'))
+                    foreach (var line in (result.Value ?? string.Empty).Split('\n'))
                     {
                         if (line.Contains("Connected to tenant:"))
                         {
@@ -162,7 +163,7 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    _loggingService.Log($"Error connecting to Microsoft Teams: {result}", LogLevel.Error);
+                    _loggingService.Log($"Error connecting to Microsoft Teams: {result.Value}", LogLevel.Error);
                 }
 
                 _sessionManager.UpdateTeamsConnection(TeamsConnected);
@@ -222,7 +223,7 @@ namespace teams_phonemanager.ViewModels
                     { "TEAMS_PM_TOKEN", authResult.AccessToken }
                 };
                 var result = await ExecutePowerShellCommandAsync(command, envVars, "ConnectGraph");
-                GraphConnected = result.Contains("SUCCESS:");
+                GraphConnected = result.HasSuccessMarker;
 
                 string? account = authResult.Account;
 
@@ -232,7 +233,7 @@ namespace teams_phonemanager.ViewModels
                 }
                 else
                 {
-                    _loggingService.Log($"Error connecting to Microsoft Graph: {result}", LogLevel.Error);
+                    _loggingService.Log($"Error connecting to Microsoft Graph: {result.Value}", LogLevel.Error);
                 }
 
                 _sessionManager.UpdateGraphConnection(GraphConnected, account);
