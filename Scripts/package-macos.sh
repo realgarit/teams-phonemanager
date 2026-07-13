@@ -78,7 +78,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSHumanReadableCopyright</key>
-    <string>Copyright © 2026 Realgar. MIT License.</string>
+    <string>Copyright © 2026 Patrik Lleshaj. MIT License.</string>
 </dict>
 </plist>
 PLIST
