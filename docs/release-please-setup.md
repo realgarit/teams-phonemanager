@@ -20,22 +20,36 @@ different release-please CLI that re-evaluates the entire commit history.
 
 ## Preventing phantom major-version bumps
 
-The most critical setting is **`last-release-sha`** in `.release-please-manifest.json`:
+The most critical setting is **`last-release-sha`** in `release-please-config.json`
+(under the `packages."."` key):
 
 ```json
 {
-  ".": "3.21.3",
-  "last-release-sha": "dc640485e0a866596b0eb6919918a4a05140b4f6"
+  "packages": {
+    ".": {
+      "last-release-sha": "dc640485e0a866596b0eb6919918a4a05140b4f6"
+    }
+  }
+}
+```
+
+The manifest file (`.release-please-manifest.json`) only holds version strings:
+
+```json
+{
+  ".": "3.21.3"
 }
 ```
 
 * `".": "3.21.3"` — the current package version (release-please format).
-* `"last-release-sha"` — the commit SHA of the last released commit. RP only evaluates
-  commits *after* this SHA for the next release, preventing it from re-scanning the
-  entire history and proposing a breaking-change major bump every time it runs.
+* `"last-release-sha"` — in the **config file**, not the manifest. The commit SHA of
+  the last released commit. RP only evaluates commits *after* this SHA for the next
+  release, preventing it from re-scanning the entire history and proposing a
+  breaking-change major bump every time it runs.
 
-**Whenever you push a tagged release commit**, update `last-release-sha` to point at that
-commit so RP does not re-propose the same release on the next push to `main`.
+**Whenever you push a tagged release commit**, update `last-release-sha` in
+`release-please-config.json` to point at that commit so RP does not re-propose the
+same release on the next push to `main`.
 
 ## Four-digit version fields for Windows
 
@@ -57,8 +71,8 @@ The .NET project uses these MSBuild properties in `teams-phonemanager.csproj`:
 | File | Purpose |
 |------|---------|
 | `.github/workflows/build.yml` | CI/CD pipeline: RP, validation, build, publish, Homebrew |
-| `release-please-config.json` | RP bootstrap SHA, changelog sections, release-type |
-| `.release-please-manifest.json` | Current version + `last-release-sha` |
+| `release-please-config.json` | RP bootstrap SHA, changelog sections, release-type, `last-release-sha` |
+| `.release-please-manifest.json` | Current version only (manifest format) |
 | `version.txt` | Human-readable version (must match RP version) |
 | `teams-phonemanager.csproj` | Project `<Version>`, `<AssemblyVersion>`, `<FileVersion>` |
 
@@ -74,8 +88,8 @@ The .NET project uses these MSBuild properties in `teams-phonemanager.csproj`:
 ## Troubleshooting
 
 ### RP keeps creating duplicate or phantom release PRs
-- Verify `.release-please-manifest.json` has `"last-release-sha"` pointing to the
-  **exact commit** of the most recent release tag.
+- Verify `release-please-config.json` has `"last-release-sha"` pointing to the
+  **exact commit** of the most recent release tag (under the `packages."."` key).
 - Verify the action is pinned to a **v4 commit SHA**, not a floating `v4` tag.
 - Delete stale RP branches (`release-please--branches--main-*`) and re-run.
 
