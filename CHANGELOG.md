@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.21.1](https://github.com/realgarit/teams-phonemanager/compare/v3.21.0...v3.21.1) (2026-07-13)
+
+
+### Bug Fixes
+
+* **release:** publish Release Please drafts in place ([#99](https://github.com/realgarit/teams-phonemanager/issues/99)) ([a8f26e5](https://github.com/realgarit/teams-phonemanager/commit/a8f26e5b32f2e7cd44fcbbc8045052e994b08f58))
+
 ## [3.21.0](https://github.com/realgarit/teams-phonemanager/compare/v3.20.1...v3.21.0) (2026-07-13)
 
 
