@@ -36,9 +36,11 @@ README screenshots at `docs/screenshots/` (2560×1496 = 1280×720 @2x + syntheti
 - **Workflow file**: `.github/workflows/build.yml`
 - **Version source**: `teams-phonemanager.csproj` `<Version>` — also in `app.manifest` and `ConstantsService.cs`. Bump via `Scripts/bump-version.sh minor|patch|major`.
 
-### Phantom v4.0.0 PR — root fix
+### Phantom v4.0.0 PR — root fix & prevention
 
-Release-please repeatedly created v4.0.0 PRs because old squashed commit `0406e3d` contained `BREAKING CHANGE: ViewModel constructors now require ISharedStateService and IDialogService parameters`. Fix: `git filter-branch` removed that line (rewritten to `8159da9`), all descendants also rewritten, force-pushed.
+Release-please repeatedly created v4.0.0 PRs because old squashed commit `0406e3d` contained `BREAKING CHANGE: ViewModel constructors now require ISharedStateService and IDialogService parameters`. 
+
+**Permanent fix**: `last-release-sha` in `release-please-config.json` anchors release-please to only scan commits after the specified SHA. The value points to the v3.21.5 release commit — any BREAKING CHANGE footers before it are ignored.
 
 **Do NOT reintroduce `BREAKING CHANGE:` footers unless you actually intend a major bump.**
 
