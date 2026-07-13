@@ -6,17 +6,23 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      validate_ref:
+        description: Release Please branch to validate
+        required: false
+        type: string
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'release' }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || inputs.validate_ref || 'release' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || inputs.validate_ref != '' }}
 
 jobs:
   release-please:
     name: Manage Release
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.validate_ref == '')
     permissions:
+      actions: write
       contents: write
       issues: write
       pull-requests: write
@@ -30,9 +36,18 @@ jobs:
       id: release
       uses: googleapis/release-please-action@8b8fd2cc23b2e18957157a9d923d75aa0c6f6ad5 # v4
       with:
-        token: ${{ secrets.PAT_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         config-file: release-please-config.json
         manifest-file: .release-please-manifest.json
+
+    - name: Start release pull request validation
+      if: steps.release.outputs.prs_created == 'true'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RELEASE_PR: ${{ steps.release.outputs.pr }}
+      run: |
+        RELEASE_REF="$(jq -r '.headBranchName' <<< "$RELEASE_PR")"
+        gh workflow run build.yml --ref "$RELEASE_REF" -f validate_ref="$RELEASE_REF"
 
   validate-release:
     name: Validate Release Version
@@ -309,7 +324,7 @@ jobs:
   pr-validate:
     name: PR Validate ${{ matrix.runtime }}
     # Pre-merge gate: build + test + publish on every runtime without releasing.
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.validate_ref != '')
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -327,6 +342,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.validate_ref || github.ref }}
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
