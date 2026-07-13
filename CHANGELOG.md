@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.21.8](https://github.com/realgarit/teams-phonemanager/compare/v3.21.7...v3.21.8) (2026-07-13)
+
+
+### Bug Fixes
+
+* move last-release-sha to root level where release-please actually reads it ([#125](https://github.com/realgarit/teams-phonemanager/issues/125)) ([69f1019](https://github.com/realgarit/teams-phonemanager/commit/69f101957dd0104875c62ca58fd5b52e62d57d1e))
+* prevent phantom v4.0.0 by anchoring release-please with last-release-sha ([2124de5](https://github.com/realgarit/teams-phonemanager/commit/2124de5296d947886339d52fe60b5336438a2983))
+* prevent phantom v4.0.0 by anchoring release-please with last-release-sha ([b8e915e](https://github.com/realgarit/teams-phonemanager/commit/b8e915ebdf18bec5b2b376e6b3cadb022a373e8d))
+
 ## [3.21.7](https://github.com/realgarit/teams-phonemanager/compare/v3.21.6...v3.21.7) (2026-07-13)
 
 
