@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.21.5](https://github.com/realgarit/teams-phonemanager/compare/v3.21.4...v3.21.5) (2026-07-13)
+
+
+### Bug Fixes
+
+* upgrade to release-please v5 and fix CI checkout race ([4734209](https://github.com/realgarit/teams-phonemanager/commit/47342098ca55c2f59eb2de35de9cf4de12513fa9))
+* upgrade to release-please v5 and stop phantom v4.0.0 PRs ([fb336d6](https://github.com/realgarit/teams-phonemanager/commit/fb336d65cfcd1eaa160de1ff7f5a33d572f48a13))
+
 ## [3.21.4](https://github.com/realgarit/teams-phonemanager/compare/v3.21.3...v3.21.4) (2026-07-13)
 
 
