@@ -51,7 +51,7 @@ namespace teams_phonemanager.Services
 
         public static class Application
         {
-            public const string Version = "Version 3.21.1"; // x-release-please-version
+            public const string Version = "Version 3.21.2"; // x-release-please-version
             public const string Copyright = "Patrik Lleshaj © 2026. MIT License.";
         }
 
