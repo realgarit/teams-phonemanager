@@ -66,6 +66,16 @@ namespace teams_phonemanager.Services.Holidays
         // Jura-specific: Commémoration du plébiscite jurassien
         public static DateTime JurassianIndependenceDay(int year) => new DateTime(year, 6, 23);
 
+                // Eidgenössischer Dank-, Buss- und Bettag (Federal Day of Thanksgiving, Repentance and Prayer)
+                // Third Sunday in September
+                public static DateTime Bettag(int year)
+                {
+                    var sept1 = new DateTime(year, 9, 1);
+                    while (sept1.DayOfWeek != DayOfWeek.Sunday)
+                        sept1 = sept1.AddDays(1);
+                    return sept1.AddDays(14); // Third Sunday
+                }
+
         // Computus - Meeus/Jones/Butcher algorithm for Gregorian Easter Sunday
         public static DateTime EasterSunday(int year)
         {

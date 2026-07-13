@@ -42,7 +42,8 @@ namespace teams_phonemanager.Services.Holidays
                 { "Stephanstag", SwissHolidayFormulaEvaluator.StStephensDay },
                 { "Näfelser Fahrt", SwissHolidayFormulaEvaluator.NaefelserFahrt },
                 { "Jeûne genevois", SwissHolidayFormulaEvaluator.JeuneGenevois },
-                { "Restauration de la République", SwissHolidayFormulaEvaluator.RestaurationRepublique }
+                { "Restauration de la République", SwissHolidayFormulaEvaluator.RestaurationRepublique },
+                { "Bettag", SwissHolidayFormulaEvaluator.Bettag }
             };
 
             // Get holidays for specific canton
@@ -70,19 +71,19 @@ namespace teams_phonemanager.Services.Holidays
             {
                 "aargau" => GetAargauHolidays(district),
                 "bern" => new[] { "Neujahr", "Berchtoldstag", "Karfreitag", "Ostermontag", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Weihnachtstag", "Stephanstag" },
-                "basel-land" => new[] { "Neujahr", "Karfreitag", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Weihnachtstag", "Stephanstag" },
+                "basel-land" => new[] { "Neujahr", "Karfreitag", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Bettag", "Weihnachtstag", "Stephanstag" },
                 "fribourg" => new[] { "Neujahr", "Karfreitag", "Auffahrt", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag" },
                 "genf" => new[] { "Neujahr", "Karfreitag", "Ostermontag", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Jeûne genevois", "Weihnachtstag", "Restauration de la République" },
                 "glarus" => new[] { "Neujahr", "Karfreitag", "Ostermontag", "Näfelser Fahrt", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Allerheiligen", "Weihnachtstag", "Stephanstag" },
-                "luzern" => new[] { "Neujahr", "Berchtoldstag", "Karfreitag", "Ostermontag", "Auffahrt", "Pfingstmontag", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag", "Stephanstag" },
+                "luzern" => new[] { "Neujahr", "Karfreitag", "Auffahrt", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag", "Stephanstag" },
                 "solothurn" => new[] { "Neujahr", "St. Josef", "Karfreitag", "Tag der Arbeit", "Auffahrt", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Weihnachtstag" },
-                "schwyz" => new[] { "Neujahr", "Dreikönigstag", "St. Josef", "Karfreitag", "Ostermontag", "Auffahrt", "Pfingstmontag", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag", "Stephanstag" },
+                "schwyz" => new[] { "Neujahr", "Dreikönigstag", "St. Josef", "Karfreitag", "Ostermontag", "Auffahrt", "Pfingstmontag", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Mariä Empfängnis", "Weihnachtstag", "Stephanstag" },
                 "tessin" => new[] { "Neujahr", "Dreikönigstag", "San Giuseppe", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Fronleichnam", "San Pietro e Paolo", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag", "Stephanstag" },
                 "thurgau" => new[] { "Neujahr", "Berchtoldstag", "Karfreitag", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Weihnachtstag", "Stephanstag" },
                 "zug" => new[] { "Neujahr", "Karfreitag", "Auffahrt", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag" },
-                "zürich" => new[] { "Neujahr", "Berchtoldstag", "Karfreitag", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Weihnachtstag", "Stephanstag" },
+                "zürich" => new[] { "Neujahr", "Karfreitag", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Weihnachtstag", "Stephanstag" },
                 "uri" => new[] { "Neujahr", "Dreikönigstag", "St. Josef", "Karfreitag", "Ostermontag", "Auffahrt", "Pfingstmontag", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag", "Stephanstag" },
-                "obwalden" => new[] { "Neujahr", "Karfreitag", "Auffahrt", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Bruderklausenfest", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag" },
+                "obwalden" => new[] { "Neujahr", "Karfreitag", "Auffahrt", "Bundesfeier", "Mariä Empfängnis", "Bruderklausenfest", "Fronleichnam", "Mariä Himmelfahrt", "Allerheiligen", "Weihnachtstag", "Bettag" },
                 "nidwalden" => new[] { "Neujahr", "St. Josef", "Karfreitag", "Auffahrt", "Fronleichnam", "Bundesfeier", "Mariä Himmelfahrt", "Allerheiligen", "Mariä Empfängnis", "Weihnachtstag" },
                 "basel-stadt" => new[] { "Neujahr", "Karfreitag", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Weihnachtstag", "Stephanstag" },
                 "schaffhausen" => new[] { "Neujahr", "Karfreitag", "Ostermontag", "Tag der Arbeit", "Auffahrt", "Pfingstmontag", "Bundesfeier", "Weihnachtstag", "Stephanstag" },
