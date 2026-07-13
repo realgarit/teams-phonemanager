@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.21.6](https://github.com/realgarit/teams-phonemanager/compare/v3.21.5...v3.21.6) (2026-07-13)
+
+
+### Bug Fixes
+
+* prevent phantom v4.0.0 by anchoring release-please with last-release-sha ([2124de5](https://github.com/realgarit/teams-phonemanager/commit/2124de5296d947886339d52fe60b5336438a2983))
+* prevent phantom v4.0.0 by anchoring release-please with last-release-sha ([b8e915e](https://github.com/realgarit/teams-phonemanager/commit/b8e915ebdf18bec5b2b376e6b3cadb022a373e8d))
+
 ## [3.21.5](https://github.com/realgarit/teams-phonemanager/compare/v3.21.4...v3.21.5) (2026-07-13)
 
 
