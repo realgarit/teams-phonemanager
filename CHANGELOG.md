@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.21.4](https://github.com/realgarit/teams-phonemanager/compare/v3.21.3...v3.21.4) (2026-07-13)
+
+
+### Bug Fixes
+
+* correct Swiss canton holidays against official canton Gesetzessammlungen ([4ebded4](https://github.com/realgarit/teams-phonemanager/commit/4ebded4594ce78a225d920afa4f947aa76041fcb))
+
 ## [3.21.3](https://github.com/realgarit/teams-phonemanager/compare/v3.21.3...v3.21.3) (2026-07-13)
 
 
