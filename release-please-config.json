@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "cfb346991e7af160335d657e696ed267f22254f0",
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "teams-phonemanager",
+      "include-component-in-tag": false,
+      "draft": true,
+      "extra-files": [
+        {
+          "type": "generic",
+          "path": "teams-phonemanager.csproj"
+        }
+      ]
+    }
+  }
+}
