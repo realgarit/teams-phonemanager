@@ -6,8 +6,8 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>teams_phonemanager</RootNamespace>
     <Version>3.21.2</Version> <!-- x-release-please-version -->
-    <AssemblyVersion>3.21.2</AssemblyVersion> <!-- x-release-please-version -->
-    <FileVersion>3.21.2</FileVersion> <!-- x-release-please-version -->
+    <AssemblyVersion>3.21.2.0</AssemblyVersion> <!-- x-release-please-version -->
+    <FileVersion>3.21.2.0</FileVersion> <!-- x-release-please-version -->
     
     <!-- Publish Settings for Framework-Dependent Deployment -->
     <PublishSingleFile>false</PublishSingleFile>
