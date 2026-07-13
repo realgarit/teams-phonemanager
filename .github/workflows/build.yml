@@ -2,82 +2,94 @@ name: Build and Release
 
 on:
   push:
-    branches: [ main, master ]
-    tags:
-      - 'v*'
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:  # Allows manual triggering
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || 'release' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  create-tag:
-    name: Create Tag from Version
+  release-please:
+    name: Manage Release
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    if: github.event_name != 'pull_request'
     permissions:
       contents: write
+      issues: write
+      pull-requests: write
     outputs:
-      tag_name: ${{ steps.get-version.outputs.tag }}
-      # 'true' only when this run created the tag. Downstream release jobs are
-      # gated on this so a plain push to main never rebuilds and overwrites the
-      # assets of an existing release (that would break the Homebrew cask shas).
-      created: ${{ steps.check-tag.outputs.exists == 'false' }}
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
     
     steps:
-    - name: Checkout code
+    - name: Create or update release pull request
+      id: release
+      uses: googleapis/release-please-action@8b8fd2cc23b2e18957157a9d923d75aa0c6f6ad5 # v4
+      with:
+        token: ${{ secrets.PAT_TOKEN }}
+        config-file: release-please-config.json
+        manifest-file: .release-please-manifest.json
+
+  validate-release:
+    name: Validate Release Version
+    runs-on: ubuntu-latest
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    outputs:
+      tag_name: ${{ steps.version.outputs.tag }}
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+    - name: Checkout release tag
       uses: actions/checkout@v4
       with:
+        ref: ${{ needs.release-please.outputs.tag_name }}
         fetch-depth: 0
-    
-    - name: Extract version from csproj
-      id: get-version
-      run: |
-        VERSION=$(grep '<Version>' teams-phonemanager.csproj | sed -n 's/.*<Version>\([0-9.]*\)<\/Version>.*/\1/p' | head -1)
-        TAG="v$VERSION"
-        echo "version=$VERSION" >> $GITHUB_OUTPUT
-        echo "tag=$TAG" >> $GITHUB_OUTPUT
-        echo "Extracted version: $VERSION"
-        echo "Tag will be: $TAG"
-    
-    - name: Check if tag exists
-      id: check-tag
-      run: |
-        TAG="${{ steps.get-version.outputs.tag }}"
-        if git rev-parse "$TAG" >/dev/null 2>&1; then
-          echo "exists=true" >> $GITHUB_OUTPUT
-          echo "Tag $TAG already exists, skipping tag creation"
-        else
-          echo "exists=false" >> $GITHUB_OUTPUT
-          echo "Tag $TAG does not exist, will create it"
-        fi
-    
-    - name: Import GPG key
-      if: steps.check-tag.outputs.exists == 'false'
-      uses: crazy-max/ghaction-import-gpg@v6
-      with:
-        gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-        passphrase: ${{ secrets.GPG_PASSPHRASE }}
-        git_user_signingkey: true
-        git_commit_gpgsign: true
 
-    - name: Create and push tag
-      if: steps.check-tag.outputs.exists == 'false'
+    - name: Match tag and project versions
+      id: version
       env:
-        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+        RELEASE_TAG: ${{ needs.release-please.outputs.tag_name }}
       run: |
-        TAG="${{ steps.get-version.outputs.tag }}"
-        git remote set-url origin https://${{ github.actor }}:${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-        git tag -s "$TAG" -m "Release $TAG"
-        git push origin "$TAG"
-        echo "Created and pushed tag: $TAG"
+        set -euo pipefail
+        if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "::error::Release tag '$RELEASE_TAG' is not a stable semantic version."
+          exit 1
+        fi
+
+        VERSION="${RELEASE_TAG#v}"
+        VERSION_FILE="$(tr -d '[:space:]' < version.txt)"
+        if [[ "$VERSION_FILE" != "$VERSION" ]]; then
+          echo "::error::version.txt contains '$VERSION_FILE', expected '$VERSION'."
+          exit 1
+        fi
+
+        for PROPERTY in Version AssemblyVersion FileVersion; do
+          PROJECT_VERSION="$(sed -n "s:.*<$PROPERTY>\\([^<]*\\)</$PROPERTY>.*:\\1:p" teams-phonemanager.csproj | head -1)"
+          if [[ "$PROJECT_VERSION" != "$VERSION" ]]; then
+            echo "::error::$PROPERTY is '$PROJECT_VERSION', expected '$VERSION'."
+            exit 1
+          fi
+        done
+
+        git fetch origin main
+        if ! git merge-base --is-ancestor HEAD origin/main; then
+          echo "::error::Release tag '$RELEASE_TAG' is not reachable from main."
+          exit 1
+        fi
+
+        echo "tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+        echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
   build:
     name: Build ${{ matrix.runtime }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    needs: create-tag
-    if: |
-      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') &&
-      needs.create-tag.outputs.created == 'true'
+    needs: [release-please, validate-release]
+    if: needs.release-please.outputs.release_created == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -95,7 +107,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        ref: ${{ github.sha }}
+        ref: ${{ needs.validate-release.outputs.tag_name }}
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
@@ -147,25 +159,24 @@ jobs:
     - name: Package (macOS .app bundle, stable self-signed identity)
       if: startsWith(matrix.runtime, 'osx-')
       env:
-        VERSION: ${{ needs.create-tag.outputs.tag_name }}
+        VERSION: ${{ needs.validate-release.outputs.version }}
         KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       run: |
         security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
         chmod +x Scripts/package-macos.sh
         SIGN_IDENTITY="Teams Phone Manager Self-Signed" \
-          ./Scripts/package-macos.sh ./publish/${{ matrix.runtime }} "${VERSION#v}" ./dist
+          ./Scripts/package-macos.sh ./publish/${{ matrix.runtime }} "$VERSION" ./dist
         ditto -c -k --keepParent "./dist/Teams Phone Manager.app" "./dist/teams-phonemanager-${{ matrix.runtime }}.zip"
 
     - name: Package (Windows zip + Inno Setup installer)
       if: matrix.runtime == 'win-x64'
       shell: pwsh
       env:
-        VERSION: ${{ needs.create-tag.outputs.tag_name }}
+        VERSION: ${{ needs.validate-release.outputs.version }}
       run: |
         New-Item -ItemType Directory -Force -Path ./dist | Out-Null
         Compress-Archive -Path ./publish/win-x64/* -DestinationPath ./dist/teams-phonemanager-win-x64.zip
-        $ver = $env:VERSION.TrimStart('v')
-        iscc /DAppVersion=$ver /DPublishDir=..\..\publish\win-x64 /O.\dist installer\windows\teams-phonemanager.iss
+        iscc /DAppVersion=$env:VERSION /DPublishDir=..\..\publish\win-x64 /O.\dist installer\windows\teams-phonemanager.iss
 
     - name: Package (Linux zip)
       if: matrix.runtime == 'linux-x64'
@@ -182,27 +193,15 @@ jobs:
         path: ./dist/*
         retention-days: 30
 
-  create-release:
-    name: Create Release
-    needs: [create-tag, build]
+  upload-release-assets:
+    name: Upload Release Assets
+    needs: [release-please, validate-release, build]
     runs-on: ubuntu-latest
-    if: |
-      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') &&
-      needs.create-tag.outputs.created == 'true'
+    if: needs.release-please.outputs.release_created == 'true'
     permissions:
       contents: write
     
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Get tag name
-      id: tag
-      run: |
-        TAG_NAME="${{ needs.create-tag.outputs.tag_name }}"
-        echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-        echo "Creating release for tag: $TAG_NAME"
-    
     - name: Download all artifacts
       # Build jobs upload finished assets (zips / setup exe), so a flat merge is enough.
       uses: actions/download-artifact@v4
@@ -218,11 +217,10 @@ jobs:
       working-directory: artifacts
       run: sha256sum teams-phonemanager-* > SHA256SUMS
 
-    - name: Create Release
+    - name: Attach assets to release
       uses: softprops/action-gh-release@4634c16e79c963813287e889244c50009e7f0981 # v2.0.8
       with:
-        tag_name: ${{ steps.tag.outputs.tag_name }}
-        name: ${{ steps.tag.outputs.tag_name }}
+        tag_name: ${{ needs.validate-release.outputs.tag_name }}
         files: |
           artifacts/teams-phonemanager-win-x64.zip
           artifacts/teams-phonemanager-win-x64-setup.exe
@@ -232,18 +230,14 @@ jobs:
           artifacts/SHA256SUMS
         fail_on_unmatched_files: true
         draft: false
-        prerelease: false
-        generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
   bump-homebrew-cask:
     name: Update Homebrew cask
-    needs: [create-tag, create-release]
+    needs: [release-please, validate-release, upload-release-assets]
     runs-on: ubuntu-latest
-    if: |
-      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') &&
-      needs.create-tag.outputs.created == 'true'
+    if: needs.release-please.outputs.release_created == 'true'
     steps:
     - name: Checkout tap
       uses: actions/checkout@v4
@@ -253,7 +247,7 @@ jobs:
 
     - name: Regenerate cask
       env:
-        TAG: ${{ needs.create-tag.outputs.tag_name }}
+        TAG: ${{ needs.validate-release.outputs.tag_name }}
       run: |
         VERSION="${TAG#v}"
         BASE="https://github.com/realgarit/teams-phonemanager/releases/download/${TAG}"
@@ -300,7 +294,7 @@ jobs:
 
     - name: Commit and push
       env:
-        TAG: ${{ needs.create-tag.outputs.tag_name }}
+        TAG: ${{ needs.validate-release.outputs.tag_name }}
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -314,8 +308,7 @@ jobs:
 
   pr-validate:
     name: PR Validate ${{ matrix.runtime }}
-    # Pre-merge gate: build + test + publish on every runtime, WITHOUT tagging or releasing.
-    # The release jobs above are main-only, so without this a PR would have no CI to gate on.
+    # Pre-merge gate: build + test + publish on every runtime without releasing.
     if: github.event_name == 'pull_request'
     runs-on: ${{ matrix.os }}
     strategy:

@@ -87,6 +87,9 @@ dotnet run
 
 Built with Avalonia, CommunityToolkit.Mvvm, Microsoft.PowerShell.SDK, and MSAL.
 
+Releases use Conventional Commit PR titles. Release Please opens the version PR;
+merging it creates the tag, release notes, platform packages, and Homebrew update.
+
 ## License
 
 MIT © 2026 Patrik Lleshaj. See [LICENSE](LICENSE).
