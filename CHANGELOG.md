@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.21.8](https://github.com/realgarit/teams-phonemanager/compare/v3.21.7...v3.21.8) (2026-07-13)
+
+
+### Bug Fixes
+
+* add force-tag-creation to prevent duplicate release PRs ([ad6ae21](https://github.com/realgarit/teams-phonemanager/commit/ad6ae21d6cd645c8c9d3beb4f3adc28b47c4ce8a))
+* add force-tag-creation to prevent duplicate release PRs ([ad6ae21](https://github.com/realgarit/teams-phonemanager/commit/ad6ae21d6cd645c8c9d3beb4f3adc28b47c4ce8a))
+* add force-tag-creation to prevent duplicate release PRs ([238f4ad](https://github.com/realgarit/teams-phonemanager/commit/238f4ad22a7d6fd3ed74986bdbc32f73fc5e5446))
+* sidebar brand and footer spacing ([349027c](https://github.com/realgarit/teams-phonemanager/commit/349027cadbc5537f36f662429e8210c7ff4061d3))
+* sidebar brand and footer spacing ([349027c](https://github.com/realgarit/teams-phonemanager/commit/349027cadbc5537f36f662429e8210c7ff4061d3))
+* sidebar brand and footer spacing cleanup ([80a1933](https://github.com/realgarit/teams-phonemanager/commit/80a19335142f0a09834b189aa918fcb4d53368f3))
+
 ## [3.21.7](https://github.com/realgarit/teams-phonemanager/compare/v3.21.6...v3.21.7) (2026-07-13)
 
 
