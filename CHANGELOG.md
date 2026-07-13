@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.21.2](https://github.com/realgarit/teams-phonemanager/compare/v3.21.1...v3.21.2) (2026-07-13)
+
+
+### Bug Fixes
+
+* sync release-please version across all files and fix UI spacing ([780d8dd](https://github.com/realgarit/teams-phonemanager/commit/780d8dd6294fc552e22b8c3f19648f1b4bd796f4))
+* sync release-please version across all files and fix UI spacing ([#102](https://github.com/realgarit/teams-phonemanager/issues/102)) ([45125d0](https://github.com/realgarit/teams-phonemanager/commit/45125d04961e0a7e25f66b7a591bb2be4392f340))
+
 ## [3.21.1](https://github.com/realgarit/teams-phonemanager/compare/v3.21.0...v3.21.1) (2026-07-13)
 
 
