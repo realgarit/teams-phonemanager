@@ -5,9 +5,9 @@
          EnableNETAnalyzers and AnalysisLevel are inherited from Directory.Build.props. -->
     <OutputType>WinExe</OutputType>
     <RootNamespace>teams_phonemanager</RootNamespace>
-    <Version>3.19.0</Version>
-    <AssemblyVersion>3.19.0</AssemblyVersion>
-    <FileVersion>3.19.0</FileVersion>
+    <Version>3.19.0</Version> <!-- x-release-please-version -->
+    <AssemblyVersion>3.19.0</AssemblyVersion> <!-- x-release-please-version -->
+    <FileVersion>3.19.0</FileVersion> <!-- x-release-please-version -->
     
     <!-- Publish Settings for Framework-Dependent Deployment -->
     <PublishSingleFile>false</PublishSingleFile>
