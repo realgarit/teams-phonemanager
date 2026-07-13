@@ -20,36 +20,17 @@ different release-please CLI that re-evaluates the entire commit history.
 
 ## Preventing phantom major-version bumps
 
-The most critical setting is **`last-release-sha`** in `release-please-config.json`
-(under the `packages."."` key):
+The primary protection against phantom bumps (e.g. 3.x → 4.0.0) is **pinning the
+action to a v4 commit SHA** (see above). RP v5 re-evaluates the entire commit history
+and may propose a major bump based on old breaking-change commits.
 
-```json
-{
-  "packages": {
-    ".": {
-      "last-release-sha": "dc640485e0a866596b0eb6919918a4a05140b4f6"
-    }
-  }
-}
-```
+Beyond that, RP is **self-managing**: it tracks `last-release-sha` internally and
+updates it automatically when a release is published. No manual SHA management is
+needed under normal operation.
 
-The manifest file (`.release-please-manifest.json`) only holds version strings:
-
-```json
-{
-  ".": "3.21.3"
-}
-```
-
-* `".": "3.21.3"` — the current package version (release-please format).
-* `"last-release-sha"` — in the **config file**, not the manifest. The commit SHA of
-  the last released commit. RP only evaluates commits *after* this SHA for the next
-  release, preventing it from re-scanning the entire history and proposing a
-  breaking-change major bump every time it runs.
-
-**Whenever you push a tagged release commit**, update `last-release-sha` in
-`release-please-config.json` to point at that commit so RP does not re-propose the
-same release on the next push to `main`.
+Do NOT add `release-as` or `last-release-sha` to `release-please-config.json` unless
+you need a one-time override (e.g. bootstrapping a new release track). These manually
+lock the version and prevent RP from evaluating new commits correctly.
 
 ## Four-digit version fields for Windows
 
@@ -71,8 +52,8 @@ The .NET project uses these MSBuild properties in `teams-phonemanager.csproj`:
 | File | Purpose |
 |------|---------|
 | `.github/workflows/build.yml` | CI/CD pipeline: RP, validation, build, publish, Homebrew |
-| `release-please-config.json` | RP bootstrap SHA, changelog sections, release-type, `last-release-sha` |
-| `.release-please-manifest.json` | Current version only (manifest format) |
+| `release-please-config.json` | RP config: release-type, extra-files, draft mode |
+| `.release-please-manifest.json` | Current package version (auto-managed by RP) |
 | `version.txt` | Human-readable version (must match RP version) |
 | `teams-phonemanager.csproj` | Project `<Version>`, `<AssemblyVersion>`, `<FileVersion>` |
 
