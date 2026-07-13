@@ -30,6 +30,7 @@ jobs:
       release_created: ${{ steps.release.outputs.release_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
       version: ${{ steps.release.outputs.version }}
+      release_sha: ${{ github.sha }}
     
     steps:
     - name: Create or update release pull request
@@ -59,16 +60,18 @@ jobs:
       version: ${{ steps.version.outputs.version }}
 
     steps:
-    - name: Checkout release tag
+    - name: Checkout release commit
       uses: actions/checkout@v4
       with:
-        ref: ${{ needs.release-please.outputs.tag_name }}
+        # Draft GitHub releases do not create their tag until publication.
+        ref: ${{ needs.release-please.outputs.release_sha }}
         fetch-depth: 0
 
     - name: Match tag and project versions
       id: version
       env:
         RELEASE_TAG: ${{ needs.release-please.outputs.tag_name }}
+        RELEASE_SHA: ${{ needs.release-please.outputs.release_sha }}
       run: |
         set -euo pipefail
         if [[ ! "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
@@ -91,9 +94,14 @@ jobs:
           fi
         done
 
+        if [[ "$(git rev-parse HEAD)" != "$RELEASE_SHA" ]]; then
+          echo "::error::Checked out commit does not match Release Please SHA '$RELEASE_SHA'."
+          exit 1
+        fi
+
         git fetch origin main
         if ! git merge-base --is-ancestor HEAD origin/main; then
-          echo "::error::Release tag '$RELEASE_TAG' is not reachable from main."
+          echo "::error::Release commit '$RELEASE_SHA' is not reachable from main."
           exit 1
         fi
 
@@ -122,7 +130,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        ref: ${{ needs.validate-release.outputs.tag_name }}
+        ref: ${{ needs.release-please.outputs.release_sha }}
     
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
@@ -236,6 +244,7 @@ jobs:
       uses: softprops/action-gh-release@4634c16e79c963813287e889244c50009e7f0981 # v2.0.8
       with:
         tag_name: ${{ needs.validate-release.outputs.tag_name }}
+        target_commitish: ${{ needs.release-please.outputs.release_sha }}
         files: |
           artifacts/teams-phonemanager-win-x64.zip
           artifacts/teams-phonemanager-win-x64-setup.exe
