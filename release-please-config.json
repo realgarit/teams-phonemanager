@@ -1,12 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "last-release-sha": "8eb007b104609408e270262ac9dbaafa72b0d113",
   "packages": {
     ".": {
       "release-type": "simple",
       "package-name": "teams-phonemanager",
       "include-component-in-tag": false,
       "draft": true,
-      "last-release-sha": "8eb007b104609408e270262ac9dbaafa72b0d113",
       "extra-files": [
         {
           "type": "generic",
