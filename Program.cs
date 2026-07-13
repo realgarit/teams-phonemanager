@@ -49,6 +49,7 @@ class Program
         services.AddSingleton<IMsalGraphAuthenticationService, MsalGraphAuthenticationService>();
         services.AddSingleton<ISharedStateService, SharedStateService>();
         services.AddSingleton<IUpdateCheckService, GitHubUpdateCheckService>();
+        services.AddSingleton<IUpdateInstallerService, GitHubUpdateInstallerService>();
         
         // UI Services (singleton - manages UI state)
         services.AddSingleton<IDialogService, DialogService>();
@@ -95,4 +96,3 @@ class Program
             .WithInterFont()
             .LogToTrace();
 }
-

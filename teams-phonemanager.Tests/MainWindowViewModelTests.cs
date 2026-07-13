@@ -11,6 +11,7 @@ namespace teams_phonemanager.Tests
     {
         private readonly Mock<IPageViewModelFactory> _pageViewModelFactory = new();
         private readonly Mock<IUpdateCheckService> _updateCheckService = new();
+        private readonly Mock<IUpdateInstallerService> _updateInstallerService = new();
 
         public MainWindowViewModelTests()
         {
@@ -38,7 +39,8 @@ namespace teams_phonemanager.Tests
                 harness.SharedStateService.Object,
                 harness.DialogService.Object,
                 _pageViewModelFactory.Object,
-                _updateCheckService.Object);
+                _updateCheckService.Object,
+                _updateInstallerService.Object);
         }
 
         [Fact]
@@ -72,6 +74,7 @@ namespace teams_phonemanager.Tests
             var vm = CreateViewModel(harness);
 
             Assert.True(vm.IsUpdateBannerVisible);
+            Assert.True(vm.IsUpdateAvailable);
             Assert.Contains("2.0.0", vm.UpdateBannerMessage);
         }
 
@@ -86,6 +89,60 @@ namespace teams_phonemanager.Tests
             vm.DismissUpdateBannerCommand.Execute(null);
 
             Assert.False(vm.IsUpdateBannerVisible);
+            Assert.True(vm.IsUpdateAvailable);
+        }
+
+        [Fact]
+        public async Task InstallUpdateCommand_DownloadsAndLaunchesVerifiedInstaller()
+        {
+            var harness = new ViewModelTestHarness();
+            var asset = new UpdateAsset(
+                "teams-phonemanager-win-x64-setup.exe",
+                "https://github.com/realgarit/teams-phonemanager/releases/download/v2.0.0/setup.exe",
+                new string('a', 64));
+            _updateInstallerService.SetupGet(u => u.IsSupported).Returns(true);
+            _updateInstallerService
+                .Setup(u => u.DownloadInstallerAsync(
+                    asset,
+                    It.IsAny<IProgress<UpdateDownloadProgress>>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync("verified-setup.exe");
+            _updateCheckService.Setup(u => u.CheckForUpdateAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new UpdateInfo("2.0.0", "https://example.com/release", asset));
+            var vm = CreateViewModel(harness);
+
+            await vm.InstallUpdateCommand.ExecuteAsync(null);
+
+            _updateInstallerService.Verify(
+                u => u.LaunchInstaller("verified-setup.exe"),
+                Times.Once);
+            Assert.False(vm.IsUpdateInProgress);
+        }
+
+        [Fact]
+        public async Task InstallUpdateCommand_UserDeclines_DoesNotDownload()
+        {
+            var harness = new ViewModelTestHarness();
+            var asset = new UpdateAsset(
+                "teams-phonemanager-win-x64-setup.exe",
+                "https://github.com/realgarit/teams-phonemanager/releases/download/v2.0.0/setup.exe",
+                new string('a', 64));
+            harness.DialogService
+                .Setup(d => d.ShowConfirmationAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(false);
+            _updateInstallerService.SetupGet(u => u.IsSupported).Returns(true);
+            _updateCheckService.Setup(u => u.CheckForUpdateAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new UpdateInfo("2.0.0", "https://example.com/release", asset));
+            var vm = CreateViewModel(harness);
+
+            await vm.InstallUpdateCommand.ExecuteAsync(null);
+
+            _updateInstallerService.Verify(
+                u => u.DownloadInstallerAsync(
+                    It.IsAny<UpdateAsset>(),
+                    It.IsAny<IProgress<UpdateDownloadProgress>>(),
+                    It.IsAny<CancellationToken>()),
+                Times.Never);
         }
 
         [Fact]
