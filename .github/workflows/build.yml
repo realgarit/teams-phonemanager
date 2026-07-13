@@ -88,9 +88,19 @@ jobs:
 
         for PROPERTY in Version AssemblyVersion FileVersion; do
           PROJECT_VERSION="$(sed -n "s:.*<$PROPERTY>\\([^<]*\\)</$PROPERTY>.*:\\1:p" teams-phonemanager.csproj | head -1)"
-          if [[ "$PROJECT_VERSION" != "$VERSION" ]]; then
-            echo "::error::$PROPERTY is '$PROJECT_VERSION', expected '$VERSION'."
-            exit 1
+          if [[ "$PROPERTY" == "Version" ]]; then
+            # Version must match exactly (SemVer, 3 parts)
+            if [[ "$PROJECT_VERSION" != "$VERSION" ]]; then
+              echo "::error::$PROPERTY is '$PROJECT_VERSION', expected '$VERSION'."
+              exit 1
+            fi
+          else
+            # AssemblyVersion/FileVersion need 4 parts on Windows; accept either 3.21.3 or 3.21.3.0
+            EXPECTED4="${VERSION}.0"
+            if [[ "$PROJECT_VERSION" != "$VERSION" && "$PROJECT_VERSION" != "$EXPECTED4" ]]; then
+              echo "::error::$PROPERTY is '$PROJECT_VERSION', expected '$VERSION' or '$EXPECTED4'."
+              exit 1
+            fi
           fi
         done
 
