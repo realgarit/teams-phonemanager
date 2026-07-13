@@ -47,7 +47,7 @@ jobs:
         RELEASE_PR: ${{ steps.release.outputs.pr }}
       run: |
         RELEASE_REF="$(jq -r '.headBranchName' <<< "$RELEASE_PR")"
-        gh workflow run build.yml --ref "$RELEASE_REF" -f validate_ref="$RELEASE_REF"
+        gh workflow run build.yml --repo "$GITHUB_REPOSITORY" --ref "$RELEASE_REF" -f validate_ref="$RELEASE_REF"
 
   validate-release:
     name: Validate Release Version
