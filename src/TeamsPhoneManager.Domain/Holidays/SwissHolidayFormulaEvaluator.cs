@@ -10,6 +10,7 @@ namespace teams_phonemanager.Services.Holidays
         public static DateTime EasterMonday(int year) => EasterSunday(year).AddDays(1);
         public static DateTime AscensionDay(int year) => EasterSunday(year).AddDays(39);
         public static DateTime WhitMonday(int year) => EasterSunday(year).AddDays(50);
+        public static DateTime PentecostSunday(int year) => EasterSunday(year).AddDays(49);
         public static DateTime CorpusChristi(int year) => EasterSunday(year).AddDays(60);
         public static DateTime SwissNationalDay(int year) => new DateTime(year, 8, 1);
         public static DateTime AssumptionDay(int year) => new DateTime(year, 8, 15);
@@ -75,6 +76,10 @@ namespace teams_phonemanager.Services.Holidays
                         sept1 = sept1.AddDays(1);
                     return sept1.AddDays(14); // Third Sunday
                 }
+
+        // Eidg. Dank-, Buss- und Bettag (Federal Fast) — alias of <see cref="Bettag"/>,
+        // the third Sunday in September. Named per spec 5.2 / 6.2.
+        public static DateTime FederalFast(int year) => Bettag(year);
 
         // Computus - Meeus/Jones/Butcher algorithm for Gregorian Easter Sunday
         public static DateTime EasterSunday(int year)
