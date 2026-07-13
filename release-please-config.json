@@ -7,6 +7,7 @@
       "include-component-in-tag": false,
       "draft": true,
       "last-release-sha": "0ffe990075f460ac7b773b2d587de7abefa8e4ae",
+      "release-as": "3.21.3",
       "extra-files": [
         {
           "type": "generic",
