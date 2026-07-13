@@ -27,12 +27,31 @@ namespace teams_phonemanager.ViewModels
 
         private readonly IPageViewModelFactory _pageViewModelFactory;
         private readonly IUpdateCheckService _updateCheckService;
+        private readonly IUpdateInstallerService _updateInstallerService;
+        private readonly IDialogService _updateDialogService;
+        private UpdateInfo? _availableUpdate;
+        private CancellationTokenSource? _updateCancellation;
 
         [ObservableProperty]
         private bool _isUpdateBannerVisible;
 
         [ObservableProperty]
+        private bool _isUpdateAvailable;
+
+        [ObservableProperty]
         private string _updateBannerMessage = string.Empty;
+
+        [ObservableProperty]
+        private bool _canInstallUpdate;
+
+        [ObservableProperty]
+        private bool _isUpdateInProgress;
+
+        [ObservableProperty]
+        private bool _isUpdateProgressIndeterminate;
+
+        [ObservableProperty]
+        private double _updateDownloadProgress;
 
         private string? _updateReleaseUrl;
 
@@ -44,10 +63,108 @@ namespace teams_phonemanager.ViewModels
                 return;
             }
 
+            _availableUpdate = update;
             _updateReleaseUrl = update.ReleaseUrl;
             UpdateBannerMessage = $"Version {update.LatestVersion} is available.";
+            CanInstallUpdate = _updateInstallerService.IsSupported && update.WindowsInstaller is not null;
+            IsUpdateAvailable = true;
             IsUpdateBannerVisible = true;
             _loggingService.Log($"Update available: {update.LatestVersion}", LogLevel.Info);
+        }
+
+        partial void OnCanInstallUpdateChanged(bool value)
+        {
+            InstallUpdateCommand.NotifyCanExecuteChanged();
+        }
+
+        partial void OnIsUpdateInProgressChanged(bool value)
+        {
+            InstallUpdateCommand.NotifyCanExecuteChanged();
+            CancelUpdateCommand.NotifyCanExecuteChanged();
+        }
+
+        private bool CanInstallUpdateNow() => CanInstallUpdate && !IsUpdateInProgress;
+
+        [RelayCommand(CanExecute = nameof(CanInstallUpdateNow))]
+        private async Task InstallUpdateAsync()
+        {
+            var update = _availableUpdate;
+            if (update?.WindowsInstaller is not { } installer)
+            {
+                _loggingService.Log("No verified Windows update installer is available.", LogLevel.Warning);
+                return;
+            }
+
+            var confirmed = await _updateDialogService.ShowConfirmationAsync(
+                "Install update",
+                $"Download and install version {update.LatestVersion}? " +
+                "Teams Phone Manager will close and restart automatically.");
+            if (!confirmed)
+            {
+                return;
+            }
+
+            _updateCancellation?.Dispose();
+            _updateCancellation = new CancellationTokenSource();
+            IsUpdateInProgress = true;
+            IsUpdateProgressIndeterminate = true;
+            UpdateDownloadProgress = 0;
+            UpdateBannerMessage = $"Downloading version {update.LatestVersion}...";
+
+            var progress = new Progress<UpdateDownloadProgress>(download =>
+            {
+                IsUpdateProgressIndeterminate = download.TotalBytes is not > 0;
+                UpdateDownloadProgress = download.Percentage;
+                UpdateBannerMessage = download.TotalBytes is > 0
+                    ? $"Downloading version {update.LatestVersion}... {download.Percentage}%"
+                    : $"Downloading version {update.LatestVersion}...";
+            });
+
+            try
+            {
+                var installerPath = await _updateInstallerService.DownloadInstallerAsync(
+                    installer,
+                    progress,
+                    _updateCancellation.Token);
+
+                UpdateBannerMessage = "Starting the verified installer...";
+                _updateInstallerService.LaunchInstaller(installerPath);
+                _loggingService.Log(
+                    $"Starting installer for version {update.LatestVersion}",
+                    LogLevel.Info);
+
+                if (Avalonia.Application.Current?.ApplicationLifetime is
+                    Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+                {
+                    desktop.Shutdown();
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                UpdateBannerMessage = $"Version {update.LatestVersion} is available.";
+                _loggingService.Log("Update download cancelled.", LogLevel.Info);
+            }
+            catch (UpdateInstallationException ex)
+            {
+                UpdateBannerMessage = $"Version {update.LatestVersion} is available.";
+                _loggingService.Log($"Update installation failed: {ex.Message}", LogLevel.Error);
+                await _updateDialogService.ShowMessageAsync("Update failed", ex.Message);
+            }
+            finally
+            {
+                _updateCancellation.Dispose();
+                _updateCancellation = null;
+                IsUpdateInProgress = false;
+                IsUpdateProgressIndeterminate = false;
+            }
+        }
+
+        private bool CanCancelUpdate() => IsUpdateInProgress;
+
+        [RelayCommand(CanExecute = nameof(CanCancelUpdate))]
+        private void CancelUpdate()
+        {
+            _updateCancellation?.Cancel();
         }
 
         [RelayCommand]
@@ -76,6 +193,12 @@ namespace teams_phonemanager.ViewModels
         private void DismissUpdateBanner()
         {
             IsUpdateBannerVisible = false;
+        }
+
+        [RelayCommand]
+        private void ShowUpdateBanner()
+        {
+            IsUpdateBannerVisible = true;
         }
 
         public ObservableCollection<string> LogEntries => _loggingService.LogEntries;
@@ -227,12 +350,15 @@ namespace teams_phonemanager.ViewModels
             ISharedStateService sharedStateService,
             IDialogService dialogService,
             IPageViewModelFactory pageViewModelFactory,
-            IUpdateCheckService updateCheckService)
+            IUpdateCheckService updateCheckService,
+            IUpdateInstallerService updateInstallerService)
             : base(powerShellContextService, powerShellCommandService, loggingService,
                   sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
         {
             _pageViewModelFactory = pageViewModelFactory;
             _updateCheckService = updateCheckService;
+            _updateInstallerService = updateInstallerService;
+            _updateDialogService = dialogService;
             CurrentViewModel = _pageViewModelFactory.Create(CurrentPage);
 
             _loggingService.Log("Application started", LogLevel.Info);

@@ -13,4 +13,13 @@ public interface IUpdateCheckService
 }
 
 /// <summary>A newer release available for download.</summary>
-public sealed record UpdateInfo(string LatestVersion, string ReleaseUrl);
+public sealed record UpdateInfo(
+    string LatestVersion,
+    string ReleaseUrl,
+    UpdateAsset? WindowsInstaller = null);
+
+/// <summary>A release asset whose integrity can be verified before execution.</summary>
+public sealed record UpdateAsset(
+    string Name,
+    string DownloadUrl,
+    string Sha256);

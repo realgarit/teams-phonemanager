@@ -19,9 +19,10 @@
     <!-- Application Settings -->
     <ApplicationTitle>Teams Phone Manager</ApplicationTitle>
     <ApplicationDescription>An Avalonia-based Microsoft Teams Phone Manager to simplify admin tasks</ApplicationDescription>
-    <Company>Realgar</Company>
+    <Authors>Patrik Lleshaj</Authors>
+    <Company>Patrik Lleshaj</Company>
     <Product>Teams Phone Manager</Product>
-    <Copyright>Copyright © 2026</Copyright>
+    <Copyright>Copyright © 2026 Patrik Lleshaj</Copyright>
     
     <!-- Application Manifest for Windows security and compatibility -->
     <ApplicationManifest>app.manifest</ApplicationManifest>

@@ -11,7 +11,7 @@
 
 #define AppName "Teams Phone Manager"
 #define AppExeName "teams-phonemanager.exe"
-#define AppPublisher "Realgar"
+#define AppPublisher "Patrik Lleshaj"
 #define AppURL "https://github.com/realgarit/teams-phonemanager"
 
 [Setup]
@@ -19,13 +19,16 @@
 AppId={{8E1D3A5B-6C0F-4D9E-9B7A-2F4C1A7E5D21}
 AppName={#AppName}
 AppVersion={#AppVersion}
+AppVerName={#AppName}
 AppPublisher={#AppPublisher}
 AppPublisherURL={#AppURL}
 AppSupportURL={#AppURL}/issues
 AppUpdatesURL={#AppURL}/releases
-DefaultDirName={localappdata}\Programs\TeamsPhoneManager
+DefaultDirName={autopf}\TeamsPhoneManager
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
+PrivilegesRequiredOverridesAllowed=dialog commandline
+UsePreviousPrivileges=yes
 OutputBaseFilename=teams-phonemanager-win-x64-setup
 SetupIconFile=..\..\assets\icon.ico
 UninstallDisplayIcon={app}\{#AppExeName}
@@ -47,8 +50,15 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "{#PublishDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{userprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"
-Name: "{userdesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
+Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExeName}"
+Name: "{autodesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(AppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\{#AppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(AppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent runasoriginaluser
+Filename: "{app}\{#AppExeName}"; Flags: nowait skipifnotsilent runasoriginaluser; Check: ShouldRestartApplication
+
+[Code]
+function ShouldRestartApplication(): Boolean;
+begin
+  Result := ExpandConstant('{param:RESTARTAPP|0}') = '1';
+end;
