@@ -74,7 +74,8 @@
                                         Background="{DynamicResource TeamsPrimaryBrush}"
                                         BorderThickness="0"
                                         CornerRadius="5"
-                                        Padding="5,1"
+                                        Padding="6,2"
+                                        Margin="4,0,0,0"
                                         MinHeight="0"
                                         VerticalAlignment="Center"/>
                             </StackPanel>
@@ -199,6 +200,7 @@
                                     Command="{Binding ToggleSettingsCommand}"
                                     Width="34"
                                     Height="34"
+                                    Margin="4,0,0,0"
                                     Classes="IconOnly"
                                     AutomationProperties.Name="Settings"
                                     ToolTip.Tip="Settings">
