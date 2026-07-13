@@ -6,8 +6,6 @@
       "package-name": "teams-phonemanager",
       "include-component-in-tag": false,
       "draft": true,
-      "last-release-sha": "ca1abc468569193afa61b890e3261e8c75f9d57c",
-      "release-as": "3.21.3",
       "extra-files": [
         {
           "type": "generic",
