@@ -10,6 +10,14 @@
         {
           "type": "generic",
           "path": "teams-phonemanager.csproj"
+        },
+        {
+          "type": "generic",
+          "path": "src/TeamsPhoneManager.Domain/ConstantsService.cs"
+        },
+        {
+          "type": "generic",
+          "path": "app.manifest"
         }
       ]
     }
