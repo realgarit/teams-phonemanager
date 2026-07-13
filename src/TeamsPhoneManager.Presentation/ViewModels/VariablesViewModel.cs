@@ -600,9 +600,17 @@ namespace teams_phonemanager.ViewModels
 
                 // Use Swiss provider for Switzerland; expand later for other countries
                 var provider = new teams_phonemanager.Services.Holidays.SwissHolidaysProvider();
-                var holidays = provider.GetHolidays(SelectedCountry ?? "", SelectedCanton, SelectedBezirk, SelectedYear);
+                var result = provider.GetHolidaysDetailed(SelectedCountry ?? "", SelectedCanton, SelectedBezirk, SelectedYear);
 
-                foreach (var holiday in holidays)
+                if (result.Completeness != teams_phonemanager.Holidays.HolidayResultCompleteness.Complete)
+                {
+                    _loggingService.Log(
+                        $"Predefined holidays for '{SelectedCanton}' are regionally incomplete ({result.Completeness}): " +
+                        "only the canton-wide intersection was applied. A region/Bezirk is required for the full list.",
+                        LogLevel.Warning);
+                }
+
+                foreach (var holiday in result.Holidays)
                 {
                     variables.HolidaySeries.Add(holiday);
                     _loggingService.Log($"Added predefined holiday: {holiday.DisplayText}", LogLevel.Info);
