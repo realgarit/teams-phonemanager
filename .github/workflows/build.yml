@@ -240,22 +240,24 @@ jobs:
       working-directory: artifacts
       run: sha256sum teams-phonemanager-* > SHA256SUMS
 
-    - name: Attach assets to release
-      uses: softprops/action-gh-release@4634c16e79c963813287e889244c50009e7f0981 # v2.0.8
-      with:
-        tag_name: ${{ needs.validate-release.outputs.tag_name }}
-        target_commitish: ${{ needs.release-please.outputs.release_sha }}
-        files: |
-          artifacts/teams-phonemanager-win-x64.zip
-          artifacts/teams-phonemanager-win-x64-setup.exe
-          artifacts/teams-phonemanager-osx-x64.zip
-          artifacts/teams-phonemanager-osx-arm64.zip
-          artifacts/teams-phonemanager-linux-x64.zip
-          artifacts/SHA256SUMS
-        fail_on_unmatched_files: true
-        draft: false
+    - name: Publish draft release
       env:
-        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+        TAG: ${{ needs.validate-release.outputs.tag_name }}
+        RELEASE_SHA: ${{ needs.release-please.outputs.release_sha }}
+      run: |
+        set -euo pipefail
+        gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" --clobber \
+          artifacts/teams-phonemanager-win-x64.zip \
+          artifacts/teams-phonemanager-win-x64-setup.exe \
+          artifacts/teams-phonemanager-osx-x64.zip \
+          artifacts/teams-phonemanager-osx-arm64.zip \
+          artifacts/teams-phonemanager-linux-x64.zip \
+          artifacts/SHA256SUMS
+        RELEASE_ID="$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json databaseId --jq .databaseId)"
+        gh api -X PATCH "repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID" \
+          -F draft=false \
+          -f target_commitish="$RELEASE_SHA"
 
   bump-homebrew-cask:
     name: Update Homebrew cask
