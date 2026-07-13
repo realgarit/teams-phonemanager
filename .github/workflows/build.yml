@@ -35,7 +35,7 @@ jobs:
     steps:
     - name: Create or update release pull request
       id: release
-      uses: googleapis/release-please-action@8b8fd2cc23b2e18957157a9d923d75aa0c6f6ad5 # v4
+      uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         config-file: release-please-config.json
@@ -364,7 +364,9 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        ref: ${{ inputs.validate_ref || github.ref }}
+        # For PR events, use the head SHA (not the merge ref) to avoid race
+        # where the merge ref is deleted before the runner picks up the job.
+        ref: ${{ inputs.validate_ref || github.event.pull_request.head.sha || github.ref }}
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
