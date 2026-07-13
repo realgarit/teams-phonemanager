@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.21.3](https://github.com/realgarit/teams-phonemanager/compare/v3.21.2...v3.21.3) (2026-07-13)
+
+
+### Bug Fixes
+
+* anchor release-please to v3.21.1 to prevent phantom major bumps ([#105](https://github.com/realgarit/teams-phonemanager/issues/105)) ([e1be303](https://github.com/realgarit/teams-phonemanager/commit/e1be303492176e85231173d4c0dd1ffafbb4eabc))
+
 ## [3.21.2](https://github.com/realgarit/teams-phonemanager/compare/v3.21.1...v3.21.2) (2026-07-13)
 
 
