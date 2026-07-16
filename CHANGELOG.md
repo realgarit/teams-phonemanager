@@ -1,5 +1,24 @@
 # Changelog
 
+## [3.22.0](https://github.com/realgarit/teams-phonemanager/compare/v3.21.9...v3.22.0) (2026-07-16)
+
+
+### Features
+
+* dry-run preview with exportable plan for wizard and bulk operations ([065fa62](https://github.com/realgarit/teams-phonemanager/commit/065fa623b785236f5e6a0d93a8377add58c20ac6))
+* dry-run preview with exportable plan for wizard and bulk operations ([e2b951c](https://github.com/realgarit/teams-phonemanager/commit/e2b951c3a1d5c6a879ceca8c3ad62c2be98534f9)), closes [#68](https://github.com/realgarit/teams-phonemanager/issues/68)
+* persistent audit log with in-app history viewer ([1b2ae9a](https://github.com/realgarit/teams-phonemanager/commit/1b2ae9ad737575cb6ef991fa667af469ba3938da))
+* persistent audit log with in-app history viewer ([fd90a24](https://github.com/realgarit/teams-phonemanager/commit/fd90a24303c947fdaaf449099dd67aa7e092f610))
+* pin bundled module versions and show them in About ([6c6e45f](https://github.com/realgarit/teams-phonemanager/commit/6c6e45f716aae21daba864d6cbaea5bba669f162))
+* pin bundled module versions and show them in About ([35f27a5](https://github.com/realgarit/teams-phonemanager/commit/35f27a57fc52c980eba3ddc38fe314f94151fd6e))
+* read-only tenant dashboard with topology and orphan detection ([bf7335b](https://github.com/realgarit/teams-phonemanager/commit/bf7335bbc4f92296124f71748ee720dca6919db5))
+* read-only tenant dashboard with topology and orphan detection ([e66c8fa](https://github.com/realgarit/teams-phonemanager/commit/e66c8fabff33a19bee6407ac1793969c68895200))
+
+
+### Bug Fixes
+
+* pin bundled modules to current latest stable versions ([bd08efd](https://github.com/realgarit/teams-phonemanager/commit/bd08efd042d04eb9658dfe5087810472900442db))
+
 ## [3.21.9](https://github.com/realgarit/teams-phonemanager/compare/v3.21.8...v3.21.9) (2026-07-16)
 
 
