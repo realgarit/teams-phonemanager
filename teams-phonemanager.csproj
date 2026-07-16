@@ -80,6 +80,11 @@
     <Content Include="Modules\**\*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <!-- Bundled-module version pins, read at runtime by BundledModuleVersionService
+         to populate the Settings/About panel. -->
+    <Content Include="Scripts\module-versions.json" Link="Scripts\module-versions.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
-  
+
 </Project>

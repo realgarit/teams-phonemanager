@@ -53,6 +53,7 @@ class Program
 
         // Persistent audit log (issue #67): per-tenant JSON-lines under the app-data directory.
         services.AddSingleton<IAuditLog, FileAuditLog>();
+        services.AddSingleton<IBundledModuleVersionService, BundledModuleVersionService>();
         
         // UI Services (singleton - manages UI state)
         services.AddSingleton<IDialogService, DialogService>();

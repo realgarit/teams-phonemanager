@@ -572,6 +572,51 @@
                             </Grid>
                         </StackPanel>
 
+                        <Border Height="1" Background="{DynamicResource HairlineBrush}"/>
+
+                        <!-- About Section -->
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="About"
+                                     FontSize="16"
+                                     FontWeight="SemiBold"/>
+
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="MicrosoftTeams Module"/>
+                                    <TextBlock Text="Bundled PowerShell module version"
+                                             FontSize="11" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1"
+                                         Text="{Binding BundledTeamsModuleVersion}"
+                                         Margin="12,0,0,0"
+                                         VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="Microsoft.Graph Modules"/>
+                                    <TextBlock Text="Bundled PowerShell module version"
+                                             FontSize="11" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1"
+                                         Text="{Binding BundledGraphModuleVersion}"
+                                         Margin="12,0,0,0"
+                                         VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="PowerShell SDK"/>
+                                    <TextBlock Text="Bundled PowerShell runtime version"
+                                             FontSize="11" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <TextBlock Grid.Column="1"
+                                         Text="{Binding BundledPowerShellSdkVersion}"
+                                         Margin="12,0,0,0"
+                                         VerticalAlignment="Center"/>
+                            </Grid>
+                        </StackPanel>
+
                     </StackPanel>
                 </ScrollViewer>
             </Grid>

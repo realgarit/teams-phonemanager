@@ -110,6 +110,26 @@ Built with Avalonia, CommunityToolkit.Mvvm, Microsoft.PowerShell.SDK, and MSAL.
 Releases use Conventional Commit PR titles. Release Please opens the version PR;
 merging it creates the tag, release notes, platform packages, and Homebrew update.
 
+### Bundled PowerShell modules
+
+The app ships with pinned versions of MicrosoftTeams and the Microsoft.Graph.* modules it
+needs, declared in [`Scripts/module-versions.json`](Scripts/module-versions.json). CI reads
+this file at build time (`Scripts/download-modules.ps1` / `.sh`) to download exactly those
+versions into `Modules/`, which are bundled into every published build. The pinned versions
+are also surfaced in the app itself, in **Settings → About**, alongside the bundled
+PowerShell SDK version.
+
+The [`module-compatibility.yml`](.github/workflows/module-compatibility.yml) workflow runs
+weekly (and on manual dispatch) to check the PowerShell Gallery for newer releases of the
+pinned modules. When a newer version is found, it bumps `module-versions.json`, builds and
+tests against the update, and opens a pull request if that succeeds (or an issue with the
+failure details if it doesn't) — the pins are never bumped automatically without a passing
+build.
+
+To bump a pinned version manually: edit `Scripts/module-versions.json` and either run
+`Scripts/download-modules.ps1` / `.sh` locally to re-download `Modules/`, or just push the
+change — the next CI build downloads the updated versions automatically.
+
 ## License
 
 MIT © 2026 Patrik Lleshaj. See [LICENSE](LICENSE).
