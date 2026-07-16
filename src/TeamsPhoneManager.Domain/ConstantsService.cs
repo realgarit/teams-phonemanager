@@ -102,6 +102,7 @@ namespace teams_phonemanager.Services
             public const string Documentation = "Documentation";
             public const string Wizard = "Wizard";
             public const string BulkOperations = "BulkOperations";
+            public const string History = "History";
         }
 
         public static class ErrorDialogTitles

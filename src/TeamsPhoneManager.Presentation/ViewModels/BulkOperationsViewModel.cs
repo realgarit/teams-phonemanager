@@ -47,9 +47,10 @@ namespace teams_phonemanager.ViewModels
             IValidationService validationService,
             ISharedStateService sharedStateService,
             IDialogService dialogService,
-            BulkOperationsScriptBuilder bulkBuilder)
+            BulkOperationsScriptBuilder bulkBuilder,
+            IAuditLog? auditLog = null)
             : base(powerShellContextService, powerShellCommandService, loggingService,
-                  sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
+                  sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService, auditLog)
         {
             _bulkBuilder = bulkBuilder;
             _loggingService.Log("Bulk Operations page loaded", LogLevel.Info);

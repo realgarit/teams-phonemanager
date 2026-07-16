@@ -38,9 +38,10 @@ namespace teams_phonemanager.ViewModels
             INavigationService navigationService,
             IErrorHandlingService errorHandlingService,
             IValidationService validationService,
-            IMsalGraphAuthenticationService msalAuthService)
+            IMsalGraphAuthenticationService msalAuthService,
+            IAuditLog? auditLog = null)
             : base(powerShellContextService, powerShellCommandService, loggingService,
-                  sessionManager, navigationService, errorHandlingService, validationService)
+                  sessionManager, navigationService, errorHandlingService, validationService, auditLog: auditLog)
         {
             _msalAuthService = msalAuthService;
             _modulesChecked = _sessionManager.ModulesChecked;

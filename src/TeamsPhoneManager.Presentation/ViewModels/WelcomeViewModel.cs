@@ -15,9 +15,10 @@ namespace teams_phonemanager.ViewModels
             ISessionManager sessionManager,
             INavigationService navigationService,
             IErrorHandlingService errorHandlingService,
-            IValidationService validationService)
+            IValidationService validationService,
+            IAuditLog? auditLog = null)
             : base(powerShellContextService, powerShellCommandService, loggingService,
-                  sessionManager, navigationService, errorHandlingService, validationService)
+                  sessionManager, navigationService, errorHandlingService, validationService, auditLog: auditLog)
         {
             _loggingService.Log("Welcome page loaded", LogLevel.Info);
         }

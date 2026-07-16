@@ -127,6 +127,19 @@ namespace teams_phonemanager.Tests
                 harness.DialogService.Object,
                 new BulkOperationsScriptBuilder(harness.PowerShellCommandService.Object, sanitizationService)));
 
+            var auditLog = new Mock<IAuditLog>();
+            auditLog.Setup(a => a.Read()).Returns(System.Array.Empty<teams_phonemanager.Audit.AuditRecord>());
+            auditLog.SetupGet(a => a.LogDirectoryPath).Returns("/tmp/audit");
+            services.AddSingleton(sp => new HistoryViewModel(
+                harness.PowerShellContextService.Object,
+                harness.PowerShellCommandService.Object,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object,
+                auditLog.Object));
+
             return services.BuildServiceProvider();
         }
 
@@ -153,6 +166,7 @@ namespace teams_phonemanager.Tests
             yield return new object[] { ConstantsService.Pages.Documentation, typeof(DocumentationViewModel) };
             yield return new object[] { ConstantsService.Pages.Wizard, typeof(WizardViewModel) };
             yield return new object[] { ConstantsService.Pages.BulkOperations, typeof(BulkOperationsViewModel) };
+            yield return new object[] { ConstantsService.Pages.History, typeof(HistoryViewModel) };
         }
 
         [Theory]

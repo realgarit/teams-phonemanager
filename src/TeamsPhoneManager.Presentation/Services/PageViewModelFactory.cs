@@ -42,6 +42,7 @@ namespace teams_phonemanager.Services
                 ConstantsService.Pages.Documentation,
                 ConstantsService.Pages.Wizard,
                 ConstantsService.Pages.BulkOperations,
+                ConstantsService.Pages.History,
             })
             {
                 map[page] = page;
@@ -68,6 +69,7 @@ namespace teams_phonemanager.Services
                 ConstantsService.Pages.Documentation => _services.GetRequiredService<DocumentationViewModel>(),
                 ConstantsService.Pages.Wizard => _services.GetRequiredService<WizardViewModel>(),
                 ConstantsService.Pages.BulkOperations => _services.GetRequiredService<BulkOperationsViewModel>(),
+                ConstantsService.Pages.History => _services.GetRequiredService<HistoryViewModel>(),
                 _ => _services.GetRequiredService<WelcomeViewModel>()
             };
         }

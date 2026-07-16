@@ -50,6 +50,9 @@ class Program
         services.AddSingleton<ISharedStateService, SharedStateService>();
         services.AddSingleton<IUpdateCheckService, GitHubUpdateCheckService>();
         services.AddSingleton<IUpdateInstallerService, GitHubUpdateInstallerService>();
+
+        // Persistent audit log (issue #67): per-tenant JSON-lines under the app-data directory.
+        services.AddSingleton<IAuditLog, FileAuditLog>();
         services.AddSingleton<IBundledModuleVersionService, BundledModuleVersionService>();
         
         // UI Services (singleton - manages UI state)
@@ -88,6 +91,7 @@ class Program
         services.AddTransient<DocumentationViewModel>();
         services.AddTransient<WizardViewModel>();
         services.AddTransient<BulkOperationsViewModel>();
+        services.AddTransient<HistoryViewModel>();
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.

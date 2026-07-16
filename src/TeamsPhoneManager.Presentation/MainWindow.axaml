@@ -169,6 +169,13 @@
                                     <TextBlock Text="Documentation" FontSize="13" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </ListBoxItem>
+
+                            <ListBoxItem Tag="History" Classes="nav" AutomationProperties.Name="History">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                                    <fi:SymbolIcon Symbol="History"/>
+                                    <TextBlock Text="History" FontSize="13" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </ListBoxItem>
                         </ListBox>
                     </ScrollViewer>
 
@@ -543,6 +550,25 @@
                                     <ComboBoxItem Content="Warning"/>
                                     <ComboBoxItem Content="Error"/>
                                 </ComboBox>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*,Auto">
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="Audit Log Location"/>
+                                    <TextBlock Text="{Binding AuditLogDirectory}"
+                                             FontSize="11" Opacity="0.6" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <Button Grid.Column="1"
+                                        Command="{Binding OpenAuditFolderCommand}"
+                                        Classes="IconText"
+                                        Margin="12,0,0,0"
+                                        VerticalAlignment="Center"
+                                        ToolTip.Tip="Open the audit log folder in the file manager">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fi:SymbolIcon Symbol="FolderOpen"/>
+                                        <TextBlock Text="Open" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
                             </Grid>
                         </StackPanel>
 
