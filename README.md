@@ -23,6 +23,26 @@ Teams Phone without writing PowerShell.
 - Guided setup, bulk operations, and tenant documentation
 - Native Windows, macOS, and Linux builds with dark and light themes
 
+## Screenshots
+
+<p align="center">
+  <img src="docs/screenshots/welcome.png" width="800" alt="Welcome screen (dark theme)"/>
+</p>
+
+<details>
+<summary><b>More screenshots</b> — setup wizard, call queues, auto attendants, holidays, bulk operations, and more</summary>
+<br/>
+
+| | |
+|:---:|:---:|
+| <img src="docs/screenshots/setup-wizard.png" alt="Setup wizard"/> Setup wizard | <img src="docs/screenshots/get-started.png" alt="Get started"/> Get started |
+| <img src="docs/screenshots/call-queues.png" alt="Call queues"/> Call queues | <img src="docs/screenshots/auto-attendants.png" alt="Auto attendants"/> Auto attendants |
+| <img src="docs/screenshots/holidays.png" alt="Holidays"/> Holidays | <img src="docs/screenshots/bulk-operations.png" alt="Bulk operations"/> Bulk operations |
+| <img src="docs/screenshots/m365-groups.png" alt="Microsoft 365 Groups"/> Microsoft 365 Groups | <img src="docs/screenshots/variables.png" alt="Variables"/> Variables |
+| <img src="docs/screenshots/documentation.png" alt="Documentation"/> Documentation | <img src="docs/screenshots/welcome-light.png" alt="Welcome screen (light theme)"/> Light theme |
+
+</details>
+
 ## Installation
 
 Download the latest build from [GitHub Releases](https://github.com/realgarit/teams-phonemanager/releases/latest).
