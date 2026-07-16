@@ -49,12 +49,12 @@ namespace teams_phonemanager.Tests
         // ── CSV parsing edge cases ──────────────────────────────────────────
 
         [Fact]
-        public void ParseCsv_Utf8Bom_DoesNotThrow_ButBreaksFirstHeaderMatch()
+        public void ParseCsv_Utf8Bom_StripsBom_FirstHeaderMatchesCorrectly()
         {
-            // A UTF-8 BOM prefixed onto the header line becomes part of the first header token
-            // ("﻿Customer"), so BulkOperationsScriptBuilder.GetField's lookup for "Customer"
-            // misses and that column comes back empty. This documents the real current behavior —
-            // parsing does not throw and the row is still added, but the first column is dropped.
+            // A UTF-8 BOM prefixed onto the header line must not become part of the first header
+            // token ("﻿Customer"), which would otherwise make BulkOperationsScriptBuilder.GetField's
+            // lookup for "Customer" miss and silently drop that column. The BOM should be stripped
+            // before header parsing so the first column matches and parses normally.
             var harness = new ViewModelTestHarness();
             var vm = CreateViewModel(harness);
             vm.CsvContent = "﻿" + TemplateHeader + "\n" + TemplateDataRow;
@@ -63,7 +63,7 @@ namespace teams_phonemanager.Tests
 
             Assert.Single(vm.ParsedEntries);
             var entry = vm.ParsedEntries[0];
-            Assert.Equal(string.Empty, entry.Customer);
+            Assert.Equal("contoso", entry.Customer);
             Assert.Equal("hauptnummer", entry.GroupName);
             Assert.Equal("+41441234567", entry.PhoneNumber);
             Assert.Equal("de-DE", entry.Language);

@@ -63,6 +63,15 @@ namespace teams_phonemanager.Services.ScriptBuilders
         public List<PhoneManagerVariables> ParseCsv(string csvContent)
         {
             var results = new List<PhoneManagerVariables>();
+
+            // Strip a leading UTF-8 BOM (U+FEFF) so it doesn't get glued onto the first header
+            // token (e.g. "Customer" becoming "﻿Customer"), which would otherwise break the
+            // case-insensitive header lookup and silently drop the first column's values.
+            if (csvContent.Length > 0 && csvContent[0] == '﻿')
+            {
+                csvContent = csvContent.Substring(1);
+            }
+
             var lines = csvContent.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
             if (lines.Length < 2)
