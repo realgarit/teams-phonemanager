@@ -38,7 +38,7 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private ObservableCollection<WizardStepInfo> _steps = new();
 
-        public bool CanGoNext => CurrentStep < TotalSteps - 1;
+        public bool CanGoNext => CurrentStep < TotalSteps - 1 && !StepFailed;
         public bool CanGoPrevious => CurrentStep > 0;
         public bool CanExecuteStep => !IsBusy && !StepCompleted;
 
@@ -94,6 +94,7 @@ namespace teams_phonemanager.ViewModels
                 OnPropertyChanged(nameof(CanGoNext));
                 OnPropertyChanged(nameof(CanGoPrevious));
                 OnPropertyChanged(nameof(CanExecuteStep));
+                GoToNextStepCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -243,10 +244,10 @@ namespace teams_phonemanager.ViewModels
             OnPropertyChanged(nameof(CanExecuteStep));
         }
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(CanGoNext))]
         private void GoToNextStep()
         {
-            if (CurrentStep < TotalSteps - 1)
+            if (CurrentStep < TotalSteps - 1 && !StepFailed)
             {
                 CurrentStep++;
                 UpdateCurrentStep();
@@ -308,6 +309,12 @@ namespace teams_phonemanager.ViewModels
         partial void OnCurrentStepChanged(int value)
         {
             UpdateCurrentStep();
+        }
+
+        partial void OnStepFailedChanged(bool value)
+        {
+            OnPropertyChanged(nameof(CanGoNext));
+            GoToNextStepCommand.NotifyCanExecuteChanged();
         }
     }
 
