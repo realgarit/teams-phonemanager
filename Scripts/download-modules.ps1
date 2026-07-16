@@ -12,14 +12,23 @@ if (!(Test-Path $modulesDir)) {
     New-Item -Path $modulesDir -ItemType Directory -Force | Out-Null
 }
 
+# Pinned module versions (see Scripts/module-versions.json)
+$versionsFile = Join-Path $PSScriptRoot 'module-versions.json'
+$versions = Get-Content $versionsFile -Raw | ConvertFrom-Json
+$moduleVersions = @{}
+foreach ($entry in $versions.modules) {
+    $moduleVersions[$entry.name] = $entry.version
+}
+
 # MicrosoftTeams module (single module)
 Write-Host "Downloading MicrosoftTeams module..."
 try {
     $nupkg = Join-Path $modulesDir 'MicrosoftTeams.nupkg'
     $zip = Join-Path $modulesDir 'MicrosoftTeams.zip'
     $destination = Join-Path $modulesDir 'MicrosoftTeams'
+    $teamsVersion = $moduleVersions['MicrosoftTeams']
 
-    Invoke-WebRequest -Uri "https://www.powershellgallery.com/api/v2/package/MicrosoftTeams" -OutFile $nupkg
+    Invoke-WebRequest -Uri "https://www.powershellgallery.com/api/v2/package/MicrosoftTeams/$teamsVersion" -OutFile $nupkg
     Write-Host "MicrosoftTeams downloaded successfully"
     
     # Extract the module
@@ -51,8 +60,9 @@ foreach ($module in $coreGraphModules) {
         $nupkg = Join-Path $modulesDir "$module.nupkg"
         $zip = Join-Path $modulesDir "$module.zip"
         $destination = Join-Path $modulesDir $module
+        $moduleVersion = $moduleVersions[$module]
 
-        Invoke-WebRequest -Uri "https://www.powershellgallery.com/api/v2/package/$module" -OutFile $nupkg
+        Invoke-WebRequest -Uri "https://www.powershellgallery.com/api/v2/package/$module/$moduleVersion" -OutFile $nupkg
         Write-Host "$module downloaded successfully"
         
         # Extract the module
