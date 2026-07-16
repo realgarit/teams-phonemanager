@@ -20,8 +20,8 @@ namespace teams_phonemanager.Tests
             // object resolved via the factory, it never inspects the concrete type itself.
             _pageViewModelFactory.Setup(f => f.Create(It.IsAny<string>())).Returns((ViewModelBase)null!);
             _updateCheckService.Setup(u => u.CheckForUpdateAsync(It.IsAny<CancellationToken>())).ReturnsAsync((UpdateInfo?)null);
-            _bundledModuleVersionService.SetupGet(m => m.TeamsModuleVersion).Returns("6.9.0");
-            _bundledModuleVersionService.SetupGet(m => m.GraphModuleVersion).Returns("2.25.0");
+            _bundledModuleVersionService.SetupGet(m => m.TeamsModuleVersion).Returns("7.8.0");
+            _bundledModuleVersionService.SetupGet(m => m.GraphModuleVersion).Returns("2.38.1");
             _bundledModuleVersionService.SetupGet(m => m.PowerShellSdkVersion).Returns("7.6.0");
         }
 
