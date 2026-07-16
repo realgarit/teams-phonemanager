@@ -180,23 +180,48 @@ namespace teams_phonemanager.Tests
         }
 
         [Fact]
-        public void GoToNextStepCommand_AfterStepFailure_CurrentImplementationDoesNotBlockAdvancement()
+        public async Task GoToNextStepCommand_AfterStepFailure_CannotAdvancePastFailedStep()
         {
-            // NOTE: this documents the ViewModel's *actual* current behavior, which is a gap against the
-            // acceptance criterion "cannot advance past a failed step". CanGoNext (bound to the Next
-            // button's IsEnabled in WizardView.axaml) is defined purely as `CurrentStep < TotalSteps - 1`
-            // and does not consult StepFailed/Steps[CurrentStep].IsFailed, and GoToNextStep()'s body has
-            // the same bounds-only guard. So today, once a step fails, the Next command remains enabled
-            // and calling it does move the wizard forward. Flagged for the orchestrator rather than
-            // silently "fixed" here, since gating GoToNextStep on step failure is a product decision.
+            // Acceptance criterion: cannot advance past a failed step. CanGoNext (bound to the Next
+            // button's IsEnabled in WizardView.axaml) consults StepFailed/Steps[CurrentStep].IsFailed
+            // in addition to the bounds check, and GoToNextStep() guards identically, so once a step
+            // fails the Next command is disabled and calling it does not move the wizard forward.
             var harness = new ViewModelTestHarness();
+            harness.PowerShellCommandService.Setup(c => c.GetCreateM365GroupCommand(It.IsAny<string>())).Returns("New-CsGroup ...");
             var vm = CreateViewModel(harness);
             vm.GoToNextStepCommand.Execute(null); // step 1
             harness.SetExecutionResult("ERROR: boom", hadErrors: true);
+            await vm.ExecuteCurrentStepCommand.ExecuteAsync(null);
+            Assert.True(vm.StepFailed);
 
-            var canExecuteBeforeAdvance = vm.GoToNextStepCommand.CanExecute(null);
+            var canExecuteAfterFailure = vm.GoToNextStepCommand.CanExecute(null);
+            Assert.False(canExecuteAfterFailure);
 
-            Assert.True(canExecuteBeforeAdvance);
+            vm.GoToNextStepCommand.Execute(null);
+
+            Assert.Equal(1, vm.CurrentStep);
+        }
+
+        [Fact]
+        public async Task GoToNextStepCommand_AfterFailureIsRetriedSuccessfully_CanAdvanceAgain()
+        {
+            var harness = new ViewModelTestHarness();
+            harness.PowerShellCommandService.Setup(c => c.GetCreateM365GroupCommand(It.IsAny<string>())).Returns("New-CsGroup ...");
+            var vm = CreateViewModel(harness);
+            vm.GoToNextStepCommand.Execute(null); // step 1
+            harness.SetExecutionResult("ERROR: boom", hadErrors: true);
+            await vm.ExecuteCurrentStepCommand.ExecuteAsync(null);
+            Assert.False(vm.GoToNextStepCommand.CanExecute(null));
+
+            vm.RetryStepCommand.Execute(null);
+            harness.SetExecutionResult("SUCCESS: group created");
+            await vm.ExecuteCurrentStepCommand.ExecuteAsync(null);
+
+            Assert.True(vm.GoToNextStepCommand.CanExecute(null));
+
+            vm.GoToNextStepCommand.Execute(null);
+
+            Assert.Equal(2, vm.CurrentStep);
         }
 
         [Fact]
