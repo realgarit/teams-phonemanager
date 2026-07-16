@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using teams_phonemanager.Planning;
 using teams_phonemanager.Services;
 using teams_phonemanager.Services.Interfaces;
 using teams_phonemanager.Services.ScriptBuilders;
@@ -78,6 +79,12 @@ class Program
         services.AddTransient<ResourceAccountScriptBuilder>();
         services.AddTransient<IDocumentationScriptBuilder, DocumentationScriptBuilder>();
         services.AddTransient<BulkOperationsScriptBuilder>();
+
+        // Dry-run preview (issue #68): read-only plan generation + exportable plan. Neither touches the
+        // tenant, executes PowerShell, nor generates script text — the plan derives purely from the same
+        // configuration inputs the frozen script builders consume.
+        services.AddTransient<IDryRunPlanBuilder, DryRunPlanBuilder>();
+        services.AddTransient<IDryRunPlanExporter, DryRunPlanExporter>();
 
         // ViewModels (transient - new instance per navigation)
         services.AddTransient<MainWindowViewModel>();

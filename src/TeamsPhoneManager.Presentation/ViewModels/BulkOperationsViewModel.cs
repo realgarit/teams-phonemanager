@@ -4,9 +4,13 @@ using teams_phonemanager.Services.Interfaces;
 using teams_phonemanager.Services;
 using teams_phonemanager.Services.ScriptBuilders;
 using teams_phonemanager.Models;
+using teams_phonemanager.Planning;
+using teams_phonemanager.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +19,22 @@ namespace teams_phonemanager.ViewModels
     public partial class BulkOperationsViewModel : ViewModelBase
     {
         private readonly BulkOperationsScriptBuilder _bulkBuilder;
+        private readonly IDryRunPlanBuilder? _planBuilder;
+        private readonly IDryRunPlanExporter? _planExporter;
+
+        /// <summary>
+        /// The most recently generated dry-run plan for the parsed CSV entries. Null until the operator
+        /// generates a preview. Generating it performs no tenant mutation and executes no PowerShell.
+        /// </summary>
+        [ObservableProperty]
+        private DryRunPlan? _plan;
+
+        /// <summary>
+        /// When true, executing bulk operations skips entries that failed validation/preflight instead of
+        /// blocking the whole run. Off by default: nothing executes while any row is invalid.
+        /// </summary>
+        [ObservableProperty]
+        private bool _skipInvalidRows;
 
         [ObservableProperty]
         private string _csvContent = string.Empty;
@@ -48,11 +68,15 @@ namespace teams_phonemanager.ViewModels
             ISharedStateService sharedStateService,
             IDialogService dialogService,
             BulkOperationsScriptBuilder bulkBuilder,
+            IDryRunPlanBuilder? planBuilder = null,
+            IDryRunPlanExporter? planExporter = null,
             IAuditLog? auditLog = null)
             : base(powerShellContextService, powerShellCommandService, loggingService,
                   sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService, auditLog)
         {
             _bulkBuilder = bulkBuilder;
+            _planBuilder = planBuilder;
+            _planExporter = planExporter;
             _loggingService.Log("Bulk Operations page loaded", LogLevel.Info);
         }
 
@@ -177,6 +201,72 @@ namespace teams_phonemanager.ViewModels
             StatusMessage = $"Script preview generated for {entries.Count} entries.";
         }
 
+        private List<PhoneManagerVariables> CollectParsedVariables() =>
+            ParsedEntries.Select(e => e.Variables).ToList();
+
+        /// <summary>
+        /// Builds a read-only dry-run plan for the parsed CSV: a per-row list of the objects that would be
+        /// created with resolved names/UPNs/number, per-row validation errors, and intra-plan preflight
+        /// (duplicate group/UPN/number across rows). Performs no tenant mutation and executes no PowerShell.
+        /// </summary>
+        [RelayCommand]
+        private void GeneratePlan()
+        {
+            if (_planBuilder == null)
+            {
+                StatusMessage = "Plan preview is unavailable.";
+                return;
+            }
+
+            if (ParsedEntries.Count == 0)
+            {
+                StatusMessage = "No entries to plan. Parse CSV first.";
+                return;
+            }
+
+            Plan = _planBuilder.BuildBulkPlan(CollectParsedVariables());
+            StatusMessage = Plan.InvalidEntryCount > 0
+                ? $"Plan generated: {Plan.ValidEntryCount} valid, {Plan.InvalidEntryCount} invalid of {Plan.EntryCount} rows. Fix issues or enable 'Skip invalid rows'."
+                : $"Plan generated: {Plan.EntryCount} rows, {Plan.TotalObjectCount} objects would be created/changed.";
+            _loggingService.Log($"Bulk dry-run plan generated: {Plan.EntryCount} rows ({Plan.InvalidEntryCount} invalid)", LogLevel.Info);
+        }
+
+        [RelayCommand]
+        private Task ExportPlanJsonAsync() => ExportPlanAsync(asJson: true);
+
+        [RelayCommand]
+        private Task ExportPlanCsvAsync() => ExportPlanAsync(asJson: false);
+
+        private async Task ExportPlanAsync(bool asJson)
+        {
+            if (_planBuilder == null || _planExporter == null)
+            {
+                StatusMessage = "Plan export is unavailable.";
+                return;
+            }
+
+            if (ParsedEntries.Count == 0)
+            {
+                StatusMessage = "No entries to export. Parse CSV first.";
+                return;
+            }
+
+            Plan ??= _planBuilder.BuildBulkPlan(CollectParsedVariables());
+
+            var content = asJson ? _planExporter.ToJson(Plan) : _planExporter.ToCsv(Plan);
+            var extension = asJson ? "json" : "csv";
+            var saved = await DryRunPlanExportHelper.SavePlanAsync(content, $"bulk-dry-run-plan.{extension}", extension);
+            if (saved != null)
+            {
+                StatusMessage = $"Plan exported to {saved}";
+                _loggingService.Log($"Bulk dry-run plan exported to: {saved}", LogLevel.Info);
+            }
+            else
+            {
+                StatusMessage = "Plan export cancelled.";
+            }
+        }
+
         [RelayCommand]
         private async Task ExecuteAllAsync()
         {
@@ -186,10 +276,35 @@ namespace teams_phonemanager.ViewModels
                 return;
             }
 
-            var entries = new System.Collections.Generic.List<PhoneManagerVariables>();
-            foreach (var entry in ParsedEntries)
+            var entries = CollectParsedVariables();
+
+            // Dry-run gate: validate the whole batch up front. Nothing executes while any row is invalid
+            // unless the operator explicitly opts into skipping invalid rows, in which case only the valid
+            // rows execute. This selects which entries run; it never alters the frozen builder's output for
+            // a given entry, so execution remains byte-identical.
+            if (_planBuilder != null)
             {
-                entries.Add(entry.Variables);
+                Plan = _planBuilder.BuildBulkPlan(entries);
+
+                if (Plan.InvalidEntryCount > 0)
+                {
+                    if (!SkipInvalidRows)
+                    {
+                        StatusMessage = $"{Plan.InvalidEntryCount} of {Plan.EntryCount} row(s) are invalid. Fix them, or enable 'Skip invalid rows' to run only the valid rows.";
+                        _loggingService.Log($"Bulk execution blocked: {Plan.InvalidEntryCount} invalid rows and skip-invalid is off", LogLevel.Warning);
+                        return;
+                    }
+
+                    var validEntries = Plan.ValidEntries.Select(e => entries[e.RowNumber - 1]).ToList();
+                    if (validEntries.Count == 0)
+                    {
+                        StatusMessage = "All rows are invalid. Nothing to execute.";
+                        return;
+                    }
+
+                    _loggingService.Log($"Bulk execution skipping {Plan.InvalidEntryCount} invalid row(s); running {validEntries.Count} valid row(s)", LogLevel.Warning);
+                    entries = validEntries;
+                }
             }
 
             var bulkScript = _bulkBuilder.GenerateBulkScript(entries);

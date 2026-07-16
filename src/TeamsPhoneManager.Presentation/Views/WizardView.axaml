@@ -123,22 +123,65 @@
                                      Height="4"/>
                     </Grid>
 
-                    <!-- Script Preview / Content -->
+                    <!-- Script Preview / Dry-Run Plan Content -->
                     <Border Grid.Row="2"
                             Classes="sunken"
                             Margin="0,0,0,12">
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                                      VerticalScrollBarVisibility="Auto">
-                            <TextBox Text="{Binding StepScript}"
-                                     IsReadOnly="True"
-                                     AcceptsReturn="True"
-                                     TextWrapping="NoWrap"
-                                     FontFamily="{StaticResource CodeFontFamily}"
-                                     FontSize="12"
-                                     BorderThickness="0"
-                                     Padding="16"
-                                     Watermark="Script preview will appear here..."/>
-                        </ScrollViewer>
+                        <Grid>
+                            <!-- PowerShell script preview (default view) -->
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Auto"
+                                          IsVisible="{Binding Plan, Converter={x:Static ObjectConverters.IsNull}}">
+                                <TextBox Text="{Binding StepScript}"
+                                         IsReadOnly="True"
+                                         AcceptsReturn="True"
+                                         TextWrapping="NoWrap"
+                                         FontFamily="{StaticResource CodeFontFamily}"
+                                         FontSize="12"
+                                         BorderThickness="0"
+                                         Padding="16"
+                                         Watermark="Script preview will appear here..."/>
+                            </ScrollViewer>
+
+                            <!-- Dry-run plan (shown once generated) -->
+                            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                          IsVisible="{Binding Plan, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                          Padding="16">
+                                <ItemsControl ItemsSource="{Binding Plan.Entries}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Spacing="8">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <fi:SymbolIcon Symbol="CheckmarkCircle" Foreground="Green" IsVisible="{Binding IsValid}"/>
+                                                    <fi:SymbolIcon Symbol="ErrorCircle" Foreground="OrangeRed" IsVisible="{Binding !IsValid}"/>
+                                                    <TextBlock Text="{Binding Label}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <ItemsControl ItemsSource="{Binding ValidationErrors}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding}" Foreground="OrangeRed" FontSize="12" TextWrapping="Wrap"/>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                                <ItemsControl ItemsSource="{Binding Objects}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,2,0,2">
+                                                                <fi:SymbolIcon Symbol="ChevronRight" FontSize="12" VerticalAlignment="Center"/>
+                                                                <TextBlock Text="{Binding Summary}" FontSize="12" VerticalAlignment="Center"/>
+                                                                <TextBlock Text="{Binding Upn}" FontSize="12"
+                                                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                                           VerticalAlignment="Center"/>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
                     </Border>
 
                     <!-- Step Result -->
@@ -196,6 +239,26 @@
                                     <fi:SymbolIcon Symbol="Next" FontSize="14"/>
                                     <TextBlock Text="Skip" VerticalAlignment="Center"/>
                                 </StackPanel>
+                            </Button>
+
+                            <!-- Dry-run plan preview + export -->
+                            <Button Command="{Binding GeneratePlanCommand}"
+                                    IsEnabled="{Binding !IsBusy}"
+                                    ToolTip.Tip="Preview every object that would be created, with resolved names, UPNs, number and settings — no changes are made.">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <fi:SymbolIcon Symbol="ClipboardTaskListLtr" FontSize="14"/>
+                                    <TextBlock Text="Dry-Run Plan" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding ExportPlanJsonCommand}"
+                                    IsEnabled="{Binding !IsBusy}"
+                                    ToolTip.Tip="Export the plan as JSON for change-approval workflows.">
+                                <fi:SymbolIcon Symbol="Code" FontSize="14"/>
+                            </Button>
+                            <Button Command="{Binding ExportPlanCsvCommand}"
+                                    IsEnabled="{Binding !IsBusy}"
+                                    ToolTip.Tip="Export the plan as CSV for change-approval workflows.">
+                                <fi:SymbolIcon Symbol="DocumentTable" FontSize="14"/>
                             </Button>
                             <!-- Retry (visible on failure) -->
                             <Button Command="{Binding RetryStepCommand}"
