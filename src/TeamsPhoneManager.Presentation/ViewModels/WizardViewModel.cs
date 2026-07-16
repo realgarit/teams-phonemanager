@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using teams_phonemanager.Services.Interfaces;
 using teams_phonemanager.Services;
 using teams_phonemanager.Models;
+using teams_phonemanager.Planning;
+using teams_phonemanager.Helpers;
 using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
@@ -38,6 +40,16 @@ namespace teams_phonemanager.ViewModels
         [ObservableProperty]
         private ObservableCollection<WizardStepInfo> _steps = new();
 
+        private readonly IDryRunPlanBuilder? _planBuilder;
+        private readonly IDryRunPlanExporter? _planExporter;
+
+        /// <summary>
+        /// The most recently generated dry-run plan for the current configuration. Null until the operator
+        /// generates a preview. Generating it performs no tenant mutation and executes no PowerShell.
+        /// </summary>
+        [ObservableProperty]
+        private DryRunPlan? _plan;
+
         public bool CanGoNext => CurrentStep < TotalSteps - 1 && !StepFailed;
         public bool CanGoPrevious => CurrentStep > 0;
         public bool CanExecuteStep => !IsBusy && !StepCompleted;
@@ -54,10 +66,14 @@ namespace teams_phonemanager.ViewModels
             IValidationService validationService,
             ISharedStateService sharedStateService,
             IDialogService dialogService,
+            IDryRunPlanBuilder? planBuilder = null,
+            IDryRunPlanExporter? planExporter = null,
             IAuditLog? auditLog = null)
             : base(powerShellContextService, powerShellCommandService, loggingService,
                   sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService, auditLog)
         {
+            _planBuilder = planBuilder;
+            _planExporter = planExporter;
             _loggingService.Log("Wizard page loaded", LogLevel.Info);
             InitializeSteps();
             UpdateCurrentStep();
@@ -305,6 +321,64 @@ namespace teams_phonemanager.ViewModels
         private void GoToHolidaysPage()
         {
             NavigateToHolidays();
+        }
+
+        /// <summary>
+        /// Builds a read-only dry-run plan for the current configuration: every object that would be created
+        /// with its resolved names, UPNs, number and settings, plus validation and preflight results. This
+        /// performs no tenant mutation and executes no PowerShell — it derives purely from the current
+        /// variables, so it can never diverge from what execution would emit.
+        /// </summary>
+        [RelayCommand]
+        private void GeneratePlan()
+        {
+            if (_planBuilder == null)
+            {
+                StatusMessage = "Plan preview is unavailable.";
+                return;
+            }
+
+            Plan = _planBuilder.BuildWizardPlan(Variables);
+            var entry = Plan.Entries.Count > 0 ? Plan.Entries[0] : null;
+            if (entry != null && !entry.IsValid)
+            {
+                StatusMessage = $"Plan generated with {entry.ValidationErrors.Count} validation issue(s). Review before executing.";
+            }
+            else
+            {
+                StatusMessage = $"Plan generated: {Plan.TotalObjectCount} objects would be created/changed.";
+            }
+            _loggingService.Log("Wizard dry-run plan generated", LogLevel.Info);
+        }
+
+        [RelayCommand]
+        private Task ExportPlanJsonAsync() => ExportPlanAsync(asJson: true);
+
+        [RelayCommand]
+        private Task ExportPlanCsvAsync() => ExportPlanAsync(asJson: false);
+
+        private async Task ExportPlanAsync(bool asJson)
+        {
+            if (_planBuilder == null || _planExporter == null)
+            {
+                StatusMessage = "Plan export is unavailable.";
+                return;
+            }
+
+            Plan ??= _planBuilder.BuildWizardPlan(Variables);
+
+            var content = asJson ? _planExporter.ToJson(Plan) : _planExporter.ToCsv(Plan);
+            var extension = asJson ? "json" : "csv";
+            var saved = await DryRunPlanExportHelper.SavePlanAsync(content, $"wizard-dry-run-plan.{extension}", extension);
+            if (saved != null)
+            {
+                StatusMessage = $"Plan exported to {saved}";
+                _loggingService.Log($"Wizard dry-run plan exported to: {saved}", LogLevel.Info);
+            }
+            else
+            {
+                StatusMessage = "Plan export cancelled.";
+            }
         }
 
         partial void OnCurrentStepChanged(int value)

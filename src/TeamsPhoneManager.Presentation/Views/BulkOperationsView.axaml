@@ -71,6 +71,12 @@
                                 <TextBlock Text="Preview Script" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
+                        <Button Command="{Binding GeneratePlanCommand}" IsEnabled="{Binding !IsBusy}" Classes="IconText">
+                            <StackPanel Orientation="Horizontal">
+                                <fi:SymbolIcon Symbol="ClipboardTaskListLtr"/>
+                                <TextBlock Text="Dry-Run Plan" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
                         <Button Command="{Binding ExecuteAllCommand}"
                                 Classes="accent IconText"
                                 IsEnabled="{Binding !IsBusy}">
@@ -79,6 +85,25 @@
                                 <TextBlock Text="Execute All" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
+                    </StackPanel>
+
+                    <!-- Dry-run plan export + safety toggle -->
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                        <Button Command="{Binding ExportPlanJsonCommand}" IsEnabled="{Binding !IsBusy}" Classes="IconText">
+                            <StackPanel Orientation="Horizontal">
+                                <fi:SymbolIcon Symbol="Code"/>
+                                <TextBlock Text="Export Plan (JSON)" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding ExportPlanCsvCommand}" IsEnabled="{Binding !IsBusy}" Classes="IconText">
+                            <StackPanel Orientation="Horizontal">
+                                <fi:SymbolIcon Symbol="DocumentTable"/>
+                                <TextBlock Text="Export Plan (CSV)" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <CheckBox IsChecked="{Binding SkipInvalidRows}"
+                                  Content="Skip invalid rows on execute"
+                                  VerticalAlignment="Center"/>
                     </StackPanel>
 
                     <!-- Status -->
@@ -145,6 +170,80 @@
                                 <DataGridTextColumn Header="Language" Binding="{Binding Language}" Width="80"/>
                             </DataGrid.Columns>
                         </DataGrid>
+                    </TabItem>
+
+                    <!-- Dry-Run Plan Tab -->
+                    <TabItem Header="Dry-Run Plan">
+                        <Grid RowDefinitions="Auto,*">
+                            <TextBlock Grid.Row="0"
+                                       Margin="0,8,0,8"
+                                       TextWrapping="Wrap"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       IsVisible="{Binding Plan, Converter={x:Static ObjectConverters.IsNull}}"
+                                       Text="Click 'Dry-Run Plan' above to preview what would be created for each row before any execution."/>
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding Plan.Entries}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Classes="card" Margin="0,0,0,10" Padding="14">
+                                                <StackPanel Spacing="8">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <fi:SymbolIcon Symbol="CheckmarkCircle"
+                                                                       Foreground="Green"
+                                                                       IsVisible="{Binding IsValid}"/>
+                                                        <fi:SymbolIcon Symbol="ErrorCircle"
+                                                                       Foreground="OrangeRed"
+                                                                       IsVisible="{Binding !IsValid}"/>
+                                                        <TextBlock Text="{Binding Label}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                        <TextBlock Text="{Binding RowNumber, StringFormat='Row {0}'}"
+                                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                                   VerticalAlignment="Center"/>
+                                                    </StackPanel>
+
+                                                    <!-- Validation errors -->
+                                                    <ItemsControl ItemsSource="{Binding ValidationErrors}"
+                                                                  IsVisible="{Binding ValidationErrors.Count}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <TextBlock Text="{Binding}" Foreground="OrangeRed" FontSize="12" TextWrapping="Wrap"/>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+
+                                                    <!-- Planned objects -->
+                                                    <ItemsControl ItemsSource="{Binding Objects}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,2,0,2">
+                                                                    <fi:SymbolIcon Symbol="ChevronRight" FontSize="12" VerticalAlignment="Center"/>
+                                                                    <TextBlock Text="{Binding Summary}" FontSize="12" VerticalAlignment="Center"/>
+                                                                    <TextBlock Text="{Binding Upn}" FontSize="12"
+                                                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                                               VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+
+                                                    <!-- Preflight checks -->
+                                                    <ItemsControl ItemsSource="{Binding PreflightChecks}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <TextBlock FontSize="11"
+                                                                           Margin="12,1,0,1"
+                                                                           TextWrapping="Wrap"
+                                                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                                           Text="{Binding Detail, StringFormat='Preflight — {0}'}"/>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
                     </TabItem>
 
                     <!-- Script Preview Tab -->
