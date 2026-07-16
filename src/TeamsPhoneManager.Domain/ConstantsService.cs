@@ -93,6 +93,7 @@ namespace teams_phonemanager.Services
         public static class Pages
         {
             public const string Welcome = "Welcome";
+            public const string Dashboard = "Dashboard";
             public const string GetStarted = "Get Started";
             public const string Variables = "Variables";
             public const string M365Groups = "M365 Groups";

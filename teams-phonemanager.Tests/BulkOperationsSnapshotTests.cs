@@ -54,7 +54,8 @@ namespace teams_phonemanager.Tests
                 new CallQueueScriptBuilder(san),
                 new AutoAttendantScriptBuilder(san),
                 new HolidayScriptBuilder(san),
-                new ResourceAccountScriptBuilder(san));
+                new ResourceAccountScriptBuilder(san),
+                new DashboardScriptBuilder());
 
             var bulk = new BulkOperationsScriptBuilder(facade, san);
 

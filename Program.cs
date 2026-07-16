@@ -77,6 +77,7 @@ class Program
         services.AddTransient<AutoAttendantScriptBuilder>();
         services.AddTransient<HolidayScriptBuilder>();
         services.AddTransient<ResourceAccountScriptBuilder>();
+        services.AddTransient<DashboardScriptBuilder>();
         services.AddTransient<IDocumentationScriptBuilder, DocumentationScriptBuilder>();
         services.AddTransient<BulkOperationsScriptBuilder>();
 
@@ -86,8 +87,15 @@ class Program
         services.AddTransient<IDryRunPlanBuilder, DryRunPlanBuilder>();
         services.AddTransient<IDryRunPlanExporter, DryRunPlanExporter>();
 
+        // Tenant dashboard (issue #64): read-only topology assembly + session-lifetime cache.
+        // The assembler is a pure transformation; the cache is a singleton so the retrieved snapshot
+        // survives navigation between pages ("results cached in memory for the session").
+        services.AddTransient<ITenantTopologyAssembler, TenantTopologyAssembler>();
+        services.AddSingleton<ITenantTopologyCache, TenantTopologyCache>();
+
         // ViewModels (transient - new instance per navigation)
         services.AddTransient<MainWindowViewModel>();
+        services.AddTransient<DashboardViewModel>();
         services.AddTransient<WelcomeViewModel>();
         services.AddTransient<GetStartedViewModel>();
         services.AddTransient<VariablesViewModel>();
