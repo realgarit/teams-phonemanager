@@ -50,6 +50,7 @@ class Program
         services.AddSingleton<ISharedStateService, SharedStateService>();
         services.AddSingleton<IUpdateCheckService, GitHubUpdateCheckService>();
         services.AddSingleton<IUpdateInstallerService, GitHubUpdateInstallerService>();
+        services.AddSingleton<IBundledModuleVersionService, BundledModuleVersionService>();
         
         // UI Services (singleton - manages UI state)
         services.AddSingleton<IDialogService, DialogService>();

@@ -29,6 +29,7 @@ namespace teams_phonemanager.ViewModels
         private readonly IUpdateCheckService _updateCheckService;
         private readonly IUpdateInstallerService _updateInstallerService;
         private readonly IDialogService _updateDialogService;
+        private readonly IBundledModuleVersionService _bundledModuleVersionService;
         private UpdateInfo? _availableUpdate;
         private CancellationTokenSource? _updateCancellation;
 
@@ -54,6 +55,15 @@ namespace teams_phonemanager.ViewModels
         private double _updateDownloadProgress;
 
         private string? _updateReleaseUrl;
+
+        [ObservableProperty]
+        private string _bundledTeamsModuleVersion = string.Empty;
+
+        [ObservableProperty]
+        private string _bundledGraphModuleVersion = string.Empty;
+
+        [ObservableProperty]
+        private string _bundledPowerShellSdkVersion = string.Empty;
 
         private async Task CheckForUpdateAsync()
         {
@@ -351,7 +361,8 @@ namespace teams_phonemanager.ViewModels
             IDialogService dialogService,
             IPageViewModelFactory pageViewModelFactory,
             IUpdateCheckService updateCheckService,
-            IUpdateInstallerService updateInstallerService)
+            IUpdateInstallerService updateInstallerService,
+            IBundledModuleVersionService bundledModuleVersionService)
             : base(powerShellContextService, powerShellCommandService, loggingService,
                   sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
         {
@@ -359,7 +370,12 @@ namespace teams_phonemanager.ViewModels
             _updateCheckService = updateCheckService;
             _updateInstallerService = updateInstallerService;
             _updateDialogService = dialogService;
+            _bundledModuleVersionService = bundledModuleVersionService;
             CurrentViewModel = _pageViewModelFactory.Create(CurrentPage);
+
+            BundledTeamsModuleVersion = _bundledModuleVersionService.TeamsModuleVersion;
+            BundledGraphModuleVersion = _bundledModuleVersionService.GraphModuleVersion;
+            BundledPowerShellSdkVersion = _bundledModuleVersionService.PowerShellSdkVersion;
 
             _loggingService.Log("Application started", LogLevel.Info);
 

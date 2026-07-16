@@ -1,0 +1,119 @@
+name: Module Compatibility Check
+
+# Weekly best-effort check for newer PowerShell Gallery releases of the bundled modules
+# (see Scripts/module-versions.json). Never triggers on push/pull_request: it only runs on
+# its own schedule (plus manual dispatch) so it can't slow down or block normal CI.
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  check-module-versions:
+    name: Check for newer module versions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Query PowerShell Gallery for latest versions
+        id: query
+        run: |
+          set -euo pipefail
+          VERSIONS_FILE="Scripts/module-versions.json"
+          HAS_UPDATE=false
+          SUMMARY_FILE="$RUNNER_TEMP/version-summary.md"
+          : > "$SUMMARY_FILE"
+
+          NAMES=$(jq -r '.modules[].name' "$VERSIONS_FILE")
+          for NAME in $NAMES; do
+            CURRENT=$(jq -r --arg name "$NAME" '.modules[] | select(.name == $name) | .version' "$VERSIONS_FILE")
+
+            # Best-effort: PowerShell Gallery v2 OData feed, latest version for the module id.
+            LATEST=$(curl -fsSL "https://www.powershellgallery.com/api/v2/Packages()?\$filter=Id%20eq%20%27${NAME}%27%20and%20IsLatestVersion&\$orderby=Version%20desc&\$top=1" \
+              | grep -o '<d:Version>[^<]*</d:Version>' \
+              | head -1 \
+              | sed -e 's/<d:Version>//' -e 's/<\/d:Version>//' || true)
+
+            if [[ -z "$LATEST" ]]; then
+              echo "::warning::Could not determine latest version for $NAME, skipping."
+              continue
+            fi
+
+            echo "$NAME: current=$CURRENT latest=$LATEST"
+            if [[ "$LATEST" != "$CURRENT" ]]; then
+              HAS_UPDATE=true
+              echo "- **$NAME**: \`$CURRENT\` → \`$LATEST\` ([changelog](https://www.powershellgallery.com/packages/${NAME}/${LATEST}))" >> "$SUMMARY_FILE"
+              jq --arg name "$NAME" --arg version "$LATEST" \
+                '(.modules[] | select(.name == $name) | .version) = $version' \
+                "$VERSIONS_FILE" > "$VERSIONS_FILE.tmp"
+              mv "$VERSIONS_FILE.tmp" "$VERSIONS_FILE"
+            fi
+          done
+
+          echo "has_update=$HAS_UPDATE" >> "$GITHUB_OUTPUT"
+          echo "summary_file=$SUMMARY_FILE" >> "$GITHUB_OUTPUT"
+
+      - name: Build and test with updated pins
+        if: steps.query.outputs.has_update == 'true'
+        id: build
+        continue-on-error: true
+        run: |
+          dotnet restore TeamsPhoneManager.slnx
+          dotnet build TeamsPhoneManager.slnx --configuration Release --no-restore
+          dotnet test teams-phonemanager.Tests/teams-phonemanager.Tests.csproj --configuration Release --no-build 2>&1 | tee "$RUNNER_TEMP/build-output.log"
+
+      - name: Open pull request with bumped versions
+        if: steps.query.outputs.has_update == 'true' && steps.build.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          BRANCH="module-compatibility/$(date +%Y%m%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add Scripts/module-versions.json
+          git commit -m "chore: bump bundled PowerShell module versions"
+          git push origin "$BRANCH"
+          gh pr create --title "chore: bump bundled PowerShell module versions" \
+            --body "$(cat <<EOF
+          Weekly module compatibility check found newer versions on the PowerShell Gallery.
+
+          $(cat "${{ steps.query.outputs.summary_file }}")
+
+          Build and tests passed against the updated pins. Review the changelog links above before merging.
+          EOF
+          )"
+
+      - name: Open issue on build/test failure
+        if: steps.query.outputs.has_update == 'true' && steps.build.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh issue create --title "Module compatibility check: build/test failure with newer module versions" \
+            --body "$(cat <<EOF
+          The weekly module compatibility check found newer versions of one or more bundled
+          PowerShell modules, but the build/test run against the updated pins failed. No PR
+          was opened; the pin file was left unchanged.
+
+          $(cat "${{ steps.query.outputs.summary_file }}")
+
+          Build/test output:
+
+          \`\`\`
+          $(tail -c 20000 "$RUNNER_TEMP/build-output.log" 2>/dev/null || echo "No output captured.")
+          \`\`\`
+          EOF
+          )"

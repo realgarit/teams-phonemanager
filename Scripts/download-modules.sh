@@ -14,13 +14,17 @@ MODULES_DIR="$REPO_ROOT/Modules"
 # Create Modules directory if it doesn't exist
 mkdir -p "$MODULES_DIR"
 
+# Pinned module versions (see Scripts/module-versions.json)
+VERSIONS_FILE="$SCRIPT_DIR/module-versions.json"
+TEAMS_VERSION="$(jq -r '.modules[] | select(.name == "MicrosoftTeams") | .version' "$VERSIONS_FILE")"
+
 # MicrosoftTeams module (single module)
 echo "Downloading MicrosoftTeams module..."
 TEAMS_NUPKG="$MODULES_DIR/MicrosoftTeams.nupkg"
 TEAMS_ZIP="$MODULES_DIR/MicrosoftTeams.zip"
 TEAMS_DEST="$MODULES_DIR/MicrosoftTeams"
 
-curl -L -o "$TEAMS_NUPKG" "https://www.powershellgallery.com/api/v2/package/MicrosoftTeams"
+curl -L -o "$TEAMS_NUPKG" "https://www.powershellgallery.com/api/v2/package/MicrosoftTeams/$TEAMS_VERSION"
 echo "MicrosoftTeams downloaded successfully"
 
 # Extract the module
@@ -46,8 +50,9 @@ for module in "${CORE_GRAPH_MODULES[@]}"; do
     NUPKG="$MODULES_DIR/${module}.nupkg"
     ZIP="$MODULES_DIR/${module}.zip"
     DEST="$MODULES_DIR/$module"
-    
-    curl -L -o "$NUPKG" "https://www.powershellgallery.com/api/v2/package/$module"
+    MODULE_VERSION="$(jq -r --arg name "$module" '.modules[] | select(.name == $name) | .version' "$VERSIONS_FILE")"
+
+    curl -L -o "$NUPKG" "https://www.powershellgallery.com/api/v2/package/$module/$MODULE_VERSION"
     echo "$module downloaded successfully"
     
     # Extract the module
