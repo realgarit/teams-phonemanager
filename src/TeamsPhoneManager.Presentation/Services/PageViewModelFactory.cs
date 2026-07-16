@@ -33,6 +33,7 @@ namespace teams_phonemanager.Services
             foreach (var page in new[]
             {
                 ConstantsService.Pages.Welcome,
+                ConstantsService.Pages.Dashboard,
                 ConstantsService.Pages.GetStarted,
                 ConstantsService.Pages.Variables,
                 ConstantsService.Pages.M365Groups,
@@ -60,6 +61,7 @@ namespace teams_phonemanager.Services
             return canonical switch
             {
                 ConstantsService.Pages.Welcome => _services.GetRequiredService<WelcomeViewModel>(),
+                ConstantsService.Pages.Dashboard => _services.GetRequiredService<DashboardViewModel>(),
                 ConstantsService.Pages.GetStarted => _services.GetRequiredService<GetStartedViewModel>(),
                 ConstantsService.Pages.Variables => _services.GetRequiredService<VariablesViewModel>(),
                 ConstantsService.Pages.M365Groups => _services.GetRequiredService<M365GroupsViewModel>(),

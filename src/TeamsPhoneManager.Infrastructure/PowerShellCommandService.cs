@@ -11,20 +11,25 @@ namespace teams_phonemanager.Services
         private readonly AutoAttendantScriptBuilder _autoAttendantBuilder;
         private readonly HolidayScriptBuilder _holidayBuilder;
         private readonly ResourceAccountScriptBuilder _resourceAccountBuilder;
+        private readonly DashboardScriptBuilder _dashboardBuilder;
 
         public PowerShellCommandService(
             CommonScriptBuilder commonBuilder,
             CallQueueScriptBuilder callQueueBuilder,
             AutoAttendantScriptBuilder autoAttendantBuilder,
             HolidayScriptBuilder holidayBuilder,
-            ResourceAccountScriptBuilder resourceAccountBuilder)
+            ResourceAccountScriptBuilder resourceAccountBuilder,
+            DashboardScriptBuilder dashboardBuilder)
         {
             _commonBuilder = commonBuilder;
             _callQueueBuilder = callQueueBuilder;
             _autoAttendantBuilder = autoAttendantBuilder;
             _holidayBuilder = holidayBuilder;
             _resourceAccountBuilder = resourceAccountBuilder;
+            _dashboardBuilder = dashboardBuilder;
         }
+
+        public string GetRetrieveTenantTopologyCommand() => _dashboardBuilder.GetRetrieveTenantTopologyCommand();
 
         public string GetCheckModulesCommand() => _commonBuilder.GetCheckModulesCommand();
         public string GetCommonSetupScript() => _commonBuilder.GetCommonSetupScript();

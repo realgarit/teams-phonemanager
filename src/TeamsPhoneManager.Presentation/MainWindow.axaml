@@ -99,6 +99,13 @@
                                 </StackPanel>
                             </ListBoxItem>
 
+                            <ListBoxItem Tag="Dashboard" Classes="nav" AutomationProperties.Name="Dashboard">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                                    <fi:SymbolIcon Symbol="DataTrending"/>
+                                    <TextBlock Text="Dashboard" FontSize="13" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </ListBoxItem>
+
                             <ListBoxItem Tag="GetStarted" Classes="nav" AutomationProperties.Name="Get Started">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                                     <fi:SymbolIcon Symbol="Rocket"/>

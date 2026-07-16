@@ -7,6 +7,9 @@ namespace teams_phonemanager.Services.Interfaces;
 /// </summary>
 public interface IPowerShellCommandService
 {
+    // Dashboard (read-only tenant topology, issue #64)
+    string GetRetrieveTenantTopologyCommand();
+
     // Common commands
     string GetCheckModulesCommand();
     string GetCommonSetupScript();
