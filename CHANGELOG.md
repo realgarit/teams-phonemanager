@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.21.9](https://github.com/realgarit/teams-phonemanager/compare/v3.21.8...v3.21.9) (2026-07-16)
+
+
+### Bug Fixes
+
+* block wizard advancement past a failed step ([9882174](https://github.com/realgarit/teams-phonemanager/commit/988217402f8b9cf322e229a1ff57d329c495a01a))
+* block wizard advancement past a failed step ([c9086bd](https://github.com/realgarit/teams-phonemanager/commit/c9086bd4ce4665b984cbe1406390097c9ef4e709))
+* strip UTF-8 BOM from CSV headers in bulk operations ([75e15c7](https://github.com/realgarit/teams-phonemanager/commit/75e15c74d7ee8f897145cd96485d7e0b089d48ca))
+* strip UTF-8 BOM from CSV headers in bulk operations ([c796dcd](https://github.com/realgarit/teams-phonemanager/commit/c796dcd3c3f4486de68a75a0235b67773625e123))
+
 ## [3.21.8](https://github.com/realgarit/teams-phonemanager/compare/v3.21.7...v3.21.8) (2026-07-13)
 
 
