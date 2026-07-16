@@ -84,9 +84,10 @@ namespace teams_phonemanager.ViewModels
             IErrorHandlingService errorHandlingService,
             IValidationService validationService,
             ISharedStateService sharedStateService,
-            IDialogService dialogService)
+            IDialogService dialogService,
+            IAuditLog? auditLog = null)
             : base(powerShellContextService, powerShellCommandService, loggingService,
-                  sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
+                  sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService, auditLog)
         {
             _loggingService.Log("Auto Attendants page loaded", LogLevel.Info);
 

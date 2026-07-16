@@ -1,8 +1,10 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
+using teams_phonemanager.Audit;
 using teams_phonemanager.Services;
 using teams_phonemanager.Services.Interfaces;
 
@@ -19,6 +21,13 @@ namespace teams_phonemanager.ViewModels
         protected readonly IValidationService _validationService;
         protected readonly ISharedStateService? _sharedStateService;
         protected readonly IDialogService? _dialogService;
+
+        /// <summary>
+        /// Optional persistent audit sink. When supplied by the composition root, every PowerShell-backed
+        /// operation executed through <see cref="ExecutePowerShellCommandAsync(string, Dictionary{string, string}?, string, bool)"/>
+        /// appends a record. Null in unit tests, where auditing is not under test.
+        /// </summary>
+        protected readonly IAuditLog? _auditLog;
 
         [ObservableProperty]
         private bool _isBusy;
@@ -101,7 +110,8 @@ namespace teams_phonemanager.ViewModels
             IErrorHandlingService errorHandlingService,
             IValidationService validationService,
             ISharedStateService? sharedStateService = null,
-            IDialogService? dialogService = null)
+            IDialogService? dialogService = null,
+            IAuditLog? auditLog = null)
         {
             _powerShellContextService = powerShellContextService;
             _powerShellCommandService = powerShellCommandService;
@@ -112,6 +122,7 @@ namespace teams_phonemanager.ViewModels
             _validationService = validationService;
             _sharedStateService = sharedStateService;
             _dialogService = dialogService;
+            _auditLog = auditLog;
         }
 
         protected void UpdateStatus(string message)
@@ -184,6 +195,15 @@ namespace teams_phonemanager.ViewModels
                     result = PowerShellOperationResultMapper.Map(execution);
                 }
 
+                // Persist an audit record for the attempt (out-of-band; never alters the operation).
+                RecordAudit(
+                    context,
+                    environmentVariables,
+                    allowThrottleRetry,
+                    result.IsSuccess ? AuditOutcome.Success : AuditOutcome.Failure,
+                    result.IsSuccess ? null : (result.ErrorMessage ?? result.RawOutput),
+                    result.CorrelationId);
+
                 // Surface a user-facing error only for a reportable failure (error marker without success marker).
                 if (result.ShouldReportError)
                 {
@@ -198,6 +218,7 @@ namespace teams_phonemanager.ViewModels
                 // The runspace remains reusable, so the next operation runs normally.
                 _loggingService.Log($"Operation cancelled: {context}", LogLevel.Warning);
                 StatusMessage = "Operation cancelled.";
+                RecordAudit(context, environmentVariables, allowThrottleRetry, AuditOutcome.Cancelled, null, correlationId: null);
                 return PowerShellOperationResultMapper.Failure(
                     OperationErrorCategory.Cancelled,
                     "Operation cancelled by user.",
@@ -205,6 +226,7 @@ namespace teams_phonemanager.ViewModels
             }
             catch (Exception ex)
             {
+                RecordAudit(context, environmentVariables, allowThrottleRetry, AuditOutcome.Failure, ex.Message, correlationId: null);
                 await _errorHandlingService.HandlePowerShellError(command, ex.Message, context);
                 return PowerShellOperationResultMapper.Failure(
                     OperationErrorCategory.Unknown,
@@ -217,6 +239,76 @@ namespace teams_phonemanager.ViewModels
                 IsCancellable = false;
                 ResetProgress();
             }
+        }
+
+        /// <summary>
+        /// Appends an audit record for an operation attempt. No-op when no audit sink is wired (unit tests).
+        /// Never throws: an audit failure is logged and swallowed so it cannot affect the operation. Secrets
+        /// in <paramref name="environmentVariables"/> / <paramref name="errorDetail"/> are redacted by the sink.
+        /// </summary>
+        private void RecordAudit(
+            string context,
+            IReadOnlyDictionary<string, string>? environmentVariables,
+            bool isReadOnly,
+            AuditOutcome outcome,
+            string? errorDetail,
+            string? correlationId)
+        {
+            if (_auditLog is null)
+            {
+                return;
+            }
+
+            try
+            {
+                var variables = _sharedStateService?.Variables;
+                var record = new AuditRecord
+                {
+                    TimestampUtc = DateTimeOffset.UtcNow,
+                    Operator = _sessionManager.GraphAccount ?? _sessionManager.TeamsAccount,
+                    TenantId = _sessionManager.TenantId,
+                    TenantName = _sessionManager.TenantName,
+                    Operation = string.IsNullOrWhiteSpace(context) ? "PowerShell operation" : context,
+                    Target = BuildAuditTarget(variables),
+                    Parameters = environmentVariables is { Count: > 0 }
+                        ? new Dictionary<string, string>(environmentVariables)
+                        : null,
+                    Outcome = outcome,
+                    ErrorDetail = Truncate(errorDetail, 2000),
+                    CorrelationId = correlationId ?? Guid.NewGuid().ToString("N"),
+                    AppVersion = ConstantsService.Application.Version,
+                    Kind = isReadOnly ? AuditKind.Read : AuditKind.Operation
+                };
+
+                _auditLog.Append(record);
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Audit log write failed: {ex.Message}", LogLevel.Warning);
+            }
+        }
+
+        /// <summary>Best-effort identifier of the object(s) an operation acted on, from the current variables.</summary>
+        private static string? BuildAuditTarget(Models.PhoneManagerVariables? variables)
+        {
+            if (variables is null || string.IsNullOrWhiteSpace(variables.Customer))
+            {
+                return null;
+            }
+
+            return string.IsNullOrWhiteSpace(variables.CustomerGroupName)
+                ? variables.Customer
+                : $"{variables.Customer}-{variables.CustomerGroupName}";
+        }
+
+        private static string? Truncate(string? value, int maxLength)
+        {
+            if (string.IsNullOrEmpty(value) || value.Length <= maxLength)
+            {
+                return value;
+            }
+
+            return value[..maxLength] + "…";
         }
 
         protected async Task<bool> ValidatePrerequisites()

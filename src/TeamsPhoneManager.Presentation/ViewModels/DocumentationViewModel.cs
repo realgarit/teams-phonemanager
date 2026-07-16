@@ -47,9 +47,10 @@ namespace teams_phonemanager.ViewModels
             IValidationService validationService,
             ISharedStateService sharedStateService,
             IDialogService dialogService,
-            IDocumentationScriptBuilder docBuilder)
+            IDocumentationScriptBuilder docBuilder,
+            IAuditLog? auditLog = null)
             : base(powerShellContextService, powerShellCommandService, loggingService,
-                  sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
+                  sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService, auditLog)
         {
             _docBuilder = docBuilder;
             _loggingService.Log("Documentation page loaded", LogLevel.Info);

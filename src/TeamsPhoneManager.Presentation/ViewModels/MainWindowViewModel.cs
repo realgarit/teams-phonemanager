@@ -288,6 +288,33 @@ namespace teams_phonemanager.ViewModels
             }
         }
 
+        /// <summary>The directory where per-tenant audit log files are stored (shown in Settings).</summary>
+        public string AuditLogDirectory => _auditLog?.LogDirectoryPath ?? "Audit log not available";
+
+        [RelayCommand]
+        private void OpenAuditFolder()
+        {
+            var path = _auditLog?.LogDirectoryPath;
+            if (string.IsNullOrEmpty(path))
+            {
+                return;
+            }
+
+            try
+            {
+                System.IO.Directory.CreateDirectory(path);
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = path,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Could not open audit log folder: {ex.Message}", LogLevel.Warning);
+            }
+        }
+
         [ObservableProperty]
         private string _currentPage = Services.ConstantsService.Pages.Welcome;
 
@@ -351,9 +378,10 @@ namespace teams_phonemanager.ViewModels
             IDialogService dialogService,
             IPageViewModelFactory pageViewModelFactory,
             IUpdateCheckService updateCheckService,
-            IUpdateInstallerService updateInstallerService)
+            IUpdateInstallerService updateInstallerService,
+            IAuditLog? auditLog = null)
             : base(powerShellContextService, powerShellCommandService, loggingService,
-                  sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService)
+                  sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService, auditLog)
         {
             _pageViewModelFactory = pageViewModelFactory;
             _updateCheckService = updateCheckService;
