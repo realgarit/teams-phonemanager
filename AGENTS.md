@@ -63,6 +63,14 @@ Release-please repeatedly created v4.0.0 PRs because old squashed commit `0406e3
 
 Always: **branch → commit → push + open PR → CI green → merge (merge commit, not squash) → clean up ALL branches** (remote delete, local branches, stale worktrees). Always end a working session with a version bump (the bump IS the release trigger). Do NOT create tags manually — build.yml auto-creates them.
 
+## Project memory (distilled)
+
+<!-- Curated snapshot of prior agent session knowledge (2026-07-17). Claude's private memory remains canonical; update via Working notes. -->
+
+- **Visual verification required for UI changes**: never merge new/changed pages, dialogs, or panels on unit tests alone. Render every new/affected page in its key states (empty, populated, long text, filters open) via the headless harness (`ScreenshotGenerator.cs` pattern, `GENERATE_SCREENSHOTS=1`), then actually inspect the resulting PNGs for overflow, clipping, alignment, and centering before opening the PR. This was learned the hard way — UI shipped with unit tests only has twice gone out with text overflow / mis-centered layouts (History page, Dashboard, dry-run preview).
+- Icon and screenshot/brand conventions, the Clean Architecture layering, the frozen Graph/PowerShell + auth surface, the macOS signing/delivery pipeline, and the branch→PR→CI→merge→cleanup workflow are covered above under their own sections — treat those as the durable ground truth alongside this one.
+- Homebrew cask auto-bump (`PAT_TOKEN` → `realgarit/homebrew-tap`) has tap write access and is confirmed working end-to-end; no manual cask bumps needed.
+
 ## Cross-agent conventions
 
 - This file (`AGENTS.md`) is the single source of truth for agent instructions in this repo. `CLAUDE.md` and `.github/copilot-instructions.md` are pointers to it — never edit them, never duplicate content into them.
