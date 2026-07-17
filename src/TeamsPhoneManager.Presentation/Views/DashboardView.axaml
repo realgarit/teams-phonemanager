@@ -8,6 +8,14 @@
              mc:Ignorable="d"
              d:DesignHeight="760" d:DesignWidth="1100">
 
+    <UserControl.Styles>
+        <!-- Stretch list rows to full width so the star-sized Name column fills the row instead of
+             sizing to content (which would leave the secondary columns floating left). -->
+        <Style Selector="ListBoxItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Style>
+    </UserControl.Styles>
+
     <Grid>
         <Border Classes="card" Margin="0">
             <Grid>
@@ -20,19 +28,17 @@
                 </Grid.RowDefinitions>
 
                 <!-- Header -->
-                <StackPanel Grid.Row="0" Margin="24,24,24,12">
-                    <StackPanel Orientation="Horizontal" Spacing="14">
-                        <Border Classes="icon-badge">
-                            <fi:SymbolIcon Symbol="DataTrending"/>
-                        </Border>
-                        <StackPanel Spacing="4" VerticalAlignment="Center">
-                            <TextBlock Text="Tenant Dashboard" Classes="page-title" Margin="0"/>
-                            <TextBlock Text="A read-only, live view of your telephony topology: auto attendants, call queues, resource accounts, phone numbers and groups — with relationships and orphan detection."
-                                       TextWrapping="Wrap"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
-                        </StackPanel>
+                <Grid Grid.Row="0" Margin="24,24,24,12" ColumnDefinitions="Auto,*">
+                    <Border Grid.Column="0" Classes="icon-badge" VerticalAlignment="Top">
+                        <fi:SymbolIcon Symbol="DataTrending"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center" Margin="14,0,0,0">
+                        <TextBlock Text="Tenant Dashboard" Classes="page-title" Margin="0"/>
+                        <TextBlock Text="A read-only, live view of your telephony topology: auto attendants, call queues, resource accounts, phone numbers and groups — with relationships and orphan detection."
+                                   TextWrapping="Wrap"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                     </StackPanel>
-                </StackPanel>
+                </Grid>
 
                 <!-- Toolbar -->
                 <Border Grid.Row="1" Classes="sunken" Margin="24,0,24,12" Padding="16,12">
@@ -115,12 +121,17 @@
                                          MaxHeight="220">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid ColumnDefinitions="*,140,120">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" MinWidth="120"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
                                                 <TextBlock Grid.Column="0" Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding LanguageId}" FontSize="12"
+                                                <TextBlock Grid.Column="1" Text="{Binding LanguageId}" FontSize="12" Margin="10,0,0,0"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
-                                                <TextBlock Grid.Column="2" Text="{Binding TimeZoneId}" FontSize="12"
-                                                           TextTrimming="CharacterEllipsis"
+                                                <TextBlock Grid.Column="2" Text="{Binding TimeZoneId}" FontSize="12" Margin="10,0,0,0"
+                                                           MaxWidth="150" TextTrimming="CharacterEllipsis"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                                             </Grid>
                                         </DataTemplate>
@@ -136,11 +147,16 @@
                                          MaxHeight="220">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid ColumnDefinitions="*,140,80">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" MinWidth="120"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
                                                 <TextBlock Grid.Column="0" Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding RoutingMethod}" FontSize="12"
+                                                <TextBlock Grid.Column="1" Text="{Binding RoutingMethod}" FontSize="12" Margin="10,0,0,0"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
-                                                <TextBlock Grid.Column="2" FontSize="12"
+                                                <TextBlock Grid.Column="2" FontSize="12" Margin="10,0,0,0"
                                                            Text="{Binding AgentAlertTime, StringFormat='{}{0}s'}"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                                             </Grid>
@@ -155,11 +171,16 @@
                                 <ListBox ItemsSource="{Binding ResourceAccountsView}" MaxHeight="220">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid ColumnDefinitions="*,160,110">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" MinWidth="120"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
                                                 <TextBlock Grid.Column="0" Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding PhoneNumber}" FontSize="12"
+                                                <TextBlock Grid.Column="1" Text="{Binding PhoneNumber}" FontSize="12" Margin="10,0,0,0"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
-                                                <TextBlock Grid.Column="2" Text="{Binding Kind}" FontSize="12"
+                                                <TextBlock Grid.Column="2" Text="{Binding Kind}" FontSize="12" Margin="10,0,0,0"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                                             </Grid>
                                         </DataTemplate>
@@ -173,9 +194,14 @@
                                 <ListBox ItemsSource="{Binding GroupsView}" MaxHeight="180">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid ColumnDefinitions="*,220">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" MinWidth="120"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
                                                 <TextBlock Grid.Column="0" Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Grid.Column="1" Text="{Binding MailNickname}" FontSize="12"
+                                                <TextBlock Grid.Column="1" Text="{Binding MailNickname}" FontSize="12" Margin="10,0,0,0"
+                                                           MaxWidth="220" TextTrimming="CharacterEllipsis"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                                             </Grid>
                                         </DataTemplate>
@@ -210,7 +236,7 @@
                                     <ItemsControl ItemsSource="{Binding SelectedAutoAttendantResourceAccounts}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <TextBlock FontSize="12" Text="{Binding DisplayName}"/>
+                                                <TextBlock FontSize="12" TextWrapping="Wrap" Text="{Binding DisplayName}"/>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
@@ -219,7 +245,7 @@
                                     <ItemsControl ItemsSource="{Binding SelectedAutoAttendantCallQueues}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <TextBlock FontSize="12" Text="{Binding Name}"/>
+                                                <TextBlock FontSize="12" TextWrapping="Wrap" Text="{Binding Name}"/>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
@@ -228,7 +254,7 @@
                                     <ItemsControl ItemsSource="{Binding SelectedAutoAttendantHolidayIds}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <TextBlock FontSize="12" Text="{Binding}"/>
+                                                <TextBlock FontSize="12" TextWrapping="Wrap" Text="{Binding}"/>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
@@ -244,7 +270,7 @@
                                     <ItemsControl ItemsSource="{Binding SelectedCallQueueResourceAccounts}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <TextBlock FontSize="12" Text="{Binding DisplayName}"/>
+                                                <TextBlock FontSize="12" TextWrapping="Wrap" Text="{Binding DisplayName}"/>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
@@ -253,7 +279,7 @@
                                     <ItemsControl ItemsSource="{Binding SelectedCallQueueGroups}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <TextBlock FontSize="12" Text="{Binding DisplayName}"/>
+                                                <TextBlock FontSize="12" TextWrapping="Wrap" Text="{Binding DisplayName}"/>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
@@ -262,7 +288,7 @@
                                     <ItemsControl ItemsSource="{Binding SelectedCallQueueAgentIds}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <TextBlock FontSize="12" Text="{Binding}"/>
+                                                <TextBlock FontSize="12" TextWrapping="Wrap" Text="{Binding}"/>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
