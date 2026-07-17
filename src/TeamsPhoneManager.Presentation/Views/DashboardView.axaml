@@ -121,17 +121,13 @@
                                          MaxHeight="220">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" MinWidth="120"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
+                                            <Grid Margin="0,0,10,0" ColumnDefinitions="1.9*,Auto,1.3*">
                                                 <TextBlock Grid.Column="0" Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
                                                 <TextBlock Grid.Column="1" Text="{Binding LanguageId}" FontSize="12" Margin="10,0,0,0"
+                                                           TextTrimming="CharacterEllipsis"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                                                 <TextBlock Grid.Column="2" Text="{Binding TimeZoneId}" FontSize="12" Margin="10,0,0,0"
-                                                           MaxWidth="150" TextTrimming="CharacterEllipsis"
+                                                           TextTrimming="CharacterEllipsis"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                                             </Grid>
                                         </DataTemplate>
@@ -147,14 +143,10 @@
                                          MaxHeight="220">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" MinWidth="120"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
+                                            <Grid Margin="0,0,10,0" ColumnDefinitions="*,Auto,Auto">
                                                 <TextBlock Grid.Column="0" Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
                                                 <TextBlock Grid.Column="1" Text="{Binding RoutingMethod}" FontSize="12" Margin="10,0,0,0"
+                                                           TextTrimming="CharacterEllipsis"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                                                 <TextBlock Grid.Column="2" FontSize="12" Margin="10,0,0,0"
                                                            Text="{Binding AgentAlertTime, StringFormat='{}{0}s'}"
@@ -171,16 +163,13 @@
                                 <ListBox ItemsSource="{Binding ResourceAccountsView}" MaxHeight="220">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" MinWidth="120"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
+                                            <Grid Margin="0,0,10,0" ColumnDefinitions="1.9*,1.3*,Auto">
                                                 <TextBlock Grid.Column="0" Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis"/>
                                                 <TextBlock Grid.Column="1" Text="{Binding PhoneNumber}" FontSize="12" Margin="10,0,0,0"
+                                                           TextTrimming="CharacterEllipsis"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                                                 <TextBlock Grid.Column="2" Text="{Binding Kind}" FontSize="12" Margin="10,0,0,0"
+                                                           TextTrimming="CharacterEllipsis"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                                             </Grid>
                                         </DataTemplate>
@@ -194,14 +183,10 @@
                                 <ListBox ItemsSource="{Binding GroupsView}" MaxHeight="180">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" MinWidth="120"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
+                                            <Grid Margin="0,0,10,0" ColumnDefinitions="1.9*,1.3*">
                                                 <TextBlock Grid.Column="0" Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis"/>
                                                 <TextBlock Grid.Column="1" Text="{Binding MailNickname}" FontSize="12" Margin="10,0,0,0"
-                                                           MaxWidth="220" TextTrimming="CharacterEllipsis"
+                                                           TextTrimming="CharacterEllipsis"
                                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                                             </Grid>
                                         </DataTemplate>
