@@ -201,6 +201,9 @@
                                                Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                                 <TextBlock Text="No topology loaded yet. Connect to Teams and Graph, then press Refresh."
                                            HorizontalAlignment="Center"
+                                           TextAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="360"
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                             </StackPanel>
                         </StackPanel>

@@ -113,6 +113,8 @@
                                     <Setter Property="FontSize" Value="11"/>
                                     <Setter Property="FontWeight" Value="SemiBold"/>
                                     <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                    <!-- Right gutter so header labels never touch the next column. -->
+                                    <Setter Property="Margin" Value="0,0,12,0"/>
                                 </Style>
                             </Grid.Styles>
                             <TextBlock Grid.Column="0" Text="Time (UTC)"/>
@@ -135,6 +137,13 @@
                                                     BorderBrush="{DynamicResource HairlineBrush}"
                                                     BorderThickness="0,0,0,1">
                                                 <Grid ColumnDefinitions="150,1.1*,1.7*,1.5*,95,75">
+                                                    <Grid.Styles>
+                                                        <!-- Right gutter so wrapped cells (Operation/Target/Operator)
+                                                             can never collide with the next column. -->
+                                                        <Style Selector="TextBlock">
+                                                            <Setter Property="Margin" Value="0,0,12,0"/>
+                                                        </Style>
+                                                    </Grid.Styles>
                                                     <TextBlock Grid.Column="0" FontSize="12"
                                                                Text="{Binding TimestampUtc, StringFormat='{}{0:yyyy-MM-dd HH:mm:ss}'}"/>
                                                     <TextBlock Grid.Column="1" FontSize="12" TextWrapping="Wrap"

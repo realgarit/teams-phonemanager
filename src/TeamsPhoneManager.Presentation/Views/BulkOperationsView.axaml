@@ -15,6 +15,13 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </UserControl.Resources>
 
+    <UserControl.Styles>
+        <!-- Ellipsis-trim long identifiers in the Parsed Entries grid so rows stay distinguishable. -->
+        <Style Selector="DataGridCell TextBlock">
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
+    </UserControl.Styles>
+
     <Grid>
         <Border Classes="card" Margin="0">
             <Grid>

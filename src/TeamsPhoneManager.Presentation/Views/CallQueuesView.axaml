@@ -18,7 +18,11 @@
     </UserControl.Resources>
 
     <UserControl.Styles>
-        <!-- Local styles removed, using App.axaml styles -->
+        <!-- Ellipsis-trim long values in list grids so rows stay distinguishable and the
+             rightmost column's text can never disappear under the vertical scrollbar. -->
+        <Style Selector="DataGridCell TextBlock">
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
     </UserControl.Styles>
 
     <Border Classes="card" Margin="0">
