@@ -77,12 +77,12 @@
                         Margin="24,0,24,24"
                         Classes="sunken"
                         Padding="0">
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
                                   VerticalScrollBarVisibility="Auto">
                         <TextBox Text="{Binding DocumentationOutput}"
                                  IsReadOnly="True"
                                  AcceptsReturn="True"
-                                 TextWrapping="NoWrap"
+                                 TextWrapping="Wrap"
                                  FontFamily="{StaticResource CodeFontFamily}"
                                  FontSize="12"
                                  BorderThickness="0"

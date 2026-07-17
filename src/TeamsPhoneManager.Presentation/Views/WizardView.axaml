@@ -151,11 +151,14 @@
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
                                             <StackPanel Spacing="8">
-                                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                                    <fi:SymbolIcon Symbol="CheckmarkCircle" Foreground="Green" IsVisible="{Binding IsValid}"/>
-                                                    <fi:SymbolIcon Symbol="ErrorCircle" Foreground="OrangeRed" IsVisible="{Binding !IsValid}"/>
-                                                    <TextBlock Text="{Binding Label}" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                                </StackPanel>
+                                                <Grid ColumnDefinitions="Auto,*">
+                                                    <Panel Grid.Column="0" VerticalAlignment="Top" Margin="0,1,8,0">
+                                                        <fi:SymbolIcon Symbol="CheckmarkCircle" Foreground="Green" IsVisible="{Binding IsValid}"/>
+                                                        <fi:SymbolIcon Symbol="ErrorCircle" Foreground="OrangeRed" IsVisible="{Binding !IsValid}"/>
+                                                    </Panel>
+                                                    <TextBlock Grid.Column="1" Text="{Binding Label}" FontWeight="SemiBold"
+                                                               TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                                </Grid>
                                                 <ItemsControl ItemsSource="{Binding ValidationErrors}">
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
@@ -166,13 +169,17 @@
                                                 <ItemsControl ItemsSource="{Binding Objects}">
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
-                                                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="8,2,0,2">
-                                                                <fi:SymbolIcon Symbol="ChevronRight" FontSize="12" VerticalAlignment="Center"/>
-                                                                <TextBlock Text="{Binding Summary}" FontSize="12" VerticalAlignment="Center"/>
-                                                                <TextBlock Text="{Binding Upn}" FontSize="12"
-                                                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                                                           VerticalAlignment="Center"/>
-                                                            </StackPanel>
+                                                            <Grid ColumnDefinitions="Auto,*" Margin="8,2,0,2">
+                                                                <fi:SymbolIcon Grid.Column="0" Symbol="ChevronRight" FontSize="12"
+                                                                               VerticalAlignment="Top" Margin="0,2,8,0"/>
+                                                                <StackPanel Grid.Column="1" Spacing="1">
+                                                                    <TextBlock Text="{Binding Summary}" FontSize="12" TextWrapping="Wrap"/>
+                                                                    <TextBlock Text="{Binding Upn}" FontSize="12"
+                                                                               TextWrapping="Wrap"
+                                                                               IsVisible="{Binding Upn, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                                                </StackPanel>
+                                                            </Grid>
                                                         </DataTemplate>
                                                     </ItemsControl.ItemTemplate>
                                                 </ItemsControl>
@@ -206,9 +213,16 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
+                        <Grid.Styles>
+                            <!-- Restore the inter-button gap lost when the centre group became a WrapPanel. -->
+                            <Style Selector="WrapPanel#WizardActionButtons > Button">
+                                <Setter Property="Margin" Value="4"/>
+                            </Style>
+                        </Grid.Styles>
 
                         <!-- Left: Back -->
                         <Button Grid.Column="0"
+                                VerticalAlignment="Center"
                                 Command="{Binding GoToPreviousStepCommand}"
                                 IsEnabled="{Binding CanGoPrevious}">
                             <StackPanel Orientation="Horizontal" Spacing="6">
@@ -217,11 +231,13 @@
                             </StackPanel>
                         </Button>
 
-                        <!-- Center: Execute / Skip / Retry -->
-                        <StackPanel Grid.Column="1" 
-                                    Orientation="Horizontal" 
-                                    HorizontalAlignment="Center"
-                                    Spacing="8">
+                        <!-- Center: Execute / Skip / Retry — wraps to multiple rows when the width is tight
+                             instead of overflowing under the Back/Next buttons. -->
+                        <WrapPanel Grid.Column="1"
+                                   x:Name="WizardActionButtons"
+                                   Orientation="Horizontal"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center">
                             <!-- Execute Step -->
                             <Button Command="{Binding ExecuteCurrentStepCommand}"
                                     Classes="accent"
@@ -278,10 +294,11 @@
                                     <TextBlock Text="Edit Variables" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
-                        </StackPanel>
+                        </WrapPanel>
 
                         <!-- Right: Next -->
                         <Button Grid.Column="2"
+                                VerticalAlignment="Center"
                                 Command="{Binding GoToNextStepCommand}"
                                 IsEnabled="{Binding CanGoNext}"
                                 Classes="accent">

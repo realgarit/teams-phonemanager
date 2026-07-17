@@ -15,6 +15,13 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </UserControl.Resources>
 
+    <UserControl.Styles>
+        <!-- Ellipsis-trim long identifiers in the Parsed Entries grid so rows stay distinguishable. -->
+        <Style Selector="DataGridCell TextBlock">
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
+    </UserControl.Styles>
+
     <Grid>
         <Border Classes="card" Margin="0">
             <Grid>
@@ -25,11 +32,11 @@
 
                 <!-- Header -->
                 <StackPanel Grid.Row="0" Margin="24,24,24,16">
-                    <StackPanel Orientation="Horizontal" Spacing="14" Margin="0,0,0,14">
-                        <Border Classes="icon-badge">
+                    <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,14">
+                        <Border Grid.Column="0" Classes="icon-badge" VerticalAlignment="Top">
                             <fi:SymbolIcon Symbol="TableMultiple"/>
                         </Border>
-                        <StackPanel Spacing="4" VerticalAlignment="Center">
+                        <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center" Margin="14,0,0,0">
                             <TextBlock Text="Bulk Operations"
                                      Classes="page-title"
                                      Margin="0"/>
@@ -37,10 +44,15 @@
                                      TextWrapping="Wrap"
                                      Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
                         </StackPanel>
-                    </StackPanel>
+                    </Grid>
 
-                    <!-- Action Buttons -->
-                    <StackPanel Orientation="Horizontal" Spacing="8">
+                    <!-- Action Buttons — wrap so no button is clipped at narrow widths. -->
+                    <WrapPanel Orientation="Horizontal">
+                        <WrapPanel.Styles>
+                            <Style Selector="WrapPanel > Button">
+                                <Setter Property="Margin" Value="0,0,8,8"/>
+                            </Style>
+                        </WrapPanel.Styles>
                         <Button Command="{Binding ExportTemplateFileCommand}" Classes="IconText">
                             <StackPanel Orientation="Horizontal">
                                 <fi:SymbolIcon Symbol="ArrowDownload"/>
@@ -85,10 +97,10 @@
                                 <TextBlock Text="Execute All" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
-                    </StackPanel>
+                    </WrapPanel>
 
                     <!-- Dry-run plan export + safety toggle -->
-                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,0">
                         <Button Command="{Binding ExportPlanJsonCommand}" IsEnabled="{Binding !IsBusy}" Classes="IconText">
                             <StackPanel Orientation="Horizontal">
                                 <fi:SymbolIcon Symbol="Code"/>
@@ -187,18 +199,22 @@
                                         <DataTemplate>
                                             <Border Classes="card" Margin="0,0,0,10" Padding="14">
                                                 <StackPanel Spacing="8">
-                                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                                        <fi:SymbolIcon Symbol="CheckmarkCircle"
-                                                                       Foreground="Green"
-                                                                       IsVisible="{Binding IsValid}"/>
-                                                        <fi:SymbolIcon Symbol="ErrorCircle"
-                                                                       Foreground="OrangeRed"
-                                                                       IsVisible="{Binding !IsValid}"/>
-                                                        <TextBlock Text="{Binding Label}" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                                        <TextBlock Text="{Binding RowNumber, StringFormat='Row {0}'}"
+                                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                                        <Panel Grid.Column="0" VerticalAlignment="Top" Margin="0,1,8,0">
+                                                            <fi:SymbolIcon Symbol="CheckmarkCircle"
+                                                                           Foreground="Green"
+                                                                           IsVisible="{Binding IsValid}"/>
+                                                            <fi:SymbolIcon Symbol="ErrorCircle"
+                                                                           Foreground="OrangeRed"
+                                                                           IsVisible="{Binding !IsValid}"/>
+                                                        </Panel>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Label}" FontWeight="SemiBold"
+                                                                   TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                                        <TextBlock Grid.Column="2" Text="{Binding RowNumber, StringFormat='Row {0}'}"
+                                                                   Margin="12,0,0,0"
                                                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                                                    VerticalAlignment="Center"/>
-                                                    </StackPanel>
+                                                    </Grid>
 
                                                     <!-- Validation errors -->
                                                     <ItemsControl ItemsSource="{Binding ValidationErrors}"
@@ -214,13 +230,17 @@
                                                     <ItemsControl ItemsSource="{Binding Objects}">
                                                         <ItemsControl.ItemTemplate>
                                                             <DataTemplate>
-                                                                <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,2,0,2">
-                                                                    <fi:SymbolIcon Symbol="ChevronRight" FontSize="12" VerticalAlignment="Center"/>
-                                                                    <TextBlock Text="{Binding Summary}" FontSize="12" VerticalAlignment="Center"/>
-                                                                    <TextBlock Text="{Binding Upn}" FontSize="12"
-                                                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                                                               VerticalAlignment="Center"/>
-                                                                </StackPanel>
+                                                                <Grid ColumnDefinitions="Auto,*" Margin="12,2,0,2">
+                                                                    <fi:SymbolIcon Grid.Column="0" Symbol="ChevronRight" FontSize="12"
+                                                                                   VerticalAlignment="Top" Margin="0,2,8,0"/>
+                                                                    <StackPanel Grid.Column="1" Spacing="1">
+                                                                        <TextBlock Text="{Binding Summary}" FontSize="12" TextWrapping="Wrap"/>
+                                                                        <TextBlock Text="{Binding Upn}" FontSize="12"
+                                                                                   TextWrapping="Wrap"
+                                                                                   IsVisible="{Binding Upn, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                                                    </StackPanel>
+                                                                </Grid>
                                                             </DataTemplate>
                                                         </ItemsControl.ItemTemplate>
                                                     </ItemsControl>
