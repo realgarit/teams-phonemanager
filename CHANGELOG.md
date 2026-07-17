@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.22.1](https://github.com/realgarit/teams-phonemanager/compare/v3.22.0...v3.22.1) (2026-07-17)
+
+
+### Bug Fixes
+
+* column collisions, missing ellipsis, and empty-state wrapping across list pages ([a5bae79](https://github.com/realgarit/teams-phonemanager/commit/a5bae7942aa1774776e767d3c6d95775903a71b7))
+* dashboard list secondary columns clipped under scrollbar at narrow widths ([1b5b503](https://github.com/realgarit/teams-phonemanager/commit/1b5b503a377e34ffafd925fc7e315bd3c1288544))
+* text overflow and alignment issues in history, dashboard, and dry-run UI ([833b5b8](https://github.com/realgarit/teams-phonemanager/commit/833b5b8237cfe6ab2795b1f8d71db39f6330b941))
+* text overflow and alignment issues in history, dashboard, and dry-run UI ([86c6482](https://github.com/realgarit/teams-phonemanager/commit/86c6482e96decd2aaf5dc170aea1f681c7a1304f))
+
 ## [3.22.0](https://github.com/realgarit/teams-phonemanager/compare/v3.21.9...v3.22.0) (2026-07-16)
 
 
