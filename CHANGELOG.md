@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.22.3](https://github.com/realgarit/teams-phonemanager/compare/v3.22.2...v3.22.3) (2026-07-19)
+
+
+### Bug Fixes
+
+* **ci:** use lowercase scripts/ paths in build.yml (Linux CI fix) ([b61ee9d](https://github.com/realgarit/teams-phonemanager/commit/b61ee9dced71e67e786687c40b0c1fc1fef1e9f3))
+
 ## [3.22.2](https://github.com/realgarit/teams-phonemanager/compare/v3.22.1...v3.22.2) (2026-07-19)
 
 
