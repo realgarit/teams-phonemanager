@@ -24,7 +24,7 @@ PYEOF
 MODEL_DISPATCHER="$(dirname "$0")/invoke-model.sh"
 
 set +e
-"$MODEL_DISPATCHER" < prompt.txt > ai-review.txt 2> ai-review-stderr.txt
+bash "$MODEL_DISPATCHER" < prompt.txt > ai-review.txt 2> ai-review-stderr.txt
 MODEL_EXIT=$?
 set -e
 
