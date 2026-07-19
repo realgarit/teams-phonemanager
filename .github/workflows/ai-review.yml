@@ -1,0 +1,88 @@
+# Copy this file (and scripts/, prompts/) into a repo's own
+# .github/workflows/ to wire in Layer 1 (CI review) of the harness. See
+# ../../docs/setup-new-repo.md for the full checklist, including the
+# secrets each provider needs.
+#
+# Choose your AI model by setting AI_MODEL (default: claude). Each provider
+# needs its own secrets — see scripts/invoke-model.sh for the full list.
+name: ai-review
+
+on:
+  pull_request:
+
+jobs:
+  review:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    env:
+      AI_MODEL: ${{ vars.AI_MODEL || 'claude' }}
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd
+        with:
+          fetch-depth: 0
+
+      - name: Compute PR diff
+        env:
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: bash scripts/compute-diff.sh
+
+      - name: Run Semgrep
+        run: bash scripts/run-semgrep.sh
+
+      - name: Install model CLI (if needed)
+        run: |
+          case "${AI_MODEL}" in
+            claude) npm install -g @anthropic-ai/claude-code ;;
+            codex)  npm install -g @openai/codex ;;
+            *)      echo "AI_MODEL=${AI_MODEL} uses API (curl+jq), no CLI install needed" ;;
+          esac
+
+      - name: Run AI review
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
+          OPENAI_COMPAT_BASE_URL: ${{ secrets.OPENAI_COMPAT_BASE_URL }}
+          OPENAI_COMPAT_API_KEY: ${{ secrets.OPENAI_COMPAT_API_KEY }}
+          OPENAI_COMPAT_MODEL: ${{ vars.OPENAI_COMPAT_MODEL }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+          DEEPSEEK_MODEL: ${{ vars.DEEPSEEK_MODEL }}
+          MOONSHOT_MODEL: ${{ vars.MOONSHOT_MODEL }}
+        run: bash scripts/run-ai-review.sh
+
+      - name: Format combined comment
+        run: python3 scripts/format-review-comment.py semgrep.json ai-review.txt > comment.md
+
+      - name: Post PR comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh pr comment "${{ github.event.pull_request.number }}" --body-file comment.md
+
+      - name: Fail check if findings exist
+        run: |
+          # Count findings from the sources, not by grepping the combined
+          # comment with an allow-list - the AI reviewer legitimately writes
+          # a summary sentence around its "No findings." line, and any such
+          # prose line tripped the old grep into a false-positive exit 1.
+          # Findings are machine-detectable: Semgrep's JSON results array,
+          # and the AI review's `- **file:line**` bullet lines.
+          if ! SEMGREP_COUNT=$(python3 -c 'import json; print(len(json.load(open("semgrep.json")).get("results", [])))' 2>/dev/null); then
+            echo "Could not parse semgrep.json - failing check so it gets looked at."
+            exit 1
+          fi
+          AI_COUNT=$(grep -c '^- \*\*' ai-review.txt || true)
+          echo "Semgrep findings: $SEMGREP_COUNT, AI review findings: $AI_COUNT"
+          if [ "$AI_COUNT" -eq 0 ] && ! grep -q "No findings." ai-review.txt; then
+            echo "AI review output has neither findings nor a 'No findings.' marker - review likely failed, see PR comment."
+            exit 1
+          fi
+          if [ "$SEMGREP_COUNT" -gt 0 ] || [ "$AI_COUNT" -gt 0 ]; then
+            echo "Findings reported - see PR comment. This check does not block merge by default (no branch protection on a free-plan personal repo); treat it as a strong signal to look before merging."
+            exit 1
+          fi
