@@ -60,7 +60,7 @@ namespace teams_phonemanager.Tests
             var dir = new DirectoryInfo(AppContext.BaseDirectory);
             while (dir is not null)
             {
-                var candidate = Path.Combine(dir.FullName, "Scripts", "module-versions.json");
+                var candidate = Path.Combine(dir.FullName, "scripts", "module-versions.json");
                 if (File.Exists(candidate))
                 {
                     return candidate;
@@ -68,7 +68,7 @@ namespace teams_phonemanager.Tests
 
                 if (dir.GetFiles("*.slnx").Length > 0 || dir.GetFiles("*.sln").Length > 0)
                 {
-                    return Path.Combine(dir.FullName, "Scripts", "module-versions.json");
+                    return Path.Combine(dir.FullName, "scripts", "module-versions.json");
                 }
 
                 dir = dir.Parent;
