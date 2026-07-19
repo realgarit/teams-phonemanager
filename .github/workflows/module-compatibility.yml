@@ -30,7 +30,7 @@ jobs:
         id: query
         run: |
           set -euo pipefail
-          VERSIONS_FILE="Scripts/module-versions.json"
+          VERSIONS_FILE="scripts/module-versions.json"
           HAS_UPDATE=false
           SUMMARY_FILE="$RUNNER_TEMP/version-summary.md"
           : > "$SUMMARY_FILE"
@@ -83,7 +83,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "$BRANCH"
-          git add Scripts/module-versions.json
+          git add scripts/module-versions.json
           git commit -m "chore: bump bundled PowerShell module versions"
           git push origin "$BRANCH"
           gh pr create --title "chore: bump bundled PowerShell module versions" \

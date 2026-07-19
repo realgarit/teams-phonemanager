@@ -24,7 +24,7 @@ namespace teams_phonemanager.Tests
         public void ModuleVersionsJson_ParsesAndContainsAllExpectedModulesWithVersions()
         {
             var path = FindModuleVersionsFile();
-            Assert.True(File.Exists(path), $"Scripts/module-versions.json not found (searched up from {AppContext.BaseDirectory})");
+            Assert.True(File.Exists(path), $"scripts/module-versions.json not found (searched up from {AppContext.BaseDirectory})");
 
             using var doc = JsonDocument.Parse(File.ReadAllText(path));
 
@@ -53,14 +53,14 @@ namespace teams_phonemanager.Tests
 
         /// <summary>
         /// Walks up from the test's execution directory to find the repo root, identified by
-        /// the presence of the solution file, then returns the path to Scripts/module-versions.json.
+        /// the presence of the solution file, then returns the path to scripts/module-versions.json.
         /// </summary>
         private static string FindModuleVersionsFile()
         {
             var dir = new DirectoryInfo(AppContext.BaseDirectory);
             while (dir is not null)
             {
-                var candidate = Path.Combine(dir.FullName, "Scripts", "module-versions.json");
+                var candidate = Path.Combine(dir.FullName, "scripts", "module-versions.json");
                 if (File.Exists(candidate))
                 {
                     return candidate;
@@ -68,7 +68,7 @@ namespace teams_phonemanager.Tests
 
                 if (dir.GetFiles("*.slnx").Length > 0 || dir.GetFiles("*.sln").Length > 0)
                 {
-                    return Path.Combine(dir.FullName, "Scripts", "module-versions.json");
+                    return Path.Combine(dir.FullName, "scripts", "module-versions.json");
                 }
 
                 dir = dir.Parent;

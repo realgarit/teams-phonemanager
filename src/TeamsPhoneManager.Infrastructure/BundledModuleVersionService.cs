@@ -13,7 +13,7 @@ namespace teams_phonemanager.Services;
 public sealed class BundledModuleVersionService : IBundledModuleVersionService
 {
     private const string UnknownVersion = "Unknown";
-    private const string VersionsFileName = "Scripts/module-versions.json";
+    private const string VersionsFileName = "scripts/module-versions.json";
     private const string GraphModulePrefix = "Microsoft.Graph";
 
     public string TeamsModuleVersion { get; }
