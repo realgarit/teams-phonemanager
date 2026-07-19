@@ -150,14 +150,14 @@ jobs:
     - name: Download PowerShell modules (Windows)
       if: matrix.os == 'windows-latest'
       shell: pwsh
-      run: ./Scripts/download-modules.ps1
+      run: ./scripts/download-modules.ps1
     
     - name: Download PowerShell modules (macOS/Linux)
       if: matrix.os != 'windows-latest'
       shell: bash
       run: |
-        chmod +x Scripts/download-modules.sh
-        ./Scripts/download-modules.sh
+        chmod +x scripts/download-modules.sh
+        ./scripts/download-modules.sh
     
     - name: Restore dependencies
       run: dotnet restore TeamsPhoneManager.slnx
@@ -184,8 +184,8 @@ jobs:
       run: |
         printf '%s' "$P12_BASE64" | base64 --decode > "$RUNNER_TEMP/signing.p12"
         export KEYCHAIN="$RUNNER_TEMP/tpm-ci.keychain-db"
-        chmod +x Scripts/import-cert.sh
-        Scripts/import-cert.sh "$RUNNER_TEMP/signing.p12"
+        chmod +x scripts/import-cert.sh
+        scripts/import-cert.sh "$RUNNER_TEMP/signing.p12"
         rm -f "$RUNNER_TEMP/signing.p12"
         echo "KEYCHAIN=$KEYCHAIN" >> "$GITHUB_ENV"
 
@@ -196,9 +196,9 @@ jobs:
         KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       run: |
         security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
-        chmod +x Scripts/package-macos.sh
+        chmod +x scripts/package-macos.sh
         SIGN_IDENTITY="Teams Phone Manager Self-Signed" \
-          ./Scripts/package-macos.sh ./publish/${{ matrix.runtime }} "$VERSION" ./dist
+          ./scripts/package-macos.sh ./publish/${{ matrix.runtime }} "$VERSION" ./dist
         ditto -c -k --keepParent "./dist/Teams Phone Manager.app" "./dist/teams-phonemanager-${{ matrix.runtime }}.zip"
 
     - name: Package (Windows zip + Inno Setup installer)
@@ -388,8 +388,8 @@ jobs:
     - name: Package smoke (macOS .app bundle)
       if: startsWith(matrix.runtime, 'osx-')
       run: |
-        chmod +x Scripts/package-macos.sh
-        ./Scripts/package-macos.sh ./publish/${{ matrix.runtime }} 0.0.0 ./dist
+        chmod +x scripts/package-macos.sh
+        ./scripts/package-macos.sh ./publish/${{ matrix.runtime }} 0.0.0 ./dist
         ditto -c -k --keepParent "./dist/Teams Phone Manager.app" "./dist/teams-phonemanager-${{ matrix.runtime }}.zip"
 
     - name: Package smoke (Windows installer)
