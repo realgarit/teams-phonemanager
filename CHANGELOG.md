@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.22.2](https://github.com/realgarit/teams-phonemanager/compare/v3.22.1...v3.22.2) (2026-07-19)
+
+
+### Bug Fixes
+
+* **ci:** use bash prefix for invoke-model.sh to fix permission error ([db38834](https://github.com/realgarit/teams-phonemanager/commit/db388346626e517cf227b609acf5135870c07403))
+* use lowercase paths in ModuleVersionsFileTests directory walk ([4e9161a](https://github.com/realgarit/teams-phonemanager/commit/4e9161a7ab214770d40b4bc1d28782e04031308a))
+* use lowercase scripts path for module-versions.json references ([b89bef9](https://github.com/realgarit/teams-phonemanager/commit/b89bef9a3443ca24e94baa58b9276abd9d86483f))
+
 ## [3.22.1](https://github.com/realgarit/teams-phonemanager/compare/v3.22.0...v3.22.1) (2026-07-17)
 
 
