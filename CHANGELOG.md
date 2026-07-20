@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.23.0](https://github.com/realgarit/teams-phonemanager/compare/v3.22.3...v3.23.0) (2026-07-20)
+
+
+### Features
+
+* add SCREENSHOT_FRAMELESS mode to screenshot generator ([a9fa1db](https://github.com/realgarit/teams-phonemanager/commit/a9fa1dbf9d9db08277c2c936cda635b7db83d28a))
+* add SCREENSHOT_FRAMELESS mode to screenshot generator ([85e8ab9](https://github.com/realgarit/teams-phonemanager/commit/85e8ab931dd5b1096d9f3ac1ad4874dca2b03ab8))
+
 ## [3.22.3](https://github.com/realgarit/teams-phonemanager/compare/v3.22.2...v3.22.3) (2026-07-19)
 
 
