@@ -49,8 +49,15 @@ namespace teams_phonemanager.Tests
         private const int PixelWidth = (int)(LogicalWidth * Scale);          // 2560
         private const int ContentPixelHeight = (int)(LogicalHeight * Scale); // 1440
         private const int TitleBarPixelHeight = 56;                          // 28pt @2x
-        private const int PixelHeight = ContentPixelHeight + TitleBarPixelHeight; // 1496
         private const int MaxAttempts = 3;
+
+        // SCREENSHOT_FRAMELESS=1 skips the synthetic macOS title bar (2560x1440 output) —
+        // used for platform-neutral shots, e.g. the Microsoft Store listing.
+        private static bool Frameless =>
+            Environment.GetEnvironmentVariable("SCREENSHOT_FRAMELESS") == "1";
+
+        private static int PixelHeight =>
+            Frameless ? ContentPixelHeight : ContentPixelHeight + TitleBarPixelHeight;
 
         private sealed record Shot(string Page, bool Dark, string FileName);
 
@@ -254,6 +261,12 @@ namespace teams_phonemanager.Tests
 
         private static void Composite(Bitmap content, bool dark, string path)
         {
+            if (Frameless)
+            {
+                content.Save(path);
+                return;
+            }
+
             var final = new RenderTargetBitmap(new PixelSize(PixelWidth, PixelHeight), new Vector(96, 96));
             using (var ctx = final.CreateDrawingContext())
             {
