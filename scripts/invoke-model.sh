@@ -154,6 +154,20 @@ invoke_openai_responses() {
   : "${OPENAI_RESPONSES_BASE_URL:?OPENAI_RESPONSES_BASE_URL is required for the openai-responses provider}"
   : "${OPENAI_RESPONSES_API_KEY:?OPENAI_RESPONSES_API_KEY is required for the openai-responses provider}"
   local model="${OPENAI_RESPONSES_MODEL:-gpt-5.6-sol}"
+  local auth_mode="${OPENAI_RESPONSES_AUTH_MODE:-bearer}"
+  local auth_header
+  case "$auth_mode" in
+    bearer)
+      auth_header="Authorization: Bearer ${OPENAI_RESPONSES_API_KEY}"
+      ;;
+    api-key)
+      auth_header="api-key: ${OPENAI_RESPONSES_API_KEY}"
+      ;;
+    *)
+      echo "Unsupported OPENAI_RESPONSES_AUTH_MODE: ${auth_mode}" >&2
+      return 1
+      ;;
+  esac
   local prompt
   prompt=$(cat)
 
@@ -172,7 +186,7 @@ invoke_openai_responses() {
   local http_status
   local curl_status=0
   http_status=$(curl --silent -X POST "${OPENAI_RESPONSES_BASE_URL%/}/responses" \
-    -H "api-key: ${OPENAI_RESPONSES_API_KEY}" \
+    -H "$auth_header" \
     -H "Content-Type: application/json" \
     -d "$payload" \
     --output "$response_file" \

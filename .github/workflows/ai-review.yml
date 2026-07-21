@@ -57,6 +57,7 @@ jobs:
           OPENAI_RESPONSES_BASE_URL: ${{ secrets.OPENAI_RESPONSES_BASE_URL }}
           OPENAI_RESPONSES_API_KEY: ${{ secrets.OPENAI_RESPONSES_API_KEY }}
           OPENAI_RESPONSES_MODEL: ${{ vars.OPENAI_RESPONSES_MODEL }}
+          OPENAI_RESPONSES_AUTH_MODE: api-key
         run: bash scripts/run-ai-review.sh
 
       - name: Format combined comment
