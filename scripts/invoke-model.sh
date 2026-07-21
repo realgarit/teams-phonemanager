@@ -172,9 +172,9 @@ invoke_openai_responses() {
     }')
 
   curl -sf -X POST "${OPENAI_RESPONSES_BASE_URL%/}/responses" \
-    -H "Authorization: ******" \
+      -H "api-key: ${OPENAI_RESPONSES_API_KEY}" \
     -H "Content-Type: application/json" \
-    -d "$payload" | jq -r '.output[0].content[0].text // empty'
+      -d "$payload" | jq -r '.output_text // .output[0].content[0].text // empty'
 }
 
 # --- Dispatch ---
