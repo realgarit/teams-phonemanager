@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace teams_phonemanager.Views
+namespace PhoneDesk.Views
 {
     public partial class TestView : UserControl
     {

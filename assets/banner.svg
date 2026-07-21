@@ -40,7 +40,7 @@
 
     <!-- Wordmark + tagline -->
     <g font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
-      <text x="292" y="150" font-size="54" font-weight="700" letter-spacing="-1" fill="url(#wordmark)">Teams Phone Manager</text>
+      <text x="292" y="150" font-size="54" font-weight="700" letter-spacing="-1" fill="url(#wordmark)">PhoneDesk</text>
       <text x="294" y="188" font-size="20" fill="#8A8F98">Manage Microsoft Teams telephony — auto attendants, call queues,</text>
       <text x="294" y="214" font-size="20" fill="#8A8F98">and phone numbers — from one desktop app.</text>
     </g>

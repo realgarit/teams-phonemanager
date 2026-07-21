@@ -1,15 +1,15 @@
-# teams-phonemanager — Agent instructions
+# phonedesk — Agent instructions
 
 > Canonical instructions for all coding agents (Claude Code, Codex, GitHub Copilot). Claude loads this via the CLAUDE.md stub.
 
 ## Architecture (Clean Architecture)
 
 4 layers under `src/`:
-- `TeamsPhoneManager.Domain` — framework-free (rules, value objects, constants, holiday computus, `LogLevel`, `IPhoneManagerVariables`/`IHolidayEntry`/`IDaySchedule` contracts)
-- `TeamsPhoneManager.Application` — ports (interfaces) + use cases (`ValidationService`)
-- `TeamsPhoneManager.Infrastructure` — PowerShell/MSAL adapters (only layer with `System.Management.Automation` and `Microsoft.Identity.Client`)
-- `TeamsPhoneManager.Presentation` — Avalonia/MVVM UI (depends only on Domain + Application)
-- `teams-phonemanager` (repo root exe) — composition root (DI, app.manifest, version, Modules content)
+- `PhoneDesk.Domain` — framework-free (rules, value objects, constants, holiday computus, `LogLevel`, `IPhoneManagerVariables`/`IHolidayEntry`/`IDaySchedule` contracts)
+- `PhoneDesk.Application` — ports (interfaces) + use cases (`ValidationService`)
+- `PhoneDesk.Infrastructure` — PowerShell/MSAL adapters (only layer with `System.Management.Automation` and `Microsoft.Identity.Client`)
+- `PhoneDesk.Presentation` — Avalonia/MVVM UI (depends only on Domain + Application)
+- `phonedesk` (repo root exe) — composition root (DI, app.manifest, version, Modules content)
 
 **Dependency Rule**: enforced by `DependencyRuleTests` — forbidden inward deps fail the build.
 **ObservableObject models** = Presentation concern. **VM-first ViewLocator** (no service locator).
@@ -17,10 +17,10 @@
 ## Frozen / Do Not Touch
 
 ### Graph/PowerShell script builders & auth
-The `ScriptBuilders` in `src/TeamsPhoneManager.Infrastructure/ScriptBuilders/` and the auth flow (`MsalGraphAuthenticationService`, `PowerShellContextService`) are **off-limits** — do NOT change behavior or emitted text without asking. Structural changes (relocating, interfaces) OK if output stays byte-identical.
+The `ScriptBuilders` in `src/PhoneDesk.Infrastructure/ScriptBuilders/` and the auth flow (`MsalGraphAuthenticationService`, `PowerShellContextService`) are **off-limits** — do NOT change behavior or emitted text without asking. Structural changes (relocating, interfaces) OK if output stays byte-identical.
 
 ### macOS signing cert
-The self-signed cert "Teams Phone Manager Self-Signed" (stable designated requirement `identifier "ch.realgar.teams-phonemanager" and certificate leaf = H"965282c9..."`) keeps MSAL keychain items / TCC grants across upgrades. **NEVER regenerate** — p12 at `~/.teams-phonemanager-signing/signing.p12`, also in repo secrets.
+The self-signed cert "Teams Phone Manager Self-Signed" (stable designated requirement `identifier "ch.realgar.teams-phonemanager" and certificate leaf = H"965282c9..."`) keeps MSAL keychain items / TCC grants across upgrades. **NEVER regenerate** — p12 at `~/.phonedesk-signing/signing.p12`, also in repo secrets.
 
 ## UI / Icons
 
@@ -36,7 +36,7 @@ README screenshots at `docs/screenshots/` (2560×1496 = 1280×720 @2x + syntheti
 - **Config file**: `release-please-config.json`
 - **Manifest file**: `.release-please-manifest.json`
 - **Workflow file**: `.github/workflows/build.yml`
-- **Version source**: `teams-phonemanager.csproj` `<Version>` — also in `app.manifest` and `ConstantsService.cs`. Bump via `Scripts/bump-version.sh minor|patch|major`.
+- **Version source**: `phonedesk.csproj` `<Version>` — also in `app.manifest` and `ConstantsService.cs`. Bump via `Scripts/bump-version.sh minor|patch|major`.
 
 ### Phantom v4.0.0 PR — root fix & prevention
 

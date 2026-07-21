@@ -34,7 +34,7 @@ lock the version and prevent RP from evaluating new commits correctly.
 
 ## Four-digit version fields for Windows
 
-The .NET project uses these MSBuild properties in `teams-phonemanager.csproj`:
+The .NET project uses these MSBuild properties in `phonedesk.csproj`:
 
 ```xml
 <Version>3.21.3</Version>            <!-- SemVer — must match RP tag exactly -->
@@ -55,7 +55,7 @@ The .NET project uses these MSBuild properties in `teams-phonemanager.csproj`:
 | `release-please-config.json` | RP config: release-type, extra-files, draft mode |
 | `.release-please-manifest.json` | Current package version (auto-managed by RP) |
 | `version.txt` | Human-readable version (must match RP version) |
-| `teams-phonemanager.csproj` | Project `<Version>`, `<AssemblyVersion>`, `<FileVersion>` |
+| `phonedesk.csproj` | Project `<Version>`, `<AssemblyVersion>`, `<FileVersion>` |
 
 ## What happens on a push to `main`
 
@@ -77,7 +77,7 @@ The .NET project uses these MSBuild properties in `teams-phonemanager.csproj`:
 ### Validate-release fails with "Version is not a stable semantic version"
 - Ensure the release tag matches `vX.Y.Z` format (no pre-release suffixes, no fourth
   digit).
-- Check that `<Version>` in `teams-phonemanager.csproj` matches the tag exactly (3 parts).
+- Check that `<Version>` in `phonedesk.csproj` matches the tag exactly (3 parts).
 
 ### Windows builds fail on version mismatch
 - `<AssemblyVersion>` and `<FileVersion>` must be 4-part (e.g. `3.21.3.0`). Windows

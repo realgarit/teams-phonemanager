@@ -11,7 +11,7 @@ $repoRoot = (Split-Path $PSScriptRoot -Parent)
 Set-Location $repoRoot
 
 # Read current version from csproj
-$csprojPath = Join-Path $repoRoot "teams-phonemanager.csproj"
+$csprojPath = Join-Path $repoRoot "phonedesk.csproj"
 $csprojContent = Get-Content $csprojPath -Raw
 
 # Extract current version
@@ -57,7 +57,7 @@ $csprojContent = $csprojContent -replace '<Version>[\d.]+</Version>', "<Version>
 $csprojContent = $csprojContent -replace '<AssemblyVersion>[\d.]+</AssemblyVersion>', "<AssemblyVersion>$newVersion</AssemblyVersion>"
 $csprojContent = $csprojContent -replace '<FileVersion>[\d.]+</FileVersion>', "<FileVersion>$newVersion</FileVersion>"
 Set-Content -Path $csprojPath -Value $csprojContent -NoNewline
-Write-Host "✓ Updated teams-phonemanager.csproj" -ForegroundColor Green
+Write-Host "✓ Updated phonedesk.csproj" -ForegroundColor Green
 
 # Update app.manifest
 $manifestPath = Join-Path $repoRoot "app.manifest"
@@ -67,7 +67,7 @@ Set-Content -Path $manifestPath -Value $manifestContent -NoNewline
 Write-Host "✓ Updated app.manifest" -ForegroundColor Green
 
 # Update ConstantsService.cs (use 3-part version for display)
-$constantsPath = Join-Path $repoRoot "src\TeamsPhoneManager.Domain\ConstantsService.cs"
+$constantsPath = Join-Path $repoRoot "src\PhoneDesk.Domain\ConstantsService.cs"
 $constantsContent = Get-Content $constantsPath -Raw
 # Use 3-part version for display (major.minor.patch)
 $displayVersion = "$major.$minor.$patch"

@@ -1,0 +1,336 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using PhoneDesk.Services;
+using PhoneDesk.Services.Interfaces;
+using System.Threading.Tasks;
+using System;
+
+namespace PhoneDesk.ViewModels
+{
+    public partial class GetStartedViewModel : ViewModelBase
+    {
+        [ObservableProperty]
+        private bool _modulesChecked;
+
+        [ObservableProperty]
+        private bool _teamsConnected;
+
+        [ObservableProperty]
+        private bool _graphConnected;
+
+        [ObservableProperty]
+        private bool _canProceed;
+
+        public bool CanConnectTeams => ModulesChecked && !TeamsConnected;
+        public bool CanConnectGraph => ModulesChecked && !GraphConnected;
+
+        public string ModulesStatusText => $"Step 1: Check PowerShell Modules. Status: {(ModulesChecked ? "Completed" : "Pending")}.";
+        public string TeamsStatusText => $"Step 2: Connect to Microsoft Teams. Status: {(TeamsConnected ? "Completed" : "Pending")}.";
+        public string GraphStatusText => $"Step 3: Connect to Microsoft Graph. Status: {(GraphConnected ? "Completed" : "Pending")}.";
+
+        private readonly IMsalGraphAuthenticationService _msalAuthService;
+
+        public GetStartedViewModel(
+            IPowerShellContextService powerShellContextService,
+            IPowerShellCommandService powerShellCommandService,
+            ILoggingService loggingService,
+            ISessionManager sessionManager,
+            INavigationService navigationService,
+            IErrorHandlingService errorHandlingService,
+            IValidationService validationService,
+            IMsalGraphAuthenticationService msalAuthService,
+            IAuditLog? auditLog = null)
+            : base(powerShellContextService, powerShellCommandService, loggingService,
+                  sessionManager, navigationService, errorHandlingService, validationService, auditLog: auditLog)
+        {
+            _msalAuthService = msalAuthService;
+            _modulesChecked = _sessionManager.ModulesChecked;
+            _teamsConnected = _sessionManager.TeamsConnected;
+            _graphConnected = _sessionManager.GraphConnected;
+            UpdateCanProceed();
+
+            _loggingService.Log("Get Started page loaded", LogLevel.Info);
+        }
+
+        [RelayCommand]
+        private void NavigateToPage(string page)
+        {
+            if (!CanProceed)
+            {
+                _loggingService.Log("Cannot navigate: prerequisites not met", LogLevel.Warning);
+                return;
+            }
+
+            NavigateTo(page);
+        }
+
+        [RelayCommand]
+        private async Task CheckModulesAsync()
+        {
+            try
+            {
+                IsBusy = true;
+                _loggingService.Log("Checking PowerShell modules...", LogLevel.Info);
+
+                var command = _powerShellCommandService.GetCheckModulesCommand();
+                var result = await ExecutePowerShellCommandAsync(command, "CheckModules");
+                var output = result.Value ?? string.Empty;
+
+                // Check for Teams module
+                bool teamsAvailable = output.Contains("MicrosoftTeams module is available") || output.Contains("MicrosoftTeams module installed successfully");
+
+                // Check for all required Graph modules
+                bool graphAuthAvailable = output.Contains(ConstantsService.PowerShellModules.MicrosoftGraphAuthentication + " module is available");
+                bool graphUsersAvailable = output.Contains(ConstantsService.PowerShellModules.MicrosoftGraphUsers + " module is available");
+                bool graphUsersActionsAvailable = output.Contains(ConstantsService.PowerShellModules.MicrosoftGraphUsersActions + " module is available");
+                bool graphGroupsAvailable = output.Contains(ConstantsService.PowerShellModules.MicrosoftGraphGroups + " module is available");
+                bool graphIdentityAvailable = output.Contains(ConstantsService.PowerShellModules.MicrosoftGraphIdentityDirectoryManagement + " module is available");
+
+                ModulesChecked = teamsAvailable &&
+                                graphAuthAvailable &&
+                                graphUsersAvailable &&
+                                graphUsersActionsAvailable &&
+                                graphGroupsAvailable &&
+                                graphIdentityAvailable;
+
+                _sessionManager.UpdateModulesChecked(ModulesChecked);
+
+                if (ModulesChecked)
+                {
+                    _loggingService.Log("PowerShell modules are available", LogLevel.Success);
+                    foreach (var line in output.Split('\n'))
+                    {
+                        if (!string.IsNullOrWhiteSpace(line))
+                        {
+                            _loggingService.Log(line.Trim(), LogLevel.Info);
+                        }
+                    }
+                }
+                else
+                {
+                    var errorMessage = "One or more required modules could not be installed";
+                    _loggingService.Log(errorMessage, LogLevel.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Error checking PowerShell modules: {ex.Message}", LogLevel.Error);
+                ModulesChecked = false;
+                _sessionManager.UpdateModulesChecked(false);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task ConnectTeamsAsync()
+        {
+            try
+            {
+                if (!ModulesChecked)
+                {
+                    _loggingService.Log("Please check modules first", LogLevel.Warning);
+                    return;
+                }
+
+                IsBusy = true;
+                _loggingService.Log("Connecting to Microsoft Teams...", LogLevel.Info);
+
+                var command = _powerShellCommandService.GetConnectTeamsCommand();
+                var result = await ExecutePowerShellCommandAsync(command, "ConnectTeams");
+                TeamsConnected = result.HasSuccessMarker;
+
+                string? tenantId = null;
+                string? tenantName = null;
+
+                if (TeamsConnected)
+                {
+                    _loggingService.Log("Connected to Microsoft Teams successfully", LogLevel.Success);
+
+                    foreach (var line in (result.Value ?? string.Empty).Split('\n'))
+                    {
+                        if (line.Contains("Connected to tenant:"))
+                        {
+                            var parts = line.Split(':')[1].Trim().Split('(');
+                            if (parts.Length >= 2)
+                            {
+                                tenantName = parts[0].Trim();
+                                tenantId = parts[1].Trim(')').Trim();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    _loggingService.Log($"Error connecting to Microsoft Teams: {result.Value}", LogLevel.Error);
+                }
+
+                _sessionManager.UpdateTeamsConnection(TeamsConnected);
+                if (tenantId != null && tenantName != null)
+                {
+                    _sessionManager.UpdateTenantInfo(tenantId, tenantName);
+                }
+
+                UpdateCanProceed();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Error connecting to Microsoft Teams: {ex.Message}", LogLevel.Error);
+                TeamsConnected = false;
+                _sessionManager.UpdateTeamsConnection(false);
+                UpdateCanProceed();
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task ConnectGraphAsync()
+        {
+            try
+            {
+                if (!ModulesChecked)
+                {
+                    _loggingService.Log("Please check modules first", LogLevel.Warning);
+                    return;
+                }
+
+                IsBusy = true;
+                _loggingService.Log("Authenticating to Microsoft Graph...", LogLevel.Info);
+
+                // Step 1: Authenticate using MSAL (opens browser popup)
+                var authResult = await _msalAuthService.AuthenticateAsync();
+
+                if (!authResult.Success || string.IsNullOrEmpty(authResult.AccessToken))
+                {
+                    _loggingService.Log($"Authentication failed: {authResult.ErrorMessage}", LogLevel.Error);
+                    GraphConnected = false;
+                    _sessionManager.UpdateGraphConnection(false);
+                    UpdateCanProceed();
+                    return;
+                }
+
+                _loggingService.Log("Authentication successful, connecting PowerShell to Microsoft Graph...", LogLevel.Info);
+
+                // Step 2: Pass the token securely via environment variable (not embedded in script)
+                // This prevents the token from appearing in logs or error messages
+                var command = _powerShellCommandService.GetConnectGraphWithTokenCommand(authResult.AccessToken);
+                var envVars = new Dictionary<string, string>
+                {
+                    { "TEAMS_PM_TOKEN", authResult.AccessToken }
+                };
+                var result = await ExecutePowerShellCommandAsync(command, envVars, "ConnectGraph");
+                GraphConnected = result.HasSuccessMarker;
+
+                string? account = authResult.Account;
+
+                if (GraphConnected)
+                {
+                    _loggingService.Log($"Connected to Microsoft Graph successfully as {account}", LogLevel.Success);
+                }
+                else
+                {
+                    _loggingService.Log($"Error connecting to Microsoft Graph: {result.Value}", LogLevel.Error);
+                }
+
+                _sessionManager.UpdateGraphConnection(GraphConnected, account);
+                UpdateCanProceed();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Error connecting to Microsoft Graph: {ex.Message}", LogLevel.Error);
+                GraphConnected = false;
+                _sessionManager.UpdateGraphConnection(false);
+                UpdateCanProceed();
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task DisconnectTeamsAsync()
+        {
+            try
+            {
+                IsBusy = true;
+                _loggingService.Log("Disconnecting from Microsoft Teams...", LogLevel.Info);
+
+                var command = _powerShellCommandService.GetDisconnectTeamsCommand();
+                var result = await ExecutePowerShellCommandAsync(command, "DisconnectTeams");
+                TeamsConnected = false;
+                _sessionManager.UpdateTeamsConnection(false);
+                _loggingService.Log("Disconnected from Microsoft Teams", LogLevel.Info);
+                UpdateCanProceed();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Error disconnecting from Microsoft Teams: {ex.Message}", LogLevel.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task DisconnectGraphAsync()
+        {
+            try
+            {
+                IsBusy = true;
+                _loggingService.Log("Disconnecting from Microsoft Graph...", LogLevel.Info);
+
+                // Sign out from MSAL to clear cached tokens
+                await _msalAuthService.SignOutAsync();
+
+                var command = _powerShellCommandService.GetDisconnectGraphCommand();
+                var result = await ExecutePowerShellCommandAsync(command, "DisconnectGraph");
+                GraphConnected = false;
+                _sessionManager.UpdateGraphConnection(false);
+                _loggingService.Log("Disconnected from Microsoft Graph", LogLevel.Info);
+                UpdateCanProceed();
+            }
+            catch (Exception ex)
+            {
+                _loggingService.Log($"Error disconnecting from Microsoft Graph: {ex.Message}", LogLevel.Error);
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private void UpdateCanProceed()
+        {
+            CanProceed = ModulesChecked && TeamsConnected && GraphConnected;
+        }
+
+        partial void OnModulesCheckedChanged(bool value)
+        {
+            UpdateCanProceed();
+            OnPropertyChanged(nameof(CanConnectTeams));
+            OnPropertyChanged(nameof(CanConnectGraph));
+            OnPropertyChanged(nameof(ModulesStatusText));
+        }
+
+        partial void OnTeamsConnectedChanged(bool value)
+        {
+            UpdateCanProceed();
+            OnPropertyChanged(nameof(CanConnectTeams));
+            OnPropertyChanged(nameof(TeamsStatusText));
+        }
+
+        partial void OnGraphConnectedChanged(bool value)
+        {
+            UpdateCanProceed();
+            OnPropertyChanged(nameof(CanConnectGraph));
+            OnPropertyChanged(nameof(GraphStatusText));
+        }
+    }
+}

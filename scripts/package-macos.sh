@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Assemble an ad-hoc-signed "Teams Phone Manager.app" from a dotnet publish output.
+# Assemble an ad-hoc-signed "PhoneDesk.app" from a dotnet publish output.
 #
 # Usage: ./Scripts/package-macos.sh <publish-dir> <version> <output-dir>
 #   e.g. ./Scripts/package-macos.sh ./publish/osx-arm64 3.17.0 ./artifacts
 #
-# Produces: <output-dir>/Teams Phone Manager.app  (signed, ready to ditto-zip)
+# Produces: <output-dir>/PhoneDesk.app  (signed, ready to ditto-zip)
 
 set -euo pipefail
 
@@ -13,7 +13,7 @@ VERSION="${2:?version required}"
 OUTPUT_DIR="${3:?output dir required}"
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-APP_NAME="Teams Phone Manager"
+APP_NAME="PhoneDesk"
 BUNDLE_ID="ch.realgar.teams-phonemanager"
 APP="$OUTPUT_DIR/$APP_NAME.app"
 
@@ -28,11 +28,11 @@ APP="$OUTPUT_DIR/$APP_NAME.app"
 # refuses to sign a bundle's main executable in place (it would attempt to
 # seal the bundle and reject the .NET managed-dll layout as nested code).
 SIGN_IDENTITY="${SIGN_IDENTITY:-}"
-chmod +x "$PUBLISH_DIR/teams-phonemanager"
+chmod +x "$PUBLISH_DIR/phonedesk"
 find "$PUBLISH_DIR" -type f | while read -r f; do
   if file "$f" | grep -q "Mach-O"; then
     if [ -n "$SIGN_IDENTITY" ]; then
-      if [ "$(basename "$f")" = "teams-phonemanager" ]; then
+      if [ "$(basename "$f")" = "phonedesk" ]; then
         codesign --force --sign "$SIGN_IDENTITY" --identifier "$BUNDLE_ID" \
           ${KEYCHAIN:+--keychain "$KEYCHAIN"} "$f"
       else
@@ -49,7 +49,7 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
 cp -R "$PUBLISH_DIR"/. "$APP/Contents/MacOS/"
-chmod +x "$APP/Contents/MacOS/teams-phonemanager"
+chmod +x "$APP/Contents/MacOS/phonedesk"
 cp "$REPO_ROOT/assets/icon.icns" "$APP/Contents/Resources/icon.icns"
 
 cat > "$APP/Contents/Info.plist" <<PLIST
@@ -68,7 +68,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>CFBundleShortVersionString</key>
     <string>$VERSION</string>
     <key>CFBundleExecutable</key>
-    <string>teams-phonemanager</string>
+    <string>phonedesk</string>
     <key>CFBundleIconFile</key>
     <string>icon.icns</string>
     <key>CFBundlePackageType</key>
@@ -95,6 +95,6 @@ done
 
 if [ -n "$SIGN_IDENTITY" ]; then
   echo "Signed with identity: $SIGN_IDENTITY"
-  codesign -d --requirements - "$APP/Contents/MacOS/teams-phonemanager" 2>&1 | sed -n 's/^designated => /DR: /p'
+  codesign -d --requirements - "$APP/Contents/MacOS/phonedesk" 2>&1 | sed -n 's/^designated => /DR: /p'
 fi
 echo "Packaged: $APP"

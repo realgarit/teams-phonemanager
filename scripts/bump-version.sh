@@ -44,9 +44,9 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$REPO_ROOT"
 
 # Read current version from csproj
-CSPROJ_PATH="$REPO_ROOT/teams-phonemanager.csproj"
+CSPROJ_PATH="$REPO_ROOT/phonedesk.csproj"
 if [ ! -f "$CSPROJ_PATH" ]; then
-    echo "Error: teams-phonemanager.csproj not found"
+    echo "Error: phonedesk.csproj not found"
     exit 1
 fi
 
@@ -94,7 +94,7 @@ sed -i.bak "s/<Version>$CURRENT_VERSION<\/Version>/<Version>$NEW_VERSION_SHORT<\
 sed -i.bak "s/<AssemblyVersion>[0-9.]*<\/AssemblyVersion>/<AssemblyVersion>$NEW_VERSION<\/AssemblyVersion>/g" "$CSPROJ_PATH"
 sed -i.bak "s/<FileVersion>[0-9.]*<\/FileVersion>/<FileVersion>$NEW_VERSION<\/FileVersion>/g" "$CSPROJ_PATH"
 rm -f "$CSPROJ_PATH.bak"
-echo -e "\033[32m✓ Updated teams-phonemanager.csproj\033[0m"
+echo -e "\033[32m✓ Updated phonedesk.csproj\033[0m"
 
 # Update app.manifest (Windows requires 4-part version)
 MANIFEST_PATH="$REPO_ROOT/app.manifest"
@@ -103,7 +103,7 @@ rm -f "$MANIFEST_PATH.bak"
 echo -e "\033[32m✓ Updated app.manifest\033[0m"
 
 # Update ConstantsService.cs (use 3-part version for display)
-CONSTANTS_PATH="$REPO_ROOT/src/TeamsPhoneManager.Domain/ConstantsService.cs"
+CONSTANTS_PATH="$REPO_ROOT/src/PhoneDesk.Domain/ConstantsService.cs"
 sed -i.bak "s/public const string Version = \"Version [0-9.]*\";/public const string Version = \"Version $NEW_VERSION_SHORT\";/g" "$CONSTANTS_PATH"
 rm -f "$CONSTANTS_PATH.bak"
 echo -e "\033[32m✓ Updated ConstantsService.cs\033[0m"

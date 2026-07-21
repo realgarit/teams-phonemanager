@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    PhoneDesk.Application — use cases and ports (Clean Architecture).
+
+    Depends ONLY on Domain. MUST stay free of UI / IO frameworks: no Avalonia, no
+    CommunityToolkit.Mvvm, no System.Management.Automation, no Microsoft.Identity.Client.
+    (BCL types such as System.ComponentModel.INotifyPropertyChanged are allowed.)
+    Enforced by DependencyRuleTests.
+  -->
+  <PropertyGroup>
+    <RootNamespace>PhoneDesk</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PhoneDesk.Domain\PhoneDesk.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
