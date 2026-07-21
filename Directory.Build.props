@@ -6,8 +6,8 @@
     Per-project files override these where needed.
 
     NOTE: Version/AssemblyVersion/FileVersion intentionally stay in the application
-    project (teams-phonemanager.csproj) — CI version extraction and Scripts/bump-version.*
-    grep/sed them there. They move to TeamsPhoneManager.App.csproj in the final stage.
+    project (phonedesk.csproj) — CI version extraction and Scripts/bump-version.*
+    grep/sed them there. They move to PhoneDesk.App.csproj in the final stage.
   -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>

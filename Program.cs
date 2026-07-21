@@ -2,13 +2,13 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using teams_phonemanager.Planning;
-using teams_phonemanager.Services;
-using teams_phonemanager.Services.Interfaces;
-using teams_phonemanager.Services.ScriptBuilders;
-using teams_phonemanager.ViewModels;
+using PhoneDesk.Planning;
+using PhoneDesk.Services;
+using PhoneDesk.Services.Interfaces;
+using PhoneDesk.Services.ScriptBuilders;
+using PhoneDesk.ViewModels;
 
-namespace teams_phonemanager;
+namespace PhoneDesk;
 
 class Program
 {

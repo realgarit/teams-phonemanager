@@ -69,9 +69,9 @@ jobs:
         id: build
         continue-on-error: true
         run: |
-          dotnet restore TeamsPhoneManager.slnx
-          dotnet build TeamsPhoneManager.slnx --configuration Release --no-restore
-          dotnet test teams-phonemanager.Tests/teams-phonemanager.Tests.csproj --configuration Release --no-build 2>&1 | tee "$RUNNER_TEMP/build-output.log"
+          dotnet restore PhoneDesk.slnx
+          dotnet build PhoneDesk.slnx --configuration Release --no-restore
+          dotnet test PhoneDesk.Tests/PhoneDesk.Tests.csproj --configuration Release --no-build 2>&1 | tee "$RUNNER_TEMP/build-output.log"
 
       - name: Open pull request with bumped versions
         if: steps.query.outputs.has_update == 'true' && steps.build.outcome == 'success'

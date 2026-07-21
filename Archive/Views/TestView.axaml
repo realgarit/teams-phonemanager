@@ -1,10 +1,10 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             x:Class="teams_phonemanager.Views.TestView"
+             x:Class="PhoneDesk.Views.TestView"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fi="using:FluentIcons.Avalonia"
-             xmlns:viewmodels="clr-namespace:teams_phonemanager.ViewModels"
+             xmlns:viewmodels="clr-namespace:PhoneDesk.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="1000">
 

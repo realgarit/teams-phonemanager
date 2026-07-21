@@ -3,11 +3,11 @@
   <!-- x-release-please-version -->
   <assemblyIdentity 
     version="3.23.1.0"
-    name="TeamsPhoneManager"
+    name="PhoneDesk"
     processorArchitecture="*"
     type="win32"/>
   
-  <description>Teams Phone Manager - Microsoft Teams administration tool</description>
+  <description>PhoneDesk - Microsoft Teams administration tool</description>
   
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>

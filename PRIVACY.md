@@ -1,12 +1,12 @@
-# Privacy Policy — Teams Phone Manager
+# Privacy Policy — PhoneDesk for Microsoft Teams
 
-**Last updated: 20 July 2026**
+**Last updated: 21 July 2026**
 
-Teams Phone Manager is a desktop application that helps administrators manage Microsoft Teams telephony (call queues, auto attendants, holidays, and related configuration) in their own Microsoft 365 tenant.
+PhoneDesk is a desktop application that helps administrators manage Microsoft Teams telephony (call queues, auto attendants, holidays, and related configuration) in their own Microsoft 365 tenant.
 
 ## The short version
 
-Teams Phone Manager does not collect, store, or transmit any of your data to the developer. There are no analytics, no telemetry, no tracking, and no developer-operated servers. All data the app handles stays between your device and Microsoft's own services.
+PhoneDesk does not collect, store, or transmit any of your data to the developer. There are no analytics, no telemetry, no tracking, and no developer-operated servers. All data the app handles stays between your device and Microsoft's own services.
 
 ## What the app processes, and where it goes
 
@@ -45,4 +45,4 @@ Changes to this policy are published in this document in the app's public reposi
 ## Contact
 
 Questions about this policy: open an issue at
-<https://github.com/realgarit/teams-phonemanager/issues>
+<https://github.com/realgarit/phonedesk/issues>

@@ -4,18 +4,18 @@
   "packages": {
     ".": {
       "release-type": "simple",
-      "package-name": "teams-phonemanager",
+      "package-name": "phonedesk",
       "include-component-in-tag": false,
       "draft": true,
       "force-tag-creation": true,
       "extra-files": [
         {
           "type": "generic",
-          "path": "teams-phonemanager.csproj"
+          "path": "phonedesk.csproj"
         },
         {
           "type": "generic",
-          "path": "src/TeamsPhoneManager.Domain/ConstantsService.cs"
+          "path": "src/PhoneDesk.Domain/ConstantsService.cs"
         },
         {
           "type": "generic",

@@ -6,15 +6,15 @@
 #
 # Usage:  P12_PASSWORD=... Scripts/import-cert.sh <path-to.p12>
 # Env:    P12_PASSWORD (required)
-#         KEYCHAIN          (default teams-phonemanager-signing.keychain-db)
-#         KEYCHAIN_PASSWORD (default teams-phonemanager-build)
+#         KEYCHAIN          (default phonedesk-signing.keychain-db)
+#         KEYCHAIN_PASSWORD (default phonedesk-build)
 #
 set -euo pipefail
 
 P12="${1:?usage: import-cert.sh <path-to.p12>}"
 : "${P12_PASSWORD:?set P12_PASSWORD}"
-KC="${KEYCHAIN:-teams-phonemanager-signing.keychain-db}"
-KCPASS="${KEYCHAIN_PASSWORD:-teams-phonemanager-build}"
+KC="${KEYCHAIN:-phonedesk-signing.keychain-db}"
+KCPASS="${KEYCHAIN_PASSWORD:-phonedesk-build}"
 
 security create-keychain -p "$KCPASS" "$KC" 2>/dev/null || true
 security set-keychain-settings "$KC"                 # no auto-lock timeout
