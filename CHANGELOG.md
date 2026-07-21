@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.23.1](https://github.com/realgarit/teams-phonemanager/compare/v3.23.0...v3.23.1) (2026-07-21)
+
+
+### Bug Fixes
+
+* make responses API authentication configurable ([dedfb24](https://github.com/realgarit/teams-phonemanager/commit/dedfb24d1541bcbd860bb6bb7561b7e16205e3ca))
+* repair responses API review provider ([5a3662e](https://github.com/realgarit/teams-phonemanager/commit/5a3662ea5ef2e19bf869ed5e8f44951e87a86618))
+* resolve vulnerable cryptography dependency ([0aff78d](https://github.com/realgarit/teams-phonemanager/commit/0aff78d940435e4e00a7c8469f3092770290951a))
+
 ## [3.23.0](https://github.com/realgarit/teams-phonemanager/compare/v3.22.3...v3.23.0) (2026-07-20)
 
 
