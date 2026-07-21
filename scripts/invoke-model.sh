@@ -10,8 +10,8 @@
 #   codex           OpenAI Codex CLI (npm @openai/codex, subscription auth)
 #   deepseek        DeepSeek API (OpenAI-compatible endpoint)
 #   moonshot        Moonshot/Kimi API (OpenAI-compatible endpoint)
-#   openai-compat   Generic OpenAI-compatible endpoint (bring your own base URL, /chat/completions)
-#   openai-responses  OpenAI-compatible responses API (bring your own base URL, /responses)
+#   openai-compat   Generic OpenAI-compatible endpoint (bring your own base URL)
+#   openai-responses  OpenAI-compatible Responses API (bring your own base URL)
 #
 # Reads prompt from stdin, writes review to stdout, errors to stderr.
 # Exit code reflects the underlying command's exit code.
@@ -149,11 +149,8 @@ invoke_openai_compat() {
     -d "$payload" | jq -r '.choices[0].message.content // empty'
 }
 
-# --- Provider: openai-responses (OpenAI-compatible responses API) ---
+# --- Provider: openai-responses (OpenAI-compatible Responses API) ---
 invoke_openai_responses() {
-  # Uses the /responses endpoint (not /chat/completions). Reads
-  # OPENAI_RESPONSES_BASE_URL, OPENAI_RESPONSES_API_KEY, and
-  # OPENAI_RESPONSES_MODEL from env.
   : "${OPENAI_RESPONSES_BASE_URL:?OPENAI_RESPONSES_BASE_URL is required for the openai-responses provider}"
   : "${OPENAI_RESPONSES_API_KEY:?OPENAI_RESPONSES_API_KEY is required for the openai-responses provider}"
   local model="${OPENAI_RESPONSES_MODEL:-gpt-5.6-sol}"
@@ -163,18 +160,53 @@ invoke_openai_responses() {
   local payload
   payload=$(jq -n \
     --arg model "$model" \
-    --arg content "$prompt" \
+    --arg input "$prompt" \
     '{
       model: $model,
-      input: $content,
-      temperature: 0.3,
+      input: $input,
       max_output_tokens: 4096
     }')
 
-  curl -sf -X POST "${OPENAI_RESPONSES_BASE_URL%/}/responses" \
-      -H "api-key: ${OPENAI_RESPONSES_API_KEY}" \
+  local response_file
+  response_file=$(mktemp)
+  local http_status
+  local curl_status=0
+  http_status=$(curl --silent -X POST "${OPENAI_RESPONSES_BASE_URL%/}/responses" \
+    -H "api-key: ${OPENAI_RESPONSES_API_KEY}" \
     -H "Content-Type: application/json" \
-      -d "$payload" | jq -r '.output_text // .output[0].content[0].text // empty'
+    -d "$payload" \
+    --output "$response_file" \
+    --write-out '%{http_code}') || curl_status=$?
+
+  if ((curl_status != 0)); then
+    rm -f "$response_file"
+    echo "Responses API request failed during transport." >&2
+    return 1
+  fi
+
+  if [[ ! "$http_status" =~ ^2[0-9][0-9]$ ]]; then
+    rm -f "$response_file"
+    echo "Responses API request failed with HTTP status ${http_status}." >&2
+    return 1
+  fi
+
+  local output
+  if ! output=$(jq -er '
+    (
+      .output_text? //
+      ([.output[]?.content[]? | select(.type? == "output_text") | .text?]
+        | map(select(type == "string"))
+        | join("\n"))
+    )
+    | select(type == "string" and length > 0)
+  ' "$response_file"); then
+    rm -f "$response_file"
+    echo "Responses API returned no text output." >&2
+    return 1
+  fi
+
+  rm -f "$response_file"
+  printf '%s\n' "$output"
 }
 
 # --- Dispatch ---

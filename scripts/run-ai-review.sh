@@ -37,9 +37,9 @@ if [ ! -s ai-review.txt ]; then
   {
     printf "AI review step failed (exit %d)." "$MODEL_EXIT"
     if [ -s ai-review-stderr.txt ]; then
-      printf "\n\n```\n"
+      printf '\n\n```\n'
       cat ai-review-stderr.txt
-      printf "\n```\n"
+      printf '\n```\n'
     fi
     printf "\nCheck the [repo secrets](https://github.com/%s/settings/secrets/actions) are configured for your chosen model (AI_MODEL=%s).\n" \
       "${GITHUB_REPOSITORY:-OWNER/REPO}" "${AI_MODEL:-claude}"
