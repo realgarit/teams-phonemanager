@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.24.0](https://github.com/realgarit/phonedesk/compare/v3.23.1...v3.24.0) (2026-07-21)
+
+
+### Features
+
+* rebrand to PhoneDesk ([3ecd19e](https://github.com/realgarit/phonedesk/commit/3ecd19ed661f5181d0260a0704bdcd9fabd5a2e8))
+* rebrand to PhoneDesk ([7ae6976](https://github.com/realgarit/phonedesk/commit/7ae69768ce2729ed792a47c5bfd3525d2c99a518))
+
 ## [3.23.1](https://github.com/realgarit/teams-phonemanager/compare/v3.23.0...v3.23.1) (2026-07-21)
 
 
