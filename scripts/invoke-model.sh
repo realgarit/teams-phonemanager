@@ -10,8 +10,7 @@
 #   codex           OpenAI Codex CLI (npm @openai/codex, subscription auth)
 #   deepseek        DeepSeek API (OpenAI-compatible endpoint)
 #   moonshot        Moonshot/Kimi API (OpenAI-compatible endpoint)
-#   openai-compat   Generic OpenAI-compatible endpoint (bring your own base URL, /chat/completions)
-#   openai-responses  OpenAI-compatible responses API (bring your own base URL, /responses)
+#   openai-compat   Generic OpenAI-compatible endpoint (bring your own base URL)
 #
 # Reads prompt from stdin, writes review to stdout, errors to stderr.
 # Exit code reflects the underlying command's exit code.
@@ -149,34 +148,6 @@ invoke_openai_compat() {
     -d "$payload" | jq -r '.choices[0].message.content // empty'
 }
 
-# --- Provider: openai-responses (OpenAI-compatible responses API) ---
-invoke_openai_responses() {
-  # Uses the /responses endpoint (not /chat/completions). Reads
-  # OPENAI_RESPONSES_BASE_URL, OPENAI_RESPONSES_API_KEY, and
-  # OPENAI_RESPONSES_MODEL from env.
-  : "${OPENAI_RESPONSES_BASE_URL:?OPENAI_RESPONSES_BASE_URL is required for the openai-responses provider}"
-  : "${OPENAI_RESPONSES_API_KEY:?OPENAI_RESPONSES_API_KEY is required for the openai-responses provider}"
-  local model="${OPENAI_RESPONSES_MODEL:-gpt-5.6-sol}"
-  local prompt
-  prompt=$(cat)
-
-  local payload
-  payload=$(jq -n \
-    --arg model "$model" \
-    --arg content "$prompt" \
-    '{
-      model: $model,
-      input: $content,
-      temperature: 0.3,
-      max_output_tokens: 4096
-    }')
-
-  curl -sf -X POST "${OPENAI_RESPONSES_BASE_URL%/}/responses" \
-    -H "Authorization: ******" \
-    -H "Content-Type: application/json" \
-    -d "$payload" | jq -r '.output[0].content[0].text // empty'
-}
-
 # --- Dispatch ---
 case "$AI_MODEL" in
   claude)
@@ -197,11 +168,8 @@ case "$AI_MODEL" in
   openai-compat)
     invoke_openai_compat
     ;;
-  openai-responses)
-    invoke_openai_responses
-    ;;
   *)
-    echo "Unknown AI_MODEL: $AI_MODEL. Supported: claude, openai, codex, deepseek, moonshot, openai-compat, openai-responses" >&2
+    echo "Unknown AI_MODEL: $AI_MODEL. Supported: claude, openai, codex, deepseek, moonshot, openai-compat" >&2
     exit 1
     ;;
 esac
