@@ -24,7 +24,7 @@
     <PackageReference Include="System.Management.Automation" Version="7.6.0" />
     <PackageReference Include="Microsoft.Identity.Client" Version="4.83.3" />
     <!-- Transitive dependency override to resolve a known vulnerability pulled via PowerShell.SDK -->
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.6" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
   </ItemGroup>
 
 </Project>

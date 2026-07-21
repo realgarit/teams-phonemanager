@@ -15,7 +15,7 @@ jobs:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     env:
-      AI_MODEL: ${{ vars.AI_MODEL || 'claude' }}
+      AI_MODEL: ${{ vars.AI_MODEL || 'openai-responses' }}
     permissions:
       contents: read
       pull-requests: write
@@ -54,6 +54,10 @@ jobs:
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
           DEEPSEEK_MODEL: ${{ vars.DEEPSEEK_MODEL }}
           MOONSHOT_MODEL: ${{ vars.MOONSHOT_MODEL }}
+          OPENAI_RESPONSES_BASE_URL: ${{ secrets.OPENAI_RESPONSES_BASE_URL }}
+          OPENAI_RESPONSES_API_KEY: ${{ secrets.OPENAI_RESPONSES_API_KEY }}
+          OPENAI_RESPONSES_MODEL: ${{ vars.OPENAI_RESPONSES_MODEL }}
+          OPENAI_RESPONSES_AUTH_MODE: api-key
         run: bash scripts/run-ai-review.sh
 
       - name: Format combined comment

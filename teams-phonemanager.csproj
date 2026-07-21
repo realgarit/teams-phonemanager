@@ -5,9 +5,9 @@
          EnableNETAnalyzers and AnalysisLevel are inherited from Directory.Build.props. -->
     <OutputType>WinExe</OutputType>
     <RootNamespace>teams_phonemanager</RootNamespace>
-    <Version>3.23.0</Version> <!-- x-release-please-version -->
-    <AssemblyVersion>3.23.0.0</AssemblyVersion> <!-- x-release-please-version -->
-    <FileVersion>3.23.0.0</FileVersion> <!-- x-release-please-version -->
+    <Version>3.23.1</Version> <!-- x-release-please-version -->
+    <AssemblyVersion>3.23.1.0</AssemblyVersion> <!-- x-release-please-version -->
+    <FileVersion>3.23.1.0</FileVersion> <!-- x-release-please-version -->
     
     <!-- Publish Settings for Framework-Dependent Deployment -->
     <PublishSingleFile>false</PublishSingleFile>
@@ -42,7 +42,7 @@
     <PackageReference Include="System.IO.Packaging" Version="10.0.6" />
     <PackageReference Include="System.Management.Automation" Version="7.6.0" />
     <!-- Transitive dependency overrides to resolve known vulnerabilities -->
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.6" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
     <PackageReference Include="Tmds.DBus.Protocol" Version="0.92.0" />
   </ItemGroup>
 
