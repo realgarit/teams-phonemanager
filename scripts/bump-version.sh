@@ -91,8 +91,8 @@ echo -e "\033[32mNew version: $NEW_VERSION_SHORT (Win: $NEW_VERSION)\033[0m"
 
 # Update csproj file
 sed -i.bak "s/<Version>$CURRENT_VERSION<\/Version>/<Version>$NEW_VERSION_SHORT<\/Version>/g" "$CSPROJ_PATH"
-sed -i.bak "s/<AssemblyVersion>$CURRENT_VERSION<\/AssemblyVersion>/<AssemblyVersion>$NEW_VERSION_SHORT<\/AssemblyVersion>/g" "$CSPROJ_PATH"
-sed -i.bak "s/<FileVersion>$CURRENT_VERSION<\/FileVersion>/<FileVersion>$NEW_VERSION_SHORT<\/FileVersion>/g" "$CSPROJ_PATH"
+sed -i.bak "s/<AssemblyVersion>[0-9.]*<\/AssemblyVersion>/<AssemblyVersion>$NEW_VERSION<\/AssemblyVersion>/g" "$CSPROJ_PATH"
+sed -i.bak "s/<FileVersion>[0-9.]*<\/FileVersion>/<FileVersion>$NEW_VERSION<\/FileVersion>/g" "$CSPROJ_PATH"
 rm -f "$CSPROJ_PATH.bak"
 echo -e "\033[32m✓ Updated teams-phonemanager.csproj\033[0m"
 
