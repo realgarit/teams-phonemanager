@@ -80,6 +80,8 @@ Always: **branch → commit → push + open PR → CI green → merge (merge com
 
 ## Working notes
 
+- 2026-10-12 - Aligned all Avalonia 11 packages to 11.3.22 for the dependency wave. FluentIcons.Avalonia remains at the compatible 1.1.223: the proposed 1.3.316 targets pre-0.11 Avalonia, while 2.1.344 requires Avalonia 12. Local Release tests: 662 unit and 29 integration passed. Avalonia 12 requires a separate migration.
+
 - 2026-10-08: Dependabot alerts/security updates are enabled. Version updates run
   weekly on Monday at 06:00 Europe/Zurich for the manifests in .github/dependabot.yml.
   Minor/patch updates are grouped, majors stay separate, and merging remains review-driven.
