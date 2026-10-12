@@ -27,6 +27,14 @@ updates:
     default-days: 7
 - package-ecosystem: nuget
   directory: /
+  # Accepted Avalonia 11 compatibility limit: realgarit/phonedesk#203.
+  ignore:
+  - dependency-name: "Avalonia*"
+    versions: ["[12.0.0,)"]
+  - dependency-name: "FluentAvaloniaUI"
+    versions: ["[3.0.0,)"]
+  - dependency-name: "FluentIcons.Avalonia"
+    versions: ["(1.1.223,)"]
   schedule:
     interval: weekly
     day: monday

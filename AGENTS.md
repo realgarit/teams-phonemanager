@@ -80,6 +80,8 @@ Always: **branch → commit → push + open PR → CI green → merge (merge com
 
 ## Working notes
 
+- 2026-10-12 - Operator accepted Avalonia 11 as the compatibility boundary for #203. Explicit NuGet upper bounds and Dependabot exclusions enforce it; docs/dependency-limits.md records the verified failures and the conditions for a future migration.
+
 - 2026-10-12 - Release 3.29.3 includes the compatible dependency wave from #201. Keep the release-please manifest aligned with version.txt, composition-root version, Windows manifest and displayed ConstantsService version. Dependency validation passed 691 local tests and all four platform PR jobs.
 
 - 2026-10-12 - Aligned all Avalonia 11 packages to 11.3.22 for the dependency wave. FluentIcons.Avalonia remains at the compatible 1.1.223: the proposed 1.3.316 targets pre-0.11 Avalonia, while 2.1.344 requires Avalonia 12. Local Release tests: 662 unit and 29 integration passed. Avalonia 12 requires a separate migration.
