@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.29.4](https://github.com/realgarit/phonedesk/compare/v3.29.3...v3.29.4) (2026-10-13)
+
+
+### Bug Fixes
+
+* anchor module release after the latest published version ([c8ad17b](https://github.com/realgarit/phonedesk/commit/c8ad17b0dc11289dba4a371d7cd91119836466df))
+* anchor module release after the latest published version ([c8ad17b](https://github.com/realgarit/phonedesk/commit/c8ad17b0dc11289dba4a371d7cd91119836466df))
+* anchor module release after the latest published version ([748c302](https://github.com/realgarit/phonedesk/commit/748c3025e293b6cadc9422c2c35d875f299d676d))
+* **deps:** update bundled Teams and Graph modules for 3.29.4 ([dac01a2](https://github.com/realgarit/phonedesk/commit/dac01a242d9acd3223cc79adb37c18a46558e660))
+* **deps:** update bundled Teams and Graph modules for 3.29.4 ([dac01a2](https://github.com/realgarit/phonedesk/commit/dac01a242d9acd3223cc79adb37c18a46558e660))
+* **deps:** update bundled Teams and Graph modules for 3.29.4 ([eb6f84b](https://github.com/realgarit/phonedesk/commit/eb6f84bb36f6c722c707f89aebc52df46e04b533))
+
 ## [3.29.3](https://github.com/realgarit/phonedesk/compare/v3.29.2...v3.29.3) (2026-10-12)
 
 
