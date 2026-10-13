@@ -42,7 +42,7 @@ README screenshots at `docs/screenshots/` (2560×1496 = 1280×720 @2x + syntheti
 
 Release-please repeatedly created v4.0.0 PRs because old squashed commit `0406e3d` contained `BREAKING CHANGE: ViewModel constructors now require ISharedStateService and IDialogService parameters`.
 
-**Permanent fix**: `last-release-sha` in `release-please-config.json` anchors release-please to only scan commits after the specified SHA. The value points to the v3.21.5 release commit — any BREAKING CHANGE footers before it are ignored.
+**Recovery boundary**: `last-release-sha` is a temporary recovery override, not a permanent anchor. Release 3.29.4 removes the override after recovering from old Release-As footers. Normal release discovery must follow the latest published release so old commits cannot generate phantom releases.
 
 **Do NOT reintroduce `BREAKING CHANGE:` footers unless you actually intend a major bump.**
 
@@ -136,3 +136,5 @@ Always: **branch → commit → push + open PR → CI green → merge (merge com
 - 2026-10-13: Consolidated module PRs #192/#194/#195/#202 at MicrosoftTeams 8.0.0 and Graph 2.41.1. Local Release tests pass (662 unit, 29 integration). Release sources and release-please manifest align at 3.29.4. Frozen scripts/auth behavior is unchanged; tenant sign-in is not covered by these tests.
 
 - 2026-10-13: Release Please must anchor after the last published release (v3.29.3 at eaae8e83), not the obsolete 3.21.5-era SHA: old Release-As footers otherwise recreate 3.27.2. The manifest tracks the last released version until the generated release PR advances it; manually advancing it in a dependency PR does not publish a release. Version files already target 3.29.4; let the repaired generated PR record that release.
+
+- 2026-10-13: The generated 3.29.4 release PR removes the temporary last-release-sha recovery override in the release commit itself. Subsequent runs discover the new published release boundary, rather than replaying already released fixes. This supersedes the old permanent-anchor guidance.
