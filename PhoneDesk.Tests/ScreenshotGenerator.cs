@@ -81,6 +81,26 @@ namespace PhoneDesk.Tests
             new("GetStarted", true, "get-started-connections-en.png", "ready-connections-en"),
             new("GetStarted", true, "get-started-connections-de.png", "ready-connections-de"),
             new("GetStarted", true, "get-started-ready-de.png", "ready-de"),
+            new("Variables", true, "holiday-audit-empty-en.png", "holiday-audit-empty-en"),
+            new("Variables", true, "holiday-audit-empty-de.png", "holiday-audit-empty-de"),
+            new("Variables", true, "holiday-audit-fr-required-en.png", "holiday-audit-fr-required-en"),
+            new("Variables", true, "holiday-audit-fr-required-de.png", "holiday-audit-fr-required-de"),
+            new("Variables", true, "holiday-audit-fr-catholic-en.png", "holiday-audit-fr-catholic-en"),
+            new("Variables", true, "holiday-audit-fr-catholic-de.png", "holiday-audit-fr-catholic-de"),
+            new("Variables", true, "holiday-audit-fr-reformed-en.png", "holiday-audit-fr-reformed-en"),
+            new("Variables", true, "holiday-audit-fr-reformed-de.png", "holiday-audit-fr-reformed-de"),
+            new("Variables", true, "holiday-audit-so-bucheggberg-en.png", "holiday-audit-so-bucheggberg-en"),
+            new("Variables", true, "holiday-audit-so-bucheggberg-de.png", "holiday-audit-so-bucheggberg-de"),
+            new("Variables", true, "holiday-audit-so-other-en.png", "holiday-audit-so-other-en"),
+            new("Variables", true, "holiday-audit-so-other-de.png", "holiday-audit-so-other-de"),
+            new("Variables", true, "holiday-audit-ti-en.png", "holiday-audit-ti-en"),
+            new("Variables", true, "holiday-audit-ti-de.png", "holiday-audit-ti-de"),
+            new("Variables", true, "holiday-audit-ge-en.png", "holiday-audit-ge-en"),
+            new("Variables", true, "holiday-audit-ge-de.png", "holiday-audit-ge-de"),
+            new("Variables", true, "holiday-audit-ag-open-en.png", "holiday-audit-ag-open-en"),
+            new("Variables", true, "holiday-audit-ag-open-de.png", "holiday-audit-ag-open-de"),
+            new("Variables", true, "holiday-audit-manager-en.png", "holiday-audit-manager-en"),
+            new("Variables", true, "holiday-audit-manager-de.png", "holiday-audit-manager-de"),
             new("Variables", true, "variables.png"),
             new("Variables", true, "variables-de.png", "ready-de"),
             new("Variables", true, "config-import-preview-en.png", "issue71-config-import-en"),
@@ -186,7 +206,8 @@ namespace PhoneDesk.Tests
             var kept = new List<string>();
             string? previousPage = null;
 
-            foreach (var shot in Shots)
+            foreach (var shot in Shots.Where(s => string.IsNullOrEmpty(Environment.GetEnvironmentVariable("SCREENSHOT_FILTER"))
+                || s.FileName.StartsWith(Environment.GetEnvironmentVariable("SCREENSHOT_FILTER")!, StringComparison.Ordinal)))
             {
                 if (shot.Scenario.StartsWith("task6-", StringComparison.Ordinal))
                 {
@@ -577,6 +598,38 @@ namespace PhoneDesk.Tests
                         new Dictionary<string, object?> { ["error"] = errorDetails });
                     break;
                     }
+
+                case VariablesViewModel holidaysVariables when scenario.StartsWith("holiday-audit-", StringComparison.Ordinal):
+                    holidaysVariables.OpenPredefinedHolidaysWizardCommand.Execute(null);
+                    holidaysVariables.SelectedYear = 2026;
+                    if (scenario.Contains("-fr-", StringComparison.Ordinal))
+                    {
+                        holidaysVariables.SelectedCanton = "Fribourg";
+                        if (scenario.Contains("-catholic-", StringComparison.Ordinal)) holidaysVariables.SelectedHolidayRegionIndex = 0;
+                        if (scenario.Contains("-reformed-", StringComparison.Ordinal)) holidaysVariables.SelectedHolidayRegionIndex = 1;
+                    }
+                    else if (scenario.Contains("-so-", StringComparison.Ordinal))
+                    {
+                        holidaysVariables.SelectedCanton = "Solothurn";
+                        holidaysVariables.SelectedHolidayRegionIndex = scenario.Contains("-bucheggberg-", StringComparison.Ordinal) ? 0 : 1;
+                    }
+                    else if (scenario.Contains("-ti-", StringComparison.Ordinal) || scenario.Contains("-manager-", StringComparison.Ordinal))
+                        holidaysVariables.SelectedCanton = "Tessin";
+                    else if (scenario.Contains("-ge-", StringComparison.Ordinal))
+                        holidaysVariables.SelectedCanton = "Genf";
+                    else if (scenario.Contains("-ag-open-", StringComparison.Ordinal))
+                    {
+                        holidaysVariables.SelectedCanton = "Aargau";
+                        holidaysVariables.SelectedBezirk = holidaysVariables.Bezirke[3];
+                        PumpRender();
+                        window.GetVisualDescendants().OfType<ComboBox>().Single(c => c.Name == "AargauHolidayRegion").IsDropDownOpen = true;
+                    }
+                    if (scenario.Contains("-manager-", StringComparison.Ordinal))
+                    {
+                        holidaysVariables.ApplyPredefinedHolidaysCommand.Execute(null);
+                        holidaysVariables.OpenHolidaySeriesManagerCommand.Execute(null);
+                    }
+                    break;
 
                 case VariablesViewModel variables when scenario.StartsWith("issue71-config-import", StringComparison.Ordinal):
                     variables.PendingConfigurationFileName = "contoso-production.json";

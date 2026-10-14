@@ -1174,5 +1174,21 @@
   "DocumentationReportHealthFinding": "  [{severity}] {rule}: {object}",
   "DocumentationReportHealthExplanation": "    Grund: {text}",
   "DocumentationReportHealthRecommendation": "    Korrektur: {text}",
-  "DocumentationReportHealthNoFindings": "  Keine aktiven Feststellungen aus den aktivierten Regeln."
+  "DocumentationReportHealthNoFindings": "  Keine aktiven Feststellungen aus den aktivierten Regeln.",
+  "HolidayCategoryStatutory": "Gesetzlicher Feiertag (Art. 20a ArG)",
+  "HolidayCategoryAdditional": "Zusätzlicher kantonaler Ruhetag · mit Kunde prüfen",
+  "HolidayCategorySunday": "Feiertag an einem Sonntag",
+  "HolidayCategoryCustom": "Kundenspezifisch / nicht eingestuft",
+  "HolidayReviewHint": "Prüfen Sie alle Daten und Schliesszeiten mit dem Kunden. Lokale Bräuche, Betriebsferien und arbeitgeberspezifische Ausnahmen ergänzen Sie separat.",
+  "HolidayRegionRequired": "Wählen Sie die Region des Arbeitsorts für die vollständige gesetzliche Liste.",
+  "HolidayFribourgRegionHint": "Wählen Sie das gesetzliche Feiertagsgebiet des Arbeitsorts, nicht die Konfession des Kunden. Eine Auswahl ist erforderlich.",
+  "HolidayFribourgCatholic": "Katholisches Feiertagsgebiet (alle übrigen Orte)",
+  "HolidayFribourgReformed": "Reformiertes Feiertagsgebiet (aufgeführte Orte)",
+  "HolidayFribourgLocalities": "Reformiertes Gebiet: Courgevaux, Fräschels, Greng, Kerzers, Meyriez, Muntelier, Murten, Ried bei Kerzers, Ulmiz, Mont-Vully sowie die Orte Flamatt und Sensebrügg in Wünnewil-Flamatt. Im übrigen Wünnewil-Flamatt gilt die katholische Liste.",
+  "HolidaySolothurnBucheggberg": "Bezirk Bucheggberg",
+  "HolidaySolothurnOther": "Alle übrigen Bezirke",
+  "HolidaySolothurnHint": "Der 1. Mai beginnt um 12:00 Uhr. Ausserhalb des Bezirks Bucheggberg sind auch Fronleichnam, Mariä Himmelfahrt und Allerheiligen gesetzliche Feiertage.",
+  "HolidayGenevaHint": "Ersatztage für Arbeitgeber ausserhalb des Arbeitsgesetzes werden nicht automatisch ergänzt. Prüfen Sie diese separat mit dem Kunden.",
+  "HolidayIncludeAdditional": "Zusätzliche kantonale Ruhetage einschliessen (anderer Rechtsstatus; mit Kunde prüfen)",
+  "HolidayPreviewTitle": "Vorgeschlagene Daten — vor dem Hinzufügen prüfen"
 }

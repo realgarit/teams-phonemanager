@@ -268,6 +268,8 @@ public sealed class TenantAsCodeService : ITenantAsCodeService
             {
                 throw new InvalidDataException("A holiday end must be later than its start.");
             }
+            if (!Enum.IsDefined(entry.Category))
+                throw new InvalidDataException("The holiday category is invalid.");
         }
     }
 

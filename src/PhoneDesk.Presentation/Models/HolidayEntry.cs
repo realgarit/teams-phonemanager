@@ -1,28 +1,47 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using PhoneDesk.Holidays;
+using System.Text.Json.Serialization;
 
 namespace PhoneDesk.Models
 {
     public partial class HolidayEntry : ObservableObject, IHolidayEntry
     {
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsStatutory))]
+        [NotifyPropertyChangedFor(nameof(IsAdditionalCantonalRestDay))]
+        [NotifyPropertyChangedFor(nameof(IsSundayObservance))]
+        [NotifyPropertyChangedFor(nameof(IsCustom))]
+        private HolidayCategory _category;
+
+        [JsonIgnore] public bool IsStatutory => Category == HolidayCategory.Statutory;
+        [JsonIgnore] public bool IsAdditionalCantonalRestDay => Category == HolidayCategory.AdditionalCantonalRestDay;
+        [JsonIgnore] public bool IsSundayObservance => Category == HolidayCategory.SundayObservance;
+        [JsonIgnore] public bool IsCustom => Category == HolidayCategory.Custom;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DisplayText))]
         private DateTime _date = DateTime.Now;
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DisplayText))]
         private TimeSpan _time = new TimeSpan(9, 0, 0); // Default to 9:00 AM
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DisplayText))]
         private string? _name; // Holiday name for predefined sets
 
         /// <summary>
         /// Optional end date for multi-day holidays. When null, Teams defaults to next day at 12:00 PM.
         /// </summary>
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DisplayText))]
         private DateTime? _endDate;
 
         /// <summary>
         /// Optional end time. Only used when EndDate is set.
         /// </summary>
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DisplayText))]
         private TimeSpan? _endTime;
 
         public HolidayEntry()

@@ -93,7 +93,8 @@ public static class PhoneManagerVariablesPortabilityMapper
                         TimeOnly.FromTimeSpan(entry.Time),
                         entry.Name,
                         entry.EndDate.HasValue ? DateOnly.FromDateTime(entry.EndDate.Value) : null,
-                        entry.EndTime.HasValue ? TimeOnly.FromTimeSpan(entry.EndTime.Value) : null)).ToArray())));
+                        entry.EndTime.HasValue ? TimeOnly.FromTimeSpan(entry.EndTime.Value) : null,
+                        entry.Category)).ToArray())));
     }
 
     public static PhoneManagerVariables FromDocument(ConfigurationDocument document)
@@ -159,7 +160,7 @@ public static class PhoneManagerVariablesPortabilityMapper
                 entry.Time.ToTimeSpan(),
                 entry.Name,
                 entry.EndDate?.ToDateTime(TimeOnly.MinValue),
-                entry.EndTime?.ToTimeSpan()))),
+                entry.EndTime?.ToTimeSpan()) { Category = entry.Category })),
             CqGreetingType = callQueue.GreetingType,
             CqGreetingAudioFileId = callQueue.GreetingAudioFileId,
             CqGreetingTextToSpeechPrompt = callQueue.GreetingTextToSpeechPrompt,
