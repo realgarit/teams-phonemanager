@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.31.0](https://github.com/realgarit/phonedesk/compare/v3.30.0...v3.31.0) (2026-10-14)
+
+
+### Features
+
+* simplify beginner navigation and contextual help ([178d226](https://github.com/realgarit/phonedesk/commit/178d226fb9429c88df38beb5c4c427a9b67f53a7))
+* simplify beginner navigation and contextual help ([545bb45](https://github.com/realgarit/phonedesk/commit/545bb45f5664a76697d5add52fa136c742222264))
+
+
+### Bug Fixes
+
+* highlight the active page when the window opens ([0a9ff43](https://github.com/realgarit/phonedesk/commit/0a9ff43ae38bb8a7c8781fc481c8f57a974ff0be))
+* keep readiness prerequisites visible and support CI parsing ([3b8df52](https://github.com/realgarit/phonedesk/commit/3b8df52bebde7eaac18b8d2a7954e503da1cf330))
+
 ## [3.30.0](https://github.com/realgarit/phonedesk/compare/v3.29.4...v3.30.0) (2026-10-14)
 
 
