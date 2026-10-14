@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.30.0](https://github.com/realgarit/phonedesk/compare/v3.29.4...v3.30.0) (2026-10-14)
+
+
+### Features
+
+* classify Swiss holidays and complete regional calendars ([b4e652f](https://github.com/realgarit/phonedesk/commit/b4e652fda9ebf30a1f48e7e4642fa4002621626f))
+* classify Swiss holidays and complete regional calendars ([8241ece](https://github.com/realgarit/phonedesk/commit/8241ece71a9fa97fb5cdf89932631aa8e1e34b4e))
+
 ## [3.29.4](https://github.com/realgarit/phonedesk/compare/v3.29.3...v3.29.4) (2026-10-13)
 
 
