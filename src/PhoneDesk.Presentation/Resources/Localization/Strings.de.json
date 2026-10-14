@@ -642,7 +642,7 @@
   "GetStartedStatusWaiting": "Wartet",
   "GetStartedSetupGuidanceReady": "Ihre Verbindungen sind bereit. Fahren Sie mit der Konfiguration fort.",
   "GetStartedSetupGuidanceDetailReady": "Ihre Verbindungen sind bereit. Sie können jetzt mit der Kundenkonfiguration beginnen.",
-  "GetStartedSetupGuidanceDetailBlocked": "Schliessen Sie alle drei Prüfungen ab, bevor Sie die geführte Einrichtung ausführen. Das Formular unter Konfiguration können Sie bereits vorbereiten.",
+  "GetStartedSetupGuidanceDetailBlocked": "Schliessen Sie alle drei Prüfungen vor der geführten Einrichtung ab.",
   "GetStartedSetupGuidanceStartModules": "Beginnen Sie mit «Module prüfen».",
   "GetStartedSetupGuidanceConnectTeams": "Die Module sind bereit. Verbinden Sie als Nächstes Microsoft Teams.",
   "GetStartedSetupGuidanceConnectGraph": "Teams ist verbunden. Verbinden Sie als Nächstes Microsoft Graph.",

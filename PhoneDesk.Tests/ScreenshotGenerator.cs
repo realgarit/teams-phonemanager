@@ -457,6 +457,12 @@ namespace PhoneDesk.Tests
             mainWindowViewModel.IsSettingsOpen = false;
             if (scenario.StartsWith("navigation-", StringComparison.Ordinal))
             {
+                if (mainWindowViewModel.CurrentViewModel is GetStartedViewModel readiness)
+                {
+                    var prerequisite = window.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Name == "ReadinessPrerequisite");
+                    Assert.Equal(!readiness.CanProceed, prerequisite.IsVisible);
+                    Assert.Equal(readiness.SetupGuidanceDetail, prerequisite.Text);
+                }
                 if (mainWindowViewModel.CurrentViewModel is VariablesViewModel)
                 {
                     var next = window.GetVisualDescendants().OfType<Button>().Single(b => b.Name == "ContinueToGuidedSetupButton");

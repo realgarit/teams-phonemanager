@@ -665,7 +665,8 @@ namespace PhoneDesk.ViewModels
                     OnPropertyChanged(nameof(AuditLogDirectory));
                 }
             };
-            _translationService?.PropertyChanged += _translationPropertyHandler;
+            if (_translationService != null)
+                _translationService.PropertyChanged += _translationPropertyHandler;
 
             _navigationPropertyHandler = (s, e) =>
             {

@@ -55,7 +55,7 @@ namespace PhoneDesk.ViewModels
                 "Your connections are ready. You can start the customer configuration now.")
             : GetText(
                 UiTextKey.GetStartedSetupGuidanceDetailBlocked,
-                "Complete all three checks before running Guided Setup. You can already prepare the form in Configuration.");
+                "Complete all three checks before Guided Setup.");
 
         public string ModulesActionText => ModulesChecked
             ? GetText(UiTextKey.GetStartedCheckAgainAction, "Check again")

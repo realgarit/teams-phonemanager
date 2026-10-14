@@ -642,7 +642,7 @@
   "GetStartedStatusWaiting": "Waiting",
   "GetStartedSetupGuidanceReady": "Your connections are ready. Continue to Configuration.",
   "GetStartedSetupGuidanceDetailReady": "Your connections are ready. You can start the customer configuration now.",
-  "GetStartedSetupGuidanceDetailBlocked": "Complete all three checks before running Guided Setup. You can already prepare the form in Configuration.",
+  "GetStartedSetupGuidanceDetailBlocked": "Complete all three checks before Guided Setup.",
   "GetStartedSetupGuidanceStartModules": "Start with Check modules.",
   "GetStartedSetupGuidanceConnectTeams": "The modules are ready. Connect to Microsoft Teams next.",
   "GetStartedSetupGuidanceConnectGraph": "Teams is connected. Connect to Microsoft Graph next.",

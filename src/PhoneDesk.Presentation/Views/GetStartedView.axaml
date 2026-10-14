@@ -57,10 +57,10 @@
                     <StackPanel Grid.Column="1" Spacing="4">
                         <TextBlock Text="{loc:Translate Key=GetStartedWhatHappensHereTitle}"
                                    FontWeight="SemiBold"/>
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                            <TextBlock Text="{Binding SetupGuidance}" TextWrapping="Wrap"/>
-                            <controls:InfoButton Grid.Column="1" HelpTitle="{loc:Translate Key=GetStartedWhatHappensHereTitle}" HelpText="{Binding SetupGuidanceDetail}"/>
-                        </Grid>
+                        <TextBlock Text="{Binding SetupGuidance}" TextWrapping="Wrap"/>
+                        <TextBlock Name="ReadinessPrerequisite" Text="{Binding SetupGuidanceDetail}"
+                                   IsVisible="{Binding !CanProceed}" FontSize="12" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
 
                     </StackPanel>
                     <Button Grid.Column="2"
