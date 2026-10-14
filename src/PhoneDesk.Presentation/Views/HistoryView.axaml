@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:fi="using:FluentIcons.Avalonia"
              xmlns:loc="clr-namespace:PhoneDesk.Localization"
+             xmlns:controls="clr-namespace:PhoneDesk.Controls"
              xmlns:viewmodels="clr-namespace:PhoneDesk.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="700" d:DesignWidth="900">
@@ -26,12 +27,13 @@
                             <fi:SymbolIcon Symbol="History"/>
                         </Border>
                         <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center" Margin="14,0,0,0">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
                             <TextBlock Text="{loc:Translate Key=HistoryTitle}"
                                      Classes="page-title"
                                      Margin="0"/>
-                            <TextBlock Text="{loc:Translate Key=HistorySubtitle}"
-                                     TextWrapping="Wrap"
-                                     Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                            <controls:InfoButton Name="PageHelp" HelpTitle="{loc:Translate Key=HistoryTitle}" HelpText="{loc:Translate Key=HistorySubtitle}"/>
+                        </StackPanel>
+
                         </StackPanel>
                     </Grid>
 

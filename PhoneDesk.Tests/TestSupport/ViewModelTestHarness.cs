@@ -122,6 +122,9 @@ namespace PhoneDesk.Tests.TestSupport
 
         private sealed class InMemoryUserPreferencesStore : IUserPreferencesStore
         {
+        public bool LoadIntroductionDismissed() => true;
+        public void SaveIntroductionDismissed() { }
+
             public AppLanguage? LoadLanguage() => null;
 
             public void SaveLanguage(AppLanguage language)

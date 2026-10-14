@@ -68,6 +68,31 @@ public sealed class UserPreferencesStoreTests : IDisposable
 
     private UserPreferencesStore CreateStore() => new(_settingsDirectory);
 
+    [Fact]
+    public void IntroductionDismissalSurvivesLanguageChangesAndNewStoreInstances()
+    {
+        var store = CreateStore();
+        Assert.False(store.LoadIntroductionDismissed());
+        store.SaveLanguage(AppLanguage.German);
+        store.SaveIntroductionDismissed();
+        Assert.Equal(AppLanguage.German, CreateStore().LoadLanguage());
+        Assert.True(CreateStore().LoadIntroductionDismissed());
+        store.SaveLanguage(AppLanguage.English);
+        Assert.True(CreateStore().LoadIntroductionDismissed());
+        Assert.Equal(AppLanguage.English, CreateStore().LoadLanguage());
+    }
+
+    [Fact]
+    public void LegacyLanguageOnlySettingsStillOfferIntroductionOnce()
+    {
+        Directory.CreateDirectory(_settingsDirectory);
+        File.WriteAllText(Path.Combine(_settingsDirectory, "settings.json"), """{"language":"German"}""");
+        Assert.False(CreateStore().LoadIntroductionDismissed());
+        CreateStore().SaveIntroductionDismissed();
+        Assert.Equal(AppLanguage.German, CreateStore().LoadLanguage());
+        Assert.True(CreateStore().LoadIntroductionDismissed());
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_settingsDirectory))

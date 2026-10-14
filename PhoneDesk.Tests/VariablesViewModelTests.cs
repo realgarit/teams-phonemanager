@@ -10,6 +10,18 @@ namespace PhoneDesk.Tests
 {
     public class VariablesViewModelTests
     {
+        [Fact]
+        public void ContinueToGuidedSetupNavigatesWithoutProvisioning()
+        {
+            var harness = new ViewModelTestHarness();
+            var vm = CreateViewModel(harness);
+            Assert.True(vm.OpenGuidedSetupCommand.CanExecute(null));
+            vm.OpenGuidedSetupCommand.Execute(null);
+            harness.NavigationService.Verify(n => n.NavigateTo("Wizard"), Times.Once);
+            harness.PowerShellContextService.VerifyNoOtherCalls();
+            harness.PowerShellCommandService.VerifyNoOtherCalls();
+        }
+
         private static VariablesViewModel CreateViewModel(ViewModelTestHarness harness)
             => new VariablesViewModel(
                 harness.PowerShellContextService.Object,

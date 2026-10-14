@@ -23,37 +23,38 @@ public sealed class UserPreferencesStore : IUserPreferencesStore
         _settingsFilePath = Path.Combine(settingsDirectory, SettingsFileName);
     }
 
-    public AppLanguage? LoadLanguage()
+    private readonly object _writeLock = new();
+
+    private UserPreferencesDocument ReadDocument()
     {
         try
         {
-            if (!File.Exists(_settingsFilePath))
-            {
-                return null;
-            }
-
             using var stream = File.OpenRead(_settingsFilePath);
-            var settings = JsonSerializer.Deserialize<UserPreferencesDocument>(stream);
-            if (settings?.Language is null)
-            {
-                return null;
-            }
-
-            if (!Enum.TryParse<AppLanguage>(settings.Language, ignoreCase: false, out var language) ||
-                !Enum.IsDefined(language))
-            {
-                return null;
-            }
-
-            return language;
+            return JsonSerializer.Deserialize<UserPreferencesDocument>(stream) ?? new();
         }
-        catch
-        {
-            return null;
-        }
+        catch { return new(); }
+    }
+
+    public AppLanguage? LoadLanguage()
+    {
+        var value = ReadDocument().Language;
+        return Enum.TryParse<AppLanguage>(value, ignoreCase: false, out var language) && Enum.IsDefined(language)
+            ? language : null;
+    }
+
+    public bool LoadIntroductionDismissed() => ReadDocument().IntroductionDismissed;
+
+    public void SaveIntroductionDismissed()
+    {
+        lock (_writeLock) SaveDocument(ReadDocument() with { IntroductionDismissed = true });
     }
 
     public void SaveLanguage(AppLanguage language)
+    {
+        lock (_writeLock) SaveDocument(ReadDocument() with { Language = language.ToString() });
+    }
+
+    private void SaveDocument(UserPreferencesDocument document)
     {
         var settingsDirectory = Path.GetDirectoryName(_settingsFilePath);
         if (string.IsNullOrWhiteSpace(settingsDirectory))
@@ -67,10 +68,7 @@ public sealed class UserPreferencesStore : IUserPreferencesStore
         {
             Directory.CreateDirectory(settingsDirectory);
 
-            var json = JsonSerializer.Serialize(new UserPreferencesDocument
-            {
-                Language = language.ToString()
-            });
+            var json = JsonSerializer.Serialize(document);
 
             using (var stream = new FileStream(temporaryFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
             using (var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false)))
@@ -100,9 +98,12 @@ public sealed class UserPreferencesStore : IUserPreferencesStore
         }
     }
 
-    private sealed class UserPreferencesDocument
+    private sealed record UserPreferencesDocument
     {
         [JsonPropertyName("language")]
         public string? Language { get; init; }
+
+        [JsonPropertyName("introductionDismissed")]
+        public bool IntroductionDismissed { get; init; }
     }
 }

@@ -4,6 +4,17 @@ namespace PhoneDesk.Tests;
 
 public sealed class LocalizationGuardTests
 {
+    [Theory]
+    [InlineData("HelpTitle")]
+    [InlineData("HelpText")]
+    public void InfoButtonHelpMustUseTheTranslationCatalog(string property)
+    {
+        using var fixture = GuardFixture.Create();
+        fixture.WriteView($"<InfoButton {property}=\"Untranslated help explanation\" />");
+        Assert.Contains(Guard.Scan(fixture.Root), finding =>
+            finding.FilePath.EndsWith("Main.axaml", StringComparison.Ordinal));
+    }
+
     [Fact]
     public void MatchingCatalogsAndApprovedBindingsHaveNoFindings()
     {

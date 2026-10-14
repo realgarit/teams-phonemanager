@@ -78,6 +78,11 @@ public partial class MainWindow : Window
                 vm.CloseSettingsCommand.Execute(null);
                 e.Handled = true;
             }
+            else if (vm.IsIntroductionVisible)
+            {
+                vm.DismissIntroductionCommand.Execute(null);
+                e.Handled = true;
+            }
         }
     }
 

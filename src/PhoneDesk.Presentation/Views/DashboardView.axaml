@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:fi="using:FluentIcons.Avalonia"
              xmlns:loc="clr-namespace:PhoneDesk.Localization"
+             xmlns:controls="clr-namespace:PhoneDesk.Controls"
              xmlns:viewmodels="clr-namespace:PhoneDesk.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="760" d:DesignWidth="1100">
@@ -34,10 +35,11 @@
                         <fi:SymbolIcon Symbol="DataTrending"/>
                     </Border>
                     <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center" Margin="14,0,0,0">
-                        <TextBlock Text="{loc:Translate Key=DashboardTitle}" Classes="page-title" Margin="0"/>
-                        <TextBlock Text="{loc:Translate Key=DashboardSubtitle}"
-                                   TextWrapping="Wrap"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="{loc:Translate Key=DashboardTitle}" Classes="page-title" Margin="0"/>
+                            <controls:InfoButton Name="PageHelp" HelpTitle="{loc:Translate Key=DashboardTitle}" HelpText="{loc:Translate Key=DashboardSubtitle}"/>
+                        </StackPanel>
+
                     </StackPanel>
                 </Grid>
 

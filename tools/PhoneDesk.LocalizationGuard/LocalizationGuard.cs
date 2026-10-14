@@ -51,7 +51,7 @@ public static class LocalizationGuard
         """(?:\$?"(?:\\.|[^"\\])*"|@"(?:""|[^"])*")""";
 
     private static readonly Regex RawCSharpUiAssignmentRegex = new(
-        $@"\b(?<sink>Text|Content|Header|Title|Watermark|ToolTip\.Tip|AutomationProperties\.Name|OnContent|OffContent|Message|Description|PrimaryButtonText|SecondaryButtonText|ChromeText)\b\s*=\s*(?<value>{CSharpStringLiteralPattern})",
+        $@"\b(?<sink>Text|Content|Header|Title|HelpTitle|HelpText|Watermark|ToolTip\.Tip|AutomationProperties\.Name|OnContent|OffContent|Message|Description|PrimaryButtonText|SecondaryButtonText|ChromeText)\b\s*=\s*(?<value>{CSharpStringLiteralPattern})",
         RegexOptions.Compiled | RegexOptions.Singleline);
 
     private static readonly Regex RawFilePickerTypeRegex = new(
@@ -72,6 +72,8 @@ public static class LocalizationGuard
         "Content",
         "Header",
         "Title",
+        "HelpTitle",
+        "HelpText",
         "ToolTip.Tip",
         "Watermark",
         "AutomationProperties.Name",

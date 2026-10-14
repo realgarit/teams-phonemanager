@@ -18,6 +18,66 @@ namespace PhoneDesk.ViewModels
     public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         private const int MaxLogEntries = 1000;
+        private readonly IUserPreferencesStore? _userPreferences;
+
+        [ObservableProperty]
+        private bool _isIntroductionVisible;
+
+        public int IntroductionStep => CurrentPage.Replace(" ", "", StringComparison.Ordinal) switch
+        {
+            "GetStarted" => 2, "Variables" => 3, _ => 1
+        };
+        public string IntroductionTitle => GetText(UiTextKey.IntroductionTitle, "Quick tour · {step}/3",
+            new Dictionary<string, object?> { ["step"] = IntroductionStep });
+        public string IntroductionBody => IntroductionStep switch
+        {
+            2 => GetText(UiTextKey.IntroductionReadiness, "Check modules, then connect Teams and Graph. This tour only shows the pages."),
+            3 => GetText(UiTextKey.IntroductionConfiguration, "Plan the customer, call routing, opening hours and holidays here."),
+            _ => GetText(UiTextKey.IntroductionWelcome, "Follow the first four sidebar items to set up a phone system. This tour makes no connections or changes.")
+        };
+        public string IntroductionNextText => IntroductionStep switch
+        {
+            1 => GetText(UiTextKey.IntroductionShowReadiness, "Show readiness"),
+            2 => GetText(UiTextKey.IntroductionShowConfiguration, "Show configuration"),
+            _ => GetText(UiTextKey.IntroductionShowGuidedSetup, "Show guided setup")
+        };
+
+        private void RefreshIntroduction()
+        {
+            OnPropertyChanged(nameof(IntroductionStep));
+            OnPropertyChanged(nameof(IntroductionTitle));
+            OnPropertyChanged(nameof(IntroductionBody));
+            OnPropertyChanged(nameof(IntroductionNextText));
+        }
+
+        [RelayCommand]
+        private void DismissIntroduction()
+        {
+            IsIntroductionVisible = false;
+            _userPreferences?.SaveIntroductionDismissed();
+        }
+
+        [RelayCommand]
+        private void ShowIntroduction()
+        {
+            IsSettingsOpen = false;
+            NavigateTo("Welcome");
+            IsIntroductionVisible = true;
+            RefreshIntroduction();
+        }
+
+        [RelayCommand]
+        private void NextIntroduction()
+        {
+            if (!IsIntroductionVisible) return;
+            if (IntroductionStep >= 3)
+            {
+                DismissIntroduction();
+                NavigateTo("Wizard");
+            }
+            else NavigateTo(IntroductionStep == 1 ? "GetStarted" : "Variables");
+        }
+
         private bool _disposed = false;
         private string? _allLogEntriesTextCache;
         private bool _logCacheDirty = true;
@@ -464,6 +524,9 @@ namespace PhoneDesk.ViewModels
 
         partial void OnCurrentPageChanged(string value)
         {
+            if (IsIntroductionVisible && value.Replace(" ", "", StringComparison.Ordinal) is not ("Welcome" or "GetStarted" or "Variables"))
+                DismissIntroduction();
+            RefreshIntroduction();
             var previousViewModel = CurrentViewModel;
             var nextViewModel = _pageViewModelFactory.Create(value);
             CurrentViewModel = nextViewModel;
@@ -541,10 +604,13 @@ namespace PhoneDesk.ViewModels
             IUpdateInstallerService updateInstallerService,
             IBundledModuleVersionService bundledModuleVersionService,
             IAuditLog? auditLog = null,
-            ITranslationService? translationService = null)
+            ITranslationService? translationService = null,
+            IUserPreferencesStore? userPreferences = null)
             : base(powerShellContextService, powerShellCommandService, loggingService,
                   sessionManager, navigationService, errorHandlingService, validationService, sharedStateService, dialogService, auditLog, translationService)
         {
+            _userPreferences = userPreferences;
+            IsIntroductionVisible = userPreferences != null && !userPreferences.LoadIntroductionDismissed();
             _pageViewModelFactory = pageViewModelFactory;
             _updateCheckService = updateCheckService;
             _updateInstallerService = updateInstallerService;
@@ -592,6 +658,7 @@ namespace PhoneDesk.ViewModels
                         RefreshUpdateBannerMessage();
                     }
 
+                    RefreshIntroduction();
                     OnPropertyChanged(nameof(CurrentLanguage));
                     OnPropertyChanged(nameof(LanguageOptions));
                     OnPropertyChanged(nameof(ConnectionStatusText));

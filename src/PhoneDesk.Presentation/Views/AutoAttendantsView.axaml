@@ -5,6 +5,7 @@
              xmlns:fi="using:FluentIcons.Avalonia"
              xmlns:fic="using:FluentIcons.Common"
              xmlns:loc="clr-namespace:PhoneDesk.Localization"
+             xmlns:controls="clr-namespace:PhoneDesk.Controls"
              xmlns:local="clr-namespace:PhoneDesk.Views"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:viewmodels="clr-namespace:PhoneDesk.ViewModels"
@@ -50,10 +51,11 @@
                         <fi:SymbolIcon Symbol="Bot"/>
                     </Border>
                     <StackPanel Spacing="4" VerticalAlignment="Center">
-                        <TextBlock Text="{loc:Translate Key=MainNavigationAutoAttendants}" Classes="page-title" Margin="0"/>
-                        <TextBlock Text="{loc:Translate Key=AutoAttendantsSubtitle}"
-                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                             TextWrapping="Wrap"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="{loc:Translate Key=MainNavigationAutoAttendants}" Classes="page-title" Margin="0"/>
+                            <controls:InfoButton Name="PageHelp" HelpTitle="{loc:Translate Key=MainNavigationAutoAttendants}" HelpText="{loc:Translate Key=AutoAttendantsSubtitle}"/>
+                        </StackPanel>
+
                     </StackPanel>
                 </StackPanel>
                 </StackPanel>
