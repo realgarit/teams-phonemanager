@@ -269,6 +269,8 @@ namespace PhoneDesk.Tests
                 .FirstOrDefault(l => l.Name == "NavigationListBox")
                 ?? throw new InvalidOperationException("NavigationListBox not found in MainWindow.");
 
+            Assert.Equal("Welcome", (navList.SelectedItem as ListBoxItem)?.Tag);
+
             var kept = new List<string>();
             string? previousPage = null;
 

@@ -25,6 +25,7 @@ public partial class MainWindow : Window
         if (DataContext is ViewModels.MainWindowViewModel vm)
         {
             vm.PropertyChanged += OnViewModelPropertyChanged;
+            SyncNavSelectionToCurrentPage();
         }
     }
 
