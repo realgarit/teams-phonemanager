@@ -7,16 +7,14 @@ using PhoneDesk.Services.Holidays;
 namespace PhoneDesk.Holidays
 {
     /// <summary>
-    /// Framework-free rule engine for Swiss federal + canton-wide statutory holidays.
-    /// Implements the legally audited specification (SwissHolidaysProvider_Final_Legal_Audit):
-    /// every day is backed by an official <see cref="LegalSource"/>, named Sunday holidays are
-    /// kept even when they fall on a weekend, the 1st of August is always emitted, and cantons
-    /// with regional differences (AG, FR, SO) return only the canton-wide intersection flagged
-    /// via <see cref="HolidayResultCompleteness"/>.
+    /// Framework-free Swiss holiday catalog with explicit statutory, additional cantonal rest day
+    /// and Sunday-observance categories. Official sources and regional scope are documented in
+    /// docs/swiss-holidays.md. Unresolved AG/FR/SO regions return a flagged common subset;
+    /// the presentation requires a complete regional choice before adding dates.
     /// </summary>
     public static class SwissHolidayCatalog
     {
-        private static readonly DateOnly VerifiedAt = new DateOnly(2026, 7, 13);
+        private static readonly DateOnly VerifiedAt = new DateOnly(2026, 10, 14);
 
         // ---- Formula map: standard holidays whose date is a pure function of the year. ----
         private static readonly Dictionary<SwissHolidayId, Func<int, DateTime>> Formula = new()
@@ -85,70 +83,64 @@ namespace PhoneDesk.Holidays
         };
 
         // ---- Official source URLs per canton (spec section 4). ----
-        // SECO cantonal overview PDF, used where a canton audit points at the SECO table.
-        private const string SecoOverview =
-            "https://www.seco.admin.ch/dam/de/sd-web/x5LtHPJdNis5/Anhang-Feiertage-Schweiz-Auszug-ArG-ArGV1-5-SECO-SB-2024-DE.pdf";
-
         private static readonly Dictionary<SwissCanton, string> CantonUrl = new()
         {
-            [SwissCanton.AG] = "https://gesetzessammlungen.ag.ch/frontend/texts_of_law",
+            [SwissCanton.AG] = "https://gesetzessammlungen.ag.ch/app/de/texts_of_law/961.200",
             [SwissCanton.AI] = "https://ai.clex.ch/app/de/texts_of_law/822.200",
-            [SwissCanton.AR] = SecoOverview,
+            [SwissCanton.AR] = "https://ar.clex.ch/app/de/texts_of_law/822.11",
             [SwissCanton.BE] = "https://www.belex.sites.be.ch/app/de/texts_of_law/555.1",
             [SwissCanton.BL] = "https://bl.clex.ch/app/de/texts_of_law/547",
-            [SwissCanton.BS] = "https://www.gesetzessammlung.bs.ch/app/de/texts_of_law/811.100/versions/4927",
+            [SwissCanton.BS] = "https://www.gesetzessammlung.bs.ch/app/de/texts_of_law/811.100",
             [SwissCanton.FR] = "https://www.fr.ch/de/arbeit-und-unternehmen/arbeitnehmer/feiertage",
-            [SwissCanton.GE] = "https://www.ge.ch/vacances-scolaires-jours-feries/jours-feries-officiels",
-            [SwissCanton.GL] = "https://gesetze.gl.ch/app/de/texts_of_law/IX%20B%2F21%2F1",
+            [SwissCanton.GE] = "https://silgeneve.ch/legis/data/rsg_j1_45.htm",
+            [SwissCanton.GL] = "https://www.gl.ch/verwaltung/volkswirtschaft-und-inneres/wirtschaft-und-arbeit/arbeit/arbeitsinspektorat/feiertagstagsregelung-sonntagsverkaeufe.html/999",
             [SwissCanton.GR] = "https://www.gr-lex.gr.ch/app/de/texts_of_law/520.100",
-            [SwissCanton.JU] = "https://rsju.jura.ch/fr/viewdocument.html?idn=20105&id=38948",
+            [SwissCanton.JU] = "https://rsju.jura.ch/fr/viewdocument.html?download=1&id=38948&idn=20105",
             [SwissCanton.LU] = "https://srl.lu.ch/app/de/texts_of_law/855",
-            [SwissCanton.NE] = "https://rsn.ne.ch/DATA/program/books/rsne/pdf/94102.pdf",
-            [SwissCanton.NW] = "https://gesetze.nw.ch/api/de/texts_of_law/921.1",
+            [SwissCanton.NE] = "https://www.ne.ch/themes/economie-et-emploi/jours-feries-officiels",
+            [SwissCanton.NW] = "https://gesetze.nw.ch/app/de/texts_of_law/921.1",
             [SwissCanton.OW] = "https://gdb.ow.ch/app/de/texts_of_law/975.2",
             [SwissCanton.SG] = "https://www.gesetzessammlung.sg.ch/app/de/texts_of_law/552.1",
             [SwissCanton.SH] = "https://rechtsbuch.sh.ch/app/de/texts_of_law/900.200",
-            [SwissCanton.SO] = "https://bgs.so.ch/api/de/texts_of_law/512.41",
+            [SwissCanton.SO] = "https://bgs.so.ch/api/de/versions/649/pdf_file",
             [SwissCanton.SZ] = "https://www.sz.ch/public/upload/assets/36693/Feiertagsregelung_Kanton_Schwyz.pdf",
-            [SwissCanton.TG] = "https://www.rechtsbuch.tg.ch/app/de/texts_of_law/822.9",
-            [SwissCanton.TI] = "https://www3.ti.ch/CAN/rl/program/books/rst/htm/10_53.htm",
-            [SwissCanton.UR] = "https://rechtsbuch.ur.ch/app/de/texts_of_law/70.1421",
-            [SwissCanton.VD] = SecoOverview,
-            [SwissCanton.VS] = "https://lex.vs.ch/app/fr/texts_of_law/822.2",
-            [SwissCanton.ZG] = "https://bgs.zg.ch/app/de/texts_of_law/942.31",
+            [SwissCanton.TG] = "https://awa.tg.ch/public/upload/assets/190722/ArZ-Merkblatt_Feier-_und_Ruhetage_2024_-_2026_-_Version_f%C3%BCr_HP.pdf?fp=1",
+            [SwissCanton.TI] = "https://m3.ti.ch/CAN/RLeggi/public/index.php/raccolta-leggi/legge/num/569",
+            [SwissCanton.UR] = "https://www.ur.ch/_docn/404812/%C3%9Cbersicht_Feiertage_Kanton_Uri_gem._ArG_und_LSG.pdf",
+            [SwissCanton.VD] = "https://www.vd.ch/fileadmin/user_upload/themes/economie_emploi/emploi/fichiers_pdf/FAQ-droit_du_travail-DGEM.pdf",
+            [SwissCanton.VS] = "https://lex.vs.ch/app/fr/texts_of_law/822.100",
+            [SwissCanton.ZG] = "https://zg.ch/de/wirtschaft-arbeit/arbeitsbedingungen/arbeits-und-ruhezeiten",
             [SwissCanton.ZH] = "https://www.zh.ch/de/wirtschaft-arbeit/arbeitsbedingungen/arbeitsssicherheit-gesundheitsschutz/arbeits-ruhezeiten/feiertage.html",
         };
 
         private static LegalSource Src(SwissCanton canton)
         {
-            // Thurgau's new Ruhetagsgesetz is in force from 1 January 2026 (spec section 9).
-            DateOnly? validFrom = canton == SwissCanton.TG ? new DateOnly(2026, 1, 1) : null;
-            return new LegalSource(CantonUrl[canton], $"Kanton {canton} – amtliche Rechtsgrundlage", VerifiedAt, validFrom);
+            return new LegalSource(CantonUrl[canton], $"Kanton {canton} – amtliche Rechtsgrundlage", VerifiedAt);
         }
 
         /// <summary>
         /// Computes the holidays for a canton and year. <paramref name="district"/> is only
-        /// meaningful for Aargau; it is ignored elsewhere.
+        /// meaningful for Aargau, Freiburg and Solothurn; it is ignored elsewhere.
         /// </summary>
         public static SwissHolidayResult Compute(SwissCanton canton, string? district, int year)
         {
             var (rules, completeness) = GetRules(canton, district);
 
-            var produced = new List<(DateTime Date, TimeSpan Time, string Name, SwissHolidayId Id)>();
+            var produced = new List<(DateTime Date, TimeSpan Time, string Name, SwissHolidayId Id, HolidayCategory Category)>();
             foreach (var rule in rules)
             {
                 if (rule.Applies != null && !rule.Applies(year))
                     continue;
 
                 foreach (var date in rule.Dates(year))
-                    produced.Add((date, rule.StartTime, rule.DisplayName, rule.Id));
+                    produced.Add((date, rule.StartTime, rule.DisplayName, rule.Id, rule.Category));
             }
 
             // Spec 5.5: the 1st of August is always emitted, regardless of region resolution.
             if (rules.All(r => r.Id != SwissHolidayId.NationalDay))
             {
                 produced.Add((SwissHolidayFormulaEvaluator.SwissNationalDay(year), TimeSpan.Zero,
-                    Names[SwissHolidayId.NationalDay], SwissHolidayId.NationalDay));
+                    Names[SwissHolidayId.NationalDay], SwissHolidayId.NationalDay, HolidayCategory.Statutory));
             }
 
             // Spec 5.10: de-duplicate by (date, id), then sort by date and start time.
@@ -157,7 +149,7 @@ namespace PhoneDesk.Holidays
                 .Select(g => g.First())
                 .OrderBy(h => h.Date)
                 .ThenBy(h => h.Time)
-                .Select(h => new HolidayDate(h.Date, h.Time, h.Name))
+                .Select(h => new HolidayDate(h.Date, h.Time, h.Name, category: h.Category))
                 .ToList();
 
             return new SwissHolidayResult(holidays, completeness);
@@ -182,7 +174,8 @@ namespace PhoneDesk.Holidays
                 Names[id],
                 startTime ?? TimeSpan.Zero,
                 regional,
-                applies);
+                applies,
+                CategoryFor(canton, id));
         }
 
         private static SwissHolidayRule Rule(
@@ -190,19 +183,11 @@ namespace PhoneDesk.Holidays
             SwissHolidayId id,
             Func<int, IEnumerable<DateTime>> dates,
             string? name = null)
-            => new SwissHolidayRule(id, dates, Src(canton), name ?? Names[id]);
+            => new SwissHolidayRule(id, dates, Src(canton), name ?? Names[id], Category: CategoryFor(canton, id));
 
         // ---------------------------------------------------------------------------------
         // Conditional / substitute date generators (spec 5.8)
         // ---------------------------------------------------------------------------------
-
-        /// <summary>The date, plus the following Monday when the date falls on a Sunday.</summary>
-        private static IEnumerable<DateTime> WithMondaySubstitute(DateTime date)
-        {
-            yield return date;
-            if (date.DayOfWeek == DayOfWeek.Sunday)
-                yield return date.AddDays(1);
-        }
 
         /// <summary>The date, plus <paramref name="substitute"/> when the date falls on a Sunday.</summary>
         private static IEnumerable<DateTime> WithSundaySubstitute(DateTime date, DateTime substitute)
@@ -243,7 +228,8 @@ namespace PhoneDesk.Holidays
                     SwissHolidayId.NewYear, SwissHolidayId.GoodFriday, SwissHolidayId.EasterSunday,
                     SwissHolidayId.EasterMonday, SwissHolidayId.Ascension, SwissHolidayId.PentecostSunday,
                     SwissHolidayId.WhitMonday, SwissHolidayId.NationalDay, SwissHolidayId.FederalFast,
-                    SwissHolidayId.Christmas, SwissHolidayId.StStephensDay), HolidayResultCompleteness.Complete),
+                    SwissHolidayId.Christmas).Append(Rule(canton, SwissHolidayId.StStephensDay,
+                        applies: IncludeAiStStephensDay)).ToList(), HolidayResultCompleteness.Complete),
                 SwissCanton.BE => (Simple(canton,
                     SwissHolidayId.NewYear, SwissHolidayId.BerchtoldsDay, SwissHolidayId.GoodFriday,
                     SwissHolidayId.EasterSunday, SwissHolidayId.EasterMonday, SwissHolidayId.Ascension,
@@ -262,10 +248,7 @@ namespace PhoneDesk.Holidays
                     SwissHolidayId.PentecostSunday, SwissHolidayId.WhitMonday, SwissHolidayId.NationalDay,
                     SwissHolidayId.FederalFast, SwissHolidayId.Christmas, SwissHolidayId.StStephensDay),
                     HolidayResultCompleteness.Complete),
-                SwissCanton.FR => (Simple(canton,
-                    SwissHolidayId.NewYear, SwissHolidayId.GoodFriday, SwissHolidayId.Ascension,
-                    SwissHolidayId.NationalDay, SwissHolidayId.Christmas),
-                    HolidayResultCompleteness.CantonWideIntersectionOnly),
+                SwissCanton.FR => Fribourg(district),
                 SwissCanton.GE => (Geneva(), HolidayResultCompleteness.Complete),
                 SwissCanton.GL => (Simple(canton,
                     SwissHolidayId.NewYear, SwissHolidayId.NaefelserFahrt, SwissHolidayId.GoodFriday,
@@ -316,7 +299,7 @@ namespace PhoneDesk.Holidays
                     SwissHolidayId.PentecostSunday, SwissHolidayId.WhitMonday, SwissHolidayId.NationalDay,
                     SwissHolidayId.FederalFast, SwissHolidayId.Christmas, SwissHolidayId.StStephensDay),
                     HolidayResultCompleteness.Complete),
-                SwissCanton.SO => (Solothurn(), HolidayResultCompleteness.CantonWideIntersectionOnly),
+                SwissCanton.SO => Solothurn(district),
                 SwissCanton.SZ => (Simple(canton,
                     SwissHolidayId.NewYear, SwissHolidayId.Epiphany, SwissHolidayId.StJoseph,
                     SwissHolidayId.GoodFriday, SwissHolidayId.EasterSunday, SwissHolidayId.EasterMonday,
@@ -361,6 +344,44 @@ namespace PhoneDesk.Holidays
             };
         }
 
+        // Legal categories are derived from the cantonal legislation, not the number of days.
+        // See docs/swiss-holidays.md for the source and article for every canton.
+        private static HolidayCategory CategoryFor(SwissCanton canton, SwissHolidayId id)
+        {
+            if (id is SwissHolidayId.EasterSunday or SwissHolidayId.PentecostSunday or SwissHolidayId.FederalFast)
+                return HolidayCategory.SundayObservance;
+            var additional = canton switch
+            {
+                SwissCanton.AI => id is SwissHolidayId.Assumption or SwissHolidayId.AllSaints or SwissHolidayId.ImmaculateConception,
+                SwissCanton.GL => id == SwissHolidayId.WhitMonday,
+                SwissCanton.JU => id is SwissHolidayId.BerchtoldsDay or SwissHolidayId.JuraIndependenceDay or SwissHolidayId.Assumption or SwissHolidayId.AllSaints,
+                SwissCanton.LU => id == SwissHolidayId.ImmaculateConception,
+                SwissCanton.NW => id == SwissHolidayId.StJoseph,
+                SwissCanton.OW => id == SwissHolidayId.BruderKlaus,
+                SwissCanton.SZ => id is SwissHolidayId.Epiphany or SwissHolidayId.EasterMonday or SwissHolidayId.WhitMonday or SwissHolidayId.ImmaculateConception or SwissHolidayId.StStephensDay,
+                SwissCanton.TG => id == SwissHolidayId.LabourDay,
+                SwissCanton.TI => id is SwissHolidayId.StJoseph or SwissHolidayId.LabourDay or SwissHolidayId.WhitMonday or SwissHolidayId.CorpusChristi or SwissHolidayId.StPeterAndPaul or SwissHolidayId.ImmaculateConception,
+                SwissCanton.UR => id is SwissHolidayId.Epiphany or SwissHolidayId.StJoseph or SwissHolidayId.EasterMonday or SwissHolidayId.WhitMonday or SwissHolidayId.StStephensDay,
+                _ => false
+            };
+            return additional ? HolidayCategory.AdditionalCantonalRestDay : HolidayCategory.Statutory;
+        }
+
+        private static (IReadOnlyList<SwissHolidayRule> Rules, HolidayResultCompleteness Completeness) Fribourg(string? region)
+        {
+            const SwissCanton c = SwissCanton.FR;
+            var rules = Simple(c, SwissHolidayId.NewYear, SwissHolidayId.GoodFriday, SwissHolidayId.Ascension,
+                SwissHolidayId.NationalDay, SwissHolidayId.Christmas).ToList();
+            if (region == "fr-catholic")
+                rules.AddRange(Simple(c, SwissHolidayId.CorpusChristi, SwissHolidayId.Assumption,
+                    SwissHolidayId.AllSaints, SwissHolidayId.ImmaculateConception));
+            else if (region == "fr-reformed")
+                rules.AddRange(Simple(c, SwissHolidayId.BerchtoldsDay, SwissHolidayId.EasterMonday,
+                    SwissHolidayId.WhitMonday, SwissHolidayId.StStephensDay));
+            return (rules, region is "fr-catholic" or "fr-reformed"
+                ? HolidayResultCompleteness.Complete : HolidayResultCompleteness.CantonWideIntersectionOnly);
+        }
+
         private static IReadOnlyList<SwissHolidayRule> Simple(SwissCanton canton, params SwissHolidayId[] ids)
             => ids.Select(id => Rule(canton, id)).ToList();
 
@@ -388,20 +409,21 @@ namespace PhoneDesk.Holidays
             };
         }
 
-        // ---- Geneva (spec 4 GE, 5.8): Monday substitute for 1 Jan / 1 Aug / 25 Dec on Sundays. ----
+        // Geneva LJF Art. 1(2) substitutes apply only to employers outside the federal Labour Act.
+        // They are customer-specific, never part of this general canton selection.
         private static IReadOnlyList<SwissHolidayRule> Geneva()
         {
             const SwissCanton c = SwissCanton.GE;
             return new List<SwissHolidayRule>
             {
-                Rule(c, SwissHolidayId.NewYear, y => WithMondaySubstitute(new DateTime(y, 1, 1))),
+                Rule(c, SwissHolidayId.NewYear),
                 Rule(c, SwissHolidayId.GoodFriday),
                 Rule(c, SwissHolidayId.EasterMonday),
                 Rule(c, SwissHolidayId.Ascension),
                 Rule(c, SwissHolidayId.WhitMonday),
-                Rule(c, SwissHolidayId.NationalDay, y => WithMondaySubstitute(new DateTime(y, 8, 1))),
+                Rule(c, SwissHolidayId.NationalDay),
                 Rule(c, SwissHolidayId.JeuneGenevois),
-                Rule(c, SwissHolidayId.Christmas, y => WithMondaySubstitute(new DateTime(y, 12, 25))),
+                Rule(c, SwissHolidayId.Christmas),
                 Rule(c, SwissHolidayId.GenevaRestauration),
             };
         }
@@ -424,11 +446,11 @@ namespace PhoneDesk.Holidays
             };
         }
 
-        // ---- Solothurn (spec 4 SO, 5.7): 1 May from 12:00; Bucheggberg exceptions excluded. ----
-        private static IReadOnlyList<SwissHolidayRule> Solothurn()
+        // Solothurn: 1 May from 12:00; three additional statutory holidays outside Bucheggberg.
+        private static (IReadOnlyList<SwissHolidayRule> Rules, HolidayResultCompleteness Completeness) Solothurn(string? region)
         {
             const SwissCanton c = SwissCanton.SO;
-            return new List<SwissHolidayRule>
+            var rules = new List<SwissHolidayRule>
             {
                 Rule(c, SwissHolidayId.NewYear),
                 Rule(c, SwissHolidayId.GoodFriday),
@@ -440,6 +462,10 @@ namespace PhoneDesk.Holidays
                 Rule(c, SwissHolidayId.FederalFast),
                 Rule(c, SwissHolidayId.Christmas),
             };
+            if (region == "so-other")
+                rules.AddRange(Simple(c, SwissHolidayId.CorpusChristi, SwissHolidayId.Assumption, SwissHolidayId.AllSaints));
+            return (rules, region is "so-bucheggberg" or "so-other"
+                ? HolidayResultCompleteness.Complete : HolidayResultCompleteness.CantonWideIntersectionOnly);
         }
 
         // ---- Ticino (spec 4 TI): Italian names for St Joseph and Sts Peter & Paul. ----
@@ -449,7 +475,7 @@ namespace PhoneDesk.Holidays
             var src = Src(c);
             DateTime Single(SwissHolidayId id, int year) => Formula[id](year);
             SwissHolidayRule R(SwissHolidayId id, string? name = null) =>
-                new SwissHolidayRule(id, y => new[] { Single(id, y) }, src, name ?? Names[id]);
+                new SwissHolidayRule(id, y => new[] { Single(id, y) }, src, name ?? Names[id], Category: CategoryFor(c, id));
 
             return new List<SwissHolidayRule>
             {

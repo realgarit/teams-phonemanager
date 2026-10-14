@@ -16,6 +16,14 @@
         <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
         <converters:TimeSpanConverter x:Key="TimeSpanConverter"/>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <DataTemplate x:Key="HolidayCategoryLabel">
+            <StackPanel>
+                <TextBlock IsVisible="{Binding IsStatutory}" Text="{loc:Translate Key=HolidayCategoryStatutory}" FontSize="12" Opacity="0.75" TextWrapping="Wrap"/>
+                <TextBlock IsVisible="{Binding IsAdditionalCantonalRestDay}" Text="{loc:Translate Key=HolidayCategoryAdditional}" FontSize="12" Foreground="{DynamicResource TeamsPrimaryBrush}" TextWrapping="Wrap"/>
+                <TextBlock IsVisible="{Binding IsSundayObservance}" Text="{loc:Translate Key=HolidayCategorySunday}" FontSize="12" Opacity="0.75" TextWrapping="Wrap"/>
+                <TextBlock IsVisible="{Binding IsCustom}" Text="{loc:Translate Key=HolidayCategoryCustom}" FontSize="12" Opacity="0.75" TextWrapping="Wrap"/>
+            </StackPanel>
+        </DataTemplate>
     </UserControl.Resources>
 
     <UserControl.Styles>
@@ -751,9 +759,9 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel Grid.Column="0">
-                                                    <TextBlock Text="{Binding DisplayText}"
-                                                             FontSize="16"
-                                                             FontWeight="SemiBold"/>
+                                                    <TextBlock Text="{Binding DisplayText}" TextWrapping="Wrap"
+                                                             FontSize="16" FontWeight="SemiBold"/>
+                                                    <ContentControl Content="{Binding}" ContentTemplate="{StaticResource HolidayCategoryLabel}"/>
                                                     <StackPanel Orientation="Horizontal"
                                                                 IsVisible="{Binding Name, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                         <TextBlock Text="{loc:Translate Key=VariablesHolidayNamePrefix}"
@@ -968,117 +976,72 @@
             </Border.Styles>
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center"
                   PointerPressed="PredefinedHolidaysWizardCard_PointerPressed">
-                <Border Classes="dialog" MinWidth="500" MaxWidth="700" Margin="16">
-                    <StackPanel>
-                        <TextBlock Text="{loc:Translate Key=VariablesPredefinedHolidaySetsTitle}"
-                                   FontWeight="SemiBold"
-                                   Margin="0,0,0,16"/>
-
-                    <StackPanel Spacing="8">
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="{loc:Translate Key=VariablesCountryLabel}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                            <ComboBox ItemsSource="{Binding Countries}"
-                                      SelectedItem="{Binding SelectedCountry}"
-                                      HorizontalAlignment="Stretch"
-                                      VerticalContentAlignment="Center">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding}" VerticalAlignment="Center" Margin="2"/>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-                        </StackPanel>
-
-                        <StackPanel IsVisible="{Binding IsSwitzerlandSelected, Converter={StaticResource BooleanToVisibilityConverter}}" Spacing="8">
-                            <StackPanel Spacing="4">
-                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                    <TextBlock Text="{loc:Translate Key=VariablesCantonLabel}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                    <Button Command="{Binding ShowAargauInfoCommand}"
-                                            IsVisible="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                            ToolTip.Tip="{loc:Translate Key=VariablesAargauHolidayReferenceInfoA11y}"
-                                            AutomationProperties.Name="{loc:Translate Key=VariablesAargauHolidayReferenceInfoA11y}"
-                                            Background="Transparent"
-                                            VerticalAlignment="Center"
-                                            Classes="IconOnly"
-                                            Width="30"
-                                            Height="30"
-                                            Padding="0">
-                                        <fi:SymbolIcon  Symbol="Info"
-                                                      HorizontalAlignment="Center"
-                                                      VerticalAlignment="Center"/>
-                                    </Button>
-                                    <!-- Animated arrow pointing to info button -->
-                                    <StackPanel Orientation="Horizontal" 
-                                                IsVisible="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                                Spacing="4"
-                                                VerticalAlignment="Center">
-                                        <fi:SymbolIcon  Symbol="ArrowLeft" Foreground="{DynamicResource TeamsPrimaryBrush}" Classes="AnimatedArrow"/>
-                                        <TextBlock Text="{loc:Translate Key=VariablesClickForReferenceHint}" 
-                                                   FontSize="14"
-                                                   Foreground="{DynamicResource TeamsPrimaryBrush}"
-                                                   Opacity="0.9"
-                                                   VerticalAlignment="Center"/>
+                <Border Classes="dialog" Width="640" MaxHeight="570" Margin="16">
+                    <Grid RowDefinitions="Auto,*,Auto">
+                        <TextBlock Text="{loc:Translate Key=VariablesPredefinedHolidaySetsTitle}" FontWeight="SemiBold" Margin="0,0,0,12"/>
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <StackPanel Spacing="10" Margin="0,0,12,0">
+                                <TextBlock Text="{loc:Translate Key=HolidayReviewHint}" TextWrapping="Wrap"/>
+                                <Grid ColumnDefinitions="*,16,*">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="{loc:Translate Key=VariablesCountryLabel}" FontWeight="SemiBold"/>
+                                        <ComboBox ItemsSource="{Binding Countries}" SelectedItem="{Binding SelectedCountry}" HorizontalAlignment="Stretch"/>
                                     </StackPanel>
+                                    <StackPanel Grid.Column="2" Spacing="4">
+                                        <TextBlock Text="{loc:Translate Key=VariablesYearLabel}" FontWeight="SemiBold"/>
+                                        <ComboBox ItemsSource="{Binding Years}" SelectedItem="{Binding SelectedYear}" HorizontalAlignment="Stretch"/>
+                                    </StackPanel>
+                                </Grid>
+                                <StackPanel IsVisible="{Binding IsSwitzerlandSelected}" Spacing="8">
+                                    <TextBlock Text="{loc:Translate Key=VariablesCantonLabel}" FontWeight="SemiBold"/>
+                                    <ComboBox ItemsSource="{Binding Cantons}" SelectedItem="{Binding SelectedCanton}" HorizontalAlignment="Stretch"/>
+                                    <StackPanel IsVisible="{Binding IsAargauSelected}" Spacing="4">
+                                        <TextBlock Text="{loc:Translate Key=HolidayRegionRequired}" TextWrapping="Wrap"/>
+                                        <ComboBox Name="AargauHolidayRegion" ItemsSource="{Binding Bezirke}" SelectedItem="{Binding SelectedBezirk}" HorizontalAlignment="Stretch">
+                                            <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" MaxWidth="500" TextWrapping="Wrap"/></DataTemplate></ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel IsVisible="{Binding IsFribourgSelected}" Spacing="4">
+                                        <TextBlock Text="{loc:Translate Key=HolidayFribourgRegionHint}" TextWrapping="Wrap"/>
+                                        <ComboBox Name="FribourgHolidayRegion" SelectedIndex="{Binding SelectedHolidayRegionIndex}" HorizontalAlignment="Stretch">
+                                            <ComboBoxItem Content="{loc:Translate Key=HolidayFribourgCatholic}"/>
+                                            <ComboBoxItem Content="{loc:Translate Key=HolidayFribourgReformed}"/>
+                                        </ComboBox>
+                                        <TextBlock Text="{loc:Translate Key=HolidayFribourgLocalities}" FontSize="12" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    <StackPanel IsVisible="{Binding IsSolothurnSelected}" Spacing="4">
+                                        <TextBlock Text="{loc:Translate Key=HolidayRegionRequired}" TextWrapping="Wrap"/>
+                                        <ComboBox Name="SolothurnHolidayRegion" SelectedIndex="{Binding SelectedHolidayRegionIndex}" HorizontalAlignment="Stretch">
+                                            <ComboBoxItem Content="{loc:Translate Key=HolidaySolothurnBucheggberg}"/>
+                                            <ComboBoxItem Content="{loc:Translate Key=HolidaySolothurnOther}"/>
+                                        </ComboBox>
+                                        <TextBlock Text="{loc:Translate Key=HolidaySolothurnHint}" FontSize="12" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    <TextBlock IsVisible="{Binding IsGenevaSelected}" Text="{loc:Translate Key=HolidayGenevaHint}" FontSize="12" TextWrapping="Wrap"/>
+                                    <CheckBox IsVisible="{Binding HasAdditionalCantonalRestDays}" IsChecked="{Binding IncludeAdditionalCantonalRestDays}">
+                                        <TextBlock Text="{loc:Translate Key=HolidayIncludeAdditional}" TextWrapping="Wrap" MaxWidth="500"/>
+                                    </CheckBox>
                                 </StackPanel>
-                                <ComboBox ItemsSource="{Binding Cantons}"
-                                          SelectedItem="{Binding SelectedCanton}"
-                                          HorizontalAlignment="Stretch"
-                                          VerticalContentAlignment="Center">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding}" VerticalAlignment="Center" Margin="2"/>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
+                                <StackPanel IsVisible="{Binding HasPredefinedHolidayPreview}" Spacing="4">
+                                    <TextBlock Text="{loc:Translate Key=HolidayPreviewTitle}" FontWeight="SemiBold"/>
+                                    <ItemsControl ItemsSource="{Binding PredefinedHolidayPreview}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Margin="0,4">
+                                                    <TextBlock Text="{Binding DisplayText}" TextWrapping="Wrap"/>
+                                                    <ContentControl Content="{Binding}" ContentTemplate="{StaticResource HolidayCategoryLabel}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
                             </StackPanel>
-
-                            <StackPanel IsVisible="{Binding IsAargauSelected, Converter={StaticResource BooleanToVisibilityConverter}}" Spacing="4">
-                                <TextBlock Text="{loc:Translate Key=VariablesDistrictLabel}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                                <ComboBox ItemsSource="{Binding Bezirke}"
-                                          SelectedItem="{Binding SelectedBezirk}"
-                                          HorizontalAlignment="Stretch"
-                                          VerticalContentAlignment="Center">
-                                    <ComboBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding}" VerticalAlignment="Center" TextWrapping="Wrap" Margin="2"/>
-                                        </DataTemplate>
-                                    </ComboBox.ItemTemplate>
-                                </ComboBox>
-                            </StackPanel>
+                        </ScrollViewer>
+                        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0" Spacing="12">
+                            <Button Command="{Binding CancelPredefinedHolidaysWizardCommand}" Content="{loc:Translate Key=CommonCancel}"/>
+                            <Button Command="{Binding ApplyPredefinedHolidaysCommand}" IsEnabled="{Binding CanApplyPredefinedSelection}" Content="{loc:Translate Key=VariablesAddHolidaysAction}"/>
                         </StackPanel>
-
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="{loc:Translate Key=VariablesYearLabel}" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                            <ComboBox ItemsSource="{Binding Years}"
-                                      SelectedItem="{Binding SelectedYear}"
-                                      HorizontalAlignment="Stretch"
-                                      VerticalContentAlignment="Center">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding}" VerticalAlignment="Center" Margin="2"/>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-                        </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0" Spacing="16">
-                        <Button Command="{Binding CancelPredefinedHolidaysWizardCommand}"
-                                Classes="IconText">
-                            <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon Symbol="Dismiss"/>
-                                <TextBlock Text="{loc:Translate Key=CommonCancel}" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Command="{Binding ApplyPredefinedHolidaysCommand}"
-                                IsEnabled="{Binding CanApplyPredefinedSelection}" Classes="IconText">
-                            <StackPanel Orientation="Horizontal">
-                                <fi:SymbolIcon  Symbol="Checkmark"/>
-                                <TextBlock Text="{loc:Translate Key=VariablesAddHolidaysAction}" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </StackPanel>
+                    </Grid>
                 </Border>
             </Grid>
         </Border>

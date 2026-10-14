@@ -30,7 +30,7 @@ namespace PhoneDesk.Services.Holidays
             var result = SwissHolidayCatalog.Compute(code, district, year);
 
             var entries = result.Holidays
-                .Select(h => new HolidayEntry(h.Date, h.Time, h.Name))
+                .Select(h => new HolidayEntry(h.Date, h.Time, h.Name) { Category = h.Category })
                 .ToList();
 
             return new SwissHolidaysResult(entries, result.Completeness);

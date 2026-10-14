@@ -1174,5 +1174,21 @@
   "DocumentationReportHealthFinding": "  [{severity}] {rule}: {object}",
   "DocumentationReportHealthExplanation": "    Why: {text}",
   "DocumentationReportHealthRecommendation": "    Fix: {text}",
-  "DocumentationReportHealthNoFindings": "  No active findings from the enabled rules."
+  "DocumentationReportHealthNoFindings": "  No active findings from the enabled rules.",
+  "HolidayCategoryStatutory": "Statutory holiday (Art. 20a ArG)",
+  "HolidayCategoryAdditional": "Additional cantonal rest day · confirm with customer",
+  "HolidayCategorySunday": "Sunday observance",
+  "HolidayCategoryCustom": "Customer-specific / unclassified",
+  "HolidayReviewHint": "Review all dates and closure times with the customer. Local customs, company closures and employer-specific exceptions must be added separately.",
+  "HolidayRegionRequired": "Select the region of the workplace to load the complete statutory list.",
+  "HolidayFribourgRegionHint": "Select the legal holiday territory of the workplace, not the customer’s religion. A region is required.",
+  "HolidayFribourgCatholic": "Catholic legal territory (all other localities)",
+  "HolidayFribourgReformed": "Reformed legal territory (listed localities)",
+  "HolidayFribourgLocalities": "Reformed territory: Courgevaux, Fräschels, Greng, Kerzers, Meyriez, Muntelier, Murten, Ried bei Kerzers, Ulmiz, Mont-Vully, and the localities Flamatt and Sensebrügg in Wünnewil-Flamatt. The rest of Wünnewil-Flamatt uses the Catholic list.",
+  "HolidaySolothurnBucheggberg": "District of Bucheggberg",
+  "HolidaySolothurnOther": "All other districts",
+  "HolidaySolothurnHint": "1 May starts at 12:00. Outside Bucheggberg, Corpus Christi, Assumption and All Saints are also statutory holidays.",
+  "HolidayGenevaHint": "Substitute days for employers outside the federal Labour Act are not added automatically. Confirm these separately with the customer.",
+  "HolidayIncludeAdditional": "Include additional cantonal rest days (separate legal status; review with customer)",
+  "HolidayPreviewTitle": "Dates to add — review before adding"
 }

@@ -112,7 +112,9 @@ public sealed record PortableHolidayEntry(
     TimeOnly Time,
     string? Name,
     DateOnly? EndDate,
-    TimeOnly? EndTime);
+    TimeOnly? EndTime,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    PhoneDesk.Holidays.HolidayCategory Category = PhoneDesk.Holidays.HolidayCategory.Custom);
 
 public sealed record ConfigurationChange(
     string Path,

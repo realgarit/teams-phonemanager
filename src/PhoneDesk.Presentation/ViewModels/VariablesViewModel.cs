@@ -11,6 +11,7 @@ using PhoneDesk.Helpers;
 using PhoneDesk.Localization;
 using System.Collections.Generic;
 using PhoneDesk.Portability;
+using PhoneDesk.Holidays;
 
 namespace PhoneDesk.ViewModels
 {
@@ -68,6 +69,11 @@ namespace PhoneDesk.ViewModels
         [ObservableProperty]
         private TimeSpan? _selectedEditEndTime;
 
+        partial void OnEditingHolidayChanged(HolidayEntry? value)
+        {
+            if (value != null) NewHolidayDate = value.Date;
+        }
+
         // Simple properties for Add/Edit dialogs
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(DialogHolidayDate))]
@@ -82,15 +88,12 @@ namespace PhoneDesk.ViewModels
         // Computed properties for the dialog
         public DateTime? DialogHolidayDate
         {
-            get => EditingHoliday?.Date ?? NewHolidayDate;
+            get => NewHolidayDate;
             set
             {
                 if (value.HasValue)
                 {
-                    if (EditingHoliday != null)
-                        EditingHoliday.Date = value.Value;
-                    else
-                        NewHolidayDate = value.Value;
+                    NewHolidayDate = value.Value;
                 }
             }
         }
@@ -504,7 +507,7 @@ namespace PhoneDesk.ViewModels
                 OriginalHolidaySeries.Clear();
                 foreach (var holiday in variables.HolidaySeries)
                 {
-                    OriginalHolidaySeries.Add(new HolidayEntry(holiday.Date, holiday.Time));
+                    OriginalHolidaySeries.Add(new HolidayEntry(holiday.Date, holiday.Time, holiday.Name, holiday.EndDate, holiday.EndTime) { Category = holiday.Category });
                 }
             }
             
@@ -596,7 +599,7 @@ namespace PhoneDesk.ViewModels
             "Aarau (Brugg/Kulm/Lenzburg/Zofingen/Baden - nur Bergdietikon)", 
             "Baden (ohne Bergdietikon)", 
             "Bremgarten", 
-            "Muri (Laufenburg, Rheinfelden - nur Hellikon, Mumpf, Obermumpf, Schupfart, Stein, Wegstetten)", 
+            "Muri (Laufenburg, Rheinfelden - nur Hellikon, Mumpf, Obermumpf, Schupfart, Stein, Wegenstetten)",
             "Rheinfelden (nur Kaiseraugst, Magden, Möhlin, Olsberg, Rheinfelden, Wallbach, Zeiningen, Zuzgen)", 
             "Zurzach" 
         });
@@ -610,6 +613,50 @@ namespace PhoneDesk.ViewModels
         [ObservableProperty]
         private int _selectedYear = Math.Max(2025, Math.Min(2030, DateTime.Now.Year));
 
+        [ObservableProperty]
+        private int _selectedHolidayRegionIndex = -1;
+
+        [ObservableProperty]
+        private bool _includeAdditionalCantonalRestDays = true;
+
+        public ObservableCollection<HolidayEntry> PredefinedHolidayPreview { get; } = new();
+        public bool IsFribourgSelected => SelectedCanton == "Fribourg";
+        public bool IsSolothurnSelected => SelectedCanton == "Solothurn";
+        public bool IsGenevaSelected => SelectedCanton == "Genf";
+        public bool HasPredefinedHolidayPreview => PredefinedHolidayPreview.Count > 0;
+        public bool HasAdditionalCantonalRestDays => IsSwitzerlandSelected && SelectedCanton != null && Cantons.Contains(SelectedCanton)
+            && PhoneDesk.Services.Holidays.SwissHolidaysProvider.MapCanton(SelectedCanton) is
+                SwissCanton.AI or SwissCanton.GL or SwissCanton.JU or SwissCanton.LU or SwissCanton.NW or
+                SwissCanton.OW or SwissCanton.SZ or SwissCanton.TG or SwissCanton.TI or SwissCanton.UR;
+
+        private string? HolidayRegionCode => IsFribourgSelected
+            ? SelectedHolidayRegionIndex switch { 0 => "fr-catholic", 1 => "fr-reformed", _ => null }
+            : IsSolothurnSelected
+                ? SelectedHolidayRegionIndex switch { 0 => "so-bucheggberg", 1 => "so-other", _ => null }
+                : SelectedBezirk;
+
+        private void RefreshHolidayPreview()
+        {
+            PredefinedHolidayPreview.Clear();
+            if (CanApplyPredefinedSelection && IsSwitzerlandSelected)
+            {
+                var result = new PhoneDesk.Services.Holidays.SwissHolidaysProvider()
+                    .GetHolidaysDetailed(SelectedCountry!, SelectedCanton, HolidayRegionCode, SelectedYear);
+                if (result.Completeness == HolidayResultCompleteness.Complete)
+                    foreach (var holiday in result.Holidays.Where(h => IncludeAdditionalCantonalRestDays || !h.IsAdditionalCantonalRestDay))
+                        PredefinedHolidayPreview.Add(holiday);
+            }
+            OnPropertyChanged(nameof(HasPredefinedHolidayPreview));
+        }
+
+        partial void OnSelectedHolidayRegionIndexChanged(int value)
+        {
+            OnPropertyChanged(nameof(CanApplyPredefinedSelection));
+            RefreshHolidayPreview();
+        }
+
+        partial void OnIncludeAdditionalCantonalRestDaysChanged(bool value) => RefreshHolidayPreview();
+
         public bool IsSwitzerlandSelected => string.Equals(SelectedCountry, "Switzerland", StringComparison.OrdinalIgnoreCase);
         public bool IsAargauSelected => string.Equals(SelectedCanton, "Aargau", StringComparison.OrdinalIgnoreCase);
 
@@ -617,12 +664,21 @@ namespace PhoneDesk.ViewModels
         {
             OnPropertyChanged(nameof(IsSwitzerlandSelected));
             OnPropertyChanged(nameof(CanApplyPredefinedSelection));
+            OnPropertyChanged(nameof(HasAdditionalCantonalRestDays));
+            RefreshHolidayPreview();
         }
 
         partial void OnSelectedCantonChanged(string? value)
         {
+            SelectedBezirk = null;
+            SelectedHolidayRegionIndex = -1;
             OnPropertyChanged(nameof(IsAargauSelected));
+            OnPropertyChanged(nameof(IsFribourgSelected));
+            OnPropertyChanged(nameof(IsSolothurnSelected));
+            OnPropertyChanged(nameof(IsGenevaSelected));
+            OnPropertyChanged(nameof(HasAdditionalCantonalRestDays));
             OnPropertyChanged(nameof(CanApplyPredefinedSelection));
+            RefreshHolidayPreview();
         }
 
         public bool CanApplyPredefinedSelection
@@ -633,20 +689,24 @@ namespace PhoneDesk.ViewModels
                     return SelectedYear >= 2025 && SelectedYear <= 2030;
 
                 if (IsAargauSelected)
-                    return !string.IsNullOrEmpty(SelectedBezirk) && SelectedYear >= 2025 && SelectedYear <= 2030;
+                    return SelectedBezirk != null && Bezirke.Contains(SelectedBezirk) && SelectedYear >= 2025 && SelectedYear <= 2030;
 
-                return !string.IsNullOrEmpty(SelectedCanton) && SelectedYear >= 2025 && SelectedYear <= 2030;
+                if ((IsFribourgSelected || IsSolothurnSelected) && SelectedHolidayRegionIndex is not (0 or 1))
+                    return false;
+                return SelectedCanton != null && Cantons.Contains(SelectedCanton) && SelectedYear >= 2025 && SelectedYear <= 2030;
             }
         }
 
         partial void OnSelectedBezirkChanged(string? value)
         {
             OnPropertyChanged(nameof(CanApplyPredefinedSelection));
+            RefreshHolidayPreview();
         }
 
         partial void OnSelectedYearChanged(int value)
         {
             OnPropertyChanged(nameof(CanApplyPredefinedSelection));
+            RefreshHolidayPreview();
         }
 
         [RelayCommand]
@@ -657,6 +717,8 @@ namespace PhoneDesk.ViewModels
                 SelectedCountry = "Switzerland";
                 SelectedCanton = null;
                 SelectedBezirk = null;
+                SelectedHolidayRegionIndex = -1;
+                IncludeAdditionalCantonalRestDays = true;
                 SelectedYear = Math.Max(2025, Math.Min(2030, DateTime.Now.Year));
                 ShowPredefinedHolidaysWizard = true;
                 LogLocalized(UiTextKey.VariablesPredefinedWizardOpenedLog, "Opened predefined holidays wizard", LogLevel.Info);
@@ -709,30 +771,18 @@ namespace PhoneDesk.ViewModels
                 var variables = _sharedStateService?.Variables;
                 if (variables == null) return;
 
-                // Use Swiss provider for Switzerland; expand later for other countries
-                var provider = new PhoneDesk.Services.Holidays.SwissHolidaysProvider();
-                var result = provider.GetHolidaysDetailed(SelectedCountry ?? "", SelectedCanton, SelectedBezirk, SelectedYear);
-
-                if (result.Completeness != PhoneDesk.Holidays.HolidayResultCompleteness.Complete)
+                // Check again in the command: a disabled button is not a validation boundary.
+                if (!CanApplyPredefinedSelection) return;
+                RefreshHolidayPreview();
+                foreach (var holiday in PredefinedHolidayPreview)
                 {
-                    LogLocalized(
-                        UiTextKey.VariablesPredefinedHolidayRegionIncompleteLog,
-                        "Predefined holidays for '{canton}' are regionally incomplete ({completeness}): only the canton-wide intersection was applied. A region or district is required for the full list.",
-                        LogLevel.Warning,
-                        new Dictionary<string, object?>
-                        {
-                            ["canton"] = SelectedCanton,
-                            ["completeness"] = result.Completeness
-                        });
-                }
-
-                foreach (var holiday in result.Holidays)
-                {
+                    // Reopening the picker must not add an identical date/name/range twice.
+                    if (variables.HolidaySeries.Any(h => h.Date == holiday.Date && h.Time == holiday.Time
+                        && h.Name == holiday.Name && h.EndDate == holiday.EndDate && h.EndTime == holiday.EndTime))
+                        continue;
                     variables.HolidaySeries.Add(holiday);
-                    LogLocalized(
-                        UiTextKey.VariablesPredefinedHolidayAddedLog,
-                        "Added predefined holiday: {holiday}",
-                        LogLevel.Info,
+                    LogLocalized(UiTextKey.VariablesPredefinedHolidayAddedLog,
+                        "Added predefined holiday: {holiday}", LogLevel.Info,
                         new Dictionary<string, object?> { ["holiday"] = holiday.DisplayText });
                 }
 
@@ -822,7 +872,12 @@ namespace PhoneDesk.ViewModels
 
                 if (EditingHoliday != null)
                 {
-                    // Editing existing holiday
+                    // User-adjusted dates/ranges no longer carry an automatic legal classification.
+                    if (EditingHoliday.Date != NewHolidayDate || EditingHoliday.Time != selectedTime
+                        || EditingHoliday.EndDate != (DialogHasEndDate ? DialogEndDate : null)
+                        || EditingHoliday.EndTime != (DialogHasEndDate ? (SelectedEditEndTime ?? TimeSpan.Zero) : null))
+                        EditingHoliday.Category = HolidayCategory.Custom;
+                    EditingHoliday.Date = NewHolidayDate;
                     EditingHoliday.Time = selectedTime;
                     EditingHoliday.EndDate = DialogHasEndDate ? DialogEndDate : null;
                     EditingHoliday.EndTime = DialogHasEndDate ? (SelectedEditEndTime ?? TimeSpan.Zero) : null;

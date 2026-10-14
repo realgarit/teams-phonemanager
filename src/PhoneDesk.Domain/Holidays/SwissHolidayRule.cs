@@ -15,5 +15,6 @@ namespace PhoneDesk.Holidays
         string DisplayName,
         TimeSpan StartTime = default,
         bool IsRegional = false,
-        Func<int, bool>? Applies = null);
+        Func<int, bool>? Applies = null,
+        HolidayCategory Category = HolidayCategory.Statutory);
 }

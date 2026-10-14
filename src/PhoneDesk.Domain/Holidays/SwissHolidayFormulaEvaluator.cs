@@ -38,11 +38,11 @@ namespace PhoneDesk.Services.Holidays
         // Glarus-specific holiday
         public static DateTime NaefelserFahrt(int year)
         {
-            // First Thursday in April
+            // First Thursday in April, postponed one week when it is Holy Thursday.
             var april1 = new DateTime(year, 4, 1);
             while (april1.DayOfWeek != DayOfWeek.Thursday)
                 april1 = april1.AddDays(1);
-            return april1;
+            return april1 == EasterSunday(year).AddDays(-3) ? april1.AddDays(7) : april1;
         }
 
         // Obwalden-specific: Saint Nicholas of Flüe Day

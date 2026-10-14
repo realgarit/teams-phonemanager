@@ -7,13 +7,15 @@ namespace PhoneDesk.Models
     /// </summary>
     public sealed class HolidayDate : IHolidayEntry
     {
-        public HolidayDate(DateTime date, TimeSpan time, string? name = null, DateTime? endDate = null, TimeSpan? endTime = null)
+        public HolidayDate(DateTime date, TimeSpan time, string? name = null, DateTime? endDate = null, TimeSpan? endTime = null,
+            Holidays.HolidayCategory category = Holidays.HolidayCategory.Custom)
         {
             Date = date;
             Time = time;
             Name = name;
             EndDate = endDate;
             EndTime = endTime;
+            Category = category;
         }
 
         public DateTime Date { get; }
@@ -21,6 +23,7 @@ namespace PhoneDesk.Models
         public string? Name { get; }
         public DateTime? EndDate { get; }
         public TimeSpan? EndTime { get; }
+        public Holidays.HolidayCategory Category { get; }
 
         public DateTime DateTime => Date.Date.Add(Time);
         public DateTime? EndDateTime => EndDate?.Date.Add(EndTime ?? TimeSpan.Zero);
