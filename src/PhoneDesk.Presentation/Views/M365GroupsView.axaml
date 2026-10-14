@@ -5,6 +5,7 @@
              xmlns:fi="using:FluentIcons.Avalonia"
              xmlns:fic="using:FluentIcons.Common"
              xmlns:loc="clr-namespace:PhoneDesk.Localization"
+             xmlns:controls="clr-namespace:PhoneDesk.Controls"
              xmlns:local="clr-namespace:PhoneDesk.Views"
              xmlns:viewmodels="clr-namespace:PhoneDesk.ViewModels"
              xmlns:converters="clr-namespace:PhoneDesk.Converters"
@@ -50,10 +51,11 @@
                         <fi:SymbolIcon Symbol="People"/>
                     </Border>
                     <StackPanel Spacing="4" VerticalAlignment="Center">
-                        <TextBlock Text="{loc:Translate Key=MainNavigationM365Groups}" Classes="page-title" Margin="0"/>
-                        <TextBlock Text="{loc:Translate Key=M365GroupsSubtitle}"
-                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                             TextWrapping="Wrap"/>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="{loc:Translate Key=MainNavigationM365Groups}" Classes="page-title" Margin="0"/>
+                            <controls:InfoButton Name="PageHelp" HelpTitle="{loc:Translate Key=MainNavigationM365Groups}" HelpText="{loc:Translate Key=M365GroupsSubtitle}"/>
+                        </StackPanel>
+
                     </StackPanel>
                 </StackPanel>
                 </StackPanel>

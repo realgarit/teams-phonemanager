@@ -480,6 +480,9 @@ namespace PhoneDesk.Tests
 
         private sealed class TrackingUserPreferencesStore : IUserPreferencesStore
         {
+        public bool LoadIntroductionDismissed() => true;
+        public void SaveIntroductionDismissed() { }
+
             public AppLanguage? SavedLanguage { get; private set; }
 
             public int SaveCount { get; private set; }

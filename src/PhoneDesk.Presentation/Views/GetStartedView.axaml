@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:fi="using:FluentIcons.Avalonia"
              xmlns:loc="clr-namespace:PhoneDesk.Localization"
+             xmlns:controls="clr-namespace:PhoneDesk.Controls"
              xmlns:local="clr-namespace:PhoneDesk.Views"
              xmlns:viewmodels="clr-namespace:PhoneDesk.ViewModels"
              xmlns:converters="clr-namespace:PhoneDesk.Converters"
@@ -36,12 +37,13 @@
                     <fi:SymbolIcon Symbol="Rocket"/>
                 </Border>
                 <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
-                    <TextBlock Text="{loc:Translate Key=GetStartedTitle}"
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="{loc:Translate Key=GetStartedTitle}"
                              Classes="page-title"
                              Margin="0"/>
-                    <TextBlock Text="{loc:Translate Key=GetStartedSubtitle}"
-                             Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                             TextWrapping="Wrap"/>
+                            <controls:InfoButton Name="PageHelp" HelpTitle="{loc:Translate Key=GetStartedTitle}" HelpText="{loc:Translate Key=GetStartedSubtitle}"/>
+                        </StackPanel>
+
                 </StackPanel>
             </Grid>
 
@@ -55,12 +57,11 @@
                     <StackPanel Grid.Column="1" Spacing="4">
                         <TextBlock Text="{loc:Translate Key=GetStartedWhatHappensHereTitle}"
                                    FontWeight="SemiBold"/>
-                        <TextBlock Text="{Binding SetupGuidance}"
-                                   TextWrapping="Wrap"/>
-                        <TextBlock Text="{Binding SetupGuidanceDetail}"
-                                   FontSize="12"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                   TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding SetupGuidance}" TextWrapping="Wrap"/>
+                        <TextBlock Name="ReadinessPrerequisite" Text="{Binding SetupGuidanceDetail}"
+                                   IsVisible="{Binding !CanProceed}" FontSize="12" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+
                     </StackPanel>
                     <Button Grid.Column="2"
                             Command="{Binding NavigateToPageCommand}"
@@ -121,13 +122,12 @@
                     </Panel>
                     <!-- Content -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
-                        <TextBlock Text="{loc:Translate Key=GetStartedModulesTitle}"
+                        <StackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="{loc:Translate Key=GetStartedModulesTitle}"
                                  FontSize="18"
                                  FontWeight="SemiBold"/>
-                        <TextBlock Text="{loc:Translate Key=GetStartedModulesDescription}"
-                                 FontSize="14"
-                                 Opacity="0.7"
-                                 TextWrapping="Wrap"/>
+                            <controls:InfoButton HelpTitle="{loc:Translate Key=GetStartedModulesTitle}" HelpText="{loc:Translate Key=GetStartedModulesDescription}"/>
+                        </StackPanel>
+
                     </StackPanel>
                     <!-- Action -->
                     <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="24,0,0,0">
@@ -177,13 +177,12 @@
                     </Panel>
                     <!-- Content -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
-                        <TextBlock Text="{loc:Translate Key=GetStartedTeamsTitle}"
+                        <StackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="{loc:Translate Key=GetStartedTeamsTitle}"
                                  FontSize="18"
                                  FontWeight="SemiBold"/>
-                        <TextBlock Text="{loc:Translate Key=GetStartedTeamsDescription}"
-                                 FontSize="14"
-                                 Opacity="0.7"
-                                 TextWrapping="Wrap"/>
+                            <controls:InfoButton HelpTitle="{loc:Translate Key=GetStartedTeamsTitle}" HelpText="{loc:Translate Key=GetStartedTeamsDescription}"/>
+                        </StackPanel>
+
                     </StackPanel>
                     <!-- Action -->
                     <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="24,0,0,0">
@@ -244,13 +243,12 @@
                     </Panel>
                     <!-- Content -->
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="6">
-                        <TextBlock Text="{loc:Translate Key=GetStartedGraphTitle}"
+                        <StackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="{loc:Translate Key=GetStartedGraphTitle}"
                                  FontSize="18"
                                  FontWeight="SemiBold"/>
-                        <TextBlock Text="{loc:Translate Key=GetStartedGraphDescription}"
-                                 FontSize="14"
-                                 Opacity="0.7"
-                                 TextWrapping="Wrap"/>
+                            <controls:InfoButton HelpTitle="{loc:Translate Key=GetStartedGraphTitle}" HelpText="{loc:Translate Key=GetStartedGraphDescription}"/>
+                        </StackPanel>
+
                     </StackPanel>
                     <!-- Action -->
                     <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="24,0,0,0">

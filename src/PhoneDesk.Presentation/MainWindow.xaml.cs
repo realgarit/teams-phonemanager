@@ -25,6 +25,7 @@ public partial class MainWindow : Window
         if (DataContext is ViewModels.MainWindowViewModel vm)
         {
             vm.PropertyChanged += OnViewModelPropertyChanged;
+            SyncNavSelectionToCurrentPage();
         }
     }
 
@@ -76,6 +77,11 @@ public partial class MainWindow : Window
             else if (vm.IsSettingsOpen)
             {
                 vm.CloseSettingsCommand.Execute(null);
+                e.Handled = true;
+            }
+            else if (vm.IsIntroductionVisible)
+            {
+                vm.DismissIntroductionCommand.Execute(null);
                 e.Handled = true;
             }
         }

@@ -66,7 +66,7 @@
         <StackPanel Margin="24" VerticalAlignment="Center" MaxWidth="980">
 
             <!-- Hero -->
-            <StackPanel Classes="hero" HorizontalAlignment="Center" Margin="0,16,0,36">
+            <StackPanel Classes="hero" HorizontalAlignment="Center" Margin="0,8,0,24">
                 <Border Width="76" Height="76"
                         CornerRadius="17"
                         HorizontalAlignment="Center"
@@ -157,9 +157,9 @@
                                Foreground="{DynamicResource TextFillColorTertiaryBrush}"
                                HorizontalAlignment="Center"
                                Margin="0,0,0,14"/>
-                    <Grid ColumnDefinitions="*,Auto,*,Auto,*,Auto,*">
+                    <Grid ColumnDefinitions="*,Auto,*,Auto,*">
                         <!-- Step 1 -->
-                        <Border Grid.Column="0" Classes="card interactive" Padding="16">
+                        <Border Grid.Column="0" Classes="card" Padding="16">
                             <StackPanel Spacing="10">
                                 <StackPanel Orientation="Horizontal" Spacing="10">
                                     <Border Classes="step-badge">
@@ -174,7 +174,7 @@
                         <fi:SymbolIcon Grid.Column="1" Symbol="ChevronRight" FontSize="14" Opacity="0.35"
                                        VerticalAlignment="Center" Margin="6,0"/>
                         <!-- Step 2 -->
-                        <Border Grid.Column="2" Classes="card interactive" Padding="16">
+                        <Border Grid.Column="2" Classes="card" Padding="16">
                             <StackPanel Spacing="10">
                                 <StackPanel Orientation="Horizontal" Spacing="10">
                                     <Border Classes="step-badge">
@@ -189,7 +189,7 @@
                         <fi:SymbolIcon Grid.Column="3" Symbol="ChevronRight" FontSize="14" Opacity="0.35"
                                        VerticalAlignment="Center" Margin="6,0"/>
                         <!-- Step 3 -->
-                        <Border Grid.Column="4" Classes="card interactive" Padding="16">
+                        <Border Grid.Column="4" Classes="card" Padding="16">
                             <StackPanel Spacing="10">
                                 <StackPanel Orientation="Horizontal" Spacing="10">
                                     <Border Classes="step-badge">
@@ -198,21 +198,6 @@
                                     <TextBlock Text="{loc:Translate Key=WelcomeStepBuildTitle}" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center"/>
                                 </StackPanel>
                                 <TextBlock Text="{loc:Translate Key=WelcomeStepBuildDescription}"
-                                         FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Border>
-                        <fi:SymbolIcon Grid.Column="5" Symbol="ChevronRight" FontSize="14" Opacity="0.35"
-                                       VerticalAlignment="Center" Margin="6,0"/>
-                        <!-- Step 4 -->
-                        <Border Grid.Column="6" Classes="card interactive" Padding="16">
-                            <StackPanel Spacing="10">
-                                <StackPanel Orientation="Horizontal" Spacing="10">
-                                    <Border Classes="step-badge">
-                                        <TextBlock Text="4"/>
-                                    </Border>
-                                    <TextBlock Text="{loc:Translate Key=WelcomeStepExportTitle}" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center"/>
-                                </StackPanel>
-                                <TextBlock Text="{loc:Translate Key=WelcomeStepExportDescription}"
                                          FontSize="12" Opacity="0.7" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>

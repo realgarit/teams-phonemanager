@@ -40,14 +40,14 @@ namespace PhoneDesk.ViewModels
                 : !ModulesChecked
                     ? GetText(
                         UiTextKey.GetStartedSetupGuidanceStartModules,
-                        "Start with Check modules below. This checks the components PhoneDesk needs to connect.")
+                        "Start with Check modules.")
                     : !TeamsConnected
                         ? GetText(
                             UiTextKey.GetStartedSetupGuidanceConnectTeams,
                             "The modules are ready. Connect to Microsoft Teams next.")
                         : GetText(
                             UiTextKey.GetStartedSetupGuidanceConnectGraph,
-                            "Teams is connected. Connect to Microsoft Graph next; a browser sign-in window will open.");
+                            "Teams is connected. Connect to Microsoft Graph next.");
 
         public string SetupGuidanceDetail => CanProceed
             ? GetText(
@@ -55,7 +55,7 @@ namespace PhoneDesk.ViewModels
                 "Your connections are ready. You can start the customer configuration now.")
             : GetText(
                 UiTextKey.GetStartedSetupGuidanceDetailBlocked,
-                "Complete all three checks before running Guided Setup. You can already prepare the form in Configuration.");
+                "Complete all three checks before Guided Setup.");
 
         public string ModulesActionText => ModulesChecked
             ? GetText(UiTextKey.GetStartedCheckAgainAction, "Check again")

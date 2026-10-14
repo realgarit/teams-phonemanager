@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
+using Avalonia.Input;
+using Avalonia.Automation;
+using PhoneDesk.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -48,11 +51,11 @@ namespace PhoneDesk.Tests
     public sealed class ScreenshotGenerator
     {
         // Logical client size of the app window; the originals are this at 2x DPI.
-        private const int LogicalWidth = 1280;
-        private const int LogicalHeight = 720;
+        private static readonly int LogicalWidth = int.TryParse(Environment.GetEnvironmentVariable("SCREENSHOT_WIDTH"), out var width) ? Math.Max(1024, width) : 1280;
+        private static readonly int LogicalHeight = int.TryParse(Environment.GetEnvironmentVariable("SCREENSHOT_HEIGHT"), out var height) ? Math.Max(640, height) : 720;
         private const double Scale = 2.0;
-        private const int PixelWidth = (int)(LogicalWidth * Scale);          // 2560
-        private const int ContentPixelHeight = (int)(LogicalHeight * Scale); // 1440
+        private static readonly int PixelWidth = (int)(LogicalWidth * Scale);          // 2560
+        private static readonly int ContentPixelHeight = (int)(LogicalHeight * Scale); // 1440
         private const int TitleBarPixelHeight = 56;                          // 28pt @2x
         private const int MaxAttempts = 3;
 
@@ -68,6 +71,69 @@ namespace PhoneDesk.Tests
 
         private static readonly Shot[] Shots =
         {
+            new("Welcome", true, "navigation-closed-Welcome-en.png", "navigation-closed-Welcome-en"),
+            new("Welcome", true, "navigation-closed-Welcome-de.png", "navigation-closed-Welcome-de"),
+            new("GetStarted", true, "navigation-closed-GetStarted-en.png", "navigation-closed-GetStarted-en"),
+            new("GetStarted", true, "navigation-help-GetStarted-en.png", "navigation-help-GetStarted-en"),
+            new("GetStarted", true, "navigation-closed-GetStarted-de.png", "navigation-closed-GetStarted-de"),
+            new("GetStarted", true, "navigation-help-GetStarted-de.png", "navigation-help-GetStarted-de"),
+            new("Variables", true, "navigation-closed-Variables-en.png", "navigation-closed-Variables-en"),
+            new("Variables", true, "navigation-help-Variables-en.png", "navigation-help-Variables-en"),
+            new("Variables", true, "navigation-closed-Variables-de.png", "navigation-closed-Variables-de"),
+            new("Variables", true, "navigation-help-Variables-de.png", "navigation-help-Variables-de"),
+            new("Wizard", true, "navigation-closed-Wizard-en.png", "navigation-closed-Wizard-en"),
+            new("Wizard", true, "navigation-closed-Wizard-de.png", "navigation-closed-Wizard-de"),
+            new("M365Groups", true, "navigation-closed-M365Groups-en.png", "navigation-closed-M365Groups-en"),
+            new("M365Groups", true, "navigation-help-M365Groups-en.png", "navigation-help-M365Groups-en"),
+            new("M365Groups", true, "navigation-closed-M365Groups-de.png", "navigation-closed-M365Groups-de"),
+            new("M365Groups", true, "navigation-help-M365Groups-de.png", "navigation-help-M365Groups-de"),
+            new("CallQueues", true, "navigation-closed-CallQueues-en.png", "navigation-closed-CallQueues-en"),
+            new("CallQueues", true, "navigation-help-CallQueues-en.png", "navigation-help-CallQueues-en"),
+            new("CallQueues", true, "navigation-closed-CallQueues-de.png", "navigation-closed-CallQueues-de"),
+            new("CallQueues", true, "navigation-help-CallQueues-de.png", "navigation-help-CallQueues-de"),
+            new("AutoAttendants", true, "navigation-closed-AutoAttendants-en.png", "navigation-closed-AutoAttendants-en"),
+            new("AutoAttendants", true, "navigation-help-AutoAttendants-en.png", "navigation-help-AutoAttendants-en"),
+            new("AutoAttendants", true, "navigation-closed-AutoAttendants-de.png", "navigation-closed-AutoAttendants-de"),
+            new("AutoAttendants", true, "navigation-help-AutoAttendants-de.png", "navigation-help-AutoAttendants-de"),
+            new("Holidays", true, "navigation-closed-Holidays-en.png", "navigation-closed-Holidays-en"),
+            new("Holidays", true, "navigation-help-Holidays-en.png", "navigation-help-Holidays-en"),
+            new("Holidays", true, "navigation-closed-Holidays-de.png", "navigation-closed-Holidays-de"),
+            new("Holidays", true, "navigation-help-Holidays-de.png", "navigation-help-Holidays-de"),
+            new("Dashboard", true, "navigation-closed-Dashboard-en.png", "navigation-closed-Dashboard-en"),
+            new("Dashboard", true, "navigation-help-Dashboard-en.png", "navigation-help-Dashboard-en"),
+            new("Dashboard", true, "navigation-closed-Dashboard-de.png", "navigation-closed-Dashboard-de"),
+            new("Dashboard", true, "navigation-help-Dashboard-de.png", "navigation-help-Dashboard-de"),
+            new("HealthCheck", true, "navigation-closed-HealthCheck-en.png", "navigation-closed-HealthCheck-en"),
+            new("HealthCheck", true, "navigation-help-HealthCheck-en.png", "navigation-help-HealthCheck-en"),
+            new("HealthCheck", true, "navigation-closed-HealthCheck-de.png", "navigation-closed-HealthCheck-de"),
+            new("HealthCheck", true, "navigation-help-HealthCheck-de.png", "navigation-help-HealthCheck-de"),
+            new("BulkOperations", true, "navigation-closed-BulkOperations-en.png", "navigation-closed-BulkOperations-en"),
+            new("BulkOperations", true, "navigation-help-BulkOperations-en.png", "navigation-help-BulkOperations-en"),
+            new("BulkOperations", true, "navigation-closed-BulkOperations-de.png", "navigation-closed-BulkOperations-de"),
+            new("BulkOperations", true, "navigation-help-BulkOperations-de.png", "navigation-help-BulkOperations-de"),
+            new("Documentation", true, "navigation-closed-Documentation-en.png", "navigation-closed-Documentation-en"),
+            new("Documentation", true, "navigation-help-Documentation-en.png", "navigation-help-Documentation-en"),
+            new("Documentation", true, "navigation-closed-Documentation-de.png", "navigation-closed-Documentation-de"),
+            new("Documentation", true, "navigation-help-Documentation-de.png", "navigation-help-Documentation-de"),
+            new("History", true, "navigation-closed-History-en.png", "navigation-closed-History-en"),
+            new("History", true, "navigation-help-History-en.png", "navigation-help-History-en"),
+            new("History", true, "navigation-closed-History-de.png", "navigation-closed-History-de"),
+            new("History", true, "navigation-help-History-de.png", "navigation-help-History-de"),
+            new("Welcome", true, "navigation-tour-Welcome-en.png", "navigation-tour-Welcome-en"),
+            new("Welcome", true, "navigation-tour-Welcome-de.png", "navigation-tour-Welcome-de"),
+            new("GetStarted", true, "navigation-tour-GetStarted-en.png", "navigation-tour-GetStarted-en"),
+            new("GetStarted", true, "navigation-tour-GetStarted-de.png", "navigation-tour-GetStarted-de"),
+            new("Variables", true, "navigation-tour-Variables-en.png", "navigation-tour-Variables-en"),
+            new("Variables", true, "navigation-tour-Variables-de.png", "navigation-tour-Variables-de"),
+            new("Wizard", true, "navigation-tour-Wizard-en.png", "navigation-tour-Wizard-en"),
+            new("Wizard", true, "navigation-tour-Wizard-de.png", "navigation-tour-Wizard-de"),
+            new("GetStarted", true, "navigation-ready-GetStarted-en.png", "navigation-ready-GetStarted-en"),
+            new("GetStarted", true, "navigation-ready-GetStarted-de.png", "navigation-ready-GetStarted-de"),
+            new("Variables", true, "navigation-ready-Variables-en.png", "navigation-ready-Variables-en"),
+            new("Variables", true, "navigation-ready-Variables-de.png", "navigation-ready-Variables-de"),
+            new("Variables", false, "navigation-light-help-Variables-en.png", "navigation-help-Variables-en"),
+            new("GetStarted", false, "navigation-light-GetStarted-de.png", "navigation-closed-GetStarted-de"),
+            new("Welcome", false, "navigation-light-tour-Welcome-en.png", "navigation-tour-Welcome-en"),
             new("Welcome", true, "shell-settings-en.png", "settings-en"),
             new("Welcome", true, "shell-settings-de.png", "settings-de"),
             new("Welcome", true, "welcome.png"),
@@ -203,11 +269,13 @@ namespace PhoneDesk.Tests
                 .FirstOrDefault(l => l.Name == "NavigationListBox")
                 ?? throw new InvalidOperationException("NavigationListBox not found in MainWindow.");
 
+            Assert.Equal("Welcome", (navList.SelectedItem as ListBoxItem)?.Tag);
+
             var kept = new List<string>();
             string? previousPage = null;
 
             foreach (var shot in Shots.Where(s => string.IsNullOrEmpty(Environment.GetEnvironmentVariable("SCREENSHOT_FILTER"))
-                || s.FileName.StartsWith(Environment.GetEnvironmentVariable("SCREENSHOT_FILTER")!, StringComparison.Ordinal)))
+                || Environment.GetEnvironmentVariable("SCREENSHOT_FILTER")!.Split(',').Any(prefix => s.FileName.StartsWith(prefix, StringComparison.Ordinal))))
             {
                 if (shot.Scenario.StartsWith("task6-", StringComparison.Ordinal))
                 {
@@ -261,6 +329,11 @@ namespace PhoneDesk.Tests
                 Console.WriteLine(
                     $"[screenshot] {shot.FileName}: {stats.Width}x{stats.Height} " +
                     $"distinctColors={stats.DistinctColors} brandPurplePixels={stats.BrandPurplePixels}");
+                foreach (var help in window.GetVisualDescendants().OfType<InfoButton>())
+                {
+                    help.Flyout?.Hide();
+                    ToolTip.SetIsOpen(help, false);
+                }
                 previousPage = shot.Page;
             }
 
@@ -343,7 +416,8 @@ namespace PhoneDesk.Tests
                 : AppLanguage.English;
 
             if (scenario.StartsWith("ready", StringComparison.Ordinal)
-                || scenario.StartsWith("failed", StringComparison.Ordinal))
+                || scenario.StartsWith("failed", StringComparison.Ordinal)
+                || scenario.StartsWith("navigation-ready-", StringComparison.Ordinal))
             {
                 sharedState.Variables = new PhoneManagerVariables
                 {
@@ -383,6 +457,48 @@ namespace PhoneDesk.Tests
             }
 
             mainWindowViewModel.IsSettingsOpen = false;
+            if (scenario.StartsWith("navigation-", StringComparison.Ordinal))
+            {
+                if (mainWindowViewModel.CurrentViewModel is GetStartedViewModel readiness)
+                {
+                    var prerequisite = window.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Name == "ReadinessPrerequisite");
+                    Assert.Equal(!readiness.CanProceed, prerequisite.IsVisible);
+                    Assert.Equal(readiness.SetupGuidanceDetail, prerequisite.Text);
+                }
+                if (mainWindowViewModel.CurrentViewModel is VariablesViewModel)
+                {
+                    var next = window.GetVisualDescendants().OfType<Button>().Single(b => b.Name == "ContinueToGuidedSetupButton");
+                    Assert.NotNull(next.Command);
+                    Assert.True(next.Command.CanExecute(null));
+                }
+                mainWindowViewModel.IsIntroductionVisible = scenario.StartsWith("navigation-tour-", StringComparison.Ordinal)
+                    && mainWindowViewModel.CurrentPage != "Wizard";
+                PumpRender();
+                if (scenario.StartsWith("navigation-help-", StringComparison.Ordinal))
+                {
+                    var help = window.GetVisualDescendants().OfType<InfoButton>().Single(c => c.Name == "PageHelp");
+                    Assert.False(string.IsNullOrWhiteSpace(AutomationProperties.GetName(help)));
+                    var point = help.TranslatePoint(new Point(help.Bounds.Width / 2, help.Bounds.Height / 2), window)!.Value;
+                    window.MouseMove(point);
+                    PumpRender();
+                    Assert.True(ToolTip.GetIsOpen(help));
+                    window.MouseMove(new Point(0, 0));
+                    PumpRender();
+                    help.Focus(NavigationMethod.Tab);
+                    PumpRender();
+                    Assert.True(ToolTip.GetIsOpen(help));
+                    window.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+                    window.KeyReleaseQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+                    PumpRender();
+                    Assert.False(ToolTip.GetIsOpen(help));
+                    window.KeyPressQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+                    window.KeyReleaseQwerty(PhysicalKey.Enter, RawInputModifiers.None);
+                    PumpRender();
+                    Assert.True(help.Flyout!.IsOpen);
+                    Assert.False(ToolTip.GetIsOpen(help));
+                }
+            }
+
             if (scenario.StartsWith("ready-connections", StringComparison.Ordinal))
             {
                 var scroll = window.GetVisualDescendants().OfType<ScrollViewer>().Single(e => e.Name == "ReadinessScroll");
@@ -1123,11 +1239,36 @@ namespace PhoneDesk.Tests
             configure.Invoke(null, new object[] { services });
 
             // Swap the only services that would touch PowerShell / MSAL-Graph / the network.
+            ReplaceSingleton<IUserPreferencesStore>(services, new ScreenshotPreferences());
+            ReplaceSingleton<IAuditLog>(services, new ScreenshotAuditLog());
             ReplaceSingleton<IUpdateCheckService>(services, new StubUpdateCheckService());
             ReplaceSingleton<IPowerShellContextService>(services, new StubPowerShellContextService());
             ReplaceSingleton<IMsalGraphAuthenticationService>(services, new StubMsalGraphAuthenticationService());
 
             return services.BuildServiceProvider();
+        }
+
+        private sealed class ScreenshotAuditLog : IAuditLog
+        {
+            public string LogDirectoryPath => "C:/Example/PhoneDesk/audit";
+            public void Append(PhoneDesk.Audit.AuditRecord record) { }
+            public IReadOnlyList<PhoneDesk.Audit.AuditRecord> Read() => new[]
+            {
+                new PhoneDesk.Audit.AuditRecord
+                {
+                    TimestampUtc = new DateTimeOffset(2026, 10, 14, 9, 0, 0, TimeSpan.Zero),
+                    Operation = "CheckModules", Operator = "operator@example.com", Target = "Example reception",
+                    Outcome = PhoneDesk.Audit.AuditOutcome.Success
+                }
+            };
+        }
+
+        private sealed class ScreenshotPreferences : IUserPreferencesStore
+        {
+            public AppLanguage? LoadLanguage() => AppLanguage.English;
+            public void SaveLanguage(AppLanguage language) { }
+            public bool LoadIntroductionDismissed() => true;
+            public void SaveIntroductionDismissed() { }
         }
 
         private static void ReplaceSingleton<T>(IServiceCollection services, object implementation) where T : class

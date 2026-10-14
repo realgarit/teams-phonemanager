@@ -100,20 +100,6 @@
                                 </StackPanel>
                             </ListBoxItem>
 
-                            <ListBoxItem Tag="Dashboard" Classes="nav" AutomationProperties.Name="{loc:Translate Key=MainNavigationDashboard}">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                                    <fi:SymbolIcon Symbol="DataTrending"/>
-                                    <TextBlock Text="{loc:Translate Key=MainNavigationDashboard}" FontSize="13" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </ListBoxItem>
-
-                            <ListBoxItem Tag="HealthCheck" Classes="nav" AutomationProperties.Name="{loc:Translate Key=MainNavigationHealthCheck}">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                                    <fi:SymbolIcon Symbol="ShieldCheckmark"/>
-                                    <TextBlock Text="{loc:Translate Key=MainNavigationHealthCheck}" FontSize="13" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </ListBoxItem>
-
                             <ListBoxItem Tag="GetStarted" Classes="nav" AutomationProperties.Name="{loc:Translate Key=MainNavigationReadinessCheck}">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                                     <fi:SymbolIcon Symbol="Rocket"/>
@@ -125,6 +111,13 @@
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
                                     <fi:SymbolIcon Symbol="Code"/>
                                     <TextBlock Text="{loc:Translate Key=MainNavigationConfiguration}" FontSize="13" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem Tag="Wizard" Classes="nav" AutomationProperties.Name="{loc:Translate Key=MainNavigationGuidedSetup}">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                                    <fi:SymbolIcon Symbol="Wand"/>
+                                    <TextBlock Text="{loc:Translate Key=MainNavigationGuidedSetup}" FontSize="13" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </ListBoxItem>
 
@@ -164,10 +157,17 @@
                                 <TextBlock Text="{loc:Translate Key=MainNavigationGroupTools}"/>
                             </ListBoxItem>
 
-                            <ListBoxItem Tag="Wizard" Classes="nav" AutomationProperties.Name="{loc:Translate Key=MainNavigationGuidedSetup}">
+                            <ListBoxItem Tag="Dashboard" Classes="nav" AutomationProperties.Name="{loc:Translate Key=MainNavigationDashboard}">
                                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
-                                    <fi:SymbolIcon Symbol="Wand"/>
-                                    <TextBlock Text="{loc:Translate Key=MainNavigationGuidedSetup}" FontSize="13" VerticalAlignment="Center"/>
+                                    <fi:SymbolIcon Symbol="DataTrending"/>
+                                    <TextBlock Text="{loc:Translate Key=MainNavigationDashboard}" FontSize="13" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </ListBoxItem>
+
+                            <ListBoxItem Tag="HealthCheck" Classes="nav" AutomationProperties.Name="{loc:Translate Key=MainNavigationHealthCheck}">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="12">
+                                    <fi:SymbolIcon Symbol="ShieldCheckmark"/>
+                                    <TextBlock Text="{loc:Translate Key=MainNavigationHealthCheck}" FontSize="13" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </ListBoxItem>
 
@@ -238,8 +238,23 @@
             <Grid Grid.Column="1" RowDefinitions="*,Auto">
 
                 <!-- Content Area -->
-                <Grid Grid.Row="0" Margin="20,18,20,10">
-                    <TransitioningContentControl Content="{Binding CurrentViewModel}">
+                <Grid Grid.Row="0" Margin="20,18,20,10" RowDefinitions="Auto,*">
+                    <Border Name="IntroductionPanel" IsVisible="{Binding IsIntroductionVisible}"
+                            Background="{DynamicResource AccentSoftBrush}" CornerRadius="10" Padding="14" Margin="0,0,0,12">
+                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto" ColumnSpacing="12" RowSpacing="6">
+                            <TextBlock Text="{Binding IntroductionTitle}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                            <Button Grid.Column="1" Command="{Binding DismissIntroductionCommand}" Classes="IconOnly"
+                                    AutomationProperties.Name="{loc:Translate Key=IntroductionClose}" ToolTip.Tip="{loc:Translate Key=IntroductionClose}">
+                                <fi:SymbolIcon Symbol="Dismiss"/>
+                            </Button>
+                            <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding IntroductionBody}" TextWrapping="Wrap"/>
+                            <WrapPanel Grid.Row="2" Grid.ColumnSpan="2" Orientation="Horizontal">
+                                <Button Command="{Binding NextIntroductionCommand}" Content="{Binding IntroductionNextText}" Classes="accent" Margin="0,4,8,0"/>
+                                <Button Command="{Binding DismissIntroductionCommand}" Content="{loc:Translate Key=IntroductionSkip}" Margin="0,4,0,0"/>
+                            </WrapPanel>
+                        </Grid>
+                    </Border>
+                    <TransitioningContentControl Grid.Row="1" Content="{Binding CurrentViewModel}">
                         <TransitioningContentControl.PageTransition>
                             <CrossFade Duration="0:0:0.15"/>
                         </TransitioningContentControl.PageTransition>
@@ -478,6 +493,8 @@
                 <!-- Content -->
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
                     <StackPanel Margin="24,20" Spacing="20">
+
+                        <Button Command="{Binding ShowIntroductionCommand}" Content="{loc:Translate Key=IntroductionReplay}" HorizontalAlignment="Stretch"/>
 
                         <!-- Appearance Section -->
                         <StackPanel Spacing="12">

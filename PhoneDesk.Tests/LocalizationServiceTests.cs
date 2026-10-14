@@ -168,9 +168,17 @@ public sealed class LocalizationServiceTests
                 }
             });
 
-    private sealed class InMemoryUserPreferencesStore(AppLanguage? initialLanguage = null) : IUserPreferencesStore
+    private sealed class InMemoryUserPreferencesStore : IUserPreferencesStore
     {
-        public AppLanguage? SavedLanguage { get; private set; } = initialLanguage;
+        public InMemoryUserPreferencesStore(AppLanguage? initialLanguage = null)
+        {
+            SavedLanguage = initialLanguage;
+        }
+
+        public bool LoadIntroductionDismissed() => true;
+        public void SaveIntroductionDismissed() { }
+
+        public AppLanguage? SavedLanguage { get; private set; }
 
         public AppLanguage? LoadLanguage() => SavedLanguage;
 

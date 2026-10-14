@@ -23,6 +23,9 @@ namespace PhoneDesk.ViewModels
         private ConfigurationDocument? _pendingConfigurationDocument;
         private bool _preserveImportedTargets;
 
+        [RelayCommand]
+        private void OpenGuidedSetup() => NavigateTo("Wizard");
+
         [ObservableProperty]
         private bool _showConfigurationImportPreview;
 

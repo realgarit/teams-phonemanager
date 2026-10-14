@@ -7,4 +7,8 @@ public interface IUserPreferencesStore
     AppLanguage? LoadLanguage();
 
     void SaveLanguage(AppLanguage language);
+
+    bool LoadIntroductionDismissed();
+
+    void SaveIntroductionDismissed();
 }
