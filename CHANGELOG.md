@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.31.1](https://github.com/realgarit/phonedesk/compare/v3.31.0...v3.31.1) (2026-10-17)
+
+
+### Bug Fixes
+
+* keep the same-organization sign-in requirement visible ([3d92c1b](https://github.com/realgarit/phonedesk/commit/3d92c1b5d54102e69b9ce1ee0324f0e7fe664b80))
+* keep the same-organization sign-in requirement visible ([5d4cb6c](https://github.com/realgarit/phonedesk/commit/5d4cb6c032432f4df6f2396958da5a080aaa8d61))
+
 ## [3.31.0](https://github.com/realgarit/phonedesk/compare/v3.30.0...v3.31.0) (2026-10-14)
 
 
