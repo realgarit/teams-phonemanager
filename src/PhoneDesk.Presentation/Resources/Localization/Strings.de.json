@@ -13,6 +13,7 @@
   "GetStartedChecklistAccount": "Ein Administratorkonto für die Organisation, die Sie einrichten. Bitten Sie Ihre Microsoft-365-Administration um Hilfe bei Zugriff, Lizenzen und Telefonnummern.",
   "GetStartedChecklistPlan": "Einen einfachen Anrufplan: Wer antwortet, wann ist geöffnet und was hören Anrufende, wenn niemand antwortet? Diese Angaben tragen Sie unter Konfiguration ein.",
   "GetStartedChecklistScope": "Diese Prüfungen bereiten die App und ihre Verbindungen vor. Sie bestätigen nicht, dass Ihre Lizenzen, Telefonnummern oder der gesamte Anrufablauf einsatzbereit sind.",
+  "GetStartedSameOrganizationRequirement": "Melden Sie sich bei Teams und Graph in derselben Organisation an.",
   "CommonOpen": "Öffnen",
   "MainBrandForMicrosoftTeams": "für Microsoft Teams",
   "MainUpdateBadge": "AKTUALISIERUNG",

@@ -16,6 +16,7 @@ public enum UiTextKey
     GetStartedChecklistAccount,
     GetStartedChecklistPlan,
     GetStartedChecklistScope,
+    GetStartedSameOrganizationRequirement,
     CommonOpen,
     MainBrandForMicrosoftTeams,
     MainUpdateBadge,
