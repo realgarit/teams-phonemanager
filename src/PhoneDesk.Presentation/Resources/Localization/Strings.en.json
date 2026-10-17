@@ -13,6 +13,7 @@
   "GetStartedChecklistAccount": "An administrator account for the organization you will set up. Ask your Microsoft 365 administrator to help with access, licenses, and phone numbers.",
   "GetStartedChecklistPlan": "A simple call plan: who answers, when the business is open, and what callers should hear when nobody answers. You will enter these details in Configuration.",
   "GetStartedChecklistScope": "These checks prepare the app and its connections. They do not confirm that your licenses, phone numbers, or complete call flow are ready for use.",
+  "GetStartedSameOrganizationRequirement": "Sign in to the same organization in Teams and Graph.",
   "CommonOpen": "Open",
   "MainBrandForMicrosoftTeams": "for Microsoft Teams",
   "MainUpdateBadge": "UPDATE",

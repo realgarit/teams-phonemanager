@@ -474,6 +474,8 @@ namespace PhoneDesk.Tests
                 mainWindowViewModel.IsIntroductionVisible = scenario.StartsWith("navigation-tour-", StringComparison.Ordinal)
                     && mainWindowViewModel.CurrentPage != "Wizard";
                 PumpRender();
+                if (mainWindowViewModel.CurrentViewModel is GetStartedViewModel)
+                    AssertSameOrganizationRequirement(provider, window);
                 if (scenario.StartsWith("navigation-help-", StringComparison.Ordinal))
                 {
                     var help = window.GetVisualDescendants().OfType<InfoButton>().Single(c => c.Name == "PageHelp");
@@ -826,6 +828,30 @@ namespace PhoneDesk.Tests
                     PumpRender();
                     break;
             }
+        }
+
+        private static void AssertSameOrganizationRequirement(ServiceProvider provider, MainWindow window)
+        {
+            var requirement = window.GetVisualDescendants().OfType<TextBlock>()
+                .Single(t => t.Name == "SameOrganizationRequirement");
+            Assert.True(requirement.IsEffectivelyVisible);
+            Assert.Equal(ReadinessGuidanceTests.ExpectedSameOrganizationRequirement(
+                provider.GetRequiredService<ITranslationService>().CurrentLanguage), requirement.Text);
+            Assert.DoesNotContain(requirement.GetVisualAncestors(), v => v is Expander or InfoButton);
+            Assert.True(requirement.Bounds.Width > 0 && requirement.Bounds.Height > 0);
+
+            var scroll = window.GetVisualDescendants().OfType<ScrollViewer>()
+                .Single(v => v.Name == "ReadinessScroll");
+            var position = requirement.TranslatePoint(default, window)!.Value;
+            var scrollPosition = scroll.TranslatePoint(default, window)!.Value;
+            Assert.InRange(position.X, scrollPosition.X, window.Bounds.Width - requirement.Bounds.Width);
+            Assert.InRange(position.Y, scrollPosition.Y, Math.Min(window.Bounds.Height,
+                scrollPosition.Y + scroll.Bounds.Height) - requirement.Bounds.Height);
+
+            var firstAction = window.GetVisualDescendants().OfType<Button>().Single(button =>
+                ReferenceEquals(button.Command, ((GetStartedViewModel)requirement.DataContext!).CheckModulesCommand));
+            Assert.True(position.Y + requirement.Bounds.Height <= firstAction.TranslatePoint(default, window)!.Value.Y,
+                "The same-organization instruction must be visible above the setup and sign-in actions.");
         }
 
         private static ShotContext CreateShotContext(ServiceProvider provider)

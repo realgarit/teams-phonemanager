@@ -61,7 +61,9 @@
                         <TextBlock Name="ReadinessPrerequisite" Text="{Binding SetupGuidanceDetail}"
                                    IsVisible="{Binding !CanProceed}" FontSize="12" TextWrapping="Wrap"
                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
-
+                        <TextBlock Name="SameOrganizationRequirement"
+                                   Text="{loc:Translate Key=GetStartedSameOrganizationRequirement}"
+                                   FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap"/>
                     </StackPanel>
                     <Button Grid.Column="2"
                             Command="{Binding NavigateToPageCommand}"
