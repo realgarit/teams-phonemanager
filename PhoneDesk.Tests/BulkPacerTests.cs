@@ -25,7 +25,7 @@ namespace PhoneDesk.Tests
             var (pacer, paced) = Create(new ThrottleRetryOptions { BulkInterItemDelaySeconds = 1 });
 
             Assert.Equal(1.0, pacer.CurrentDelay.TotalSeconds);
-            await pacer.PaceAsync();
+            await pacer.PaceAsync(TestContext.Current.CancellationToken);
             Assert.Equal(new[] { 1.0 }, paced.ConvertAll(t => t.TotalSeconds));
         }
 
@@ -99,7 +99,7 @@ namespace PhoneDesk.Tests
             });
 
             pacer.RegisterThrottle();
-            await pacer.PaceAsync();
+            await pacer.PaceAsync(TestContext.Current.CancellationToken);
 
             Assert.Equal(new[] { 2.0 }, paced.ConvertAll(t => t.TotalSeconds));
         }

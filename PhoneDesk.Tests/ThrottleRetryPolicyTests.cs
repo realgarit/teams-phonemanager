@@ -65,7 +65,7 @@ namespace PhoneDesk.Tests
             var policy = PolicyWith(logger.Object, opts, delays);
 
             var invocations = 0;
-            var result = await policy.ExecuteAsync(_ => { invocations++; return Task.FromResult(Throttled()); }, Idempotent());
+            var result = await policy.ExecuteAsync(_ => { invocations++; return Task.FromResult(Throttled()); }, Idempotent(), TestContext.Current.CancellationToken);
 
             Assert.Equal(5, invocations); // 1 initial + 4 retries
             Assert.Equal(new[] { 2.0, 4.0, 8.0, 16.0 }, delays.ConvertAll(d => d.TotalSeconds));
@@ -80,7 +80,7 @@ namespace PhoneDesk.Tests
             var opts = new ThrottleRetryOptions { MaxAttempts = 6, BaseDelaySeconds = 2, MaxDelaySeconds = 10, JitterFactor = 0 };
             var policy = PolicyWith(logger.Object, opts, delays);
 
-            await policy.ExecuteAsync(_ => Task.FromResult(Throttled()), Idempotent());
+            await policy.ExecuteAsync(_ => Task.FromResult(Throttled()), Idempotent(), TestContext.Current.CancellationToken);
 
             Assert.Equal(new[] { 2.0, 4.0, 8.0, 10.0, 10.0 }, delays.ConvertAll(d => d.TotalSeconds));
         }
@@ -93,7 +93,7 @@ namespace PhoneDesk.Tests
             var opts = new ThrottleRetryOptions { MaxAttempts = 2, BaseDelaySeconds = 2, MaxDelaySeconds = 60, JitterFactor = 0.25 };
             var policy = PolicyWith(logger.Object, opts, delays, jitter: 1.0); // full jitter -> 1.0 * 0.25 * 2 = 0.5
 
-            await policy.ExecuteAsync(_ => Task.FromResult(Throttled()), Idempotent());
+            await policy.ExecuteAsync(_ => Task.FromResult(Throttled()), Idempotent(), TestContext.Current.CancellationToken);
 
             Assert.Single(delays);
             Assert.Equal(2.5, delays[0].TotalSeconds, precision: 6);
@@ -109,7 +109,7 @@ namespace PhoneDesk.Tests
 
             await policy.ExecuteAsync(
                 _ => Task.FromResult(Throttled("ERROR: 429 TooManyRequests. Retry-After: 7")),
-                Idempotent());
+                Idempotent(), TestContext.Current.CancellationToken);
 
             Assert.Equal(new[] { 7.0, 7.0 }, delays.ConvertAll(d => d.TotalSeconds));
         }
@@ -124,7 +124,7 @@ namespace PhoneDesk.Tests
 
             await policy.ExecuteAsync(
                 _ => Task.FromResult(Throttled("ERROR: throttled, Retry-After: 9999")),
-                Idempotent());
+                Idempotent(), TestContext.Current.CancellationToken);
 
             Assert.Single(delays);
             Assert.Equal(120.0, delays[0].TotalSeconds);
@@ -139,7 +139,7 @@ namespace PhoneDesk.Tests
             var policy = PolicyWith(logger.Object, opts, delays);
 
             var invocations = 0;
-            var result = await policy.ExecuteAsync(_ => { invocations++; return Task.FromResult(Throttled()); }, Idempotent());
+            var result = await policy.ExecuteAsync(_ => { invocations++; return Task.FromResult(Throttled()); }, Idempotent(), TestContext.Current.CancellationToken);
 
             Assert.Equal(3, invocations);
             Assert.Equal(2, delays.Count); // waits happen between the 3 attempts only
@@ -154,7 +154,7 @@ namespace PhoneDesk.Tests
             var policy = PolicyWith(logger.Object, ThrottleRetryOptions.Default, delays);
 
             var invocations = 0;
-            var result = await policy.ExecuteAsync(_ => { invocations++; return Task.FromResult(ValidationFailure()); }, Idempotent());
+            var result = await policy.ExecuteAsync(_ => { invocations++; return Task.FromResult(ValidationFailure()); }, Idempotent(), TestContext.Current.CancellationToken);
 
             Assert.Equal(1, invocations);
             Assert.Empty(delays);
@@ -169,7 +169,7 @@ namespace PhoneDesk.Tests
             var policy = PolicyWith(logger.Object, ThrottleRetryOptions.Default, delays);
 
             var invocations = 0;
-            var result = await policy.ExecuteAsync(_ => { invocations++; return Task.FromResult(Success()); }, Idempotent());
+            var result = await policy.ExecuteAsync(_ => { invocations++; return Task.FromResult(Success()); }, Idempotent(), TestContext.Current.CancellationToken);
 
             Assert.Equal(1, invocations);
             Assert.Empty(delays);
@@ -189,7 +189,7 @@ namespace PhoneDesk.Tests
             {
                 invocations++;
                 return Task.FromResult(invocations < 3 ? Throttled() : Success());
-            }, Idempotent());
+            }, Idempotent(), TestContext.Current.CancellationToken);
 
             Assert.Equal(3, invocations);
             Assert.Equal(2, delays.Count);
@@ -206,7 +206,7 @@ namespace PhoneDesk.Tests
             var invocations = 0;
             var result = await policy.ExecuteAsync(
                 _ => { invocations++; return Task.FromResult(Throttled()); },
-                new ThrottleRetryContext("BulkOperations", isIdempotent: false));
+                new ThrottleRetryContext("BulkOperations", isIdempotent: false), TestContext.Current.CancellationToken);
 
             Assert.Equal(1, invocations);
             Assert.Empty(delays);
@@ -222,7 +222,7 @@ namespace PhoneDesk.Tests
             var opts = new ThrottleRetryOptions { MaxAttempts = 3, BaseDelaySeconds = 8, JitterFactor = 0 };
             var policy = PolicyWith(logger.Object, opts, delays);
 
-            await policy.ExecuteAsync(_ => Task.FromResult(Throttled()), Idempotent("Connect"));
+            await policy.ExecuteAsync(_ => Task.FromResult(Throttled()), Idempotent("Connect"), TestContext.Current.CancellationToken);
 
             Assert.Contains(lines, l => l.Contains("retrying in 8s", StringComparison.OrdinalIgnoreCase)
                                         && l.Contains("attempt 2/3", StringComparison.Ordinal));
