@@ -46,7 +46,7 @@ public sealed class PowerShellContextServiceIntegrationTests
         var running = service.ExecuteCommandWithDetailsAsync(
             "Start-Sleep -Seconds 30; 'should-not-reach'", null, null, cts.Token);
 
-        await Task.Delay(500);
+        await Task.Delay(500, TestContext.Current.CancellationToken);
 
         var stopwatch = Stopwatch.StartNew();
         cts.Cancel();
@@ -58,7 +58,7 @@ public sealed class PowerShellContextServiceIntegrationTests
             stopwatch.Elapsed < TimeSpan.FromSeconds(15),
             $"Cancellation took {stopwatch.Elapsed.TotalSeconds:F1}s; it should interrupt the pipeline promptly.");
 
-        var followUp = await service.ExecuteCommandWithDetailsAsync("'still-alive'", null, null, default);
+        var followUp = await service.ExecuteCommandWithDetailsAsync("'still-alive'", null, null, TestContext.Current.CancellationToken);
         Assert.Contains("still-alive", followUp.Output);
         Assert.False(followUp.HadErrors);
     }
@@ -73,7 +73,7 @@ public sealed class PowerShellContextServiceIntegrationTests
             "Write-Progress -Activity 'Provisioning' -Status 'Working' -PercentComplete 42; 'done'",
             null,
             progress,
-            default);
+            TestContext.Current.CancellationToken);
 
         Assert.Contains("done", result.Output);
         Assert.Contains(progress.Reports, report =>
@@ -92,7 +92,7 @@ public sealed class PowerShellContextServiceIntegrationTests
             "Write-Progress -Activity 'Scanning' -Status 'Please wait'; 'ok'",
             null,
             progress,
-            default);
+            TestContext.Current.CancellationToken);
 
         Assert.Contains(progress.Reports, report => report.Activity == "Scanning" && report.IsIndeterminate);
     }
@@ -103,11 +103,11 @@ public sealed class PowerShellContextServiceIntegrationTests
         using var service = CreateService();
 
         var first = service.ExecuteCommandWithDetailsAsync(
-            "'A-start'; Start-Sleep -Milliseconds 400; 'A-end'", null, null, default);
+            "'A-start'; Start-Sleep -Milliseconds 400; 'A-end'", null, null, TestContext.Current.CancellationToken);
         var second = service.ExecuteCommandWithDetailsAsync(
-            "'B-start'; 'B-end'", null, null, default);
+            "'B-start'; 'B-end'", null, null, TestContext.Current.CancellationToken);
 
-        var results = await Task.WhenAll(first, second).WaitAsync(TimeSpan.FromSeconds(10));
+        var results = await Task.WhenAll(first, second).WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
 
         Assert.Contains("A-start", results[0].Output);
         Assert.Contains("A-end", results[0].Output);
@@ -124,7 +124,7 @@ public sealed class PowerShellContextServiceIntegrationTests
         await ImportStubModuleAsync(service);
 
         var execution = await service.ExecuteCommandWithDetailsAsync(
-            "Invoke-PhoneDeskSuccess", null, null, default);
+            "Invoke-PhoneDeskSuccess", null, null, TestContext.Current.CancellationToken);
         var operation = PowerShellOperationResultMapper.Map(execution, correlationId: "integration-success");
         var topology = new TenantTopologyAssembler().Assemble(execution.Output, DateTimeOffset.UnixEpoch);
 
@@ -154,7 +154,7 @@ public sealed class PowerShellContextServiceIntegrationTests
         using var service = CreateService();
         await ImportStubModuleAsync(service);
 
-        var execution = await service.ExecuteCommandWithDetailsAsync(command, null, null, default);
+        var execution = await service.ExecuteCommandWithDetailsAsync(command, null, null, TestContext.Current.CancellationToken);
         var operation = PowerShellOperationResultMapper.Map(execution);
 
         Assert.True(execution.HadErrors);
@@ -174,7 +174,7 @@ public sealed class PowerShellContextServiceIntegrationTests
         await ImportStubModuleAsync(service);
 
         var execution = await service.ExecuteCommandWithDetailsAsync(
-            "Invoke-PhoneDeskMalformed", null, null, default);
+            "Invoke-PhoneDeskMalformed", null, null, TestContext.Current.CancellationToken);
         var topology = new TenantTopologyAssembler().Assemble(execution.Output, DateTimeOffset.UnixEpoch);
 
         Assert.False(execution.HadErrors);
@@ -191,7 +191,7 @@ public sealed class PowerShellContextServiceIntegrationTests
         await ImportStubModuleAsync(service);
 
         var execution = await service.ExecuteCommandWithDetailsAsync(
-            "Invoke-PhoneDeskEmpty", null, null, default);
+            "Invoke-PhoneDeskEmpty", null, null, TestContext.Current.CancellationToken);
         var operation = PowerShellOperationResultMapper.Map(execution);
         var topology = new TenantTopologyAssembler().Assemble(execution.Output, DateTimeOffset.UnixEpoch);
 
@@ -211,7 +211,7 @@ public sealed class PowerShellContextServiceIntegrationTests
         await ImportStubModuleAsync(service);
 
         var execution = await service.ExecuteCommandWithDetailsAsync(
-            "Invoke-PhoneDeskError", null, null, default);
+            "Invoke-PhoneDeskError", null, null, TestContext.Current.CancellationToken);
         var operation = PowerShellOperationResultMapper.Map(execution);
         var topology = new TenantTopologyAssembler().Assemble(execution.Output, DateTimeOffset.UnixEpoch);
 
@@ -238,7 +238,7 @@ public sealed class PowerShellContextServiceIntegrationTests
                 command,
                 new Dictionary<string, string> { [variableName] = "sensitive-test-value" },
                 null,
-                default);
+                TestContext.Current.CancellationToken);
 
             Assert.Null(Environment.GetEnvironmentVariable(variableName));
         }
@@ -256,11 +256,11 @@ public sealed class PowerShellContextServiceIntegrationTests
         ConcurrencyProbe.Reset();
 
         var first = service.ExecuteCommandWithDetailsAsync(
-            "Invoke-PhoneDeskProbe -Name 'first' -DelayMilliseconds 250", null, null, default);
+            "Invoke-PhoneDeskProbe -Name 'first' -DelayMilliseconds 250", null, null, TestContext.Current.CancellationToken);
         var second = service.ExecuteCommandWithDetailsAsync(
-            "Invoke-PhoneDeskProbe -Name 'second' -DelayMilliseconds 250", null, null, default);
+            "Invoke-PhoneDeskProbe -Name 'second' -DelayMilliseconds 250", null, null, TestContext.Current.CancellationToken);
 
-        var results = await Task.WhenAll(first, second).WaitAsync(TimeSpan.FromSeconds(10));
+        var results = await Task.WhenAll(first, second).WaitAsync(TimeSpan.FromSeconds(10), TestContext.Current.CancellationToken);
 
         Assert.All(results, result => Assert.False(result.HadErrors, result.Output));
         Assert.Contains("SUCCESS: first", results[0].Output);

@@ -39,7 +39,7 @@ public sealed class UpdateServicesTests
             }));
         var service = new GitHubUpdateCheckService("1.0.0", httpClient);
 
-        var update = await service.CheckForUpdateAsync();
+        var update = await service.CheckForUpdateAsync(TestContext.Current.CancellationToken);
 
         Assert.NotNull(update);
         Assert.NotNull(update.WindowsInstaller);
@@ -62,9 +62,9 @@ public sealed class UpdateServicesTests
             "https://github.com/realgarit/phonedesk/releases/download/v2.0.0/phonedesk-win-x64-setup.exe",
             digest);
 
-        var path = await service.DownloadInstallerAsync(asset);
+        var path = await service.DownloadInstallerAsync(asset, cancellationToken: TestContext.Current.CancellationToken);
 
-        Assert.Equal(content, await File.ReadAllBytesAsync(path));
+        Assert.Equal(content, await File.ReadAllBytesAsync(path, TestContext.Current.CancellationToken));
         Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
     }
 
@@ -84,7 +84,7 @@ public sealed class UpdateServicesTests
             new string('a', 64));
 
         var exception = await Assert.ThrowsAsync<UpdateInstallationException>(
-            () => service.DownloadInstallerAsync(asset));
+            () => service.DownloadInstallerAsync(asset, cancellationToken: TestContext.Current.CancellationToken));
 
         Assert.Contains("integrity check", exception.Message);
     }
