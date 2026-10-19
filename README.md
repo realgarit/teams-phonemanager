@@ -72,6 +72,8 @@ location. Keep the same scope and path when upgrading.
 
 ### macOS
 
+Requires macOS 15 (Sequoia) or later, the oldest macOS that .NET 10 supports.
+
 ```bash
 brew tap realgarit/tap
 brew trust realgarit/tap

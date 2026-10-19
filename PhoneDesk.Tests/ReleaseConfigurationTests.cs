@@ -36,6 +36,28 @@ public sealed class ReleaseConfigurationTests
         Assert.Equal($"{expectedVersion}.0", versionAttribute!.Value);
     }
 
+    [Fact]
+    public void MacOsMinimumVersion_MatchesBundleAndHomebrewCask()
+    {
+        // .NET 10 supports macOS 15 and later (dotnet/core release-notes/10.0/supported-os.json).
+        // The app bundle and the generated Homebrew cask must declare the same floor.
+        var root = FindRepositoryRoot();
+        var packageScript = File.ReadAllText(Path.Combine(root, "scripts", "package-macos.sh"));
+        var buildWorkflow = File.ReadAllText(Path.Combine(root, ".github", "workflows", "build.yml"));
+
+        var plistMatch = System.Text.RegularExpressions.Regex.Match(
+            packageScript,
+            @"<key>LSMinimumSystemVersion</key>\s*<string>([0-9.]+)</string>");
+        Assert.True(plistMatch.Success, "LSMinimumSystemVersion not found in package-macos.sh");
+        Assert.Equal("15.0", plistMatch.Groups[1].Value);
+
+        var caskMatch = System.Text.RegularExpressions.Regex.Match(
+            buildWorkflow,
+            @"depends_on macos: :([a-z_]+)");
+        Assert.True(caskMatch.Success, "depends_on macos not found in build.yml");
+        Assert.Equal("sequoia", caskMatch.Groups[1].Value);
+    }
+
     private static string FindRepositoryRoot()
     {
         var directory = new DirectoryInfo(AppContext.BaseDirectory);
