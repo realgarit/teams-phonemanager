@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.32.0](https://github.com/realgarit/phonedesk/compare/v3.31.1...v3.32.0) (2026-10-19)
+
+
+### Features
+
+* **macos:** require macOS 15 Sequoia or later ([9ece5c0](https://github.com/realgarit/phonedesk/commit/9ece5c0bfd2a98be21f953c7fd3e59a2b2595da0))
+* **macos:** require macOS 15 Sequoia or later ([0898da4](https://github.com/realgarit/phonedesk/commit/0898da4edbd4d4ef71e94b6bf8fc20cc4e8e546d))
+
 ## [3.31.1](https://github.com/realgarit/phonedesk/compare/v3.31.0...v3.31.1) (2026-10-17)
 
 
