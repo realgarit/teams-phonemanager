@@ -307,7 +307,7 @@ namespace PhoneDesk.ViewModels
                 var command = _powerShellCommandService.GetAssignLicenseCommand(variables.RacqUPN, variables.SkuId);
                 var result = await ExecutePowerShellCommandAsync(command, "AssignLicense");
                 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.CallQueuesAssignLicenseSuccess,
@@ -386,7 +386,7 @@ namespace PhoneDesk.ViewModels
                 var command = _powerShellCommandService.GetM365GroupIdCommand(variables.M365Group);
                 var result = await ExecutePowerShellCommandAsync(command, null, "GetM365GroupId", allowThrottleRetry: true);
                 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     // Parse the group ID from the result
                     var lines = (result.Value ?? string.Empty).Split('\n', StringSplitOptions.RemoveEmptyEntries);
@@ -483,7 +483,7 @@ namespace PhoneDesk.ViewModels
                 }
 
                 // Validate that the UPN includes a domain
-                if (string.IsNullOrWhiteSpace(variables.MsFallbackDomain) || !variables.MsFallbackDomain.StartsWith("@"))
+                if (!PhoneDesk.Models.ResourceAccountUpn.IsValidFallbackDomain(variables.MsFallbackDomain))
                 {
                     StatusMessage = GetText(
                         UiTextKey.RuntimeFallbackDomainInvalidError,
@@ -495,7 +495,7 @@ namespace PhoneDesk.ViewModels
                 var upn = ResourceAccountUpn;
                 if (!upn.Contains("@"))
                 {
-                    upn = upn + variables.MsFallbackDomain;
+                    upn = PhoneDesk.Models.ResourceAccountUpn.Build(upn, variables.MsFallbackDomain);
                 }
 
                 var command = _powerShellCommandService.GetCreateResourceAccountCommand(upn, ResourceAccountDisplayName, variables.CsAppCqId);
@@ -518,7 +518,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
                 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.CallQueuesCreateResourceAccountSuccess,
@@ -621,7 +621,7 @@ namespace PhoneDesk.ViewModels
                         UiTextKey.CallQueuesUpdateUsageLocationContext,
                         "Update usage location"));
                 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.CallQueuesUpdateUsageLocationSuccess,
@@ -738,7 +738,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
                 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.CallQueuesCreateCallQueueSuccess,
@@ -846,7 +846,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
                 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.CallQueuesAssociateResourceAccountSuccess,
@@ -937,7 +937,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.CallQueuesDeleteCallQueueSuccess,
@@ -1021,7 +1021,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.CallQueuesDeleteResourceAccountSuccess,

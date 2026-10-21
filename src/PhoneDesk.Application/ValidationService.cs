@@ -62,6 +62,12 @@ namespace PhoneDesk.Services
             {
                 result.AddError(ValidationErrorCode.MicrosoftFallbackDomainRequired, "Microsoft fallback domain is required.");
             }
+            else if (!ResourceAccountUpn.IsValidFallbackDomain(variables.MsFallbackDomain))
+            {
+                result.AddError(
+                    ValidationErrorCode.MicrosoftFallbackDomainInvalid,
+                    "Microsoft fallback domain is invalid. Enter a domain such as contoso.onmicrosoft.com.");
+            }
 
             if (string.IsNullOrWhiteSpace(variables.CustomerLegalName))
             {

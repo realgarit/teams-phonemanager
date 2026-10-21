@@ -9,6 +9,7 @@ namespace PhoneDesk.Services
         CustomerNameRequired,
         CustomerGroupNameRequired,
         MicrosoftFallbackDomainRequired,
+        MicrosoftFallbackDomainInvalid,
         CustomerLegalNameRequired,
         LanguageIdRequired,
         TimeZoneIdRequired,

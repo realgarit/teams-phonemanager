@@ -198,6 +198,12 @@ namespace PhoneDesk.Tests
             new("Wizard", true, "setup-wizard-ready-de.png", "ready-de"),
             new("Wizard", true, "setup-wizard-failed.png", "failed"),
             new("Wizard", true, "setup-wizard-failed-de.png", "failed-de"),
+            new("Wizard", true, "setup-wizard-step-error.png", "failed-step-error"),
+            new("Wizard", true, "setup-wizard-step-error-de.png", "failed-step-error-de"),
+            new("Wizard", true, "setup-wizard-progress.png", "ready-progress"),
+            new("Wizard", true, "setup-wizard-progress-de.png", "ready-progress-de"),
+            new("Wizard", true, "setup-wizard-plan.png", "ready-plan"),
+            new("Wizard", true, "setup-wizard-plan-de.png", "ready-plan-de"),
             new("BulkOperations", true, "bulk-operations.png"),
             new("BulkOperations", true, "task5-bulk-operations-error-en.png", "task5-bulk-error-en"),
             new("BulkOperations", true, "task5-bulk-operations-error-de.png", "task5-bulk-error-de"),
@@ -415,6 +421,9 @@ namespace PhoneDesk.Tests
                 ? AppLanguage.German
                 : AppLanguage.English;
 
+            // Guided Setup progress lives in the shared state; every shot starts without it.
+            sharedState.WizardProgress = null;
+
             if (scenario.StartsWith("ready", StringComparison.Ordinal)
                 || scenario.StartsWith("failed", StringComparison.Ordinal)
                 || scenario.StartsWith("navigation-ready-", StringComparison.Ordinal))
@@ -623,6 +632,47 @@ namespace PhoneDesk.Tests
                     UiTextKey.WizardStepFailedStatus,
                     new Dictionary<string, object?> { ["step"] = 2 });
                 return;
+            }
+
+            if (mainWindowViewModel.CurrentViewModel is WizardViewModel progressWizard)
+            {
+                if (scenario.StartsWith("failed-step-error", StringComparison.Ordinal))
+                {
+                    const string output = "SUCCESS: Resource account racq-contoso-reception@contoso.onmicrosoft.com created successfully\nERROR: Length cannot be less than zero. (Parameter 'length')";
+                    progressWizard.Steps[0].IsCompleted = true;
+                    progressWizard.Steps[1].IsCompleted = true;
+                    progressWizard.Steps[1].Result = "SUCCESS: ttgrp-contoso-reception created successfully";
+                    progressWizard.Steps[2].IsFailed = true;
+                    progressWizard.Steps[2].Result = output;
+                    progressWizard.Steps[2].ErrorMessage = "Length cannot be less than zero. (Parameter 'length')";
+                    progressWizard.CurrentStep = 2;
+                    return;
+                }
+
+                if (scenario.StartsWith("ready-progress", StringComparison.Ordinal))
+                {
+                    for (var index = 0; index <= 3; index++)
+                    {
+                        progressWizard.Steps[index].IsCompleted = true;
+                        progressWizard.Steps[index].ConfigurationFingerprint = WizardViewModel.ComputeConfigurationFingerprint(progressWizard.Variables);
+                    }
+                    progressWizard.Steps[1].Result = "SUCCESS: ttgrp-contoso-reception created successfully with ID: 6f1c2a9e-0d4b-4c35-9a51-2b7e0c8d1f43";
+                    progressWizard.Steps[2].Result = "SUCCESS: Resource account racq-contoso-reception@contoso.onmicrosoft.com created successfully";
+                    // Steps 2 and 3 ran before the operator corrected the Configuration.
+                    progressWizard.Steps[2].ConfigurationFingerprint = "earlier";
+                    progressWizard.Steps[3].ConfigurationFingerprint = "earlier";
+                    progressWizard.CurrentStep = 3;
+                    progressWizard.GoToStepCommand.Execute(progressWizard.Steps[2]);
+                    return;
+                }
+
+                if (scenario.StartsWith("ready-plan", StringComparison.Ordinal))
+                {
+                    progressWizard.Steps[0].IsCompleted = true;
+                    progressWizard.CurrentStep = 1;
+                    progressWizard.GeneratePlanCommand.Execute(null);
+                    return;
+                }
             }
 
             switch (mainWindowViewModel.CurrentViewModel)

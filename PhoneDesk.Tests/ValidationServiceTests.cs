@@ -156,6 +156,25 @@ namespace PhoneDesk.Tests
             Assert.Contains("\n", message);
         }
 
+        [Theory]
+        [InlineData("@test.onmicrosoft.com", true)]
+        [InlineData("test.onmicrosoft.com", true)]
+        [InlineData("test", false)]
+        [InlineData("test .onmicrosoft.com", false)]
+        [InlineData("user@test.onmicrosoft.com", false)]
+        [InlineData("test..onmicrosoft.com", false)]
+        public void ValidateVariables_FallbackDomainFormat(string domain, bool expectedValid)
+        {
+            var variables = CreateValidVariables();
+            variables.MsFallbackDomain = domain;
+
+            var result = _validationService.ValidateVariables(variables);
+
+            Assert.Equal(
+                expectedValid,
+                !result.Issues.Any(i => i.Code == ValidationErrorCode.MicrosoftFallbackDomainInvalid));
+        }
+
         private static PhoneManagerVariables CreateValidVariables()
         {
             return new PhoneManagerVariables

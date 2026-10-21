@@ -25,6 +25,27 @@
             <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Padding" Value="10,8"/>
         </Style>
+        <Style Selector="Button.wizard-step">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Style>
+        <Style Selector="Button.wizard-step.current /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource AccentSoftBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentHairlineBrush}"/>
+        </Style>
+        <Style Selector="Button.wizard-step:disabled /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+        <Style Selector="Button.wizard-step:disabled">
+            <Setter Property="Opacity" Value="0.55"/>
+        </Style>
         <Style Selector="Border.wizard-guidance Button.validation-details">
             <Setter Property="Height" Value="32"/>
             <Setter Property="Padding" Value="8,0"/>
@@ -52,6 +73,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
                         <StackPanel Grid.Row="0" Margin="16,20,16,12">
@@ -70,10 +92,13 @@
                             <ItemsControl ItemsSource="{Binding Steps}" Margin="8,0,8,8">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Padding="8,6" 
-                                                Margin="0,1"
-                                                CornerRadius="4"
-                                                Background="Transparent">
+                                        <!-- Completed, skipped and failed steps open on click; later steps stay locked. -->
+                                        <Button Classes="wizard-step"
+                                                Classes.current="{Binding IsCurrent}"
+                                                IsEnabled="{Binding IsReachable}"
+                                                Command="{Binding $parent[ItemsControl].DataContext.GoToStepCommand}"
+                                                CommandParameter="{Binding}"
+                                                AutomationProperties.Name="{Binding Title}">
                                             <Grid ColumnDefinitions="24,*">
                                                 <TextBlock Grid.Column="0"
                                                          Text="{Binding StatusIcon}"
@@ -86,11 +111,24 @@
                                                              TextWrapping="Wrap"/>
                                                 </StackPanel>
                                             </Grid>
-                                        </Border>
+                                        </Button>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </ScrollViewer>
+
+                        <Button Grid.Row="2"
+                                Margin="16,4,16,16"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                Command="{Binding StartOverCommand}"
+                                IsVisible="{Binding HasProgress}"
+                                IsEnabled="{Binding !IsBusy}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <fi:SymbolIcon Symbol="ArrowCounterclockwise" FontSize="14"/>
+                                <TextBlock Text="{loc:Translate Key=WizardStartOverAction}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
                     </Grid>
                 </Border>
 
@@ -171,6 +209,11 @@
                                                    FontSize="12"
                                                    Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                                    TextWrapping="Wrap"/>
+                                        <TextBlock Text="{Binding ConfigurationChangedNotice}"
+                                                   IsVisible="{Binding HasConfigurationChangedNotice}"
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource HealthWarningBrush}"
+                                                   TextWrapping="Wrap"/>
                                     </StackPanel>
 
                                     <Button Grid.Row="0"
@@ -250,9 +293,20 @@
                                     </ScrollViewer>
                                 </Grid>
 
-                                <!-- Dry-run plan (shown once generated). -->
-                                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                              IsVisible="{Binding Plan, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                <!-- Dry-run plan (shown once generated; closes when the step changes). -->
+                                <Grid RowDefinitions="Auto,*"
+                                      IsVisible="{Binding Plan, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                <Button Grid.Row="0"
+                                        HorizontalAlignment="Right"
+                                        Margin="0,8,12,0"
+                                        Command="{Binding ClosePlanCommand}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <fi:SymbolIcon Symbol="Dismiss" FontSize="14"/>
+                                        <TextBlock Text="{loc:Translate Key=WizardClosePlanAction}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                                <ScrollViewer Grid.Row="1"
+                                              VerticalScrollBarVisibility="Auto"
                                               Padding="16">
                                     <ItemsControl ItemsSource="{Binding Plan.Entries}">
                                         <ItemsControl.ItemTemplate>
@@ -295,24 +349,49 @@
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
                                 </ScrollViewer>
+                                </Grid>
                             </Grid>
                         </Grid>
                     </Border>
 
-                    <!-- Step Result -->
-                    <Border Grid.Row="3"
-                            IsVisible="{Binding StepResult, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                            Classes="sunken"
-                            Padding="12"
-                            Margin="0,0,0,12"
-                            MaxHeight="120">
-                        <ScrollViewer>
-                            <TextBlock Text="{Binding StepResult}"
-                                     FontSize="12"
-                                     FontFamily="{StaticResource CodeFontFamily}"
-                                     TextWrapping="Wrap"/>
-                        </ScrollViewer>
-                    </Border>
+                    <!-- Step Result: a short error first (when the step failed), then the raw output. -->
+                    <StackPanel Grid.Row="3" Spacing="8" Margin="0,0,0,12"
+                                IsVisible="{Binding StepResult, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                        <Border IsVisible="{Binding HasStepError}"
+                                BorderBrush="{DynamicResource HealthErrorBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12,8">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                                <fi:SymbolIcon Grid.Column="0"
+                                               Symbol="ErrorCircle"
+                                               FontSize="18"
+                                               Foreground="{DynamicResource HealthErrorBrush}"
+                                               VerticalAlignment="Top"/>
+                                <StackPanel Grid.Column="1" Spacing="2">
+                                    <TextBlock Text="{loc:Translate Key=WizardStepErrorTitle}"
+                                               FontWeight="SemiBold"/>
+                                    <SelectableTextBlock Text="{Binding StepErrorMessage}"
+                                                         TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <Border Classes="sunken"
+                                Padding="12"
+                                MaxHeight="140">
+                            <ScrollViewer>
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="{loc:Translate Key=WizardStepOutputTitle}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                    <SelectableTextBlock Text="{Binding StepResult}"
+                                                         FontSize="12"
+                                                         FontFamily="{StaticResource CodeFontFamily}"
+                                                         TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
 
                     <!-- Action Buttons -->
                     <Grid Grid.Row="4">
@@ -384,12 +463,13 @@
                                     ToolTip.Tip="{loc:Translate Key=WizardExportPlanCsvTooltip}">
                                 <fi:SymbolIcon Symbol="DocumentTable" FontSize="14"/>
                             </Button>
-                            <!-- Retry (visible on failure) -->
+                            <!-- Retry after a failure, or run a completed step again -->
                             <Button Command="{Binding RetryStepCommand}"
-                                    IsVisible="{Binding StepFailed}">
+                                    IsVisible="{Binding ShowRetryAction}"
+                                    IsEnabled="{Binding !IsBusy}">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <fi:SymbolIcon Symbol="ArrowSync" FontSize="14"/>
-                                    <TextBlock Text="{loc:Translate Key=CommonRetry}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding RetryActionText}" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
 

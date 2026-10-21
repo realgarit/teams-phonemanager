@@ -57,7 +57,7 @@ namespace PhoneDesk.Services.ScriptBuilders
             return $@"
 try {{
     $SkuId = ""{sanitizedSkuId}""
-    Set-MgUserLicense -UserId ""{sanitizedUserId}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
+    Set-MgUserLicense -UserId ""{sanitizedUserId}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @() -ErrorAction Stop | Out-Null
     Write-Host ""SUCCESS: License assigned to user successfully""
 }}
 catch {{
@@ -92,8 +92,20 @@ catch {
 
             return $@"
 try {{
-    New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedUpn}"" -ApplicationId ""{sanitizedAppId}"" -DisplayName ""{sanitizedDisplayName}""
-    Write-Host ""SUCCESS: Resource account created successfully""
+    $existingResourceAccount = $null
+    try {{
+        $existingResourceAccount = Get-CsOnlineApplicationInstance -Identity ""{sanitizedUpn}"" -ErrorAction Stop
+    }}
+    catch {{
+        $existingResourceAccount = $null
+    }}
+    if ($existingResourceAccount) {{
+        Write-Host ""SUCCESS: Resource account {sanitizedUpn} already exists. The existing account is used.""
+    }}
+    else {{
+        New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedUpn}"" -ApplicationId ""{sanitizedAppId}"" -DisplayName ""{sanitizedDisplayName}"" -ErrorAction Stop | Out-Null
+        Write-Host ""SUCCESS: Resource account {sanitizedUpn} created successfully""
+    }}
 }}
 catch {{
     Write-Host ""ERROR: Failed to create resource account: $_""
@@ -107,7 +119,7 @@ catch {{
 
             return $@"
 try {{
-    Update-MgUser -UserId ""{sanitizedUpn}"" -UsageLocation ""{sanitizedUsageLocation}""
+    Update-MgUser -UserId ""{sanitizedUpn}"" -UsageLocation ""{sanitizedUsageLocation}"" -ErrorAction Stop
     Write-Host ""SUCCESS: Updated usage location for resource account""
 }}
 catch {{

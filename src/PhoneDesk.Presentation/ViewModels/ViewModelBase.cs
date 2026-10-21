@@ -408,6 +408,9 @@ namespace PhoneDesk.ViewModels
                 ValidationErrorCode.MicrosoftFallbackDomainRequired => GetText(
                     UiTextKey.ValidationMicrosoftFallbackDomainRequired,
                     "Microsoft fallback domain is required."),
+                ValidationErrorCode.MicrosoftFallbackDomainInvalid => GetText(
+                    UiTextKey.ValidationMicrosoftFallbackDomainInvalid,
+                    "Microsoft fallback domain is invalid. Enter a domain such as contoso.onmicrosoft.com."),
                 ValidationErrorCode.CustomerLegalNameRequired => GetText(
                     UiTextKey.ValidationCustomerLegalNameRequired,
                     "Customer legal name is required."),

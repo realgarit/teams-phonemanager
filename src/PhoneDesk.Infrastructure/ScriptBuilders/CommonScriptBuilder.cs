@@ -245,7 +245,7 @@ catch {{
             return $@"
 try {{
     $SkuId = ""{sanitizedSkuId}""
-    Set-MgUserLicense -UserId ""{sanitizedUserId}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
+    Set-MgUserLicense -UserId ""{sanitizedUserId}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @() -ErrorAction Stop | Out-Null
     Write-Host ""SUCCESS: License assigned successfully""
 }}
 catch {{
@@ -258,24 +258,23 @@ catch {{
             var sanitizedGroupName = _sanitizer.SanitizeString(groupName);
 
             return $@"
-$existingGroup = Get-MgGroup -Filter ""displayName eq '{sanitizedGroupName}'"" -ErrorAction SilentlyContinue
-if ($existingGroup)
-{{
-    Write-Host ""{sanitizedGroupName} already exists. Please check, otherwise SFO will be salty!""
-    $global:m365groupId = $existingGroup.Id
-    Write-Host ""{sanitizedGroupName} was found successfully with ID: $global:m365groupId""
-    return
-}}
-
 try {{
-    $newGroup = New-MgGroup -DisplayName ""{sanitizedGroupName}"" `
-        -MailEnabled:$True `
-        -MailNickName ""{sanitizedGroupName}"" `
-        -SecurityEnabled `
-        -GroupTypes @(""Unified"")
+    $existingGroup = Get-MgGroup -Filter ""displayName eq '{sanitizedGroupName}'"" -ErrorAction Stop | Select-Object -First 1
+    if ($existingGroup) {{
+        $global:m365groupId = $existingGroup.Id
+        Write-Host ""SUCCESS: {sanitizedGroupName} already exists. The existing group is used (ID: $global:m365groupId)""
+    }}
+    else {{
+        $newGroup = New-MgGroup -DisplayName ""{sanitizedGroupName}"" `
+            -MailEnabled:$True `
+            -MailNickName ""{sanitizedGroupName}"" `
+            -SecurityEnabled `
+            -GroupTypes @(""Unified"") `
+            -ErrorAction Stop
 
-    $global:m365groupId = $newGroup.Id
-    Write-Host ""{sanitizedGroupName} created successfully with ID: $global:m365groupId""
+        $global:m365groupId = $newGroup.Id
+        Write-Host ""SUCCESS: {sanitizedGroupName} created successfully with ID: $global:m365groupId""
+    }}
 }}
 catch {{
     Write-Host ""ERROR: {sanitizedGroupName} failed to create: $_""

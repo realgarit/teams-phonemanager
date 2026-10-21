@@ -374,7 +374,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
 
-                if (string.IsNullOrWhiteSpace(variables.MsFallbackDomain) || !variables.MsFallbackDomain.StartsWith("@"))
+                if (!PhoneDesk.Models.ResourceAccountUpn.IsValidFallbackDomain(variables.MsFallbackDomain))
                 {
                     StatusMessage = GetText(
                         UiTextKey.RuntimeFallbackDomainInvalidError,
@@ -386,7 +386,7 @@ namespace PhoneDesk.ViewModels
                 var upn = ResourceAccountUpn;
                 if (!upn.Contains("@"))
                 {
-                    upn = upn + variables.MsFallbackDomain;
+                    upn = PhoneDesk.Models.ResourceAccountUpn.Build(upn, variables.MsFallbackDomain);
                 }
 
                 var command = _powerShellCommandService.GetCreateAutoAttendantResourceAccountCommand(upn, ResourceAccountDisplayName, variables.CsAppAaId);
@@ -404,7 +404,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.AutoAttendantsCreateResourceAccountSuccess,
@@ -522,7 +522,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.AutoAttendantsCreateAutoAttendantSuccess,
@@ -616,7 +616,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.AutoAttendantsDeleteAutoAttendantSuccess,
@@ -692,7 +692,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.AutoAttendantsDeleteScheduleSuccess,
@@ -767,7 +767,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.AutoAttendantsDeleteResourceAccountSuccess,

@@ -224,10 +224,10 @@ namespace PhoneDesk.Models
         private bool _cqNoAgentApplyToNewCallsOnly;
 
         public string M365Group => $"ttgrp-{Customer}-{CustomerGroupName}";
-        public string RacqUPN => $"racq-{Customer}-{CustomerGroupName}{MsFallbackDomain}";
+        public string RacqUPN => ResourceAccountUpn.Build($"racq-{Customer}-{CustomerGroupName}", MsFallbackDomain);
         public string RacqDisplayName => $"racq-{Customer}-{CustomerGroupName}";
         public string CqDisplayName => $"cq-{Customer}-{CustomerGroupName}";
-        public string RaaaUPN => $"raaa-{Customer}-{RaaAnrName}-{CustomerGroupName}{MsFallbackDomain}";
+        public string RaaaUPN => ResourceAccountUpn.Build($"raaa-{Customer}-{RaaAnrName}-{CustomerGroupName}", MsFallbackDomain);
         public string RaaaDisplayName => $"raaa-{Customer}-{RaaAnrName}-{CustomerGroupName}";
         public string AaDisplayName => $"aa-{Customer}-{RaaAnrName}-{CustomerGroupName}";
 

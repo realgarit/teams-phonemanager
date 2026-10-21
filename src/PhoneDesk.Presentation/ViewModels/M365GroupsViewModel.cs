@@ -321,7 +321,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     GroupStatus = GetText(
                         UiTextKey.M365GroupsDeleteGroupSuccess,

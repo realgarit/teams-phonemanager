@@ -33,37 +33,27 @@ catch {
 }";
         }
 
+        /// <summary>
+        /// Guided Setup step: creates the call flows, the after-hours schedule and the auto attendant.
+        /// The resource account, its license, its phone number and the association are separate steps.
+        /// Safe to run again: an existing auto attendant with the same name is reused.
+        /// </summary>
         public string GetCreateAutoAttendantCommand(IPhoneManagerVariables variables)
         {
             var defaultCallFlow = BuildCallFlow(variables, "Default", variables.AaDefaultGreetingType, variables.AaDefaultGreetingTextToSpeechPrompt, variables.AaDefaultGreetingAudioFileId, variables.AaDefaultAction, variables.AaDefaultActionTarget);
             var afterHoursCallFlow = BuildCallFlow(variables, "After Hours", variables.AaAfterHoursGreetingType, variables.AaAfterHoursGreetingTextToSpeechPrompt, variables.AaAfterHoursGreetingAudioFileId, variables.AaAfterHoursAction, variables.AaAfterHoursActionTarget);
 
-            var sanitizedRaaaUPN = _sanitizer.SanitizeIdentifier(variables.RaaaUPN);
-            var sanitizedRaaaDisplayName = _sanitizer.SanitizeString(variables.RaaaDisplayName);
-            var sanitizedUsageLocation = _sanitizer.SanitizeString(variables.UsageLocation);
-            var sanitizedSkuId = _sanitizer.SanitizeString(variables.SkuId);
-            var sanitizedPhoneNumber = _sanitizer.SanitizeString(variables.RaaAnr);
-            var sanitizedPhoneNumberType = _sanitizer.SanitizeString(variables.PhoneNumberType);
             var sanitizedAaDisplayName = _sanitizer.SanitizeString(variables.AaDisplayName);
             var sanitizedLanguageId = _sanitizer.SanitizeString(variables.LanguageId);
             var sanitizedTimeZoneId = _sanitizer.SanitizeString(variables.TimeZoneId);
 
             return $@"
-New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedRaaaUPN}"" -ApplicationId ""{variables.CsAppAaId}"" -DisplayName ""{sanitizedRaaaDisplayName}""
-
-Write-Host ""{ConstantsService.Messages.WaitingMessage}""
-Start-Sleep -Seconds {ConstantsService.PowerShell.DefaultWaitTimeSeconds}
-
-Update-MgUser -UserId ""{sanitizedRaaaUPN}"" -UsageLocation ""{sanitizedUsageLocation}""
-
-$SkuId = ""{sanitizedSkuId}""
-Set-MgUserLicense -UserId ""{sanitizedRaaaUPN}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
-
-Write-Host ""{ConstantsService.Messages.LicenseWaitingMessage}""
-Start-Sleep -Seconds {ConstantsService.PowerShell.DefaultWaitTimeSeconds}
-
-Set-CsPhoneNumberAssignment -Identity ""{sanitizedRaaaUPN}"" -PhoneNumber ""{sanitizedPhoneNumber}"" -PhoneNumberType ""{sanitizedPhoneNumberType}""
-
+try {{
+    $aaExisting = Get-CsAutoAttendant -NameFilter ""{sanitizedAaDisplayName}"" -ErrorAction Stop | Where-Object {{ $_.Name -eq ""{sanitizedAaDisplayName}"" }} | Select-Object -First 1
+    if ($aaExisting) {{
+        Write-Host ""INFO: Auto attendant {sanitizedAaDisplayName} already exists. The existing auto attendant is used.""
+    }}
+    else {{
 {defaultCallFlow}
 
 {afterHoursCallFlow}
@@ -71,20 +61,24 @@ Set-CsPhoneNumberAssignment -Identity ""{sanitizedRaaaUPN}"" -PhoneNumber ""{san
 $aatr1 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours1Start:hh\:mm}"" -End ""{variables.OpeningHours1End:hh\:mm}""
 $aatr2 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours2Start:hh\:mm}"" -End ""{variables.OpeningHours2End:hh\:mm}""
 $aaTimeRanges = if (""{variables.OpeningHours2Start:hh\:mm}"" -ne ""{variables.OpeningHours2End:hh\:mm}"") {{ @($aatr1, $aatr2) }} else {{ @($aatr1) }}
-$aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours $aaTimeRanges -TuesdayHours $aaTimeRanges -WednesdayHours $aaTimeRanges -ThursdayHours $aaTimeRanges -FridayHours $aaTimeRanges -Complement
+$aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours $aaTimeRanges -TuesdayHours $aaTimeRanges -WednesdayHours $aaTimeRanges -ThursdayHours $aaTimeRanges -FridayHours $aaTimeRanges -Complement -ErrorAction Stop
 $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
 
-New-CsAutoAttendant `
--Name ""{sanitizedAaDisplayName}"" `
--DefaultCallFlow $aadefaultCallFlow `
--CallFlows @($aaafterHoursCallFlow) `
--CallHandlingAssociations @($aaafterHoursCallHandlingAssociation) `
--LanguageId ""{sanitizedLanguageId}"" `
--TimeZoneId ""{sanitizedTimeZoneId}""
+        New-CsAutoAttendant `
+        -Name ""{sanitizedAaDisplayName}"" `
+        -DefaultCallFlow $aadefaultCallFlow `
+        -CallFlows @($aaafterHoursCallFlow) `
+        -CallHandlingAssociations @($aaafterHoursCallHandlingAssociation) `
+        -LanguageId ""{sanitizedLanguageId}"" `
+        -TimeZoneId ""{sanitizedTimeZoneId}"" `
+        -ErrorAction Stop | Out-Null
+    }}
 
-$aaapplicationInstanceId = (Get-CsOnlineUser ""{sanitizedRaaaUPN}"").Identity
-$aaautoAttendantId = (Get-CsAutoAttendant -NameFilter ""{sanitizedAaDisplayName}"").Identity
-New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceId) -ConfigurationId $aaautoAttendantId -ConfigurationType AutoAttendant";
+    Write-Host ""SUCCESS: Auto attendant {sanitizedAaDisplayName} is ready""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create auto attendant: $_""
+}}";
         }
 
         private string BuildCallFlow(IPhoneManagerVariables variables, string flowName, string? greetingType, string? ttsPrompt, string? audioFileId, string? action, string? actionTarget)
@@ -214,7 +208,7 @@ catch {{
             
             return $@"
 try {{
-    Set-CsPhoneNumberAssignment -Identity ""{sanitizedUpn}"" -PhoneNumber ""{sanitizedPhoneNumber}"" -PhoneNumberType ""{sanitizedPhoneNumberType}""
+    Set-CsPhoneNumberAssignment -Identity ""{sanitizedUpn}"" -PhoneNumber ""{sanitizedPhoneNumber}"" -PhoneNumberType ""{sanitizedPhoneNumberType}"" -ErrorAction Stop
     Write-Host ""SUCCESS: Phone number assigned successfully""
 }}
 catch {{
@@ -323,9 +317,27 @@ catch {{
             
             return $@"
 try {{
-    $aaapplicationInstanceId = (Get-CsOnlineUser ""{sanitizedUpn}"").Identity
-    $aaautoAttendantId = (Get-CsAutoAttendant -NameFilter ""{sanitizedAaName}"").Identity
-    New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceId) -ConfigurationId $aaautoAttendantId -ConfigurationType AutoAttendant
+    $aaapplicationInstance = Get-CsOnlineUser ""{sanitizedUpn}"" -ErrorAction Stop
+    if (-not $aaapplicationInstance) {{
+        throw ""Resource account '{sanitizedUpn}' was not found.""
+    }}
+    $aaautoAttendant = Get-CsAutoAttendant -NameFilter ""{sanitizedAaName}"" -ErrorAction Stop | Where-Object {{ $_.Name -eq ""{sanitizedAaName}"" }} | Select-Object -First 1
+    if (-not $aaautoAttendant) {{
+        throw ""Auto attendant '{sanitizedAaName}' was not found.""
+    }}
+    $aaAssociation = $null
+    try {{
+        $aaAssociation = Get-CsOnlineApplicationInstanceAssociation -Identity $aaapplicationInstance.Identity -ErrorAction Stop
+    }}
+    catch {{
+        $aaAssociation = $null
+    }}
+    if ($aaAssociation -and $aaAssociation.ConfigurationId -eq $aaautoAttendant.Identity) {{
+        Write-Host ""INFO: Resource account {sanitizedUpn} is already associated with auto attendant {sanitizedAaName}.""
+    }}
+    else {{
+        New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstance.Identity) -ConfigurationId $aaautoAttendant.Identity -ConfigurationType AutoAttendant -ErrorAction Stop | Out-Null
+    }}
     Write-Host ""SUCCESS: Associated resource account with auto attendant""
 }}
 catch {{

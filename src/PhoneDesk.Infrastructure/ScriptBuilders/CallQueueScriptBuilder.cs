@@ -33,53 +33,77 @@ catch {
 }";
         }
 
+        /// <summary>
+        /// Guided Setup step: creates the call queue for the configured M365 group and associates the
+        /// call queue resource account with it. The resource account and its license are separate steps.
+        /// Safe to run again: an existing call queue or association is reused instead of duplicated.
+        /// </summary>
         public string GetCreateCallQueueCommand(IPhoneManagerVariables variables)
         {
             var callQueueParams = BuildCallQueueParameters(variables);
             // SECURITY: Sanitize all user inputs and wrap in quotes
             var sanitizedRacqUPN = _sanitizer.SanitizeString(variables.RacqUPN);
-            var sanitizedRacqDisplayName = _sanitizer.SanitizeString(variables.RacqDisplayName);
             var sanitizedCqDisplayName = _sanitizer.SanitizeString(variables.CqDisplayName);
-            var sanitizedUsageLocation = _sanitizer.SanitizeString(variables.UsageLocation);
+            var sanitizedGroupName = _sanitizer.SanitizeString(variables.M365Group);
             var sanitizedLanguageId = _sanitizer.SanitizeString(variables.LanguageId);
 
             return $@"
 try {{
-    New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedRacqUPN}"" -ApplicationId ""{variables.CsAppCqId}"" -DisplayName ""{sanitizedRacqDisplayName}""
+    $cqGroupId = $global:m365groupId
+    if (-not $cqGroupId) {{
+        $cqGroup = Get-MgGroup -Filter ""displayName eq '{sanitizedGroupName}'"" -ErrorAction Stop | Select-Object -First 1
+        if ($cqGroup) {{
+            $cqGroupId = $cqGroup.Id
+            $global:m365groupId = $cqGroupId
+        }}
+    }}
+    if (-not $cqGroupId) {{
+        throw ""Microsoft 365 group '{sanitizedGroupName}' was not found. Run the M365 group step first.""
+    }}
 
-    Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
-    Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
+    $cqApplicationInstance = Get-CsOnlineUser ""{sanitizedRacqUPN}"" -ErrorAction Stop
+    if (-not $cqApplicationInstance) {{
+        throw ""Resource account '{sanitizedRacqUPN}' was not found. Run the call queue resource account step first.""
+    }}
 
-    $global:racqid = (Get-CsOnlineUser ""{sanitizedRacqUPN}"").Identity
+    $cqExisting = Get-CsCallQueue -NameFilter ""{sanitizedCqDisplayName}"" -ErrorAction Stop | Where-Object {{ $_.Name -eq ""{sanitizedCqDisplayName}"" }} | Select-Object -First 1
+    if ($cqExisting) {{
+        Write-Host ""INFO: Call queue {sanitizedCqDisplayName} already exists. The existing call queue is used.""
+        $cqId = $cqExisting.Identity
+    }}
+    else {{
+        $cqNew = New-CsCallQueue `
+        -Name ""{sanitizedCqDisplayName}"" `
+        -RoutingMethod Attendant `
+        -AllowOptOut $true `
+        -ConferenceMode $true `
+        -AgentAlertTime {ConstantsService.CallQueue.AgentAlertTime} `
+        -LanguageId ""{sanitizedLanguageId}"" `
+        -DistributionLists @($cqGroupId) `
+        {callQueueParams}
+        -PresenceBasedRouting $false `
+        -ErrorAction Stop
+        $cqId = $cqNew.Identity
 
-    Update-MgUser -UserId ""{sanitizedRacqUPN}"" -UsageLocation ""{sanitizedUsageLocation}""
+        Write-Host ""{ConstantsService.Messages.WaitingMessage}""
+        Start-Sleep -Seconds {ConstantsService.PowerShell.DefaultWaitTimeSeconds}
+    }}
 
-    Write-Host ""Assigning Teams Phone Resource License...""
-    $SkuId = ""{_sanitizer.SanitizeString(variables.SkuId)}""
-    Set-MgUserLicense -UserId ""{sanitizedRacqUPN}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
+    $cqAssociation = $null
+    try {{
+        $cqAssociation = Get-CsOnlineApplicationInstanceAssociation -Identity $cqApplicationInstance.Identity -ErrorAction Stop
+    }}
+    catch {{
+        $cqAssociation = $null
+    }}
+    if ($cqAssociation -and $cqAssociation.ConfigurationId -eq $cqId) {{
+        Write-Host ""INFO: Resource account {sanitizedRacqUPN} is already associated with call queue {sanitizedCqDisplayName}.""
+    }}
+    else {{
+        New-CsOnlineApplicationInstanceAssociation -Identities @($cqApplicationInstance.Identity) -ConfigurationId $cqId -ConfigurationType CallQueue -ErrorAction Stop | Out-Null
+    }}
 
-    Write-Host """ + ConstantsService.Messages.LicenseWaitingMessage + @"""
-    Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
-
-    New-CsCallQueue `
-    -Name ""{sanitizedCqDisplayName}"" `
-    -RoutingMethod Attendant `
-    -AllowOptOut $true `
-    -ConferenceMode $true `
-    -AgentAlertTime " + ConstantsService.CallQueue.AgentAlertTime + @" `
-    -LanguageId ""{sanitizedLanguageId}"" `
-    -DistributionLists $global:m365groupId `
-    {callQueueParams}
-    -PresenceBasedRouting $false
-
-    Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
-    Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
-
-    $cqapplicationInstanceId = (Get-CsOnlineUser ""{sanitizedRacqUPN}"").Identity
-    $cqautoAttendantId = (Get-CsCallQueue -NameFilter ""{sanitizedCqDisplayName}"").Identity
-    New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceId) -ConfigurationId $cqautoAttendantId -ConfigurationType CallQueue
-    
-    Write-Host ""SUCCESS: Call queue created successfully""
+    Write-Host ""SUCCESS: Call queue {sanitizedCqDisplayName} is ready and associated with {sanitizedRacqUPN}""
 }}
 catch {{
     Write-Host ""ERROR: Failed to create call queue: $_""

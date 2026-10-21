@@ -502,6 +502,24 @@ namespace PhoneDesk.Tests
         }
 
         [Fact]
+        public async Task CreateResourceAccountAsync_DomainWithoutAtSign_BuildsFullUpn()
+        {
+            var harness = new ViewModelTestHarness();
+            var variables = new PhoneManagerVariables { Customer = "Contoso", CustomerGroupName = "Group1", MsFallbackDomain = "contoso.onmicrosoft.com" };
+            harness.SharedStateService.SetupGet(s => s.Variables).Returns(variables);
+            harness.SetExecutionResult("SUCCESS: created");
+            var vm = CreateViewModel(harness);
+            vm.ResourceAccountUpn = "racq-test";
+            vm.ResourceAccountDisplayName = "racq-test";
+
+            await vm.CreateResourceAccountCommand.ExecuteAsync(null);
+
+            harness.PowerShellCommandService.Verify(
+                p => p.GetCreateResourceAccountCommand("racq-test@contoso.onmicrosoft.com", "racq-test", It.IsAny<string>()),
+                Times.Once);
+        }
+
+        [Fact]
         public async Task CreateResourceAccountAsync_UserCancelsPreview_SetsCancelledStatusWithoutExecuting()
         {
             var harness = new ViewModelTestHarness();

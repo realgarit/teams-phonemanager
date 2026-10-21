@@ -42,6 +42,10 @@ namespace PhoneDesk.ViewModels
         [ObservableProperty]
         private string _stepResult = string.Empty;
 
+        /// <summary>The short error of the current failed step (the first error record), shown above the raw output.</summary>
+        [ObservableProperty]
+        private string _stepErrorMessage = string.Empty;
+
         [ObservableProperty]
         private bool _isValidationDetailsExpanded;
 
@@ -76,6 +80,88 @@ namespace PhoneDesk.ViewModels
         public double WizardProgressValue => Math.Clamp(CurrentStep + 1, 1, TotalSteps);
         public bool IsReviewStep => CurrentStep == 0;
         public bool IsSummaryStep => CurrentStep == TotalSteps - 1;
+        public bool IsProvisioningStep => !IsReviewStep && !IsSummaryStep;
+        public bool StepSkipped => CurrentStep >= 0
+            && CurrentStep < Steps.Count
+            && Steps[CurrentStep].IsSkipped
+            && !StepCompleted
+            && !StepFailed;
+        public bool HasStepError => StepFailed && !string.IsNullOrWhiteSpace(StepErrorMessage);
+
+        /// <summary>A completed provisioning step can run again, for example after a Configuration fix.</summary>
+        public bool CanRunAgain => !IsBusy && StepCompleted && IsProvisioningStep;
+        public bool ShowRetryAction => StepFailed || CanRunAgain;
+        public string RetryActionText => StepFailed
+            ? GetText(UiTextKey.CommonRetry, "Retry")
+            : GetText(UiTextKey.WizardRunAgainAction, "Run again");
+
+        /// <summary>
+        /// The last step the operator can open from the step list: every step before it is completed or
+        /// skipped. Steps after it stay locked, so the setup order cannot be bypassed.
+        /// </summary>
+        public int FurthestReachableStep
+        {
+            get
+            {
+                for (var index = 0; index < Steps.Count; index++)
+                {
+                    if (!Steps[index].IsCompleted && !Steps[index].IsSkipped)
+                    {
+                        return index;
+                    }
+                }
+
+                return Steps.Count - 1;
+            }
+        }
+
+        public bool HasProgress
+        {
+            get
+            {
+                foreach (var step in Steps)
+                {
+                    if (step.IsCompleted || step.IsFailed || step.IsSkipped)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Names the provisioning steps that completed with Configuration values that have changed since.
+        /// Empty when every completed step matches the current Configuration.
+        /// </summary>
+        public string ConfigurationChangedNotice
+        {
+            get
+            {
+                var fingerprint = ComputeConfigurationFingerprint(Variables);
+                var changed = new List<string>();
+                for (var index = 1; index < Steps.Count - 1; index++)
+                {
+                    var step = Steps[index];
+                    if (step.IsCompleted
+                        && !string.IsNullOrEmpty(step.ConfigurationFingerprint)
+                        && step.ConfigurationFingerprint != fingerprint)
+                    {
+                        changed.Add(step.Title);
+                    }
+                }
+
+                return changed.Count == 0
+                    ? string.Empty
+                    : GetText(
+                        UiTextKey.WizardConfigurationChangedNotice,
+                        "The Configuration changed after these steps ran: {steps}. They used the earlier values. Run them again if needed.",
+                        new Dictionary<string, object?> { ["steps"] = string.Join(", ", changed) });
+            }
+        }
+
+        public bool HasConfigurationChangedNotice => !string.IsNullOrEmpty(ConfigurationChangedNotice);
         public string ExecuteButtonText => IsReviewStep
             ? GetText(UiTextKey.WizardConfirmConfigurationAction, "Confirm configuration")
             : IsSummaryStep
@@ -132,6 +218,20 @@ namespace PhoneDesk.ViewModels
         {
             get
             {
+                if (StepFailed)
+                {
+                    return GetText(
+                        UiTextKey.WizardReadinessStepFailed,
+                        "This step failed. Read the error below, correct the cause, then select Retry or Skip.");
+                }
+
+                if (StepCompleted && IsProvisioningStep)
+                {
+                    return GetText(
+                        UiTextKey.WizardReadinessStepCompleted,
+                        "This step is complete. Review the result below, or select Next to continue.");
+                }
+
                 if (!ConfigurationReady)
                 {
                     return GetText(
@@ -144,6 +244,13 @@ namespace PhoneDesk.ViewModels
                     return GetText(
                         UiTextKey.WizardReadinessConnectionsRequired,
                         "Complete the connection checks in Get Started before provisioning.");
+                }
+
+                if (StepSkipped)
+                {
+                    return GetText(
+                        UiTextKey.WizardReadinessStepSkipped,
+                        "You skipped this step. Run it now, or select Next if it is already done in the tenant.");
                 }
 
                 if (IsSummaryStep)
@@ -209,7 +316,105 @@ namespace PhoneDesk.ViewModels
                 _translationService.PropertyChanged += OnTranslationServicePropertyChanged;
             }
             InitializeSteps();
+            RestoreProgress();
             UpdateCurrentStep();
+        }
+
+        /// <summary>
+        /// Restores the step results from the shared state, so visiting Configuration or another page does
+        /// not discard the operator's progress. The current step never lies beyond the reachable steps.
+        /// </summary>
+        private void RestoreProgress()
+        {
+            var progress = _sharedStateService?.WizardProgress;
+            if (progress is null || progress.Steps.Count != Steps.Count)
+            {
+                return;
+            }
+
+            for (var index = 0; index < Steps.Count; index++)
+            {
+                var snapshot = progress.Steps[index];
+                var step = Steps[index];
+                step.IsCompleted = snapshot.IsCompleted;
+                step.IsFailed = snapshot.IsFailed;
+                step.IsSkipped = snapshot.IsSkipped;
+                step.Result = snapshot.Result;
+                step.ErrorMessage = snapshot.ErrorMessage;
+                step.ConfigurationFingerprint = snapshot.ConfigurationFingerprint;
+            }
+
+            CurrentStep = Math.Clamp(progress.CurrentStep, 0, FurthestReachableStep);
+        }
+
+        private void SaveProgress()
+        {
+            if (_sharedStateService is null)
+            {
+                return;
+            }
+
+            var progress = new WizardProgressState { CurrentStep = CurrentStep };
+            foreach (var step in Steps)
+            {
+                progress.Steps.Add(new WizardStepSnapshot(
+                    step.IsCompleted,
+                    step.IsFailed,
+                    step.IsSkipped,
+                    step.Result,
+                    step.ErrorMessage,
+                    step.ConfigurationFingerprint));
+            }
+
+            _sharedStateService.WizardProgress = progress;
+        }
+
+        public static string ComputeConfigurationFingerprint(IPhoneManagerVariables vars)
+            => string.Join(
+                "|",
+                vars.M365Group,
+                vars.RacqUPN,
+                vars.RacqDisplayName,
+                vars.CqDisplayName,
+                vars.RaaaUPN,
+                vars.RaaaDisplayName,
+                vars.AaDisplayName,
+                vars.RaaAnr,
+                vars.PhoneNumberType,
+                vars.UsageLocation,
+                vars.LanguageId,
+                vars.TimeZoneId);
+
+        private void RefreshStepNavigation()
+        {
+            var reachable = FurthestReachableStep;
+            foreach (var step in Steps)
+            {
+                step.IsCurrent = step.StepNumber == CurrentStep;
+                step.IsReachable = step.StepNumber <= reachable;
+            }
+
+            OnPropertyChanged(nameof(FurthestReachableStep));
+            OnPropertyChanged(nameof(HasProgress));
+            OnPropertyChanged(nameof(ConfigurationChangedNotice));
+            OnPropertyChanged(nameof(HasConfigurationChangedNotice));
+            OnPropertyChanged(nameof(StepSkipped));
+            OnPropertyChanged(nameof(HasStepError));
+            OnPropertyChanged(nameof(CanRunAgain));
+            OnPropertyChanged(nameof(ShowRetryAction));
+            OnPropertyChanged(nameof(RetryActionText));
+            OnPropertyChanged(nameof(ReadinessMessage));
+        }
+
+        /// <summary>Records a step state change: refreshes the step list and keeps the shared progress current.</summary>
+        private void OnStepStateChanged()
+        {
+            RefreshStepNavigation();
+            OnPropertyChanged(nameof(CanExecuteStep));
+            OnPropertyChanged(nameof(CanGoNext));
+            ExecuteCurrentStepCommand.NotifyCanExecuteChanged();
+            GoToNextStepCommand.NotifyCanExecuteChanged();
+            SaveProgress();
         }
 
         private void InitializeSteps()
@@ -355,13 +560,19 @@ namespace PhoneDesk.ViewModels
                 var step = Steps[CurrentStep];
                 _stepResultKey = null;
                 _stepResultFallback = null;
+                // The dry-run plan belongs to the step where it was opened; a new step shows its own content.
+                Plan = null;
                 StepTitle = step.Title;
                 StepDescription = step.Description;
                 StepCompleted = step.IsCompleted;
                 StepFailed = step.IsFailed;
                 StepResult = step.Result;
+                StepErrorMessage = step.ErrorMessage;
                 StepScript = GetScriptForStep(CurrentStep);
                 RefreshReadiness();
+                RefreshStepNavigation();
+                OnPropertyChanged(nameof(IsProvisioningStep));
+                SaveProgress();
                 OnPropertyChanged(nameof(ReviewSummary));
                 OnPropertyChanged(nameof(StepNumberText));
                 OnPropertyChanged(nameof(StepNumberBadgeText));
@@ -492,12 +703,11 @@ namespace PhoneDesk.ViewModels
                 }
 
                 step.IsCompleted = true;
+                step.IsSkipped = false;
                 StepCompleted = true;
                 SetLocalizedStepResult(UiTextKey.WizardConfigurationReviewedResult, "Configuration reviewed.");
                 step.Result = StepResult;
-                OnPropertyChanged(nameof(CanExecuteStep));
-                OnPropertyChanged(nameof(CanGoNext));
-                GoToNextStepCommand.NotifyCanExecuteChanged();
+                OnStepStateChanged();
                 return;
             }
 
@@ -518,7 +728,7 @@ namespace PhoneDesk.ViewModels
                 StepCompleted = true;
                 SetLocalizedStepResult(UiTextKey.WizardSetupCompleteResult, "Setup complete!");
                 step.Result = StepResult;
-                OnPropertyChanged(nameof(CanExecuteStep));
+                OnStepStateChanged();
                 return;
             }
 
@@ -557,12 +767,16 @@ namespace PhoneDesk.ViewModels
 
             var output = result.Value ?? string.Empty;
 
-            if (result.HasErrorMarker)
+            // Any error record fails the step, even when the script printed its own SUCCESS line first.
+            if (!result.IsSuccess)
             {
                 step.IsFailed = true;
+                step.IsSkipped = false;
                 step.Result = output;
+                step.ErrorMessage = result.ErrorMessage ?? string.Empty;
                 StepFailed = true;
                 StepResult = output;
+                StepErrorMessage = step.ErrorMessage;
                 StatusMessage = GetText(
                     UiTextKey.WizardStepFailedStatus,
                     "Step {step} failed. Review the output and retry or skip.",
@@ -576,8 +790,12 @@ namespace PhoneDesk.ViewModels
             else
             {
                 step.IsCompleted = true;
+                step.IsSkipped = false;
                 step.Result = output;
+                step.ErrorMessage = string.Empty;
+                step.ConfigurationFingerprint = ComputeConfigurationFingerprint(Variables);
                 StepCompleted = true;
+                StepErrorMessage = string.Empty;
                 if (string.IsNullOrWhiteSpace(output))
                 {
                     SetLocalizedStepResult(UiTextKey.WizardStepCompletedResult, "Step completed successfully.");
@@ -599,9 +817,7 @@ namespace PhoneDesk.ViewModels
                     new Dictionary<string, object?> { ["step"] = CurrentStep + 1, ["title"] = step.Title });
             }
 
-            OnPropertyChanged(nameof(CanExecuteStep));
-            OnPropertyChanged(nameof(CanGoNext));
-            GoToNextStepCommand.NotifyCanExecuteChanged();
+            OnStepStateChanged();
         }
 
         [RelayCommand(CanExecute = nameof(CanGoNext))]
@@ -631,10 +847,16 @@ namespace PhoneDesk.ViewModels
                 && (CurrentStep != 0 || EnsureProvisioningReady()))
             {
                 var step = Steps[CurrentStep];
-                step.IsSkipped = true;
-                step.Result = GetText(
-                    UiTextKey.WizardStepSkippedStatus,
-                    "Skipped by user.");
+                if (!step.IsCompleted)
+                {
+                    // A skipped failure is no longer the open problem; the summary still reports the step as incomplete.
+                    step.IsFailed = false;
+                    step.IsSkipped = true;
+                    step.ErrorMessage = string.Empty;
+                    step.Result = GetText(
+                        UiTextKey.WizardStepSkippedStatus,
+                        "Skipped by user.");
+                }
                 LogLocalized(
                     UiTextKey.WizardStepSkippedLog,
                     "Wizard step {step} ({title}) skipped",
@@ -645,6 +867,10 @@ namespace PhoneDesk.ViewModels
             }
         }
 
+        /// <summary>
+        /// Resets a failed or completed step so it can run again. The step scripts reuse objects that
+        /// already exist in the tenant, so running a completed step again does not create duplicates.
+        /// </summary>
         [RelayCommand]
         private void RetryStep()
         {
@@ -654,13 +880,78 @@ namespace PhoneDesk.ViewModels
                 step.IsFailed = false;
                 step.IsCompleted = false;
                 step.Result = string.Empty;
+                step.ErrorMessage = string.Empty;
+                step.ConfigurationFingerprint = string.Empty;
                 StepCompleted = false;
                 StepFailed = false;
                 StepResult = string.Empty;
+                StepErrorMessage = string.Empty;
+                StepScript = GetScriptForStep(CurrentStep);
                 RefreshReadiness();
-                OnPropertyChanged(nameof(CanExecuteStep));
-                ExecuteCurrentStepCommand.NotifyCanExecuteChanged();
+                OnStepStateChanged();
             }
+        }
+
+        /// <summary>
+        /// Opens a step from the step list. Completed, skipped and failed steps can be reviewed at any time;
+        /// steps after the first open step stay locked so the setup order is kept.
+        /// </summary>
+        [RelayCommand]
+        private void GoToStep(WizardStepInfo? step)
+        {
+            if (step is null || IsBusy || step.StepNumber > FurthestReachableStep)
+            {
+                return;
+            }
+
+            CurrentStep = step.StepNumber;
+        }
+
+        /// <summary>Discards all Guided Setup progress after confirmation. Nothing changes in the tenant.</summary>
+        [RelayCommand]
+        private async Task StartOverAsync()
+        {
+            if (IsBusy)
+            {
+                return;
+            }
+
+            var confirmed = _dialogService is null || await _dialogService.ShowConfirmationAsync(
+                GetText(UiTextKey.WizardStartOverConfirmTitle, "Start the Guided Setup again?"),
+                GetText(
+                    UiTextKey.WizardStartOverConfirmMessage,
+                    "All step results are removed from the list. Objects that already exist in the tenant stay unchanged. Steps that run again reuse them."));
+            if (!confirmed)
+            {
+                return;
+            }
+
+            foreach (var step in Steps)
+            {
+                step.IsCompleted = false;
+                step.IsFailed = false;
+                step.IsSkipped = false;
+                step.Result = string.Empty;
+                step.ErrorMessage = string.Empty;
+                step.ConfigurationFingerprint = string.Empty;
+            }
+
+            if (CurrentStep == 0)
+            {
+                UpdateCurrentStep();
+            }
+            else
+            {
+                CurrentStep = 0;
+            }
+
+            LogLocalized(UiTextKey.WizardStartedOverLog, "Guided setup progress was reset", LogLevel.Info);
+        }
+
+        [RelayCommand]
+        private void ClosePlan()
+        {
+            Plan = null;
         }
 
         [RelayCommand]
@@ -770,8 +1061,25 @@ namespace PhoneDesk.ViewModels
         {
             OnPropertyChanged(nameof(CanExecuteStep));
             OnPropertyChanged(nameof(CanGoNext));
+            OnPropertyChanged(nameof(HasStepError));
+            OnPropertyChanged(nameof(ShowRetryAction));
+            OnPropertyChanged(nameof(RetryActionText));
+            OnPropertyChanged(nameof(ReadinessMessage));
             ExecuteCurrentStepCommand.NotifyCanExecuteChanged();
             GoToNextStepCommand.NotifyCanExecuteChanged();
+        }
+
+        partial void OnStepCompletedChanged(bool value)
+        {
+            OnPropertyChanged(nameof(CanRunAgain));
+            OnPropertyChanged(nameof(ShowRetryAction));
+            OnPropertyChanged(nameof(RetryActionText));
+            OnPropertyChanged(nameof(ReadinessMessage));
+        }
+
+        partial void OnStepErrorMessageChanged(string value)
+        {
+            OnPropertyChanged(nameof(HasStepError));
         }
 
         private void OnTranslationServicePropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -803,6 +1111,8 @@ namespace PhoneDesk.ViewModels
 
             RebuildValidationIssues();
 
+            OnPropertyChanged(nameof(RetryActionText));
+            OnPropertyChanged(nameof(ConfigurationChangedNotice));
             OnPropertyChanged(nameof(StepNumberText));
             OnPropertyChanged(nameof(ExecuteButtonText));
             OnPropertyChanged(nameof(ReviewSummary));
@@ -834,6 +1144,7 @@ namespace PhoneDesk.ViewModels
                 _translationService.PropertyChanged -= OnTranslationServicePropertyChanged;
             }
 
+            SaveProgress();
             _disposed = true;
         }
     }
@@ -867,6 +1178,21 @@ namespace PhoneDesk.ViewModels
 
         [ObservableProperty]
         private string _result = string.Empty;
+
+        /// <summary>The short error of a failed run, shown above the raw output.</summary>
+        [ObservableProperty]
+        private string _errorMessage = string.Empty;
+
+        /// <summary>The Configuration names this step used when it completed (see WizardStepSnapshot).</summary>
+        public string ConfigurationFingerprint { get; set; } = string.Empty;
+
+        /// <summary>True for the step shown in the main area.</summary>
+        [ObservableProperty]
+        private bool _isCurrent;
+
+        /// <summary>True when the operator can open this step from the step list.</summary>
+        [ObservableProperty]
+        private bool _isReachable;
 
         public string StatusIcon => IsCompleted ? "✅" : IsFailed ? "❌" : IsSkipped ? "⏭️" : "⬜";
 

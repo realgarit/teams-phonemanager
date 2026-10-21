@@ -25,6 +25,24 @@ namespace PhoneDesk.Tests
             Assert.Equal("aa-acme-main-sales", vars.AaDisplayName);
         }
 
+        [Theory]
+        [InlineData("@acme.onmicrosoft.com")]
+        [InlineData("acme.onmicrosoft.com")]
+        [InlineData("  acme.onmicrosoft.com  ")]
+        public void ResourceAccountUpns_IncludeAtSign_WhetherOrNotDomainHasOne(string domain)
+        {
+            var vars = new PhoneManagerVariables
+            {
+                Customer = "acme",
+                CustomerGroupName = "sales",
+                MsFallbackDomain = domain,
+                RaaAnrName = "main"
+            };
+
+            Assert.Equal("racq-acme-sales@acme.onmicrosoft.com", vars.RacqUPN);
+            Assert.Equal("raaa-acme-main-sales@acme.onmicrosoft.com", vars.RaaaUPN);
+        }
+
         [Fact]
         public void HolidayName_GeneratesWithPrefix()
         {

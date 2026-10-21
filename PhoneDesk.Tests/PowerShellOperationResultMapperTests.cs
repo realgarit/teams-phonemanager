@@ -29,9 +29,26 @@ namespace PhoneDesk.Tests
             Assert.True(result.HasSuccessMarker);
             Assert.False(result.HasErrorMarker);
             Assert.False(result.ShouldReportError);
+            Assert.True(result.Succeeded);
             Assert.Null(result.ErrorMessage);
             Assert.Empty(result.Errors);
             Assert.Equal("SUCCESS: Connected to Microsoft Teams", result.Value);
+        }
+
+        [Fact]
+        public void Map_SuccessLineFollowedByErrorRecord_IsNotSucceeded()
+        {
+            // A non-terminating cmdlet error does not stop the script, so the script still prints its own
+            // SUCCESS line; the host then appends the error record. That must count as a failure.
+            var result = PowerShellOperationResultMapper.Map(Exec(
+                "SUCCESS: Resource account created successfully\nERROR: Length cannot be less than zero.",
+                hadErrors: true,
+                errors: new[] { new PowerShellErrorInfo { Message = "Length cannot be less than zero." } }));
+
+            Assert.False(result.IsSuccess);
+            Assert.False(result.Succeeded);
+            Assert.True(result.ShouldReportError);
+            Assert.Equal("Length cannot be less than zero.", result.ErrorMessage);
         }
 
         [Fact]
@@ -99,16 +116,17 @@ namespace PhoneDesk.Tests
         }
 
         [Fact]
-        public void Map_MixedSuccessAndError_DoesNotFlagAsReportable()
+        public void Map_MixedSuccessAndError_IsReportedAndNotSucceeded()
         {
-            // A batch (e.g. bulk operations) can emit both SUCCESS and ERROR lines.
+            // A batch (e.g. bulk operations) can emit both SUCCESS and ERROR lines. Part of it failed,
+            // so the operator must see the error and the operation does not count as succeeded.
             var result = PowerShellOperationResultMapper.Map(
                 Exec("SUCCESS: Created call queue\nERROR: Failed to assign license: 429"));
 
             Assert.True(result.HasSuccessMarker);
             Assert.True(result.HasErrorMarker);
-            // Mirrors the historic ViewModelBase predicate: ERROR: && !SUCCESS.
-            Assert.False(result.ShouldReportError);
+            Assert.True(result.ShouldReportError);
+            Assert.False(result.Succeeded);
             // A category is still assigned because an error signal was present.
             Assert.Equal(OperationErrorCategory.Throttling, result.Category);
         }
