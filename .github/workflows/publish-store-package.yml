@@ -143,11 +143,26 @@ jobs:
         STORE_URL="${PAGES_BASE_URL}/store/${VERSION}/phonedesk-win-x64-setup.exe"
         DOWNLOAD="$RUNNER_TEMP/phonedesk-store-live.exe"
         HEADERS="$RUNNER_TEMP/phonedesk-store-live.headers"
-        MAX_ATTEMPTS=30
+        # Wait at most 15 minutes of elapsed time, including the time each download takes. The Pages
+        # build for the gh-pages push can start several minutes after the push: for v3.33.0 it began
+        # only after a 5-minute window had closed.
+        WAIT_SECONDS=900
+        DEADLINE=$((SECONDS + WAIT_SECONDS))
+        attempt=0
 
-        for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+        while (( SECONDS < DEADLINE )); do
+          attempt=$((attempt + 1))
+          REMAINING=$((DEADLINE - SECONDS))
+          # Plain if blocks instead of the ternary operator, which the Semgrep Bash parser cannot read.
+          CURL_TIMEOUT=30
+          if (( REMAINING < CURL_TIMEOUT )); then
+            CURL_TIMEOUT=$REMAINING
+          fi
+          if (( CURL_TIMEOUT < 1 )); then
+            break # curl treats --max-time 0 as "no limit"
+          fi
           rm -f "$DOWNLOAD" "$HEADERS"
-          if curl --silent --show-error --max-time 30 --max-redirs 0 \
+          if curl --silent --show-error --max-time "$CURL_TIMEOUT" --max-redirs 0 \
             --dump-header "$HEADERS" --output "$DOWNLOAD" "$STORE_URL"; then
             STATUS="$(awk 'NR == 1 {print $2; exit}' "$HEADERS")"
             if [[ "$STATUS" == "200" ]] && ! grep -qi '^location:' "$HEADERS"; then
@@ -156,18 +171,23 @@ jobs:
                 echo "Verified non-redirecting Pages URL with matching digest: $STORE_URL"
                 exit 0
               fi
-              echo "Attempt $attempt/$MAX_ATTEMPTS: Pages returned digest '$SERVED_DIGEST', expected '$RELEASE_DIGEST'."
+              echo "Attempt $attempt: Pages returned digest '$SERVED_DIGEST', expected '$RELEASE_DIGEST'."
             else
-              echo "Attempt $attempt/$MAX_ATTEMPTS: Pages returned HTTP '$STATUS' or a redirect."
+              echo "Attempt $attempt: Pages returned HTTP '$STATUS' or a redirect."
             fi
           else
-            echo "Attempt $attempt/$MAX_ATTEMPTS: Pages URL is not available yet."
+            echo "Attempt $attempt: Pages URL is not available yet."
           fi
 
-          if [[ "$attempt" -lt "$MAX_ATTEMPTS" ]]; then
-            sleep 10
+          REMAINING=$((DEADLINE - SECONDS))
+          PAUSE=10
+          if (( REMAINING < PAUSE )); then
+            PAUSE=$REMAINING
+          fi
+          if (( PAUSE > 0 )); then
+            sleep "$PAUSE"
           fi
         done
 
-        echo "::error::Pages did not serve the expected non-redirecting installer after $MAX_ATTEMPTS attempts: $STORE_URL"
+        echo "::error::Pages did not serve the expected non-redirecting installer within $((WAIT_SECONDS / 60)) minutes ($attempt attempts): $STORE_URL"
         exit 1
