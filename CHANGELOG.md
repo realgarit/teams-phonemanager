@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.33.0](https://github.com/realgarit/phonedesk/compare/v3.32.0...v3.33.0) (2026-10-21)
+
+
+### Features
+
+* reliable Guided Setup verified in a live tenant, safe deletes ([df7f09a](https://github.com/realgarit/phonedesk/commit/df7f09ac8c0e8018ef4d98b3eb73555e1c6887ed))
+* reliable Guided Setup, verified in a live tenant ([0115a7f](https://github.com/realgarit/phonedesk/commit/0115a7f183ba699dcffae47abb98db5cc56f6fa1))
+
+
+### Bug Fixes
+
+* apply changed settings on re-run, per-step fingerprint, strict DNS check ([04bb123](https://github.com/realgarit/phonedesk/commit/04bb12360cb845bf7a8187380874dffb98c223dc))
+* reliable Guided Setup resource accounts, scripts and progress ([2620df2](https://github.com/realgarit/phonedesk/commit/2620df20013747d7f8e2113eea616937d9f36b7a))
+
 ## [3.32.0](https://github.com/realgarit/phonedesk/compare/v3.31.1...v3.32.0) (2026-10-19)
 
 
