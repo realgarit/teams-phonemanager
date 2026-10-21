@@ -153,7 +153,11 @@ jobs:
         while (( SECONDS < DEADLINE )); do
           attempt=$((attempt + 1))
           REMAINING=$((DEADLINE - SECONDS))
-          CURL_TIMEOUT=$(( REMAINING < 30 ? REMAINING : 30 ))
+          # Plain if blocks instead of the ternary operator, which the Semgrep Bash parser cannot read.
+          CURL_TIMEOUT=30
+          if (( REMAINING < CURL_TIMEOUT )); then
+            CURL_TIMEOUT=$REMAINING
+          fi
           if (( CURL_TIMEOUT < 1 )); then
             break # curl treats --max-time 0 as "no limit"
           fi
@@ -176,8 +180,12 @@ jobs:
           fi
 
           REMAINING=$((DEADLINE - SECONDS))
-          if (( REMAINING > 0 )); then
-            sleep $(( REMAINING < 10 ? REMAINING : 10 ))
+          PAUSE=10
+          if (( REMAINING < PAUSE )); then
+            PAUSE=$REMAINING
+          fi
+          if (( PAUSE > 0 )); then
+            sleep "$PAUSE"
           fi
         done
 
