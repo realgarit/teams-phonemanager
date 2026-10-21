@@ -46,6 +46,7 @@ catch {
             var sanitizedAaDisplayName = _sanitizer.SanitizeString(variables.AaDisplayName);
             var sanitizedLanguageId = _sanitizer.SanitizeString(variables.LanguageId);
             var sanitizedTimeZoneId = _sanitizer.SanitizeString(variables.TimeZoneId);
+            var afterHoursSchedule = BuildAfterHoursScheduleStatements(variables);
 
             return $@"
 try {{
@@ -58,10 +59,7 @@ try {{
 
 {afterHoursCallFlow}
 
-$aatr1 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours1Start:hh\:mm}"" -End ""{variables.OpeningHours1End:hh\:mm}""
-$aatr2 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours2Start:hh\:mm}"" -End ""{variables.OpeningHours2End:hh\:mm}""
-$aaTimeRanges = if (""{variables.OpeningHours2Start:hh\:mm}"" -ne ""{variables.OpeningHours2End:hh\:mm}"") {{ @($aatr1, $aatr2) }} else {{ @($aatr1) }}
-$aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours $aaTimeRanges -TuesdayHours $aaTimeRanges -WednesdayHours $aaTimeRanges -ThursdayHours $aaTimeRanges -FridayHours $aaTimeRanges -Complement -ErrorAction Stop
+{afterHoursSchedule}
 $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
 
         New-CsAutoAttendant `
@@ -79,6 +77,56 @@ $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociatio
 catch {{
     Write-Host ""ERROR: Failed to create auto attendant: $_""
 }}";
+        }
+
+        /// <summary>
+        /// Builds the time ranges and the after-hours schedule ($aaafterHoursSchedule) for the uniform
+        /// Monday–Friday hours or the per-day plan. A second time range is created only when it is set:
+        /// New-CsOnlineTimeRange rejects an empty 00:00–00:00 range.
+        /// </summary>
+        private static string BuildAfterHoursScheduleStatements(IPhoneManagerVariables variables)
+        {
+            var sb = new StringBuilder();
+            if (variables.UsePerDaySchedule)
+            {
+                var dayNames = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+                var parameters = new StringBuilder();
+                foreach (var dayName in dayNames)
+                {
+                    var day = variables.WeeklySchedule.FirstOrDefault(d => d.DayName == dayName);
+                    if (day == null || !day.IsEnabled) continue;
+
+                    var varPrefix = dayName.ToLower();
+                    sb.AppendLine($"${varPrefix}Tr1 = New-CsOnlineTimeRange -Start \"{day.Hours1Start:hh\\:mm}\" -End \"{day.Hours1End:hh\\:mm}\" -ErrorAction Stop");
+                    if (day.HasSecondRange && day.Hours2Start != day.Hours2End)
+                    {
+                        sb.AppendLine($"${varPrefix}Tr2 = New-CsOnlineTimeRange -Start \"{day.Hours2Start:hh\\:mm}\" -End \"{day.Hours2End:hh\\:mm}\" -ErrorAction Stop");
+                        sb.AppendLine($"${varPrefix}Hours = @(${varPrefix}Tr1, ${varPrefix}Tr2)");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"${varPrefix}Hours = @(${varPrefix}Tr1)");
+                    }
+                    parameters.Append($" -{dayName}Hours ${varPrefix}Hours");
+                }
+
+                sb.Append($"$aaafterHoursSchedule = New-CsOnlineSchedule -Name \"After Hours Schedule\" -WeeklyRecurrentSchedule{parameters} -Complement -ErrorAction Stop");
+                return sb.ToString();
+            }
+
+            sb.AppendLine($"$aatr1 = New-CsOnlineTimeRange -Start \"{variables.OpeningHours1Start:hh\\:mm}\" -End \"{variables.OpeningHours1End:hh\\:mm}\" -ErrorAction Stop");
+            if (variables.OpeningHours2Start != variables.OpeningHours2End)
+            {
+                sb.AppendLine($"$aatr2 = New-CsOnlineTimeRange -Start \"{variables.OpeningHours2Start:hh\\:mm}\" -End \"{variables.OpeningHours2End:hh\\:mm}\" -ErrorAction Stop");
+                sb.AppendLine("$aaTimeRanges = @($aatr1, $aatr2)");
+            }
+            else
+            {
+                sb.AppendLine("$aaTimeRanges = @($aatr1)");
+            }
+
+            sb.Append("$aaafterHoursSchedule = New-CsOnlineSchedule -Name \"After Hours Schedule\" -WeeklyRecurrentSchedule -MondayHours $aaTimeRanges -TuesdayHours $aaTimeRanges -WednesdayHours $aaTimeRanges -ThursdayHours $aaTimeRanges -FridayHours $aaTimeRanges -Complement -ErrorAction Stop");
+            return sb.ToString();
         }
 
         private string BuildCallFlow(IPhoneManagerVariables variables, string flowName, string? greetingType, string? ttsPrompt, string? audioFileId, string? action, string? actionTarget)
@@ -251,10 +299,7 @@ catch {{
 
             return $@"
 try {{
-    $aatr1 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours1Start:hh\:mm}"" -End ""{variables.OpeningHours1End:hh\:mm}""
-    $aatr2 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours2Start:hh\:mm}"" -End ""{variables.OpeningHours2End:hh\:mm}""
-    $aaTimeRanges = if (""{variables.OpeningHours2Start:hh\:mm}"" -ne ""{variables.OpeningHours2End:hh\:mm}"") {{ @($aatr1, $aatr2) }} else {{ @($aatr1) }}
-    $aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours $aaTimeRanges -TuesdayHours $aaTimeRanges -WednesdayHours $aaTimeRanges -ThursdayHours $aaTimeRanges -FridayHours $aaTimeRanges -Complement
+{BuildAfterHoursScheduleStatements(variables)}
 
     if ($aaafterHoursSchedule) {{
         Write-Host ""SUCCESS: Created after hours schedule with ID: $($aaafterHoursSchedule.Id)""
@@ -346,20 +391,49 @@ catch {{
         }
 
         /// <summary>
-        /// Removes an auto attendant by name.
+        /// Removes an auto attendant by name. Linked resource accounts are released first, and the
+        /// schedules it used are removed afterwards when no other configuration uses them (by ID, never
+        /// by name: schedule names such as "After Hours Schedule" are shared across auto attendants).
         /// </summary>
         public string GetRemoveAutoAttendantCommand(string autoAttendantName)
         {
             var sanitizedName = _sanitizer.SanitizeString(autoAttendantName);
-            
+
             return $@"
 try {{
-    $aa = Get-CsAutoAttendant -NameFilter ""{sanitizedName}"" | Where-Object {{$_.Name -eq ""{sanitizedName}""}} | Select-Object -First 1
+    $aa = Get-CsAutoAttendant -NameFilter ""{sanitizedName}"" -ErrorAction Stop | Where-Object {{$_.Name -eq ""{sanitizedName}""}} | Select-Object -First 1
     if (-not $aa) {{
         Write-Host ""ERROR: Auto attendant '{sanitizedName}' not found""
     }} else {{
-        Remove-CsAutoAttendant -Identity $aa.Identity
+        $aaScheduleIds = @($aa.CallHandlingAssociations | ForEach-Object {{ $_.ScheduleId }} | Where-Object {{ $_ }})
+        if ($aa.ApplicationInstances) {{
+            Remove-CsOnlineApplicationInstanceAssociation -Identities @($aa.ApplicationInstances) -ErrorAction Stop | Out-Null
+        }}
+        Remove-CsAutoAttendant -Identity $aa.Identity -ErrorAction Stop
         Write-Host ""SUCCESS: Auto attendant '{sanitizedName}' removed successfully""
+
+        # Schedule cleanup is best effort: the auto attendant is already removed. A Teams cmdlet can throw
+        # after it did its work, so the result is checked by reading the schedule again.
+        foreach ($scheduleId in $aaScheduleIds) {{
+            try {{
+                $schedule = Get-CsOnlineSchedule -Id $scheduleId -ErrorAction Stop
+                if ($schedule -and -not $schedule.AssociatedConfigurationIds) {{
+                    Remove-CsOnlineSchedule -Id $scheduleId -ErrorAction Stop
+                }}
+            }}
+            catch {{
+            }}
+            $remaining = $null
+            try {{
+                $remaining = Get-CsOnlineSchedule -Id $scheduleId -ErrorAction Stop
+            }}
+            catch {{
+                $remaining = $null
+            }}
+            if ($remaining -and -not $remaining.AssociatedConfigurationIds) {{
+                Write-Host ""WARNING: Schedule '$($remaining.Name)' ($scheduleId) is no longer used but could not be removed.""
+            }}
+        }}
     }}
 }}
 catch {{

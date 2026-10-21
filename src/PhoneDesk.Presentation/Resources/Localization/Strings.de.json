@@ -603,6 +603,8 @@
   "ValidationHolidayNameSuffixRequired": "Namenszusatz für Feiertage ist erforderlich.",
   "ValidationHolidayGreetingPromptRequired": "Ansagetext für Feiertage ist erforderlich.",
   "ValidationHolidayDateInPast": "Das Feiertagsdatum darf nicht in der Vergangenheit liegen.",
+  "ValidationOpeningHoursInvalid": "Die Öffnungszeiten sind ungültig. Jede Startzeit muss vor ihrer Endzeit liegen.",
+  "ValidationOpeningDaysRequired": "Wählen Sie im Tagesplan mindestens einen geöffneten Tag aus.",
   "ErrorConnectionTitle": "Verbindungsfehler",
   "ErrorConnectionMessage": "Verbindung zu {service} fehlgeschlagen:\n\n{error}",
   "ErrorConnectionLog": "Verbindung zu {service} fehlgeschlagen: {error}",

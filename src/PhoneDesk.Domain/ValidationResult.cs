@@ -22,7 +22,9 @@ namespace PhoneDesk.Services
         AfterHoursCallFlowAudioFileRequired,
         HolidayNameSuffixRequired,
         HolidayGreetingPromptRequired,
-        HolidayDateInPast
+        HolidayDateInPast,
+        OpeningHoursInvalid,
+        OpeningDaysRequired
     }
 
     public sealed record ValidationIssue(ValidationErrorCode Code, string Message);

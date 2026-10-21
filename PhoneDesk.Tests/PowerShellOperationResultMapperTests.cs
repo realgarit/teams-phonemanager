@@ -36,6 +36,29 @@ namespace PhoneDesk.Tests
         }
 
         [Fact]
+        public void Map_ErrorCaughtInsideTheScript_WithSuccess_IsSucceeded()
+        {
+            // Live tenant behaviour: Get-CsOnlineApplicationInstance throws "not found" inside the script's
+            // own try/catch before the create. PowerShell sets HadErrors, but the error stream is empty.
+            var result = PowerShellOperationResultMapper.Map(Exec(
+                "SUCCESS: Resource account racq-x@contoso.onmicrosoft.com created successfully",
+                hadErrors: true));
+
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Succeeded);
+            Assert.False(result.ShouldReportError);
+        }
+
+        [Fact]
+        public void Map_HadErrorsWithoutRecordsOrSuccess_IsFailure()
+        {
+            var result = PowerShellOperationResultMapper.Map(Exec("INFO: nothing reported", hadErrors: true));
+
+            Assert.False(result.IsSuccess);
+            Assert.True(result.ShouldReportError);
+        }
+
+        [Fact]
         public void Map_SuccessLineFollowedByErrorRecord_IsNotSucceeded()
         {
             // A non-terminating cmdlet error does not stop the script, so the script still prints its own

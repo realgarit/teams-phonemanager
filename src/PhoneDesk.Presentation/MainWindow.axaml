@@ -297,6 +297,7 @@
                                           VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="1"
                                          Text="{Binding LatestLogEntry}"
+                                         MaxLines="1"
                                          TextTrimming="CharacterEllipsis"
                                          VerticalAlignment="Center"
                                          Classes="code"

@@ -107,6 +107,8 @@
 
                                 <Button Grid.Column="2"
                                         Command="{Binding RemoveResourceAccountCommand}"
+                                        CommandParameter="{Binding #ResourceAccountsGrid.SelectedItem.UserPrincipalName}"
+                                        IsEnabled="{Binding #ResourceAccountsGrid.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                                         ToolTip.Tip="{loc:Translate Key=ProvisioningDeleteResourceAccountTooltip}"
                                         Margin="0,0,16,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
@@ -124,7 +126,8 @@
 
                             <!-- Resource Accounts List -->
                             <Grid Grid.Row="2">
-                                <DataGrid AutomationProperties.Name="{loc:Translate Key=ProvisioningResourceAccountsGridAutomationName}"
+                                <DataGrid x:Name="ResourceAccountsGrid"
+                                          AutomationProperties.Name="{loc:Translate Key=ProvisioningResourceAccountsGridAutomationName}"
                                           ItemsSource="{Binding ResourceAccountsView}"
                                           AutoGenerateColumns="False"
                                           HeadersVisibility="Column"
@@ -190,6 +193,8 @@
 
                                 <Button Grid.Column="2"
                                         Command="{Binding RemoveAutoAttendantCommand}"
+                                        CommandParameter="{Binding #AutoAttendantsGrid.SelectedItem.Name}"
+                                        IsEnabled="{Binding #AutoAttendantsGrid.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                                         ToolTip.Tip="{loc:Translate Key=AutoAttendantsDeleteTooltip}"
                                         Margin="0,0,16,0" Classes="IconText">
                                     <StackPanel Orientation="Horizontal">
@@ -207,7 +212,8 @@
 
                             <!-- Auto Attendants List -->
                             <Grid Grid.Row="2">
-                            <DataGrid AutomationProperties.Name="{loc:Translate Key=AutoAttendantsGridAutomationName}"
+                            <DataGrid x:Name="AutoAttendantsGrid"
+                                          AutomationProperties.Name="{loc:Translate Key=AutoAttendantsGridAutomationName}"
                                       ItemsSource="{Binding AutoAttendantsView}"
                                       AutoGenerateColumns="False"
                                       HeadersVisibility="Column"

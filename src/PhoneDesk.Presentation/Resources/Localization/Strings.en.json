@@ -603,6 +603,8 @@
   "ValidationHolidayNameSuffixRequired": "Holiday name suffix is required.",
   "ValidationHolidayGreetingPromptRequired": "Holiday greeting prompt is required.",
   "ValidationHolidayDateInPast": "Holiday date cannot be in the past.",
+  "ValidationOpeningHoursInvalid": "Opening hours are invalid. Each start time must be before its end time.",
+  "ValidationOpeningDaysRequired": "Select at least one open day in the day plan.",
   "ErrorConnectionTitle": "Connection Error",
   "ErrorConnectionMessage": "Failed to connect to {service}:\n\n{error}",
   "ErrorConnectionLog": "Failed to connect to {service}: {error}",

@@ -86,6 +86,26 @@ namespace PhoneDesk.Tests
         }
 
         [Fact]
+        public void DeleteScripts_ParseAndUseCmdletsThatExist()
+        {
+            var commands = CreateCommands();
+            var resourceAccount = commands.GetRemoveResourceAccountCommand("racq-ewp-hauptnummer@contoso.onmicrosoft.com");
+            var autoAttendant = commands.GetRemoveAutoAttendantCommand("aa-ewp-haupt-hauptnummer");
+            var callQueue = commands.GetRemoveCallQueueCommand("cq-ewp-hauptnummer");
+
+            AssertParses("remove resource account", resourceAccount);
+            AssertParses("remove auto attendant", autoAttendant);
+            AssertParses("remove call queue", callQueue);
+
+            // The MicrosoftTeams module has no Remove-CsOnlineUser; resource accounts are deleted through Graph.
+            Assert.DoesNotContain("Remove-CsOnlineUser", resourceAccount, StringComparison.Ordinal);
+            Assert.Contains("Remove-MgUser", resourceAccount, StringComparison.Ordinal);
+            // Schedules are removed by ID only; their names are shared across auto attendants.
+            Assert.Contains("Remove-CsOnlineSchedule -Id $scheduleId", autoAttendant, StringComparison.Ordinal);
+            Assert.DoesNotContain("After Hours Schedule", autoAttendant, StringComparison.Ordinal);
+        }
+
+        [Fact]
         public void BulkScript_ParsesWithoutErrors()
         {
             var san = new PowerShellSanitizationService();
@@ -119,6 +139,40 @@ namespace PhoneDesk.Tests
             Assert.DoesNotContain("Set-CsPhoneNumberAssignment", script, StringComparison.Ordinal);
             Assert.Contains("New-CsAutoAttendant ", script, StringComparison.Ordinal);
             Assert.Contains("13:30", script, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        public void AutoAttendantStep_UnusedSecondRange_IsNotCreated()
+        {
+            // Live tenant: New-CsOnlineTimeRange rejects 00:00-00:00 even when the range is not used afterwards.
+            var vars = MinimalVariables();
+            vars.OpeningHours1Start = new TimeSpan(8, 0, 0);
+            vars.OpeningHours1End = new TimeSpan(17, 0, 0);
+
+            var script = CreateCommands().GetCreateAutoAttendantCommand(vars);
+
+            Assert.Contains("-Start \"08:00\" -End \"17:00\"", script, StringComparison.Ordinal);
+            Assert.DoesNotContain("$aatr2", script, StringComparison.Ordinal);
+            Assert.DoesNotContain("\"00:00\"", script, StringComparison.Ordinal);
+            AssertParses("auto attendant", script);
+        }
+
+        [Fact]
+        public void AutoAttendantStep_UsesTheDayPlanWhenSelected()
+        {
+            var vars = MinimalVariables();
+            vars.UsePerDaySchedule = true;
+            foreach (var day in vars.WeeklySchedule)
+            {
+                day.IsEnabled = day.DayName is "Monday" or "Saturday";
+            }
+
+            var script = CreateCommands().GetCreateAutoAttendantCommand(vars);
+
+            Assert.Contains("-MondayHours $mondayHours", script, StringComparison.Ordinal);
+            Assert.Contains("-SaturdayHours $saturdayHours", script, StringComparison.Ordinal);
+            Assert.DoesNotContain("-TuesdayHours", script, StringComparison.Ordinal);
+            AssertParses("auto attendant day plan", script);
         }
 
         private static void AssertParses(string label, string script)

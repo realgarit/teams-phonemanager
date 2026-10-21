@@ -122,6 +122,7 @@
                                 HorizontalAlignment="Stretch"
                                 HorizontalContentAlignment="Center"
                                 Command="{Binding StartOverCommand}"
+                                    AutomationProperties.Name="{loc:Translate Key=WizardStartOverAction}"
                                 IsVisible="{Binding HasProgress}"
                                 IsEnabled="{Binding !IsBusy}">
                             <StackPanel Orientation="Horizontal" Spacing="6">
@@ -137,17 +138,21 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
+                        <!-- The script/review area keeps a usable height; the result area below is capped. -->
+                        <RowDefinition Height="*" MinHeight="150"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <!-- Step Header -->
                     <StackPanel Grid.Row="0" Margin="0,0,0,16">
-                        <StackPanel Orientation="Horizontal" Spacing="12">
-                            <Border Background="{DynamicResource AccentFillColorDefaultBrush}"
+                        <!-- Grid instead of a horizontal StackPanel so long (German) step titles wrap. -->
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Border Grid.Column="0"
+                                    Background="{DynamicResource AccentFillColorDefaultBrush}"
                                     CornerRadius="16"
                                     Width="32" Height="32"
+                                    VerticalAlignment="Center"
                                     HorizontalAlignment="Left">
                                 <TextBlock Text="{Binding StepNumberBadgeText}"
                                          Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"
@@ -156,7 +161,7 @@
                                          HorizontalAlignment="Center"
                                          VerticalAlignment="Center"/>
                             </Border>
-                            <StackPanel VerticalAlignment="Center" Spacing="1">
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
                                 <TextBlock Text="{Binding StepNumberText}"
                                          FontSize="11"
                                          Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
@@ -164,9 +169,10 @@
                                          FontFamily="{StaticResource DisplayFontFamily}"
                                          FontSize="21"
                                          FontWeight="SemiBold"
-                                         LetterSpacing="-0.2"/>
+                                         LetterSpacing="-0.2"
+                                         TextWrapping="Wrap"/>
                             </StackPanel>
-                        </StackPanel>
+                        </Grid>
                         <TextBlock Text="{Binding StepDescription}"
                                  FontSize="14"
                                  Foreground="{DynamicResource TextFillColorSecondaryBrush}"
@@ -185,6 +191,7 @@
                     <!-- Script Preview / Dry-Run Plan Content -->
                     <Border Grid.Row="2"
                             Classes="sunken"
+                            ClipToBounds="True"
                             Margin="0,0,0,12">
                         <Grid RowDefinitions="Auto,*">
                             <Border Grid.Row="0"
@@ -299,7 +306,8 @@
                                 <Button Grid.Row="0"
                                         HorizontalAlignment="Right"
                                         Margin="0,8,12,0"
-                                        Command="{Binding ClosePlanCommand}">
+                                        Command="{Binding ClosePlanCommand}"
+                                    AutomationProperties.Name="{loc:Translate Key=WizardClosePlanAction}">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
                                         <fi:SymbolIcon Symbol="Dismiss" FontSize="14"/>
                                         <TextBlock Text="{loc:Translate Key=WizardClosePlanAction}" VerticalAlignment="Center"/>
@@ -371,14 +379,16 @@
                                 <StackPanel Grid.Column="1" Spacing="2">
                                     <TextBlock Text="{loc:Translate Key=WizardStepErrorTitle}"
                                                FontWeight="SemiBold"/>
-                                    <SelectableTextBlock Text="{Binding StepErrorMessage}"
-                                                         TextWrapping="Wrap"/>
+                                    <ScrollViewer MaxHeight="64" VerticalScrollBarVisibility="Auto">
+                                        <SelectableTextBlock Text="{Binding StepErrorMessage}"
+                                                             TextWrapping="Wrap"/>
+                                    </ScrollViewer>
                                 </StackPanel>
                             </Grid>
                         </Border>
                         <Border Classes="sunken"
                                 Padding="12"
-                                MaxHeight="140">
+                                MaxHeight="120">
                             <ScrollViewer>
                                 <StackPanel Spacing="4">
                                     <TextBlock Text="{loc:Translate Key=WizardStepOutputTitle}"
@@ -411,6 +421,7 @@
                         <Button Grid.Column="0"
                                 VerticalAlignment="Center"
                                 Command="{Binding GoToPreviousStepCommand}"
+                                    AutomationProperties.Name="{loc:Translate Key=CommonBack}"
                                 IsEnabled="{Binding CanGoPrevious}">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <fi:SymbolIcon Symbol="ArrowLeft" FontSize="14"/>
@@ -427,6 +438,7 @@
                                    VerticalAlignment="Center">
                             <!-- Execute Step -->
                             <Button Command="{Binding ExecuteCurrentStepCommand}"
+                                    AutomationProperties.Name="{Binding ExecuteButtonText}"
                                     Classes="accent"
                                     IsEnabled="{Binding CanExecuteStep}">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
@@ -437,6 +449,7 @@
 
                             <!-- Skip -->
                             <Button Command="{Binding SkipStepCommand}"
+                                    AutomationProperties.Name="{loc:Translate Key=CommonSkip}"
                                     IsEnabled="{Binding !IsBusy}">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                     <fi:SymbolIcon Symbol="Next" FontSize="14"/>
@@ -446,6 +459,7 @@
 
                             <!-- Dry-run plan preview + export -->
                             <Button Command="{Binding GeneratePlanCommand}"
+                                    AutomationProperties.Name="{loc:Translate Key=WizardPreviewChangesAction}"
                                     IsEnabled="{Binding !IsBusy}"
                                     ToolTip.Tip="{loc:Translate Key=WizardPreviewChangesTooltip}">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
@@ -454,17 +468,20 @@
                                 </StackPanel>
                             </Button>
                             <Button Command="{Binding ExportPlanJsonCommand}"
+                                    AutomationProperties.Name="{loc:Translate Key=WizardExportPlanJsonTooltip}"
                                     IsEnabled="{Binding !IsBusy}"
                                     ToolTip.Tip="{loc:Translate Key=WizardExportPlanJsonTooltip}">
                                 <fi:SymbolIcon Symbol="Code" FontSize="14"/>
                             </Button>
                             <Button Command="{Binding ExportPlanCsvCommand}"
+                                    AutomationProperties.Name="{loc:Translate Key=WizardExportPlanCsvTooltip}"
                                     IsEnabled="{Binding !IsBusy}"
                                     ToolTip.Tip="{loc:Translate Key=WizardExportPlanCsvTooltip}">
                                 <fi:SymbolIcon Symbol="DocumentTable" FontSize="14"/>
                             </Button>
                             <!-- Retry after a failure, or run a completed step again -->
                             <Button Command="{Binding RetryStepCommand}"
+                                    AutomationProperties.Name="{Binding RetryActionText}"
                                     IsVisible="{Binding ShowRetryAction}"
                                     IsEnabled="{Binding !IsBusy}">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
@@ -475,6 +492,7 @@
 
                             <!-- Navigate to Variables (step 0 only) -->
                             <Button Command="{Binding GoToVariablesPageCommand}"
+                                    AutomationProperties.Name="{loc:Translate Key=WizardEditConfigurationAction}"
                                     IsVisible="{Binding IsReviewStep}"
                                     Tag="edit_variables">
                                 <StackPanel Orientation="Horizontal" Spacing="6">
@@ -488,6 +506,7 @@
                         <Button Grid.Column="2"
                                 VerticalAlignment="Center"
                                 Command="{Binding GoToNextStepCommand}"
+                                    AutomationProperties.Name="{loc:Translate Key=CommonNext}"
                                 IsEnabled="{Binding CanGoNext}"
                                 Classes="accent">
                             <StackPanel Orientation="Horizontal" Spacing="6">

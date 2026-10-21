@@ -129,6 +129,8 @@ namespace PhoneDesk.Services
                     "After hours call flow audio file is required when using Audio File.");
             }
 
+            ValidateOpeningHours(variables, result);
+
             if (string.IsNullOrWhiteSpace(variables.HolidayNameSuffix))
             {
                 result.AddError(ValidationErrorCode.HolidayNameSuffixRequired, "Holiday name suffix is required.");
@@ -152,6 +154,48 @@ namespace PhoneDesk.Services
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Teams rejects a time range whose start is not before its end (for example the default 00:00–00:00),
+        /// and a schedule without any open day. Catch both before a provisioning step runs.
+        /// </summary>
+        private static void ValidateOpeningHours(IPhoneManagerVariables variables, ValidationResult result)
+        {
+            const string invalidMessage = "Opening hours are invalid. Each start time must be before its end time.";
+            if (variables.UsePerDaySchedule)
+            {
+                var openDays = 0;
+                var invalid = false;
+                foreach (var day in variables.WeeklySchedule)
+                {
+                    if (!day.IsEnabled)
+                    {
+                        continue;
+                    }
+
+                    openDays++;
+                    invalid |= day.Hours1Start >= day.Hours1End
+                        || (day.HasSecondRange && day.Hours2Start != day.Hours2End && day.Hours2Start >= day.Hours2End);
+                }
+
+                if (openDays == 0)
+                {
+                    result.AddError(ValidationErrorCode.OpeningDaysRequired, "Select at least one open day in the day plan.");
+                }
+                else if (invalid)
+                {
+                    result.AddError(ValidationErrorCode.OpeningHoursInvalid, invalidMessage);
+                }
+
+                return;
+            }
+
+            if (variables.OpeningHours1Start >= variables.OpeningHours1End
+                || (variables.OpeningHours2Start != variables.OpeningHours2End && variables.OpeningHours2Start >= variables.OpeningHours2End))
+            {
+                result.AddError(ValidationErrorCode.OpeningHoursInvalid, invalidMessage);
+            }
         }
 
         public bool IsValidEmail(string email)

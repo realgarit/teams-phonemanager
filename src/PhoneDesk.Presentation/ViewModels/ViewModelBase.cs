@@ -450,6 +450,12 @@ namespace PhoneDesk.ViewModels
                 ValidationErrorCode.HolidayDateInPast => GetText(
                     UiTextKey.ValidationHolidayDateInPast,
                     "Holiday date cannot be in the past."),
+                ValidationErrorCode.OpeningHoursInvalid => GetText(
+                    UiTextKey.ValidationOpeningHoursInvalid,
+                    "Opening hours are invalid. Each start time must be before its end time."),
+                ValidationErrorCode.OpeningDaysRequired => GetText(
+                    UiTextKey.ValidationOpeningDaysRequired,
+                    "Select at least one open day in the day plan."),
                 _ => issue.Message
             };
 

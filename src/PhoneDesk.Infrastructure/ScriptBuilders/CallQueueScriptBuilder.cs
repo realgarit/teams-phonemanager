@@ -213,11 +213,15 @@ catch {{
             
             return $@"
 try {{
-    $cq = Get-CsCallQueue -NameFilter ""{sanitizedName}"" | Where-Object {{$_.Name -eq ""{sanitizedName}""}} | Select-Object -First 1
+    $cq = Get-CsCallQueue -NameFilter ""{sanitizedName}"" -ErrorAction Stop | Where-Object {{$_.Name -eq ""{sanitizedName}""}} | Select-Object -First 1
     if (-not $cq) {{
         Write-Host ""ERROR: Call queue '{sanitizedName}' not found""
     }} else {{
-        Remove-CsCallQueue -Identity $cq.Identity
+        # Release linked resource accounts first, so they can be reused or deleted afterwards.
+        if ($cq.ApplicationInstances) {{
+            Remove-CsOnlineApplicationInstanceAssociation -Identities @($cq.ApplicationInstances) -ErrorAction Stop | Out-Null
+        }}
+        Remove-CsCallQueue -Identity $cq.Identity -ErrorAction Stop
         Write-Host ""SUCCESS: Call queue '{sanitizedName}' removed successfully""
     }}
 }}
@@ -227,21 +231,29 @@ catch {{
         }
 
         /// <summary>
-        /// Removes a resource account (application instance) by UPN.
+        /// Removes a resource account (application instance) by UPN: releases its call queue or auto attendant
+        /// association, then deletes the user object. The Teams module has no Remove-CsOnlineUser cmdlet;
+        /// Microsoft Graph moves the account to Deleted users, where it can be restored for 30 days.
         /// </summary>
         public string GetRemoveResourceAccountCommand(string upn)
         {
             var sanitizedUpn = _sanitizer.SanitizeString(upn);
-            
+
             return $@"
 try {{
-    $user = Get-CsOnlineUser ""{sanitizedUpn}"" -ErrorAction Stop
-    if (-not $user) {{
-        Write-Host ""ERROR: Resource account '{sanitizedUpn}' not found""
-    }} else {{
-        Remove-CsOnlineUser -Identity $user.Identity -ErrorAction Stop
-        Write-Host ""SUCCESS: Resource account '{sanitizedUpn}' removed successfully""
+    $resourceAccount = Get-CsOnlineApplicationInstance -Identity ""{sanitizedUpn}"" -ErrorAction Stop
+    $association = $null
+    try {{
+        $association = Get-CsOnlineApplicationInstanceAssociation -Identity $resourceAccount.ObjectId -ErrorAction Stop
     }}
+    catch {{
+        $association = $null
+    }}
+    if ($association -and $association.ConfigurationId) {{
+        Remove-CsOnlineApplicationInstanceAssociation -Identities @($resourceAccount.ObjectId) -ErrorAction Stop | Out-Null
+    }}
+    Remove-MgUser -UserId $resourceAccount.ObjectId -ErrorAction Stop
+    Write-Host ""SUCCESS: Resource account '{sanitizedUpn}' removed successfully""
 }}
 catch {{
     Write-Host ""ERROR: Failed to remove resource account '{sanitizedUpn}': $_""

@@ -93,11 +93,13 @@ namespace PhoneDesk.Models
         [ObservableProperty]
         private string? _aaAfterHoursDisconnectAction; // "None", "AudioFile", "TextToSpeech" - for UI only
 
+        // Teams rejects an empty 00:00–00:00 range, so the first range starts as regular office hours.
+        // The second range stays 00:00–00:00, which means "not used".
         [ObservableProperty]
-        private TimeSpan _openingHours1Start = new TimeSpan(0, 0, 0);
+        private TimeSpan _openingHours1Start = new TimeSpan(8, 0, 0);
 
         [ObservableProperty]
-        private TimeSpan _openingHours1End = new TimeSpan(0, 0, 0);
+        private TimeSpan _openingHours1End = new TimeSpan(17, 0, 0);
 
         [ObservableProperty]
         private TimeSpan _openingHours2Start = new TimeSpan(0, 0, 0);

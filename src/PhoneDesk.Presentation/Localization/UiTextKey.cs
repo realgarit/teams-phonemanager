@@ -606,6 +606,8 @@ public enum UiTextKey
     ValidationHolidayNameSuffixRequired,
     ValidationHolidayGreetingPromptRequired,
     ValidationHolidayDateInPast,
+    ValidationOpeningHoursInvalid,
+    ValidationOpeningDaysRequired,
     ErrorConnectionTitle,
     ErrorConnectionMessage,
     ErrorConnectionLog,

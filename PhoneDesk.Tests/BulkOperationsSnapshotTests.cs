@@ -19,9 +19,10 @@ namespace PhoneDesk.Tests
     public class BulkOperationsSnapshotTests
     {
         // Re-captured when the shared resource account, license and M365 group scripts gained
-        // -ErrorAction Stop and reuse of existing objects (failed cmdlets no longer print SUCCESS).
+        // -ErrorAction Stop and reuse of existing objects (failed cmdlets no longer print SUCCESS), and the
+        // after-hours schedule stopped creating an unused 00:00-00:00 time range.
         private const string ExpectedBulkScriptHash =
-            "A28238AA26B0C0A4F9647B45B4C1C661543A263B093DD5058E89F28A4F05A5EC";
+            "21F8A4B160AF31C98D976BB2EE9442E75FA59818B5F5F7E42EDF1EC1918F6EB4";
 
         private static IPowerShellSanitizationService VerbatimSanitizer()
         {

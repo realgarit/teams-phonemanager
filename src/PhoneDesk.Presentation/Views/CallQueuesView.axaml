@@ -110,6 +110,8 @@
 
                                 <Button Grid.Column="2"
                                         Command="{Binding RemoveResourceAccountCommand}"
+                                        CommandParameter="{Binding #ResourceAccountsGrid.SelectedItem.UserPrincipalName}"
+                                        IsEnabled="{Binding #ResourceAccountsGrid.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                                         ToolTip.Tip="{loc:Translate Key=ProvisioningDeleteResourceAccountTooltip}"
                                         AutomationProperties.Name="{loc:Translate Key=ProvisioningDeleteResourceAccountAutomationName}"
                                         Margin="0,0,16,0" Classes="IconText">
@@ -128,7 +130,8 @@
 
                             <!-- Resource Accounts List -->
                             <Grid Grid.Row="2">
-                                <DataGrid AutomationProperties.Name="{loc:Translate Key=ProvisioningResourceAccountsGridAutomationName}"
+                                <DataGrid x:Name="ResourceAccountsGrid"
+                                          AutomationProperties.Name="{loc:Translate Key=ProvisioningResourceAccountsGridAutomationName}"
                                           ItemsSource="{Binding ResourceAccountsView}"
                                           AutoGenerateColumns="False"
                                           HeadersVisibility="Column"
@@ -199,6 +202,8 @@
 
                                 <Button Grid.Column="2"
                                         Command="{Binding RemoveCallQueueCommand}"
+                                        CommandParameter="{Binding #CallQueuesGrid.SelectedItem.Name}"
+                                        IsEnabled="{Binding #CallQueuesGrid.SelectedItem, Converter={x:Static ObjectConverters.IsNotNull}}"
                                         ToolTip.Tip="{loc:Translate Key=CallQueuesDeleteTooltip}"
                                         AutomationProperties.Name="{loc:Translate Key=CallQueuesDeleteAutomationName}"
                                         Margin="0,0,16,0" Classes="IconText">
@@ -217,7 +222,8 @@
 
                             <!-- Call Queues List -->
                             <Grid Grid.Row="2">
-                                <DataGrid AutomationProperties.Name="{loc:Translate Key=CallQueuesGridAutomationName}"
+                                <DataGrid x:Name="CallQueuesGrid"
+                                          AutomationProperties.Name="{loc:Translate Key=CallQueuesGridAutomationName}"
                                           ItemsSource="{Binding CallQueuesView}"
                                           AutoGenerateColumns="False"
                                           HeadersVisibility="Column"
