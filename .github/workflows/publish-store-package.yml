@@ -143,7 +143,9 @@ jobs:
         STORE_URL="${PAGES_BASE_URL}/store/${VERSION}/phonedesk-win-x64-setup.exe"
         DOWNLOAD="$RUNNER_TEMP/phonedesk-store-live.exe"
         HEADERS="$RUNNER_TEMP/phonedesk-store-live.headers"
-        MAX_ATTEMPTS=30
+        # About 15 minutes (90 x 10 s). The Pages build for the gh-pages push can start several
+        # minutes after the push: for v3.33.0 it began only after a 5-minute window had closed.
+        MAX_ATTEMPTS=90
 
         for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
           rm -f "$DOWNLOAD" "$HEADERS"
