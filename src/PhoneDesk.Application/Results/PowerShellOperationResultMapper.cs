@@ -55,7 +55,11 @@ namespace PhoneDesk.Services
 
             var hasSuccessMarker = output.Contains(SuccessMarker, StringComparison.Ordinal);
             var hasErrorMarker = output.Contains(ErrorMarker, StringComparison.Ordinal);
-            var anyError = hasErrorMarker || execution.HadErrors || errors.Count > 0;
+            // PowerShell sets HadErrors also for an error that the script caught itself (for example an
+            // existence check before a create), while the error stream stays empty. Such a run is not a
+            // failure when the script reported SUCCESS; error records and ERROR: lines always are.
+            var uncaughtErrorWithoutRecords = execution.HadErrors && errors.Count == 0 && !hasSuccessMarker;
+            var anyError = hasErrorMarker || errors.Count > 0 || uncaughtErrorWithoutRecords;
 
             if (!anyError)
             {

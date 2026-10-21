@@ -1282,7 +1282,7 @@ namespace PhoneDesk.ViewModels
                         var command = _powerShellCommandService.GetImportAudioFileCommand(filePath);
                         var result = await ExecutePowerShellCommandAsync(command, "ImportAudioFile");
                         
-                        if (result.HasSuccessMarker)
+                        if (result.Succeeded)
                         {
                             // Parse the audio file ID from the result
                             var audioFileId = ParseAudioFileIdFromResult(result.Value ?? string.Empty);

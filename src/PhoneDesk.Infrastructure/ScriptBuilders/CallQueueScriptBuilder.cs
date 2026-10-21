@@ -33,53 +33,90 @@ catch {
 }";
         }
 
+        /// <summary>
+        /// Guided Setup step: creates the call queue for the configured M365 group and associates the
+        /// call queue resource account with it. The resource account and its license are separate steps.
+        /// Safe to run again: an existing call queue is updated to the current Configuration and an existing
+        /// association is kept, instead of creating duplicates.
+        /// </summary>
         public string GetCreateCallQueueCommand(IPhoneManagerVariables variables)
         {
             var callQueueParams = BuildCallQueueParameters(variables);
             // SECURITY: Sanitize all user inputs and wrap in quotes
             var sanitizedRacqUPN = _sanitizer.SanitizeString(variables.RacqUPN);
-            var sanitizedRacqDisplayName = _sanitizer.SanitizeString(variables.RacqDisplayName);
             var sanitizedCqDisplayName = _sanitizer.SanitizeString(variables.CqDisplayName);
-            var sanitizedUsageLocation = _sanitizer.SanitizeString(variables.UsageLocation);
+            var sanitizedGroupName = _sanitizer.SanitizeString(variables.M365Group);
             var sanitizedLanguageId = _sanitizer.SanitizeString(variables.LanguageId);
 
             return $@"
 try {{
-    New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedRacqUPN}"" -ApplicationId ""{variables.CsAppCqId}"" -DisplayName ""{sanitizedRacqDisplayName}""
+    $cqGroupId = $global:m365groupId
+    if (-not $cqGroupId) {{
+        $cqGroup = Get-MgGroup -Filter ""displayName eq '{sanitizedGroupName}'"" -ErrorAction Stop | Select-Object -First 1
+        if ($cqGroup) {{
+            $cqGroupId = $cqGroup.Id
+            $global:m365groupId = $cqGroupId
+        }}
+    }}
+    if (-not $cqGroupId) {{
+        throw ""Microsoft 365 group '{sanitizedGroupName}' was not found. Run the M365 group step first.""
+    }}
 
-    Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
-    Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
+    $cqApplicationInstance = Get-CsOnlineUser ""{sanitizedRacqUPN}"" -ErrorAction Stop
+    if (-not $cqApplicationInstance) {{
+        throw ""Resource account '{sanitizedRacqUPN}' was not found. Run the call queue resource account step first.""
+    }}
 
-    $global:racqid = (Get-CsOnlineUser ""{sanitizedRacqUPN}"").Identity
+    $cqExisting = Get-CsCallQueue -NameFilter ""{sanitizedCqDisplayName}"" -ErrorAction Stop | Where-Object {{ $_.Name -eq ""{sanitizedCqDisplayName}"" }} | Select-Object -First 1
+    if ($cqExisting) {{
+        # Running the step again applies the current Configuration to the existing call queue.
+        $cqId = $cqExisting.Identity
+        Set-CsCallQueue `
+        -Identity $cqId `
+        -RoutingMethod Attendant `
+        -AllowOptOut $true `
+        -ConferenceMode $true `
+        -AgentAlertTime {ConstantsService.CallQueue.AgentAlertTime} `
+        -LanguageId ""{sanitizedLanguageId}"" `
+        -DistributionLists @($cqGroupId) `
+        {callQueueParams}
+        -PresenceBasedRouting $false `
+        -ErrorAction Stop | Out-Null
+        Write-Host ""INFO: Call queue {sanitizedCqDisplayName} already existed and was updated to the current Configuration.""
+    }}
+    else {{
+        $cqNew = New-CsCallQueue `
+        -Name ""{sanitizedCqDisplayName}"" `
+        -RoutingMethod Attendant `
+        -AllowOptOut $true `
+        -ConferenceMode $true `
+        -AgentAlertTime {ConstantsService.CallQueue.AgentAlertTime} `
+        -LanguageId ""{sanitizedLanguageId}"" `
+        -DistributionLists @($cqGroupId) `
+        {callQueueParams}
+        -PresenceBasedRouting $false `
+        -ErrorAction Stop
+        $cqId = $cqNew.Identity
 
-    Update-MgUser -UserId ""{sanitizedRacqUPN}"" -UsageLocation ""{sanitizedUsageLocation}""
+        Write-Host ""{ConstantsService.Messages.WaitingMessage}""
+        Start-Sleep -Seconds {ConstantsService.PowerShell.DefaultWaitTimeSeconds}
+    }}
 
-    Write-Host ""Assigning Teams Phone Resource License...""
-    $SkuId = ""{_sanitizer.SanitizeString(variables.SkuId)}""
-    Set-MgUserLicense -UserId ""{sanitizedRacqUPN}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
+    $cqAssociation = $null
+    try {{
+        $cqAssociation = Get-CsOnlineApplicationInstanceAssociation -Identity $cqApplicationInstance.Identity -ErrorAction Stop
+    }}
+    catch {{
+        $cqAssociation = $null
+    }}
+    if ($cqAssociation -and $cqAssociation.ConfigurationId -eq $cqId) {{
+        Write-Host ""INFO: Resource account {sanitizedRacqUPN} is already associated with call queue {sanitizedCqDisplayName}.""
+    }}
+    else {{
+        New-CsOnlineApplicationInstanceAssociation -Identities @($cqApplicationInstance.Identity) -ConfigurationId $cqId -ConfigurationType CallQueue -ErrorAction Stop | Out-Null
+    }}
 
-    Write-Host """ + ConstantsService.Messages.LicenseWaitingMessage + @"""
-    Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
-
-    New-CsCallQueue `
-    -Name ""{sanitizedCqDisplayName}"" `
-    -RoutingMethod Attendant `
-    -AllowOptOut $true `
-    -ConferenceMode $true `
-    -AgentAlertTime " + ConstantsService.CallQueue.AgentAlertTime + @" `
-    -LanguageId ""{sanitizedLanguageId}"" `
-    -DistributionLists $global:m365groupId `
-    {callQueueParams}
-    -PresenceBasedRouting $false
-
-    Write-Host """ + ConstantsService.Messages.WaitingMessage + @"""
-    Start-Sleep -Seconds " + ConstantsService.PowerShell.DefaultWaitTimeSeconds + @"
-
-    $cqapplicationInstanceId = (Get-CsOnlineUser ""{sanitizedRacqUPN}"").Identity
-    $cqautoAttendantId = (Get-CsCallQueue -NameFilter ""{sanitizedCqDisplayName}"").Identity
-    New-CsOnlineApplicationInstanceAssociation -Identities @($cqapplicationInstanceId) -ConfigurationId $cqautoAttendantId -ConfigurationType CallQueue
-    
-    Write-Host ""SUCCESS: Call queue created successfully""
+    Write-Host ""SUCCESS: Call queue {sanitizedCqDisplayName} is ready and associated with {sanitizedRacqUPN}""
 }}
 catch {{
     Write-Host ""ERROR: Failed to create call queue: $_""
@@ -189,11 +226,15 @@ catch {{
             
             return $@"
 try {{
-    $cq = Get-CsCallQueue -NameFilter ""{sanitizedName}"" | Where-Object {{$_.Name -eq ""{sanitizedName}""}} | Select-Object -First 1
+    $cq = Get-CsCallQueue -NameFilter ""{sanitizedName}"" -ErrorAction Stop | Where-Object {{$_.Name -eq ""{sanitizedName}""}} | Select-Object -First 1
     if (-not $cq) {{
         Write-Host ""ERROR: Call queue '{sanitizedName}' not found""
     }} else {{
-        Remove-CsCallQueue -Identity $cq.Identity
+        # Release linked resource accounts first, so they can be reused or deleted afterwards.
+        if ($cq.ApplicationInstances) {{
+            Remove-CsOnlineApplicationInstanceAssociation -Identities @($cq.ApplicationInstances) -ErrorAction Stop | Out-Null
+        }}
+        Remove-CsCallQueue -Identity $cq.Identity -ErrorAction Stop
         Write-Host ""SUCCESS: Call queue '{sanitizedName}' removed successfully""
     }}
 }}
@@ -203,21 +244,29 @@ catch {{
         }
 
         /// <summary>
-        /// Removes a resource account (application instance) by UPN.
+        /// Removes a resource account (application instance) by UPN: releases its call queue or auto attendant
+        /// association, then deletes the user object. The Teams module has no Remove-CsOnlineUser cmdlet;
+        /// Microsoft Graph moves the account to Deleted users, where it can be restored for 30 days.
         /// </summary>
         public string GetRemoveResourceAccountCommand(string upn)
         {
             var sanitizedUpn = _sanitizer.SanitizeString(upn);
-            
+
             return $@"
 try {{
-    $user = Get-CsOnlineUser ""{sanitizedUpn}"" -ErrorAction Stop
-    if (-not $user) {{
-        Write-Host ""ERROR: Resource account '{sanitizedUpn}' not found""
-    }} else {{
-        Remove-CsOnlineUser -Identity $user.Identity -ErrorAction Stop
-        Write-Host ""SUCCESS: Resource account '{sanitizedUpn}' removed successfully""
+    $resourceAccount = Get-CsOnlineApplicationInstance -Identity ""{sanitizedUpn}"" -ErrorAction Stop
+    $association = $null
+    try {{
+        $association = Get-CsOnlineApplicationInstanceAssociation -Identity $resourceAccount.ObjectId -ErrorAction Stop
     }}
+    catch {{
+        $association = $null
+    }}
+    if ($association -and $association.ConfigurationId) {{
+        Remove-CsOnlineApplicationInstanceAssociation -Identities @($resourceAccount.ObjectId) -ErrorAction Stop | Out-Null
+    }}
+    Remove-MgUser -UserId $resourceAccount.ObjectId -ErrorAction Stop
+    Write-Host ""SUCCESS: Resource account '{sanitizedUpn}' removed successfully""
 }}
 catch {{
     Write-Host ""ERROR: Failed to remove resource account '{sanitizedUpn}': $_""

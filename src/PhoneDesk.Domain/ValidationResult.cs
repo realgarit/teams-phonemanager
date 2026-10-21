@@ -9,6 +9,7 @@ namespace PhoneDesk.Services
         CustomerNameRequired,
         CustomerGroupNameRequired,
         MicrosoftFallbackDomainRequired,
+        MicrosoftFallbackDomainInvalid,
         CustomerLegalNameRequired,
         LanguageIdRequired,
         TimeZoneIdRequired,
@@ -21,7 +22,9 @@ namespace PhoneDesk.Services
         AfterHoursCallFlowAudioFileRequired,
         HolidayNameSuffixRequired,
         HolidayGreetingPromptRequired,
-        HolidayDateInPast
+        HolidayDateInPast,
+        OpeningHoursInvalid,
+        OpeningDaysRequired
     }
 
     public sealed record ValidationIssue(ValidationErrorCode Code, string Message);

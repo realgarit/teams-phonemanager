@@ -138,7 +138,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
                 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.HolidaysHolidaySeriesCreatedSuccess,
@@ -231,7 +231,7 @@ namespace PhoneDesk.ViewModels
                 var command = _powerShellCommandService.GetVerifyAutoAttendantCommand(AutoAttendantName);
                 var result = await ExecutePowerShellCommandAsync(command, null, "VerifyAutoAttendant", allowThrottleRetry: true);
                 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.HolidaysVerifyAutoAttendantSuccess,
@@ -347,7 +347,7 @@ namespace PhoneDesk.ViewModels
                     return;
                 }
                 
-                if (result.HasSuccessMarker)
+                if (result.Succeeded)
                 {
                     StatusMessage = GetText(
                         UiTextKey.HolidaysAttachHolidaySuccess,

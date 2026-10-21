@@ -22,4 +22,7 @@ public interface ISharedStateService : INotifyPropertyChanged
 
     /// <summary>Minimum log level displayed in the log viewer.</summary>
     LogLevel MinimumLogLevel { get; set; }
+
+    /// <summary>Guided Setup progress, kept while the operator visits other pages. Null until the setup starts.</summary>
+    WizardProgressState? WizardProgress { get; set; }
 }

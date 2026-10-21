@@ -69,10 +69,17 @@ namespace PhoneDesk.Services
         public bool HasErrorMarker { get; }
 
         /// <summary>
-        /// True when the output should trigger user-facing error handling: an error marker is present and no
-        /// success marker is (mirrors the historic <c>Contains("ERROR:") &amp;&amp; !Contains("SUCCESS")</c> check).
+        /// True when the script reported <c>SUCCESS</c> and nothing failed. A <c>SUCCESS</c> line followed by an
+        /// error record (for example a non-terminating cmdlet error after the script's own success message) is
+        /// a failure, not a success.
         /// </summary>
-        public bool ShouldReportError => HasErrorMarker && !HasSuccessMarker;
+        public bool Succeeded => IsSuccess && HasSuccessMarker;
+
+        /// <summary>
+        /// True when the output should trigger user-facing error handling: any error marker or PowerShell
+        /// error record, even when the script also printed a <c>SUCCESS</c> line.
+        /// </summary>
+        public bool ShouldReportError => !IsSuccess;
 
         /// <summary>
         /// Low-level constructor used by <see cref="PowerShellOperationResultMapper"/>. Kept internal to the

@@ -156,6 +156,68 @@ namespace PhoneDesk.Tests
             Assert.Contains("\n", message);
         }
 
+        [Theory]
+        [InlineData("@test.onmicrosoft.com", true)]
+        [InlineData("test.onmicrosoft.com", true)]
+        [InlineData("test", false)]
+        [InlineData("test .onmicrosoft.com", false)]
+        [InlineData("user@test.onmicrosoft.com", false)]
+        [InlineData("test..onmicrosoft.com", false)]
+        [InlineData("elektro-weber-partner.onmicrosoft.com", true)]
+        [InlineData("alz.ch", true)]
+        [InlineData("tenant!.onmicrosoft.com", false)]
+        [InlineData("tenant_.example.com", false)]
+        [InlineData("tenant/example.com", false)]
+        [InlineData("-tenant.onmicrosoft.com", false)]
+        [InlineData("tenant-.onmicrosoft.com", false)]
+        [InlineData("tenant.c0m", false)]
+        [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.onmicrosoft.com", false)] // 64-char label
+        public void ValidateVariables_FallbackDomainFormat(string domain, bool expectedValid)
+        {
+            var variables = CreateValidVariables();
+            variables.MsFallbackDomain = domain;
+
+            var result = _validationService.ValidateVariables(variables);
+
+            Assert.Equal(
+                expectedValid,
+                !result.Issues.Any(i => i.Code == ValidationErrorCode.MicrosoftFallbackDomainInvalid));
+        }
+
+        [Theory]
+        [InlineData(8, 17, 0, 0, true)]     // second range unused
+        [InlineData(8, 12, 13, 17, true)]
+        [InlineData(0, 0, 0, 0, false)]     // Teams rejects 00:00-00:00
+        [InlineData(17, 8, 0, 0, false)]
+        [InlineData(8, 12, 17, 13, false)]
+        public void ValidateVariables_OpeningHours(int start1, int end1, int start2, int end2, bool expectedValid)
+        {
+            var variables = CreateValidVariables();
+            variables.OpeningHours1Start = TimeSpan.FromHours(start1);
+            variables.OpeningHours1End = TimeSpan.FromHours(end1);
+            variables.OpeningHours2Start = TimeSpan.FromHours(start2);
+            variables.OpeningHours2End = TimeSpan.FromHours(end2);
+
+            var result = _validationService.ValidateVariables(variables);
+
+            Assert.Equal(expectedValid, !result.Issues.Any(i => i.Code == ValidationErrorCode.OpeningHoursInvalid));
+        }
+
+        [Fact]
+        public void ValidateVariables_DayPlanWithoutOpenDays_IsRejected()
+        {
+            var variables = CreateValidVariables();
+            variables.UsePerDaySchedule = true;
+            foreach (var day in variables.WeeklySchedule)
+            {
+                day.IsEnabled = false;
+            }
+
+            var result = _validationService.ValidateVariables(variables);
+
+            Assert.Contains(result.Issues, i => i.Code == ValidationErrorCode.OpeningDaysRequired);
+        }
+
         private static PhoneManagerVariables CreateValidVariables()
         {
             return new PhoneManagerVariables

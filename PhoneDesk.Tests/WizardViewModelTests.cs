@@ -604,5 +604,236 @@ namespace PhoneDesk.Tests
 
             harness.NavigationService.Verify(n => n.NavigateTo(ConstantsService.Pages.Holidays), Times.Once);
         }
+
+        // ---- Progress across navigation, step list, results ----
+
+        private static ViewModelTestHarness CreateHarnessWithSharedProgress(PhoneManagerVariables? variables = null)
+        {
+            var harness = new ViewModelTestHarness();
+            harness.SharedStateService.SetupProperty(s => s.WizardProgress);
+            harness.SharedStateService.SetupGet(s => s.Variables).Returns(variables ?? new PhoneManagerVariables
+            {
+                Customer = "ewp",
+                CustomerGroupName = "hauptnummer",
+                MsFallbackDomain = "contoso.onmicrosoft.com"
+            });
+            // Scripts carry their inputs, as the real builders do; the step fingerprint is a hash of the script.
+            harness.PowerShellCommandService.Setup(c => c.GetCreateM365GroupCommand(It.IsAny<string>())).Returns<string>(name => "New-MgGroup " + name);
+            harness.PowerShellCommandService.Setup(c => c.GetCreateResourceAccountCommand(It.IsAny<IPhoneManagerVariables>())).Returns("New-CsOnlineApplicationInstance ...");
+            return harness;
+        }
+
+        [Fact]
+        public async Task Progress_SurvivesLeavingAndReopeningTheGuidedSetup()
+        {
+            var harness = CreateHarnessWithSharedProgress();
+            var first = CreateViewModel(harness);
+            MoveToStepOne(first);
+            harness.SetExecutionResult("SUCCESS: group created");
+            await first.ExecuteCurrentStepCommand.ExecuteAsync(null);
+            first.GoToNextStepCommand.Execute(null);
+            harness.SetExecutionResult("ERROR: Failed to create resource account: boom", hadErrors: true);
+            await first.ExecuteCurrentStepCommand.ExecuteAsync(null);
+            first.Dispose();
+
+            // Navigation creates a new page ViewModel (for example after a Configuration fix).
+            var reopened = CreateViewModel(harness);
+
+            Assert.Equal(2, reopened.CurrentStep);
+            Assert.True(reopened.Steps[0].IsCompleted);
+            Assert.True(reopened.Steps[1].IsCompleted);
+            Assert.True(reopened.Steps[2].IsFailed);
+            Assert.True(reopened.StepFailed);
+            Assert.True(reopened.ShowRetryAction);
+            Assert.Contains("boom", reopened.StepResult);
+        }
+
+        [Fact]
+        public async Task GoToStep_OpensACompletedStepWithItsOwnResult()
+        {
+            var harness = CreateHarnessWithSharedProgress();
+            var vm = CreateViewModel(harness);
+            MoveToStepOne(vm);
+            harness.SetExecutionResult("SUCCESS: group created");
+            await vm.ExecuteCurrentStepCommand.ExecuteAsync(null);
+            vm.GoToNextStepCommand.Execute(null);
+            Assert.Equal(string.Empty, vm.StepResult);
+
+            vm.GoToStepCommand.Execute(vm.Steps[1]);
+
+            Assert.Equal(1, vm.CurrentStep);
+            Assert.True(vm.StepCompleted);
+            Assert.Equal("SUCCESS: group created", vm.StepResult);
+            Assert.True(vm.Steps[1].IsCurrent);
+            Assert.False(vm.Steps[2].IsCurrent);
+            Assert.True(vm.CanRunAgain);
+        }
+
+        [Fact]
+        public void GoToStep_CannotOpenAStepAfterTheFirstOpenStep()
+        {
+            var harness = CreateHarnessWithSharedProgress();
+            var vm = CreateViewModel(harness);
+
+            vm.GoToStepCommand.Execute(vm.Steps[4]);
+
+            Assert.Equal(0, vm.CurrentStep);
+            Assert.True(vm.Steps[0].IsReachable);
+            Assert.False(vm.Steps[1].IsReachable);
+        }
+
+        [Fact]
+        public void ChangingStep_ClosesTheDryRunPlan()
+        {
+            var harness = CreateHarnessWithSharedProgress();
+            var planBuilder = new Mock<IDryRunPlanBuilder>();
+            planBuilder.Setup(b => b.BuildWizardPlan(It.IsAny<IPhoneManagerVariables>()))
+                .Returns(new PhoneDesk.Planning.DryRunPlan("wizard", System.DateTimeOffset.UtcNow, System.Array.Empty<PhoneDesk.Planning.DryRunEntry>()));
+            var vm = new WizardViewModel(
+                harness.PowerShellContextService.Object,
+                harness.PowerShellCommandService.Object,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object,
+                harness.SharedStateService.Object,
+                harness.DialogService.Object,
+                planBuilder.Object);
+            MoveToStepOne(vm);
+            vm.GeneratePlanCommand.Execute(null);
+            Assert.NotNull(vm.Plan);
+
+            vm.GoToPreviousStepCommand.Execute(null);
+
+            Assert.Equal(0, vm.CurrentStep);
+            Assert.Null(vm.Plan);
+        }
+
+        [Fact]
+        public async Task ExecuteCurrentStep_SuccessLineFollowedByErrorRecord_FailsWithShortError()
+        {
+            var harness = CreateHarnessWithSharedProgress();
+            var vm = CreateViewModel(harness);
+            MoveToStepOne(vm);
+            harness.SetExecutionResult("SUCCESS: group created");
+            await vm.ExecuteCurrentStepCommand.ExecuteAsync(null);
+            vm.GoToNextStepCommand.Execute(null);
+            harness.SetExecutionResult(
+                "SUCCESS: Resource account created successfully\nERROR: Length cannot be less than zero.",
+                hadErrors: true,
+                errors: new[] { new PowerShellErrorInfo { Message = "Length cannot be less than zero." } });
+
+            await vm.ExecuteCurrentStepCommand.ExecuteAsync(null);
+
+            Assert.True(vm.StepFailed);
+            Assert.False(vm.Steps[2].IsCompleted);
+            Assert.True(vm.HasStepError);
+            Assert.Equal("Length cannot be less than zero.", vm.StepErrorMessage);
+        }
+
+        [Fact]
+        public async Task SkippingAFailedStep_ClearsTheFailureAndUnlocksTheNextStep()
+        {
+            var harness = CreateHarnessWithSharedProgress();
+            var vm = CreateViewModel(harness);
+            MoveToStepOne(vm);
+            harness.SetExecutionResult("ERROR: boom", hadErrors: true);
+            await vm.ExecuteCurrentStepCommand.ExecuteAsync(null);
+
+            vm.SkipStepCommand.Execute(null);
+
+            Assert.Equal(2, vm.CurrentStep);
+            Assert.False(vm.Steps[1].IsFailed);
+            Assert.True(vm.Steps[1].IsSkipped);
+            Assert.True(vm.Steps[2].IsReachable);
+        }
+
+        [Fact]
+        public async Task ChangedConfiguration_NamesTheStepsThatRanWithEarlierValues()
+        {
+            var variables = new PhoneManagerVariables
+            {
+                Customer = "ewp",
+                CustomerGroupName = "hauptnummer",
+                MsFallbackDomain = "contoso.onmicrosoft.com"
+            };
+            var harness = CreateHarnessWithSharedProgress(variables);
+            var vm = CreateViewModel(harness);
+            MoveToStepOne(vm);
+            harness.SetExecutionResult("SUCCESS: group created");
+            await vm.ExecuteCurrentStepCommand.ExecuteAsync(null);
+            Assert.False(vm.HasConfigurationChangedNotice);
+            vm.Dispose();
+
+            variables.CustomerGroupName = "zentrale";
+            var reopened = CreateViewModel(harness);
+
+            Assert.True(reopened.HasConfigurationChangedNotice);
+            Assert.Contains(reopened.Steps[1].Title, reopened.ConfigurationChangedNotice);
+        }
+
+        [Fact]
+        public void ChangedOpeningHours_FlagOnlyTheAutoAttendantStep()
+        {
+            var variables = new PhoneManagerVariables
+            {
+                Customer = "ewp",
+                CustomerGroupName = "hauptnummer",
+                MsFallbackDomain = "contoso.onmicrosoft.com",
+                RaaAnrName = "hn",
+                LanguageId = "de-DE",
+                TimeZoneId = "W. Europe Standard Time"
+            };
+            var harness = CreateHarnessWithSharedProgress(variables);
+            var san = new PowerShellSanitizationService();
+            var realCommands = new PowerShellCommandService(
+                new PhoneDesk.Services.ScriptBuilders.CommonScriptBuilder(san),
+                new PhoneDesk.Services.ScriptBuilders.CallQueueScriptBuilder(san),
+                new PhoneDesk.Services.ScriptBuilders.AutoAttendantScriptBuilder(san),
+                new PhoneDesk.Services.ScriptBuilders.HolidayScriptBuilder(san),
+                new PhoneDesk.Services.ScriptBuilders.ResourceAccountScriptBuilder(san),
+                new PhoneDesk.Services.ScriptBuilders.DashboardScriptBuilder());
+            var vm = new WizardViewModel(
+                harness.PowerShellContextService.Object,
+                realCommands,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object,
+                harness.SharedStateService.Object,
+                harness.DialogService.Object);
+            const int callQueueStep = 4;
+            const int autoAttendantStep = 7;
+            foreach (var index in new[] { callQueueStep, autoAttendantStep })
+            {
+                vm.Steps[index].IsCompleted = true;
+                vm.Steps[index].ConfigurationFingerprint = vm.ComputeStepFingerprint(index);
+            }
+            Assert.False(vm.HasConfigurationChangedNotice);
+
+            variables.OpeningHours1End = new TimeSpan(18, 0, 0);
+
+            Assert.Contains(vm.Steps[autoAttendantStep].Title, vm.ConfigurationChangedNotice);
+            Assert.DoesNotContain(vm.Steps[callQueueStep].Title, vm.ConfigurationChangedNotice);
+        }
+
+        [Fact]
+        public async Task StartOver_AfterConfirmation_ClearsAllProgress()
+        {
+            var harness = CreateHarnessWithSharedProgress();
+            var vm = CreateViewModel(harness);
+            MoveToStepOne(vm);
+            harness.SetExecutionResult("SUCCESS: group created");
+            await vm.ExecuteCurrentStepCommand.ExecuteAsync(null);
+            Assert.True(vm.HasProgress);
+
+            await vm.StartOverCommand.ExecuteAsync(null);
+
+            Assert.Equal(0, vm.CurrentStep);
+            Assert.False(vm.HasProgress);
+            Assert.All(harness.SharedStateService.Object.WizardProgress!.Steps, s => Assert.False(s.IsCompleted));
+        }
     }
 }

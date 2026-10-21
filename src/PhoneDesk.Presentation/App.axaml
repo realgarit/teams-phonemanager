@@ -196,6 +196,10 @@
             <Setter Property="Padding" Value="12,0"/>
             <Setter Property="CornerRadius" Value="8"/>
         </Style>
+        <!-- Delete buttons set an explicit red foreground, which hides the default disabled look. -->
+        <Style Selector="Button.IconText:disabled">
+            <Setter Property="Opacity" Value="0.45"/>
+        </Style>
         <Style Selector="Button.IconTextLarge">
             <Setter Property="Height" Value="50"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>

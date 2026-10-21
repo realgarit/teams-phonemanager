@@ -93,11 +93,13 @@ namespace PhoneDesk.Models
         [ObservableProperty]
         private string? _aaAfterHoursDisconnectAction; // "None", "AudioFile", "TextToSpeech" - for UI only
 
+        // Teams rejects an empty 00:00–00:00 range, so the first range starts as regular office hours.
+        // The second range stays 00:00–00:00, which means "not used".
         [ObservableProperty]
-        private TimeSpan _openingHours1Start = new TimeSpan(0, 0, 0);
+        private TimeSpan _openingHours1Start = new TimeSpan(8, 0, 0);
 
         [ObservableProperty]
-        private TimeSpan _openingHours1End = new TimeSpan(0, 0, 0);
+        private TimeSpan _openingHours1End = new TimeSpan(17, 0, 0);
 
         [ObservableProperty]
         private TimeSpan _openingHours2Start = new TimeSpan(0, 0, 0);
@@ -224,10 +226,10 @@ namespace PhoneDesk.Models
         private bool _cqNoAgentApplyToNewCallsOnly;
 
         public string M365Group => $"ttgrp-{Customer}-{CustomerGroupName}";
-        public string RacqUPN => $"racq-{Customer}-{CustomerGroupName}{MsFallbackDomain}";
+        public string RacqUPN => ResourceAccountUpn.Build($"racq-{Customer}-{CustomerGroupName}", MsFallbackDomain);
         public string RacqDisplayName => $"racq-{Customer}-{CustomerGroupName}";
         public string CqDisplayName => $"cq-{Customer}-{CustomerGroupName}";
-        public string RaaaUPN => $"raaa-{Customer}-{RaaAnrName}-{CustomerGroupName}{MsFallbackDomain}";
+        public string RaaaUPN => ResourceAccountUpn.Build($"raaa-{Customer}-{RaaAnrName}-{CustomerGroupName}", MsFallbackDomain);
         public string RaaaDisplayName => $"raaa-{Customer}-{RaaAnrName}-{CustomerGroupName}";
         public string AaDisplayName => $"aa-{Customer}-{RaaAnrName}-{CustomerGroupName}";
 

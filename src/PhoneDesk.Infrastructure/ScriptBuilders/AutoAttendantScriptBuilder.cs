@@ -33,58 +33,129 @@ catch {
 }";
         }
 
+        /// <summary>
+        /// Guided Setup step: creates the call flows, the after-hours schedule and the auto attendant.
+        /// The resource account, its license, its phone number and the association are separate steps.
+        /// Safe to run again: an existing auto attendant with the same name is updated to the current
+        /// call flows, schedule, language and time zone instead of being duplicated, and the schedule it
+        /// used before is removed by ID when nothing else uses it.
+        /// </summary>
         public string GetCreateAutoAttendantCommand(IPhoneManagerVariables variables)
         {
             var defaultCallFlow = BuildCallFlow(variables, "Default", variables.AaDefaultGreetingType, variables.AaDefaultGreetingTextToSpeechPrompt, variables.AaDefaultGreetingAudioFileId, variables.AaDefaultAction, variables.AaDefaultActionTarget);
             var afterHoursCallFlow = BuildCallFlow(variables, "After Hours", variables.AaAfterHoursGreetingType, variables.AaAfterHoursGreetingTextToSpeechPrompt, variables.AaAfterHoursGreetingAudioFileId, variables.AaAfterHoursAction, variables.AaAfterHoursActionTarget);
 
-            var sanitizedRaaaUPN = _sanitizer.SanitizeIdentifier(variables.RaaaUPN);
-            var sanitizedRaaaDisplayName = _sanitizer.SanitizeString(variables.RaaaDisplayName);
-            var sanitizedUsageLocation = _sanitizer.SanitizeString(variables.UsageLocation);
-            var sanitizedSkuId = _sanitizer.SanitizeString(variables.SkuId);
-            var sanitizedPhoneNumber = _sanitizer.SanitizeString(variables.RaaAnr);
-            var sanitizedPhoneNumberType = _sanitizer.SanitizeString(variables.PhoneNumberType);
             var sanitizedAaDisplayName = _sanitizer.SanitizeString(variables.AaDisplayName);
             var sanitizedLanguageId = _sanitizer.SanitizeString(variables.LanguageId);
             var sanitizedTimeZoneId = _sanitizer.SanitizeString(variables.TimeZoneId);
+            var afterHoursSchedule = BuildAfterHoursScheduleStatements(variables);
 
             return $@"
-New-CsOnlineApplicationInstance -UserPrincipalName ""{sanitizedRaaaUPN}"" -ApplicationId ""{variables.CsAppAaId}"" -DisplayName ""{sanitizedRaaaDisplayName}""
-
-Write-Host ""{ConstantsService.Messages.WaitingMessage}""
-Start-Sleep -Seconds {ConstantsService.PowerShell.DefaultWaitTimeSeconds}
-
-Update-MgUser -UserId ""{sanitizedRaaaUPN}"" -UsageLocation ""{sanitizedUsageLocation}""
-
-$SkuId = ""{sanitizedSkuId}""
-Set-MgUserLicense -UserId ""{sanitizedRaaaUPN}"" -AddLicenses @{{SkuId = $SkuId}} -RemoveLicenses @()
-
-Write-Host ""{ConstantsService.Messages.LicenseWaitingMessage}""
-Start-Sleep -Seconds {ConstantsService.PowerShell.DefaultWaitTimeSeconds}
-
-Set-CsPhoneNumberAssignment -Identity ""{sanitizedRaaaUPN}"" -PhoneNumber ""{sanitizedPhoneNumber}"" -PhoneNumberType ""{sanitizedPhoneNumberType}""
+try {{
+    $aaExisting = Get-CsAutoAttendant -NameFilter ""{sanitizedAaDisplayName}"" -ErrorAction Stop | Where-Object {{ $_.Name -eq ""{sanitizedAaDisplayName}"" }} | Select-Object -First 1
 
 {defaultCallFlow}
 
 {afterHoursCallFlow}
 
-$aatr1 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours1Start:hh\:mm}"" -End ""{variables.OpeningHours1End:hh\:mm}""
-$aatr2 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours2Start:hh\:mm}"" -End ""{variables.OpeningHours2End:hh\:mm}""
-$aaTimeRanges = if (""{variables.OpeningHours2Start:hh\:mm}"" -ne ""{variables.OpeningHours2End:hh\:mm}"") {{ @($aatr1, $aatr2) }} else {{ @($aatr1) }}
-$aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours $aaTimeRanges -TuesdayHours $aaTimeRanges -WednesdayHours $aaTimeRanges -ThursdayHours $aaTimeRanges -FridayHours $aaTimeRanges -Complement
+{afterHoursSchedule}
 $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
 
-New-CsAutoAttendant `
--Name ""{sanitizedAaDisplayName}"" `
--DefaultCallFlow $aadefaultCallFlow `
--CallFlows @($aaafterHoursCallFlow) `
--CallHandlingAssociations @($aaafterHoursCallHandlingAssociation) `
--LanguageId ""{sanitizedLanguageId}"" `
--TimeZoneId ""{sanitizedTimeZoneId}""
+    if ($aaExisting) {{
+        # Running the step again applies the current Configuration to the existing auto attendant.
+        $aaPreviousScheduleIds = @($aaExisting.CallHandlingAssociations | ForEach-Object {{ $_.ScheduleId }} | Where-Object {{ $_ -and $_ -ne $aaafterHoursSchedule.Id }})
+        $aaExisting.DefaultCallFlow = $aadefaultCallFlow
+        $aaExisting.CallFlows = @($aaafterHoursCallFlow)
+        $aaExisting.CallHandlingAssociations = @($aaafterHoursCallHandlingAssociation)
+        $aaExisting.LanguageId = ""{sanitizedLanguageId}""
+        $aaExisting.TimeZoneId = ""{sanitizedTimeZoneId}""
+        try {{
+            Set-CsAutoAttendant -Instance $aaExisting -ErrorAction Stop | Out-Null
+        }}
+        catch {{
+            # Do not leave the schedule created for this run behind when the update fails.
+            try {{ Remove-CsOnlineSchedule -Id $aaafterHoursSchedule.Id -ErrorAction Stop }} catch {{ }}
+            throw
+        }}
+        Write-Host ""INFO: Auto attendant {sanitizedAaDisplayName} already existed and was updated to the current Configuration.""
 
-$aaapplicationInstanceId = (Get-CsOnlineUser ""{sanitizedRaaaUPN}"").Identity
-$aaautoAttendantId = (Get-CsAutoAttendant -NameFilter ""{sanitizedAaDisplayName}"").Identity
-New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceId) -ConfigurationId $aaautoAttendantId -ConfigurationType AutoAttendant";
+        foreach ($scheduleId in $aaPreviousScheduleIds) {{
+            try {{
+                $previousSchedule = Get-CsOnlineSchedule -Id $scheduleId -ErrorAction Stop
+                if ($previousSchedule -and -not $previousSchedule.AssociatedConfigurationIds) {{
+                    Remove-CsOnlineSchedule -Id $scheduleId -ErrorAction Stop
+                }}
+            }}
+            catch {{
+            }}
+        }}
+    }}
+    else {{
+        New-CsAutoAttendant `
+        -Name ""{sanitizedAaDisplayName}"" `
+        -DefaultCallFlow $aadefaultCallFlow `
+        -CallFlows @($aaafterHoursCallFlow) `
+        -CallHandlingAssociations @($aaafterHoursCallHandlingAssociation) `
+        -LanguageId ""{sanitizedLanguageId}"" `
+        -TimeZoneId ""{sanitizedTimeZoneId}"" `
+        -ErrorAction Stop | Out-Null
+    }}
+
+    Write-Host ""SUCCESS: Auto attendant {sanitizedAaDisplayName} is ready""
+}}
+catch {{
+    Write-Host ""ERROR: Failed to create auto attendant: $_""
+}}";
+        }
+
+        /// <summary>
+        /// Builds the time ranges and the after-hours schedule ($aaafterHoursSchedule) for the uniform
+        /// Monday–Friday hours or the per-day plan. A second time range is created only when it is set:
+        /// New-CsOnlineTimeRange rejects an empty 00:00–00:00 range.
+        /// </summary>
+        private static string BuildAfterHoursScheduleStatements(IPhoneManagerVariables variables)
+        {
+            var sb = new StringBuilder();
+            if (variables.UsePerDaySchedule)
+            {
+                var dayNames = new[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+                var parameters = new StringBuilder();
+                foreach (var dayName in dayNames)
+                {
+                    var day = variables.WeeklySchedule.FirstOrDefault(d => d.DayName == dayName);
+                    if (day == null || !day.IsEnabled) continue;
+
+                    var varPrefix = dayName.ToLower();
+                    sb.AppendLine($"${varPrefix}Tr1 = New-CsOnlineTimeRange -Start \"{day.Hours1Start:hh\\:mm}\" -End \"{day.Hours1End:hh\\:mm}\" -ErrorAction Stop");
+                    if (day.HasSecondRange && day.Hours2Start != day.Hours2End)
+                    {
+                        sb.AppendLine($"${varPrefix}Tr2 = New-CsOnlineTimeRange -Start \"{day.Hours2Start:hh\\:mm}\" -End \"{day.Hours2End:hh\\:mm}\" -ErrorAction Stop");
+                        sb.AppendLine($"${varPrefix}Hours = @(${varPrefix}Tr1, ${varPrefix}Tr2)");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"${varPrefix}Hours = @(${varPrefix}Tr1)");
+                    }
+                    parameters.Append($" -{dayName}Hours ${varPrefix}Hours");
+                }
+
+                sb.Append($"$aaafterHoursSchedule = New-CsOnlineSchedule -Name \"After Hours Schedule\" -WeeklyRecurrentSchedule{parameters} -Complement -ErrorAction Stop");
+                return sb.ToString();
+            }
+
+            sb.AppendLine($"$aatr1 = New-CsOnlineTimeRange -Start \"{variables.OpeningHours1Start:hh\\:mm}\" -End \"{variables.OpeningHours1End:hh\\:mm}\" -ErrorAction Stop");
+            if (variables.OpeningHours2Start != variables.OpeningHours2End)
+            {
+                sb.AppendLine($"$aatr2 = New-CsOnlineTimeRange -Start \"{variables.OpeningHours2Start:hh\\:mm}\" -End \"{variables.OpeningHours2End:hh\\:mm}\" -ErrorAction Stop");
+                sb.AppendLine("$aaTimeRanges = @($aatr1, $aatr2)");
+            }
+            else
+            {
+                sb.AppendLine("$aaTimeRanges = @($aatr1)");
+            }
+
+            sb.Append("$aaafterHoursSchedule = New-CsOnlineSchedule -Name \"After Hours Schedule\" -WeeklyRecurrentSchedule -MondayHours $aaTimeRanges -TuesdayHours $aaTimeRanges -WednesdayHours $aaTimeRanges -ThursdayHours $aaTimeRanges -FridayHours $aaTimeRanges -Complement -ErrorAction Stop");
+            return sb.ToString();
         }
 
         private string BuildCallFlow(IPhoneManagerVariables variables, string flowName, string? greetingType, string? ttsPrompt, string? audioFileId, string? action, string? actionTarget)
@@ -214,7 +285,7 @@ catch {{
             
             return $@"
 try {{
-    Set-CsPhoneNumberAssignment -Identity ""{sanitizedUpn}"" -PhoneNumber ""{sanitizedPhoneNumber}"" -PhoneNumberType ""{sanitizedPhoneNumberType}""
+    Set-CsPhoneNumberAssignment -Identity ""{sanitizedUpn}"" -PhoneNumber ""{sanitizedPhoneNumber}"" -PhoneNumberType ""{sanitizedPhoneNumberType}"" -ErrorAction Stop
     Write-Host ""SUCCESS: Phone number assigned successfully""
 }}
 catch {{
@@ -257,10 +328,7 @@ catch {{
 
             return $@"
 try {{
-    $aatr1 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours1Start:hh\:mm}"" -End ""{variables.OpeningHours1End:hh\:mm}""
-    $aatr2 = New-CsOnlineTimeRange -Start ""{variables.OpeningHours2Start:hh\:mm}"" -End ""{variables.OpeningHours2End:hh\:mm}""
-    $aaTimeRanges = if (""{variables.OpeningHours2Start:hh\:mm}"" -ne ""{variables.OpeningHours2End:hh\:mm}"") {{ @($aatr1, $aatr2) }} else {{ @($aatr1) }}
-    $aaafterHoursSchedule = New-CsOnlineSchedule -Name ""After Hours Schedule"" -WeeklyRecurrentSchedule -MondayHours $aaTimeRanges -TuesdayHours $aaTimeRanges -WednesdayHours $aaTimeRanges -ThursdayHours $aaTimeRanges -FridayHours $aaTimeRanges -Complement
+{BuildAfterHoursScheduleStatements(variables)}
 
     if ($aaafterHoursSchedule) {{
         Write-Host ""SUCCESS: Created after hours schedule with ID: $($aaafterHoursSchedule.Id)""
@@ -323,9 +391,27 @@ catch {{
             
             return $@"
 try {{
-    $aaapplicationInstanceId = (Get-CsOnlineUser ""{sanitizedUpn}"").Identity
-    $aaautoAttendantId = (Get-CsAutoAttendant -NameFilter ""{sanitizedAaName}"").Identity
-    New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstanceId) -ConfigurationId $aaautoAttendantId -ConfigurationType AutoAttendant
+    $aaapplicationInstance = Get-CsOnlineUser ""{sanitizedUpn}"" -ErrorAction Stop
+    if (-not $aaapplicationInstance) {{
+        throw ""Resource account '{sanitizedUpn}' was not found.""
+    }}
+    $aaautoAttendant = Get-CsAutoAttendant -NameFilter ""{sanitizedAaName}"" -ErrorAction Stop | Where-Object {{ $_.Name -eq ""{sanitizedAaName}"" }} | Select-Object -First 1
+    if (-not $aaautoAttendant) {{
+        throw ""Auto attendant '{sanitizedAaName}' was not found.""
+    }}
+    $aaAssociation = $null
+    try {{
+        $aaAssociation = Get-CsOnlineApplicationInstanceAssociation -Identity $aaapplicationInstance.Identity -ErrorAction Stop
+    }}
+    catch {{
+        $aaAssociation = $null
+    }}
+    if ($aaAssociation -and $aaAssociation.ConfigurationId -eq $aaautoAttendant.Identity) {{
+        Write-Host ""INFO: Resource account {sanitizedUpn} is already associated with auto attendant {sanitizedAaName}.""
+    }}
+    else {{
+        New-CsOnlineApplicationInstanceAssociation -Identities @($aaapplicationInstance.Identity) -ConfigurationId $aaautoAttendant.Identity -ConfigurationType AutoAttendant -ErrorAction Stop | Out-Null
+    }}
     Write-Host ""SUCCESS: Associated resource account with auto attendant""
 }}
 catch {{
@@ -334,20 +420,49 @@ catch {{
         }
 
         /// <summary>
-        /// Removes an auto attendant by name.
+        /// Removes an auto attendant by name. Linked resource accounts are released first, and the
+        /// schedules it used are removed afterwards when no other configuration uses them (by ID, never
+        /// by name: schedule names such as "After Hours Schedule" are shared across auto attendants).
         /// </summary>
         public string GetRemoveAutoAttendantCommand(string autoAttendantName)
         {
             var sanitizedName = _sanitizer.SanitizeString(autoAttendantName);
-            
+
             return $@"
 try {{
-    $aa = Get-CsAutoAttendant -NameFilter ""{sanitizedName}"" | Where-Object {{$_.Name -eq ""{sanitizedName}""}} | Select-Object -First 1
+    $aa = Get-CsAutoAttendant -NameFilter ""{sanitizedName}"" -ErrorAction Stop | Where-Object {{$_.Name -eq ""{sanitizedName}""}} | Select-Object -First 1
     if (-not $aa) {{
         Write-Host ""ERROR: Auto attendant '{sanitizedName}' not found""
     }} else {{
-        Remove-CsAutoAttendant -Identity $aa.Identity
+        $aaScheduleIds = @($aa.CallHandlingAssociations | ForEach-Object {{ $_.ScheduleId }} | Where-Object {{ $_ }})
+        if ($aa.ApplicationInstances) {{
+            Remove-CsOnlineApplicationInstanceAssociation -Identities @($aa.ApplicationInstances) -ErrorAction Stop | Out-Null
+        }}
+        Remove-CsAutoAttendant -Identity $aa.Identity -ErrorAction Stop
         Write-Host ""SUCCESS: Auto attendant '{sanitizedName}' removed successfully""
+
+        # Schedule cleanup is best effort: the auto attendant is already removed. A Teams cmdlet can throw
+        # after it did its work, so the result is checked by reading the schedule again.
+        foreach ($scheduleId in $aaScheduleIds) {{
+            try {{
+                $schedule = Get-CsOnlineSchedule -Id $scheduleId -ErrorAction Stop
+                if ($schedule -and -not $schedule.AssociatedConfigurationIds) {{
+                    Remove-CsOnlineSchedule -Id $scheduleId -ErrorAction Stop
+                }}
+            }}
+            catch {{
+            }}
+            $remaining = $null
+            try {{
+                $remaining = Get-CsOnlineSchedule -Id $scheduleId -ErrorAction Stop
+            }}
+            catch {{
+                $remaining = $null
+            }}
+            if ($remaining -and -not $remaining.AssociatedConfigurationIds) {{
+                Write-Host ""WARNING: Schedule '$($remaining.Name)' ($scheduleId) is no longer used but could not be removed.""
+            }}
+        }}
     }}
 }}
 catch {{

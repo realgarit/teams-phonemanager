@@ -24,4 +24,7 @@ public partial class SharedStateService : ObservableObject, ISharedStateService
 
     [ObservableProperty]
     private LogLevel _minimumLogLevel = LogLevel.Info;
+
+    [ObservableProperty]
+    private WizardProgressState? _wizardProgress;
 }
