@@ -36,7 +36,9 @@ catch {
         /// <summary>
         /// Guided Setup step: creates the call flows, the after-hours schedule and the auto attendant.
         /// The resource account, its license, its phone number and the association are separate steps.
-        /// Safe to run again: an existing auto attendant with the same name is reused.
+        /// Safe to run again: an existing auto attendant with the same name is updated to the current
+        /// call flows, schedule, language and time zone instead of being duplicated, and the schedule it
+        /// used before is removed by ID when nothing else uses it.
         /// </summary>
         public string GetCreateAutoAttendantCommand(IPhoneManagerVariables variables)
         {
@@ -51,10 +53,7 @@ catch {
             return $@"
 try {{
     $aaExisting = Get-CsAutoAttendant -NameFilter ""{sanitizedAaDisplayName}"" -ErrorAction Stop | Where-Object {{ $_.Name -eq ""{sanitizedAaDisplayName}"" }} | Select-Object -First 1
-    if ($aaExisting) {{
-        Write-Host ""INFO: Auto attendant {sanitizedAaDisplayName} already exists. The existing auto attendant is used.""
-    }}
-    else {{
+
 {defaultCallFlow}
 
 {afterHoursCallFlow}
@@ -62,6 +61,36 @@ try {{
 {afterHoursSchedule}
 $aaafterHoursCallHandlingAssociation = New-CsAutoAttendantCallHandlingAssociation -Type AfterHours -ScheduleId $aaafterHoursSchedule.Id -CallFlowId $aaafterHoursCallFlow.Id
 
+    if ($aaExisting) {{
+        # Running the step again applies the current Configuration to the existing auto attendant.
+        $aaPreviousScheduleIds = @($aaExisting.CallHandlingAssociations | ForEach-Object {{ $_.ScheduleId }} | Where-Object {{ $_ -and $_ -ne $aaafterHoursSchedule.Id }})
+        $aaExisting.DefaultCallFlow = $aadefaultCallFlow
+        $aaExisting.CallFlows = @($aaafterHoursCallFlow)
+        $aaExisting.CallHandlingAssociations = @($aaafterHoursCallHandlingAssociation)
+        $aaExisting.LanguageId = ""{sanitizedLanguageId}""
+        $aaExisting.TimeZoneId = ""{sanitizedTimeZoneId}""
+        try {{
+            Set-CsAutoAttendant -Instance $aaExisting -ErrorAction Stop | Out-Null
+        }}
+        catch {{
+            # Do not leave the schedule created for this run behind when the update fails.
+            try {{ Remove-CsOnlineSchedule -Id $aaafterHoursSchedule.Id -ErrorAction Stop }} catch {{ }}
+            throw
+        }}
+        Write-Host ""INFO: Auto attendant {sanitizedAaDisplayName} already existed and was updated to the current Configuration.""
+
+        foreach ($scheduleId in $aaPreviousScheduleIds) {{
+            try {{
+                $previousSchedule = Get-CsOnlineSchedule -Id $scheduleId -ErrorAction Stop
+                if ($previousSchedule -and -not $previousSchedule.AssociatedConfigurationIds) {{
+                    Remove-CsOnlineSchedule -Id $scheduleId -ErrorAction Stop
+                }}
+            }}
+            catch {{
+            }}
+        }}
+    }}
+    else {{
         New-CsAutoAttendant `
         -Name ""{sanitizedAaDisplayName}"" `
         -DefaultCallFlow $aadefaultCallFlow `

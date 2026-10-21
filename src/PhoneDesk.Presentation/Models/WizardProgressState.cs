@@ -15,8 +15,8 @@ namespace PhoneDesk.Models
     }
 
     /// <param name="ConfigurationFingerprint">
-    /// The names the provisioning scripts used (UPNs, group, call queue, auto attendant, number) when the
-    /// step completed. A different current value means the step ran with earlier Configuration values.
+    /// Hash of the step's script when the step completed (WizardViewModel.ComputeStepFingerprint). A different
+    /// current value means the step ran with earlier Configuration values.
     /// </param>
     public sealed record WizardStepSnapshot(
         bool IsCompleted,

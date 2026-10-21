@@ -20,9 +20,10 @@ namespace PhoneDesk.Tests
     {
         // Re-captured when the shared resource account, license and M365 group scripts gained
         // -ErrorAction Stop and reuse of existing objects (failed cmdlets no longer print SUCCESS), and the
-        // after-hours schedule stopped creating an unused 00:00-00:00 time range.
+        // after-hours schedule stopped creating an unused 00:00-00:00 time range, and running the call queue
+        // and auto attendant steps again updates existing objects.
         private const string ExpectedBulkScriptHash =
-            "21F8A4B160AF31C98D976BB2EE9442E75FA59818B5F5F7E42EDF1EC1918F6EB4";
+            "BA2287547EDE5365AC0D7A980B0604F777DC3024CBED2A9E400074ABC55B9A47";
 
         private static IPowerShellSanitizationService VerbatimSanitizer()
         {

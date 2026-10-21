@@ -617,7 +617,8 @@ namespace PhoneDesk.Tests
                 CustomerGroupName = "hauptnummer",
                 MsFallbackDomain = "contoso.onmicrosoft.com"
             });
-            harness.PowerShellCommandService.Setup(c => c.GetCreateM365GroupCommand(It.IsAny<string>())).Returns("New-MgGroup ...");
+            // Scripts carry their inputs, as the real builders do; the step fingerprint is a hash of the script.
+            harness.PowerShellCommandService.Setup(c => c.GetCreateM365GroupCommand(It.IsAny<string>())).Returns<string>(name => "New-MgGroup " + name);
             harness.PowerShellCommandService.Setup(c => c.GetCreateResourceAccountCommand(It.IsAny<IPhoneManagerVariables>())).Returns("New-CsOnlineApplicationInstance ...");
             return harness;
         }
@@ -770,6 +771,52 @@ namespace PhoneDesk.Tests
 
             Assert.True(reopened.HasConfigurationChangedNotice);
             Assert.Contains(reopened.Steps[1].Title, reopened.ConfigurationChangedNotice);
+        }
+
+        [Fact]
+        public void ChangedOpeningHours_FlagOnlyTheAutoAttendantStep()
+        {
+            var variables = new PhoneManagerVariables
+            {
+                Customer = "ewp",
+                CustomerGroupName = "hauptnummer",
+                MsFallbackDomain = "contoso.onmicrosoft.com",
+                RaaAnrName = "hn",
+                LanguageId = "de-DE",
+                TimeZoneId = "W. Europe Standard Time"
+            };
+            var harness = CreateHarnessWithSharedProgress(variables);
+            var san = new PowerShellSanitizationService();
+            var realCommands = new PowerShellCommandService(
+                new PhoneDesk.Services.ScriptBuilders.CommonScriptBuilder(san),
+                new PhoneDesk.Services.ScriptBuilders.CallQueueScriptBuilder(san),
+                new PhoneDesk.Services.ScriptBuilders.AutoAttendantScriptBuilder(san),
+                new PhoneDesk.Services.ScriptBuilders.HolidayScriptBuilder(san),
+                new PhoneDesk.Services.ScriptBuilders.ResourceAccountScriptBuilder(san),
+                new PhoneDesk.Services.ScriptBuilders.DashboardScriptBuilder());
+            var vm = new WizardViewModel(
+                harness.PowerShellContextService.Object,
+                realCommands,
+                harness.LoggingService.Object,
+                harness.SessionManager.Object,
+                harness.NavigationService.Object,
+                harness.ErrorHandlingService.Object,
+                harness.ValidationService.Object,
+                harness.SharedStateService.Object,
+                harness.DialogService.Object);
+            const int callQueueStep = 4;
+            const int autoAttendantStep = 7;
+            foreach (var index in new[] { callQueueStep, autoAttendantStep })
+            {
+                vm.Steps[index].IsCompleted = true;
+                vm.Steps[index].ConfigurationFingerprint = vm.ComputeStepFingerprint(index);
+            }
+            Assert.False(vm.HasConfigurationChangedNotice);
+
+            variables.OpeningHours1End = new TimeSpan(18, 0, 0);
+
+            Assert.Contains(vm.Steps[autoAttendantStep].Title, vm.ConfigurationChangedNotice);
+            Assert.DoesNotContain(vm.Steps[callQueueStep].Title, vm.ConfigurationChangedNotice);
         }
 
         [Fact]

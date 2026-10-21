@@ -654,7 +654,7 @@ namespace PhoneDesk.Tests
                     for (var index = 0; index <= 3; index++)
                     {
                         progressWizard.Steps[index].IsCompleted = true;
-                        progressWizard.Steps[index].ConfigurationFingerprint = WizardViewModel.ComputeConfigurationFingerprint(progressWizard.Variables);
+                        progressWizard.Steps[index].ConfigurationFingerprint = progressWizard.ComputeStepFingerprint(index);
                     }
                     progressWizard.Steps[1].Result = "SUCCESS: ttgrp-contoso-reception created successfully with ID: 6f1c2a9e-0d4b-4c35-9a51-2b7e0c8d1f43";
                     progressWizard.Steps[2].Result = "SUCCESS: Resource account racq-contoso-reception@contoso.onmicrosoft.com created successfully";

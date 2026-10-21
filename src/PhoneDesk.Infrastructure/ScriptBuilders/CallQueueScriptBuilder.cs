@@ -36,7 +36,8 @@ catch {
         /// <summary>
         /// Guided Setup step: creates the call queue for the configured M365 group and associates the
         /// call queue resource account with it. The resource account and its license are separate steps.
-        /// Safe to run again: an existing call queue or association is reused instead of duplicated.
+        /// Safe to run again: an existing call queue is updated to the current Configuration and an existing
+        /// association is kept, instead of creating duplicates.
         /// </summary>
         public string GetCreateCallQueueCommand(IPhoneManagerVariables variables)
         {
@@ -68,8 +69,20 @@ try {{
 
     $cqExisting = Get-CsCallQueue -NameFilter ""{sanitizedCqDisplayName}"" -ErrorAction Stop | Where-Object {{ $_.Name -eq ""{sanitizedCqDisplayName}"" }} | Select-Object -First 1
     if ($cqExisting) {{
-        Write-Host ""INFO: Call queue {sanitizedCqDisplayName} already exists. The existing call queue is used.""
+        # Running the step again applies the current Configuration to the existing call queue.
         $cqId = $cqExisting.Identity
+        Set-CsCallQueue `
+        -Identity $cqId `
+        -RoutingMethod Attendant `
+        -AllowOptOut $true `
+        -ConferenceMode $true `
+        -AgentAlertTime {ConstantsService.CallQueue.AgentAlertTime} `
+        -LanguageId ""{sanitizedLanguageId}"" `
+        -DistributionLists @($cqGroupId) `
+        {callQueueParams}
+        -PresenceBasedRouting $false `
+        -ErrorAction Stop | Out-Null
+        Write-Host ""INFO: Call queue {sanitizedCqDisplayName} already existed and was updated to the current Configuration.""
     }}
     else {{
         $cqNew = New-CsCallQueue `

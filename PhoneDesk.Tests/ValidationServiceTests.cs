@@ -163,6 +163,15 @@ namespace PhoneDesk.Tests
         [InlineData("test .onmicrosoft.com", false)]
         [InlineData("user@test.onmicrosoft.com", false)]
         [InlineData("test..onmicrosoft.com", false)]
+        [InlineData("elektro-weber-partner.onmicrosoft.com", true)]
+        [InlineData("alz.ch", true)]
+        [InlineData("tenant!.onmicrosoft.com", false)]
+        [InlineData("tenant_.example.com", false)]
+        [InlineData("tenant/example.com", false)]
+        [InlineData("-tenant.onmicrosoft.com", false)]
+        [InlineData("tenant-.onmicrosoft.com", false)]
+        [InlineData("tenant.c0m", false)]
+        [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.onmicrosoft.com", false)] // 64-char label
         public void ValidateVariables_FallbackDomainFormat(string domain, bool expectedValid)
         {
             var variables = CreateValidVariables();

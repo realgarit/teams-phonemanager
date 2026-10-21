@@ -22,19 +22,33 @@ namespace PhoneDesk.Models
             => localPart + DomainSuffix(fallbackDomain);
 
         /// <summary>
-        /// True when the fallback domain, with or without a leading "@", is a plausible DNS domain.
+        /// True when the fallback domain, with or without a leading "@", is a valid DNS domain: at most
+        /// 253 characters, at least two labels of 1–63 ASCII letters, digits or hyphens without a leading
+        /// or trailing hyphen, and a top-level domain of letters only (or an "xn--" IDN label).
         /// </summary>
         public static bool IsValidFallbackDomain(string? fallbackDomain)
         {
             var domain = BareDomain(fallbackDomain);
-            if (domain.Length == 0 || domain.Contains('@') || domain.Any(char.IsWhiteSpace))
+            if (domain.Length == 0 || domain.Length > 253)
             {
                 return false;
             }
 
             var labels = domain.Split('.');
-            return labels.Length >= 2 && labels.All(label => label.Length > 0);
+            if (labels.Length < 2 || !labels.All(IsValidLabel))
+            {
+                return false;
+            }
+
+            var topLevel = labels[^1];
+            return topLevel.All(char.IsAsciiLetter) || topLevel.StartsWith("xn--", System.StringComparison.OrdinalIgnoreCase);
         }
+
+        private static bool IsValidLabel(string label)
+            => label.Length is >= 1 and <= 63
+                && label[0] != '-'
+                && label[^1] != '-'
+                && label.All(c => char.IsAsciiLetterOrDigit(c) || c == '-');
 
         private static string BareDomain(string? fallbackDomain)
         {

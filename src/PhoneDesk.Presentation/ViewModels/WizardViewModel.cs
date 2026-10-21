@@ -139,14 +139,13 @@ namespace PhoneDesk.ViewModels
         {
             get
             {
-                var fingerprint = ComputeConfigurationFingerprint(Variables);
                 var changed = new List<string>();
                 for (var index = 1; index < Steps.Count - 1; index++)
                 {
                     var step = Steps[index];
                     if (step.IsCompleted
                         && !string.IsNullOrEmpty(step.ConfigurationFingerprint)
-                        && step.ConfigurationFingerprint != fingerprint)
+                        && step.ConfigurationFingerprint != ComputeStepFingerprint(index))
                     {
                         changed.Add(step.Title);
                     }
@@ -369,21 +368,22 @@ namespace PhoneDesk.ViewModels
             _sharedStateService.WizardProgress = progress;
         }
 
-        public static string ComputeConfigurationFingerprint(IPhoneManagerVariables vars)
-            => string.Join(
-                "|",
-                vars.M365Group,
-                vars.RacqUPN,
-                vars.RacqDisplayName,
-                vars.CqDisplayName,
-                vars.RaaaUPN,
-                vars.RaaaDisplayName,
-                vars.AaDisplayName,
-                vars.RaaAnr,
-                vars.PhoneNumberType,
-                vars.UsageLocation,
-                vars.LanguageId,
-                vars.TimeZoneId);
+        /// <summary>
+        /// Fingerprint of everything a step sends to the tenant: a hash of its generated script without
+        /// comment lines (those are localized). Any Configuration value the step uses (names, opening hours,
+        /// greetings, SKU, application IDs, call queue settings) changes it; values the step does not use do not.
+        /// </summary>
+        public string ComputeStepFingerprint(int step)
+        {
+            var script = GetScriptForStep(step);
+            var lines = script
+                .Replace("\r\n", "\n")
+                .Split('\n')
+                .Select(line => line.Trim())
+                .Where(line => line.Length > 0 && !line.StartsWith('#'));
+            var bytes = System.Text.Encoding.UTF8.GetBytes(string.Join("\n", lines));
+            return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes));
+        }
 
         private void RefreshStepNavigation()
         {
@@ -793,7 +793,7 @@ namespace PhoneDesk.ViewModels
                 step.IsSkipped = false;
                 step.Result = output;
                 step.ErrorMessage = string.Empty;
-                step.ConfigurationFingerprint = ComputeConfigurationFingerprint(Variables);
+                step.ConfigurationFingerprint = ComputeStepFingerprint(CurrentStep);
                 StepCompleted = true;
                 StepErrorMessage = string.Empty;
                 if (string.IsNullOrWhiteSpace(output))
